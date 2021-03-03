@@ -224,6 +224,7 @@ public class UserService {
         if (body.length() == 0) {
             throw new BaseException(FAILED_TO_READ_RESPONSE);
         }
+        System.out.println(body);
 
         String socialId;
         String response;
@@ -237,20 +238,24 @@ public class UserService {
             throw new BaseException(FAILED_TO_PARSE);
         }
 
-        String profilePhoto;
-        String userName;
-        String email;
-        String phoneNumber;
+        String profilePhoto=null;
+        String userName=null;
+        String email=null;
+        String phoneNumber=null;
         try {
             JSONParser jsonParser = new JSONParser();
             JSONObject responObj = (JSONObject) jsonParser.parse(response);
-            email = responObj.get("email").toString();
-            phoneNumber = responObj.get("phone_number").toString();
+            if(responObj.get("email")!=null) {
+                email = responObj.get("email").toString();
+            }
 
             String profile = responObj.get("profile").toString();
             JSONObject profileObj = (JSONObject) jsonParser.parse(profile);
-            profilePhoto = profileObj.get("profile_image").toString();
             userName = profileObj.get("nickname").toString();
+
+            if(profileObj.get("profile_image")!=null) {
+                profilePhoto = profileObj.get("profile_image").toString();
+            }
 
         }
         catch (Exception e){
