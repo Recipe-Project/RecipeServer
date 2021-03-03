@@ -7,6 +7,8 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
@@ -53,5 +55,32 @@ public class UserProvider {
     public void autoLogin() throws BaseException {
         Integer userIdx = jwtService.getUserId();
         retrieveUserByUserIdx(userIdx);
+    }
+
+    /**
+     * 유저조회
+     * @return User
+     * @throws BaseException
+     */
+    public User retrieveUserInfoBySocialId(String userID) throws BaseException {
+        // 1. userId 이용해서 UserInfo DB 접근
+        List<User> existsUserInfoList;
+        try {
+            existsUserInfoList = userRepository.findBySocialIdAndStatus(userID, "ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        // 2. 존재하는 UserInfo가 있는지 확인
+        User userInfo;
+        if (existsUserInfoList != null && existsUserInfoList.size() > 0) {
+            userInfo = existsUserInfoList.get(0);
+        } else {
+            userInfo = null;
+
+        }
+
+        // 3. UserInfo를 return
+        return userInfo;
     }
 }

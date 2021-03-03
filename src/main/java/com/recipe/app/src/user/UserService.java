@@ -1,5 +1,7 @@
 package com.recipe.app.src.user;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParser;
 import com.recipe.app.config.BaseException;
 import com.recipe.app.config.secret.Secret;
 import com.recipe.app.src.user.models.*;
@@ -300,6 +302,88 @@ public class UserService {
         }catch(Exception e){
             throw new BaseException(FAILED_TO_KAKAO_LOGIN);
         }
+    }
+
+
+    /**
+     * 구글 로그인
+     * @param accessToken
+     * @return PostUserRes
+     * @throws BaseException
+     */
+    public PostUserRes googleLogin (String accessToken)  throws BaseException {
+        //요청하는 클라이언트마다 가진 정보가 다를 수 있기에 HashMap타입으로 선언
+        HashMap<String, Object> googleUserInfo = new HashMap<>();
+        // String reqURL = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="+access_Token;
+        String reqURL = "https://www.googleapis.com/userinfo/v2/me?access_token="+accessToken;
+
+        try {
+            URL url = new URL(reqURL);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+
+            //요청에 필요한 Header에 포함될 내용
+            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
+            int responseCode = conn.getResponseCode();
+            System.out.println("responseCode : "+responseCode);
+            if(responseCode == 200) {
+                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
+
+                String line = "";
+                String result = "";
+
+                while ((line = br.readLine()) != null) {
+                    result += line;
+                }
+                JsonParser parser = new JsonParser();
+                System.out.println("result : " + result);
+                JsonElement element = parser.parse(result);
+
+                String name = element.getAsJsonObject().get("name").getAsString();
+                String email = element.getAsJsonObject().get("email").getAsString();
+                String googleId = "GOOGLE_" + element.getAsJsonObject().get("id").getAsString();
+
+                googleUserInfo.put("name", name);
+                googleUserInfo.put("email", email);
+                googleUserInfo.put("googleId", googleId);
+
+                System.out.println("login Controller : " + googleUserInfo);
+
+                User existsUserInfo = null;
+
+                existsUserInfo = userProvider.retrieveUserInfoBySocialId(googleId);
+                // 1-1. 존재하는 회원이 없다면 회원가입
+                if (existsUserInfo == null) {
+                    // 빈 값은 null 처리
+                    User userInfo = new User(googleId, null, name,email,null);
+
+                    // 2. 유저 정보 저장
+                    try {
+                        userInfo = userRepository.save(userInfo);
+                    } catch (Exception exception) {
+                        throw new BaseException(DATABASE_ERROR);
+                    }
+                    // 3. JWT 생성
+                    String jwt = jwtService.createJwt(userInfo.getUserIdx());
+
+                    // 4. UserInfoLoginRes로 변환하여 return
+                    Integer useridx = userInfo.getUserIdx();
+                    return new PostUserRes(useridx, jwt);
+                }
+                // 1-2. 존재하는 회원이 있다면 로그인
+                if (existsUserInfo != null) {
+                    // 2. JWT 생성
+                    String jwt = jwtService.createJwt(existsUserInfo.getUserIdx());
+
+                    // 3. UserInfoLoginRes로 변환하여 return
+                    Integer useridx = existsUserInfo.getUserIdx();
+                    return new PostUserRes(useridx, jwt);
+                }
+
+            }
+        } catch (IOException | BaseException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
