@@ -24,4 +24,21 @@ public class UserController {
     }
 
 
+    /**
+     * 자동로그인 API
+     * [POST] /users/auto-login
+     * @RequestBody PostLoginReq
+     * @return BaseResponse<PostLoginRes>
+     */
+    @ResponseBody
+    @PostMapping("/auto-login")
+    public BaseResponse<Void> postAutoLogin() {
+
+        try {
+            userProvider.autoLogin();
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }
