@@ -9,6 +9,10 @@ import org.springframework.web.bind.annotation.*;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import org.springframework.web.context.request.*;
+
 @RestController
 @RequestMapping("/users")
 public class UserController {
@@ -27,8 +31,6 @@ public class UserController {
     /**
      * 자동로그인 API
      * [POST] /users/auto-login
-     * @RequestBody PostLoginReq
-     * @return BaseResponse<PostLoginRes>
      */
     @ResponseBody
     @PostMapping("/auto-login")
@@ -37,6 +39,28 @@ public class UserController {
         try {
             userProvider.autoLogin();
             return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 네이버 로그인 API
+     * [POST] /users/naver-login
+     * @return BaseResponse<PostUserRes>
+     */
+    @ResponseBody
+    @PostMapping("/naver-login")
+    public BaseResponse<PostUserRes> postUser() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String accessToken = request.getHeader("NAVER-ACCESS-TOKEN");
+        if (accessToken == null || accessToken.length() == 0) {
+            return new BaseResponse<>(EMPTY_TOKEN);
+        }
+
+        try {
+            PostUserRes postUserRes = userService.naverLogin(accessToken);
+            return new BaseResponse<>(postUserRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

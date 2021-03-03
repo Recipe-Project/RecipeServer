@@ -20,6 +20,7 @@ public enum BaseResponseStatus {
     REQUEST_ERROR(false, 2000, "입력값을 확인해주세요."),
     EMPTY_JWT(false, 2001, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
+    EMPTY_TOKEN(false, 2003, "ACCESS TOKEN 값을 입력해주세요."),
 
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
@@ -72,13 +73,8 @@ public enum BaseResponseStatus {
     // [POST] /users
     DUPLICATED_USER(false, 3013, "이미 존재하는 회원입니다."),
 
-    // [POST] /users/login
-    FAILED_TO_LOGIN(false, 3015, "로그인에 실패하였습니다."),
-
-    // [Common] boards
-    NOT_FOUND_BOARD(false, 3040, "존재하지 않는 게시판입니다."),
-    FORBIDDEN_BOARD(false, 3041, "해당 게시판 접근 권한이 없습니다."),
-
+    // [POST] /users/naver-login
+    FAILED_TO_NAVER_LOGIN(false, 3015, "네이버 로그인에 실패하였습니다."),
 
     /**
      * 4000 : Database, Server 오류
@@ -87,7 +83,15 @@ public enum BaseResponseStatus {
     SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
 
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
-    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다.");
+    PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
+
+    //naver 접근
+    WRONG_URL(false, 4021, "API URL이 잘못되었습니다."),
+    FAILED_TO_CONNECT(false, 4022, "연결이 실패했습니다."),
+    FAILED_TO_READ_RESPONSE(false, 4023, "API 응답을 읽는데 실패했습니다."),
+    FAILED_TO_PARSE(false, 4024, "JSON 파싱에 실패했습니다."),
+    FORBIDDEN_ACCESS(false, 3041, "접근 권한이 없습니다."),
+    ;
 
 
     // 5000 : 필요시 만들어서 쓰세요
