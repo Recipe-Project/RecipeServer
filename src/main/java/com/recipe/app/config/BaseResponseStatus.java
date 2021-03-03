@@ -21,7 +21,7 @@ public enum BaseResponseStatus {
     EMPTY_JWT(false, 2001, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
     EMPTY_TOKEN(false, 2003, "ACCESS TOKEN 값을 입력해주세요."),
-
+    EMPTY_USERRECIPEIDX(false, 2004, "나만의 레시피 인덱스값을 입력해주세요."),
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
 
@@ -78,7 +78,9 @@ public enum BaseResponseStatus {
 
     // [POST] /users/kakao-login
     FAILED_TO_KAKAO_LOGIN(false, 3016, "카카오 로그인에 실패하였습니다."),
-
+    FAILED_TO_GET_USER_RECIPE(false, 3017, "유저레시피 상세 조회에 실패하였습니다."),
+    FAILED_TO_GET_USER_RECIPE_PHOTO(false, 3018, "유저레시피 사진 조회에 실패하였습니다."),
+    FAILED_TO_GET_USER_RECIPES(false, 3019, "유저레시피 전체 조회에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */
