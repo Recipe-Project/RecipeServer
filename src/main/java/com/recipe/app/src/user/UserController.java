@@ -51,7 +51,7 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<PostUserRes> postUser() {
+    public BaseResponse<PostUserRes> postNaverLogin() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String accessToken = request.getHeader("NAVER-ACCESS-TOKEN");
         if (accessToken == null || accessToken.length() == 0) {
@@ -60,6 +60,29 @@ public class UserController {
 
         try {
             PostUserRes postUserRes = userService.naverLogin(accessToken);
+            return new BaseResponse<>(postUserRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
+    /**
+     * 카카오 로그인 API
+     * [POST] /users/kakao-login
+     * @return BaseResponse<PostUserRes>
+     */
+    @ResponseBody
+    @PostMapping("/kakao-login")
+    public BaseResponse<PostUserRes> postKakaoLogin() {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String accessToken = request.getHeader("KAKAO-ACCESS-TOKEN");
+        if (accessToken == null || accessToken.length() == 0) {
+            return new BaseResponse<>(EMPTY_TOKEN);
+        }
+
+        try {
+            PostUserRes postUserRes = userService.kakaoLogin(accessToken);
             return new BaseResponse<>(postUserRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

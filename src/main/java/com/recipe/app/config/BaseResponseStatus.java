@@ -76,6 +76,9 @@ public enum BaseResponseStatus {
     // [POST] /users/naver-login
     FAILED_TO_NAVER_LOGIN(false, 3015, "네이버 로그인에 실패하였습니다."),
 
+    // [POST] /users/kakao-login
+    FAILED_TO_KAKAO_LOGIN(false, 3016, "카카오 로그인에 실패하였습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
