@@ -111,18 +111,24 @@ public class UserService {
         }
 
         String socialId;
-        String profilePhoto;
+        String profilePhoto=null;
         String userName;
-        String email;
-        String phoneNumber;
+        String email=null;
+        String phoneNumber=null;
         try {
             JSONParser jsonParser = new JSONParser();
             JSONObject responObj = (JSONObject) jsonParser.parse(response);
             socialId = "naver_"+responObj.get("id").toString();
-            profilePhoto = responObj.get("profile_image").toString();
+            if(responObj.get("profile_image")!=null) {
+                profilePhoto = responObj.get("profile_image").toString();
+            }
             userName = responObj.get("name").toString();
-            email = responObj.get("email").toString();
-            phoneNumber = responObj.get("mobile").toString();
+            if(responObj.get("email")!=null) {
+                email = responObj.get("email").toString();
+            }
+            if(responObj.get("mobile")!=null) {
+                phoneNumber = responObj.get("mobile").toString();
+            }
         }
         catch (Exception e){
             throw new BaseException(FAILED_TO_PARSE);
