@@ -53,29 +53,51 @@ public class UserRecipeController {
     @GetMapping("/{myRecipeIdx}")
     public BaseResponse<GetMyRecipeRes> getMyRecipe(@PathVariable Integer myRecipeIdx) {
         try {
-            GetMyRecipeRes getMyRecipeRes = userRecipeProvider.retrieveMyRecipe(myRecipeIdx);
+            Integer userIdx = jwtService.getUserId();
+            GetMyRecipeRes getMyRecipeRes = userRecipeProvider.retrieveMyRecipe(userIdx,myRecipeIdx);
             return new BaseResponse<>(getMyRecipeRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
     }
 
-//    /**
-//     * 나만의 레시피 삭제 API
-//     * [DELETE] /my-recipes/:myRecipeIdx
-//     * @return BaseResponse<GetMyRecipeRes>
-//     */
+    /**
+     * 나만의 레시피 삭제 API
+     * [DELETE] /my-recipes/:myRecipeIdx
+     * @return BaseResponse<GetMyRecipeRes>
+     */
 //    @DeleteMapping("/{myRecipeIdx}")
 //    public BaseResponse<Void> deleteMyRecipe(@PathVariable Integer myRecipeIdx) {
+//
+////        try {
+////            Integer userIdx = jwtService.getUserId();
+////            if (myRecipeIdx == null || myRecipeIdx <= 0) {
+////                return new BaseResponse<>(EMPTY_USERRECIPEIDX);
+////            }
+////
+////            try {
+////                userRecipeService.deleteUserRecipe(userIdx,myRecipeIdx);
+////                return new BaseResponse<>(SUCCESS);
+////            } catch (BaseException exception) {
+////                return new BaseResponse<>(exception.getStatus());
+////            }
+////
+////        } catch (BaseException exception) {
+////            return new BaseResponse<>(exception.getStatus());
+////        }
+//
+//        //            Integer userIdx = jwtService.getUserId();
+//        Integer userIdx =1;
 //        if (myRecipeIdx == null || myRecipeIdx <= 0) {
 //            return new BaseResponse<>(EMPTY_USERRECIPEIDX);
 //        }
 //
 //        try {
-//            userRecipeService.deleteUserRecipe(myRecipeIdx);
+//            userRecipeService.deleteUserRecipe(userIdx,myRecipeIdx);
 //            return new BaseResponse<>(SUCCESS);
 //        } catch (BaseException exception) {
 //            return new BaseResponse<>(exception.getStatus());
 //        }
+//
 //    }
 }

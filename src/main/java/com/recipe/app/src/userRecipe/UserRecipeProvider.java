@@ -7,6 +7,7 @@ import com.recipe.app.src.userRecipePhoto.models.UserRecipePhoto;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -57,10 +58,11 @@ public class UserRecipeProvider {
      * @return getMyRecipeRes
      * @throws BaseException
      */
-    public GetMyRecipeRes retrieveMyRecipe(Integer myRecipeIdx) throws BaseException {
+    @Transactional
+    public GetMyRecipeRes retrieveMyRecipe(Integer userIdx, Integer myRecipeIdx) throws BaseException {
         UserRecipe userRecipe;
         try {
-            userRecipe = userRecipeRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
+            userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx, myRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_USER_RECIPE);
         }
@@ -71,4 +73,7 @@ public class UserRecipeProvider {
 
         return new GetMyRecipeRes(photoUrlList,title,content);
     }
+
+
+
 }
