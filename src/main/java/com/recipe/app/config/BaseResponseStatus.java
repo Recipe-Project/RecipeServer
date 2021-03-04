@@ -59,6 +59,11 @@ public enum BaseResponseStatus {
     // [PATCH] /boards/:boardId/status
     PATCH_BOARDS_STATUS_INVALID_BOARD_STATUS(false, 2045, "상태코드를 확인해주세요."),
 
+    // [POST] /my-recipes
+    EMPTY_TITLE(false, 2050, "제목을 입력해주세요."),
+    EMPTY_CONTENT(false, 2051, "내용을 입력해주세요."),
+    EMPTY_THUMBNAIL(false, 2052, "썸네일을 입력해주세요."),
+    EMPTY_PHOTO_URL_LIST(false, 2053, "사진을 입력해주세요."),
 
     /**
      * 3000 : Response 오류
@@ -86,7 +91,8 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_USER(false, 3020, "유저 상세 정보 조회에 실패하였습니다."),
     FAILED_TO_PATCH_USER(false, 3021, "유저 정보 수정에 실패하였습니다."),
 
-
+    // [POST] /my-recipes
+    FAILED_TO_POST_MY_RECIPE(false, 3022, "나만의 레시피 생성에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */

@@ -1,8 +1,7 @@
 package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.src.user.UserRepository;
+import com.recipe.app.src.userRecipe.models.PostMyRecipeReq;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoRepository;
 import com.recipe.app.src.userRecipePhoto.models.UserRecipePhoto;
@@ -60,5 +59,39 @@ public class UserRecipeService {
         userRecipePhotoRepository.saveAll(userRecipePhotoList);
 
     }
+
+    /**
+     * 나만의 레시피 생성
+     * @param parameters,userIdx
+     * @throws BaseException
+     */
+    @Transactional
+    public void createMyRecipe(PostMyRecipeReq parameters, int userIdx) throws BaseException {
+
+
+        List<String> photoUrlList = parameters.getPhotoUrlList();
+        String thumbnail = parameters.getThumbnail();
+        String title = parameters.getTitle();
+        String content = parameters.getContent();
+
+
+        try {
+            UserRecipe userRecipe = new UserRecipe(userIdx, thumbnail, title, content);
+            userRecipe = userRecipeRepository.save(userRecipe);
+            Integer userRecipeIdx = userRecipe.getUserRecipeIdx();
+
+
+            if (photoUrlList != null) {
+                for (int i = 0; i < photoUrlList.size(); i++) {
+                    UserRecipePhoto userRecipePhoto = new UserRecipePhoto(userRecipeIdx, photoUrlList.get(i));
+                    userRecipePhoto = userRecipePhotoRepository.save(userRecipePhoto);
+                }
+            }
+
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_POST_MY_RECIPE);
+        }
+    }
+
 
 }

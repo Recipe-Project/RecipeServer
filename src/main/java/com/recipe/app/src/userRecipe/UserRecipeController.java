@@ -73,8 +73,7 @@ public class UserRecipeController {
         }
 
         try {
-            Integer userIdx =1;
-//            Integer userIdx = jwtService.getUserId();
+            Integer userIdx = jwtService.getUserId();
             userRecipeService.deleteUserRecipe(userIdx,myRecipeIdx);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
@@ -82,4 +81,41 @@ public class UserRecipeController {
         }
 
     }
+
+    /**
+     * 나만의 레시피 생성 API
+     * [POST] /my-recipes
+     *
+     * @return BaseResponse<Void>
+     * @RequestBody parameters
+     */
+    @ResponseBody
+    @PostMapping("")
+    public BaseResponse<Void> postMyRecipe(@RequestBody PostMyRecipeReq parameters) {
+        try {
+            Integer userIdx = jwtService.getUserId();
+            if (parameters.getPhotoUrlList() != null && parameters.getThumbnail() ==null) {
+                return new BaseResponse<>(EMPTY_THUMBNAIL);
+            }
+            if (parameters.getPhotoUrlList() == null && parameters.getThumbnail() !=null) {
+                return new BaseResponse<>(EMPTY_PHOTO_URL_LIST);
+            }
+
+            if (parameters.getTitle() == null) {
+                return new BaseResponse<>(EMPTY_TITLE);
+            }
+            if (parameters.getContent() == null) {
+                return new BaseResponse<>(EMPTY_CONTENT);
+            }
+
+            userRecipeService.createMyRecipe(parameters,userIdx);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+
+    }
+
+
 }
