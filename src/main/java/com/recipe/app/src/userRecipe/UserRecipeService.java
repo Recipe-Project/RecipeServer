@@ -31,34 +31,34 @@ public class UserRecipeService {
         this.jwtService = jwtService;
     }
 
-//    /**
-//     * 나만의 레시피 삭제
-//     * @param myRecipeIdx
-//     * @throws BaseException
-//     */
-//    @Transactional
-//    public void deleteUserRecipe(Integer userIdx, Integer myRecipeIdx) throws BaseException {
-//        UserRecipe userRecipe;
-//        try {
-//            userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx,myRecipeIdx,"ACTIVE");
-//        } catch (Exception ignored) {
-//            throw new BaseException(FAILED_TO_GET_USER_RECIPE);
-//        }
-//        userRecipe.setStatus("INACTIVE");
-//
-//
-//        List<UserRecipePhoto> userRecipePhotoList;
-//        try {
-//            userRecipePhotoList = userRecipePhotoRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx,myRecipeIdx,"ACTIVE");
-//        } catch (Exception ignored) {
-//            throw new BaseException(FAILED_TO_GET_USER_RECIPE_PHOTO);
-//        }
-//
-//        for (int i=0;i<userRecipePhotoList.size();i++){
-//            userRecipePhotoList.get(i).setStatus("INACTIVE");
-//        }
-//        userRecipePhotoRepository.saveAll(userRecipePhotoList);
-//
-//    }
+    /**
+     * 나만의 레시피 삭제
+     * @param myRecipeIdx
+     * @throws BaseException
+     */
+    @Transactional
+    public void deleteUserRecipe(Integer userIdx, Integer myRecipeIdx) throws BaseException {
+        UserRecipe userRecipe;
+        try {
+            userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx,myRecipeIdx,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_USER_RECIPE);
+        }
+        userRecipe.setStatus("INACTIVE");
+
+
+        List<UserRecipePhoto> userRecipePhotoList;
+        try {
+            userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_USER_RECIPE_PHOTO);
+        }
+
+        for (int i=0;i<userRecipePhotoList.size();i++){
+            userRecipePhotoList.get(i).setStatus("INACTIVE");
+        }
+        userRecipePhotoRepository.saveAll(userRecipePhotoList);
+
+    }
 
 }

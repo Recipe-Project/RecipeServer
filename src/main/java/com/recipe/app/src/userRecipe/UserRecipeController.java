@@ -66,38 +66,20 @@ public class UserRecipeController {
      * [DELETE] /my-recipes/:myRecipeIdx
      * @return BaseResponse<GetMyRecipeRes>
      */
-//    @DeleteMapping("/{myRecipeIdx}")
-//    public BaseResponse<Void> deleteMyRecipe(@PathVariable Integer myRecipeIdx) {
-//
-////        try {
-////            Integer userIdx = jwtService.getUserId();
-////            if (myRecipeIdx == null || myRecipeIdx <= 0) {
-////                return new BaseResponse<>(EMPTY_USERRECIPEIDX);
-////            }
-////
-////            try {
-////                userRecipeService.deleteUserRecipe(userIdx,myRecipeIdx);
-////                return new BaseResponse<>(SUCCESS);
-////            } catch (BaseException exception) {
-////                return new BaseResponse<>(exception.getStatus());
-////            }
-////
-////        } catch (BaseException exception) {
-////            return new BaseResponse<>(exception.getStatus());
-////        }
-//
-//        //            Integer userIdx = jwtService.getUserId();
-//        Integer userIdx =1;
-//        if (myRecipeIdx == null || myRecipeIdx <= 0) {
-//            return new BaseResponse<>(EMPTY_USERRECIPEIDX);
-//        }
-//
-//        try {
-//            userRecipeService.deleteUserRecipe(userIdx,myRecipeIdx);
-//            return new BaseResponse<>(SUCCESS);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//
-//    }
+    @DeleteMapping("/{myRecipeIdx}")
+    public BaseResponse<Void> deleteMyRecipe(@PathVariable Integer myRecipeIdx) {
+        if (myRecipeIdx == null || myRecipeIdx <= 0) {
+            return new BaseResponse<>(EMPTY_USERRECIPEIDX);
+        }
+
+        try {
+            Integer userIdx =1;
+//            Integer userIdx = jwtService.getUserId();
+            userRecipeService.deleteUserRecipe(userIdx,myRecipeIdx);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+    }
 }
