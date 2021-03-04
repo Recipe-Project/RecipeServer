@@ -78,9 +78,11 @@ public enum BaseResponseStatus {
 
     // [POST] /users/kakao-login
     FAILED_TO_KAKAO_LOGIN(false, 3016, "카카오 로그인에 실패하였습니다."),
+
     FAILED_TO_GET_USER_RECIPE(false, 3017, "유저레시피 상세 조회에 실패하였습니다."),
     FAILED_TO_GET_USER_RECIPE_PHOTO(false, 3018, "유저레시피 사진 조회에 실패하였습니다."),
     FAILED_TO_GET_USER_RECIPES(false, 3019, "유저레시피 전체 조회에 실패하였습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
@@ -90,12 +92,12 @@ public enum BaseResponseStatus {
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
     PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
 
-    //naver 접근
+    //소셜 사용자 정보 접근
     WRONG_URL(false, 4021, "API URL이 잘못되었습니다."),
     FAILED_TO_CONNECT(false, 4022, "연결이 실패했습니다."),
     FAILED_TO_READ_RESPONSE(false, 4023, "API 응답을 읽는데 실패했습니다."),
     FAILED_TO_PARSE(false, 4024, "JSON 파싱에 실패했습니다."),
-    FORBIDDEN_ACCESS(false, 3041, "접근 권한이 없습니다."),
+    FORBIDDEN_ACCESS(false, 4025, "접근 권한이 없습니다."),
     ;
 
 
