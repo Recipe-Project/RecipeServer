@@ -83,6 +83,10 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_USER_RECIPE_PHOTO(false, 3018, "유저레시피 사진 조회에 실패하였습니다."),
     FAILED_TO_GET_USER_RECIPES(false, 3019, "유저레시피 전체 조회에 실패하였습니다."),
 
+    FAILED_TO_GET_USER(false, 3020, "유저 상세 정보 조회에 실패하였습니다."),
+    FAILED_TO_PATCH_USER(false, 3021, "유저 정보 수정에 실패하였습니다."),
+
+
     /**
      * 4000 : Database, Server 오류
      */

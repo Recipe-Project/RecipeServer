@@ -113,4 +113,64 @@ public class UserController {
     }
 
 
+    /**
+     * 회원 정보 조회 API
+     * [GET] /users/:userIdx
+     * @return BaseResponse<GetUserRes>
+     */
+    @ResponseBody
+    @GetMapping("/{userIdx}")
+    public BaseResponse<GetUserRes> getUser(@PathVariable Integer userIdx) {
+        if(userIdx==null || userIdx<=0){
+            return new BaseResponse<>(USERS_EMPTY_USER_ID);
+        }
+
+        try {
+            GetUserRes getUserRes = userProvider.retrieveUser(userIdx);
+            return new BaseResponse<>(getUserRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 회원 정보 수정 API
+     * [PATCH] /users/:userIdx
+     * @return BaseResponse<PatchUserRes>
+     */
+    @ResponseBody
+    @PatchMapping("/{userIdx}")
+    public BaseResponse<PatchUserRes> patchUser(@PathVariable Integer userIdx, @RequestBody PatchUserReq parameters) {
+        if(userIdx==null || userIdx<=0){
+            return new BaseResponse<>(USERS_EMPTY_USER_ID);
+        }
+
+        try {
+            PatchUserRes patchUserRes = userService.updateUser(userIdx, parameters);
+            return new BaseResponse<>(patchUserRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+    /**
+     * 회원 탈퇴 API
+     * [DELETE] /users/:userIdx
+     */
+    @ResponseBody
+    @DeleteMapping("/{userIdx}")
+    public BaseResponse<Void> deleteUser(@PathVariable Integer userIdx) {
+        if(userIdx==null || userIdx<=0){
+            return new BaseResponse<>(USERS_EMPTY_USER_ID);
+        }
+
+        try {
+            userService.deleteUser(userIdx);
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
 }

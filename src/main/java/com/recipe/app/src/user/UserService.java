@@ -392,4 +392,61 @@ public class UserService {
         return null;
     }
 
+    /**
+     * 회원 정보 수정
+     * @param patchUserReq
+     * @return PatchUserRes
+     * @throws BaseException
+     */
+    public PatchUserRes updateUser(Integer userIdx, PatchUserReq patchUserReq) throws BaseException {
+        //jwt 확인
+        User user = userProvider.retrieveUserByUserIdx(jwtService.getUserId());
+        if(userIdx != user.getUserIdx()){
+            throw new BaseException(FORBIDDEN_USER);
+        }
+
+        //유저 정보 수정
+        user.setProfilePhoto(patchUserReq.getProfilePhoto());
+        user.setUserName(patchUserReq.getUserName());
+        user.setEmail(patchUserReq.getEmail());
+        user.setPhoneNumber(patchUserReq.getPhoneNumber());
+        try {
+            user = userRepository.save(user);
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        try {
+            String socialId = user.getSocialId();
+            String profilePhoto = user.getProfilePhoto();
+            String userName = user.getUserName();
+            String email = user.getEmail();
+            String phoneNumber = user.getPhoneNumber();
+
+            return new PatchUserRes(userIdx, socialId, profilePhoto, userName, email, phoneNumber);
+        }catch(Exception e){
+            throw new BaseException(FAILED_TO_PATCH_USER);
+        }
+    }
+
+    /**
+     * 회원 탈퇴 API
+     * @param userIdx
+     * @throws BaseException
+     */
+    public void deleteUser(Integer userIdx) throws BaseException {
+        //jwt 확인
+        User user = userProvider.retrieveUserByUserIdx(jwtService.getUserId());
+        if(userIdx != user.getUserIdx()){
+            throw new BaseException(FORBIDDEN_USER);
+        }
+
+        user.setStatus("INACTIVE");
+        try {
+            user = userRepository.save(user);
+        } catch (Exception ignored) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+    }
+
 }

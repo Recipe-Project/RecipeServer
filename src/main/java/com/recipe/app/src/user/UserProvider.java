@@ -83,4 +83,29 @@ public class UserProvider {
         // 3. UserInfo를 return
         return userInfo;
     }
+
+    /**
+     * Idx로 회원 조회
+     * @param userIdx
+     * @return GetUserRes
+     * @throws BaseException
+     */
+    public GetUserRes retrieveUser(Integer userIdx) throws BaseException {
+        User user = retrieveUserByUserIdx(jwtService.getUserId());
+        if(userIdx != user.getUserIdx()){
+            throw new BaseException(FORBIDDEN_USER);
+        }
+
+        try {
+            String socialIdx = user.getSocialId();
+            String profilePhoto = user.getProfilePhoto();
+            String userName = user.getUserName();
+            String email = user.getEmail();
+            String phoneNumber = user.getPhoneNumber();
+
+            return new GetUserRes(userIdx, socialIdx, profilePhoto, userName, email, phoneNumber);
+        }catch(Exception e){
+            throw new BaseException(FAILED_TO_GET_USER);
+        }
+    }
 }
