@@ -1,6 +1,5 @@
 package com.recipe.app.src.userRecipePhoto;
 
-import com.recipe.app.src.userRecipe.models.UserRecipe;
 import com.recipe.app.src.userRecipePhoto.models.UserRecipePhoto;
 import org.springframework.data.repository.CrudRepository;
 

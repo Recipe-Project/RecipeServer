@@ -85,7 +85,6 @@ public class UserRecipeController {
     /**
      * 나만의 레시피 생성 API
      * [POST] /my-recipes
-     *
      * @return BaseResponse<PostMyRecipeRes>
      * @RequestBody PostMyRecipeReq parameters
      */
@@ -122,7 +121,6 @@ public class UserRecipeController {
     /**
      * 나만의 레시피 수정 API
      * [PATCH] /my-recipes/:myRecipeIdx
-     *
      * @return BaseResponse<PatchMyRecipeRes>
      * @PathVariable myRecipeIdx
      * @RequestBody PostMyRecipeReq parameters

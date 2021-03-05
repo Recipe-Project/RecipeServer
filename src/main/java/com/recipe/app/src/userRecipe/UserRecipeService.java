@@ -43,8 +43,6 @@ public class UserRecipeService {
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_USER_RECIPE);
         }
-        userRecipe.setStatus("INACTIVE");
-
 
         List<UserRecipePhoto> userRecipePhotoList;
         try {
@@ -53,10 +51,22 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_GET_USER_RECIPE_PHOTO);
         }
 
-        for (int i=0;i<userRecipePhotoList.size();i++){
-            userRecipePhotoList.get(i).setStatus("INACTIVE");
+
+
+        try {
+            userRecipe.setStatus("INACTIVE");
+            userRecipeRepository.save(userRecipe);
+
+            for (int i=0;i<userRecipePhotoList.size();i++){
+                userRecipePhotoList.get(i).setStatus("INACTIVE");
+            }
+            userRecipePhotoRepository.saveAll(userRecipePhotoList);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_MY_RECIPE);
         }
-        userRecipePhotoRepository.saveAll(userRecipePhotoList);
+
+
+
 
     }
 

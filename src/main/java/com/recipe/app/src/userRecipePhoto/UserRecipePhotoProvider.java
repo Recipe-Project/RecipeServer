@@ -1,7 +1,6 @@
 package com.recipe.app.src.userRecipePhoto;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.userRecipe.UserRecipeRepository;
 import com.recipe.app.src.userRecipePhoto.models.*;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;

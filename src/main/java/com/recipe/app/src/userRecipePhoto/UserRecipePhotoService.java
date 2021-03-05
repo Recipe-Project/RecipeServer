@@ -1,7 +1,5 @@
 package com.recipe.app.src.userRecipePhoto;
 
-import com.recipe.app.src.userRecipe.UserRecipeProvider;
-import com.recipe.app.src.userRecipe.UserRecipeRepository;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

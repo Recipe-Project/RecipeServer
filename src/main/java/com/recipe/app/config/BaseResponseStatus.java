@@ -96,6 +96,9 @@ public enum BaseResponseStatus {
 
     // [PATCH] /my-recipes/:myRecipeIdx
     FAILED_TO_PATCH_MY_RECIPE(false, 3023, "나만의 레시피 수정에 실패하였습니다."),
+
+    // [DELETE] /my-recipes/:myRecipeIdx
+    FAILED_TO_DELETE_MY_RECIPE(false, 3024, "나만의 레시피 삭제에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */
