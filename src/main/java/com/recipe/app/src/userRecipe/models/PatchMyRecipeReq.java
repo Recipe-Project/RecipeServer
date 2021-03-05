@@ -1,0 +1,20 @@
+package com.recipe.app.src.userRecipe.models;
+
+import lombok.AccessLevel;
+
+
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+
+import java.util.List;
+
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@Getter
+public class PatchMyRecipeReq {
+    private List photoUrlList;
+    private String thumbnail;
+    private String title;
+    private String content;
+}
+

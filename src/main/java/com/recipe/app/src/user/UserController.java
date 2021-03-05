@@ -95,22 +95,6 @@ public class UserController {
      * [POST] /users/google-login
      * @RequestBody parameters (accesstoken)
      */
-//    @ResponseBody
-//    @PostMapping("/google-login")
-//    public BaseResponse<PostUserRes> postGoogleLogin() {
-//        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-//        String accessToken = request.getHeader("GOOGLE-ACCESS-TOKEN");
-//        // 1. Body Parameter Validation
-//        if (accessToken == null || accessToken.length() == 0) {
-//            return new BaseResponse<>(EMPTY_TOKEN);
-//        }
-//        try {
-//            PostUserRes postUserRes = userService.googleLogin(accessToken);
-//            return new BaseResponse<>(postUserRes);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
     @ResponseBody
     @PostMapping("/google-login")
     public BaseResponse<PostUserRes> postGoogleLogin() {

@@ -93,6 +93,9 @@ public enum BaseResponseStatus {
 
     // [POST] /my-recipes
     FAILED_TO_POST_MY_RECIPE(false, 3022, "나만의 레시피 생성에 실패하였습니다."),
+
+    // [PATCH] /my-recipes/:myRecipeIdx
+    FAILED_TO_PATCH_MY_RECIPE(false, 3023, "나만의 레시피 수정에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */

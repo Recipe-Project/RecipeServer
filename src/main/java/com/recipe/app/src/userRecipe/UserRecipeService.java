@@ -1,8 +1,8 @@
 package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.userRecipe.models.PostMyRecipeReq;
-import com.recipe.app.src.userRecipe.models.UserRecipe;
+import com.recipe.app.src.user.models.PatchUserRes;
+import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoRepository;
 import com.recipe.app.src.userRecipePhoto.models.UserRecipePhoto;
 import com.recipe.app.utils.JwtService;
@@ -62,17 +62,18 @@ public class UserRecipeService {
 
     /**
      * 나만의 레시피 생성
-     * @param parameters,userIdx
+     * @param postMyRecipeReq,userIdx
+     * @return PostMyRecipeRes
      * @throws BaseException
      */
     @Transactional
-    public void createMyRecipe(PostMyRecipeReq parameters, int userIdx) throws BaseException {
+    public PostMyRecipeRes createMyRecipe(PostMyRecipeReq postMyRecipeReq, int userIdx) throws BaseException {
 
 
-        List<String> photoUrlList = parameters.getPhotoUrlList();
-        String thumbnail = parameters.getThumbnail();
-        String title = parameters.getTitle();
-        String content = parameters.getContent();
+        List<String> photoUrlList = postMyRecipeReq.getPhotoUrlList();
+        String thumbnail = postMyRecipeReq.getThumbnail();
+        String title = postMyRecipeReq.getTitle();
+        String content = postMyRecipeReq.getContent();
 
 
         try {
@@ -84,13 +85,69 @@ public class UserRecipeService {
             if (photoUrlList != null) {
                 for (int i = 0; i < photoUrlList.size(); i++) {
                     UserRecipePhoto userRecipePhoto = new UserRecipePhoto(userRecipeIdx, photoUrlList.get(i));
-                    userRecipePhoto = userRecipePhotoRepository.save(userRecipePhoto);
+                    userRecipePhotoRepository.save(userRecipePhoto);
                 }
             }
 
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_MY_RECIPE);
         }
+
+        return new PostMyRecipeRes(photoUrlList,thumbnail,title,content);
+    }
+
+    /**
+     * 나만의 레시피 수정
+     * @param patchMyRecipeReq,userIdx
+     * @return PatchMyRecipeRes
+     * @throws BaseException
+     */
+    @Transactional
+    public PatchMyRecipeRes updateMyRecipe(PatchMyRecipeReq patchMyRecipeReq, Integer userIdx, Integer userRecipeIdx) throws BaseException {
+        UserRecipe userRecipe;
+        try {
+            userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx,userRecipeIdx,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_USER_RECIPE);
+        }
+
+        List<UserRecipePhoto> userRecipePhotoList;
+        try {
+            userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(userRecipeIdx,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_USER_RECIPE_PHOTO);
+        }
+
+        List<String> photoUrlList = patchMyRecipeReq.getPhotoUrlList();
+        String thumbnail = patchMyRecipeReq.getThumbnail();
+        String title = patchMyRecipeReq.getTitle();
+        String content = patchMyRecipeReq.getContent();
+
+        try {
+            userRecipe.setThumbnail(thumbnail);
+            userRecipe.setTitle(title);
+            userRecipe.setContent(content);
+            userRecipeRepository.save(userRecipe);
+
+            // 삭제
+            for (int i=0;i<userRecipePhotoList.size();i++){
+                userRecipePhotoList.get(i).setStatus("INACTIVE");
+            }
+            userRecipePhotoRepository.saveAll(userRecipePhotoList);
+
+            // 삭제
+            if (photoUrlList != null) {
+                for (int i = 0; i < photoUrlList.size(); i++) {
+                    UserRecipePhoto userRecipePhoto = new UserRecipePhoto(userRecipeIdx, photoUrlList.get(i));
+                    userRecipePhotoRepository.save(userRecipePhoto);
+                }
+            }
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_PATCH_MY_RECIPE);
+        }
+        return new PatchMyRecipeRes(photoUrlList,thumbnail,title,content);
+
+
     }
 
 

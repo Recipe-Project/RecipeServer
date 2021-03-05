@@ -86,12 +86,12 @@ public class UserRecipeController {
      * 나만의 레시피 생성 API
      * [POST] /my-recipes
      *
-     * @return BaseResponse<Void>
-     * @RequestBody parameters
+     * @return BaseResponse<PostMyRecipeRes>
+     * @RequestBody PostMyRecipeReq parameters
      */
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<Void> postMyRecipe(@RequestBody PostMyRecipeReq parameters) {
+    public BaseResponse<PostMyRecipeRes> postMyRecipe(@RequestBody PostMyRecipeReq parameters) {
         try {
             Integer userIdx = jwtService.getUserId();
             if (parameters.getPhotoUrlList() != null && parameters.getThumbnail() ==null) {
@@ -101,6 +101,8 @@ public class UserRecipeController {
                 return new BaseResponse<>(EMPTY_PHOTO_URL_LIST);
             }
 
+
+
             if (parameters.getTitle() == null) {
                 return new BaseResponse<>(EMPTY_TITLE);
             }
@@ -108,8 +110,44 @@ public class UserRecipeController {
                 return new BaseResponse<>(EMPTY_CONTENT);
             }
 
-            userRecipeService.createMyRecipe(parameters,userIdx);
-            return new BaseResponse<>(SUCCESS);
+            PostMyRecipeRes postMyRecipeRes = userRecipeService.createMyRecipe(parameters,userIdx);
+            return new BaseResponse<>(postMyRecipeRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+
+    }
+
+    /**
+     * 나만의 레시피 수정 API
+     * [PATCH] /my-recipes/:myRecipeIdx
+     *
+     * @return BaseResponse<PatchMyRecipeRes>
+     * @PathVariable myRecipeIdx
+     * @RequestBody PostMyRecipeReq parameters
+     */
+    @ResponseBody
+    @PatchMapping("{myRecipeIdx}")
+    public BaseResponse<PatchMyRecipeRes> patchMyRecipe(@PathVariable Integer myRecipeIdx,@RequestBody PatchMyRecipeReq parameters) {
+
+
+        try {
+            Integer userIdx = jwtService.getUserId();
+            if (myRecipeIdx == null || myRecipeIdx <= 0) {
+                return new BaseResponse<>(EMPTY_USERRECIPEIDX);
+            }
+
+            if (parameters.getPhotoUrlList() != null && parameters.getThumbnail() ==null) {
+                return new BaseResponse<>(EMPTY_THUMBNAIL);
+            }
+            if (parameters.getPhotoUrlList() == null && parameters.getThumbnail() !=null) {
+                return new BaseResponse<>(EMPTY_PHOTO_URL_LIST);
+            }
+
+
+            PatchMyRecipeRes patchMyRecipeRes = userRecipeService.updateMyRecipe(parameters,userIdx,myRecipeIdx);
+            return new BaseResponse<>(patchMyRecipeRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

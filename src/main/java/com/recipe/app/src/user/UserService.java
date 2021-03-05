@@ -317,81 +317,6 @@ public class UserService {
      * @return PostUserRes
      * @throws BaseException
      */
-//    public PostUserRes googleLogin (String accessToken)  throws BaseException {
-//        //요청하는 클라이언트마다 가진 정보가 다를 수 있기에 HashMap타입으로 선언
-//        HashMap<String, Object> googleUserInfo = new HashMap<>();
-//        // String reqURL = "https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token="+access_Token;
-//        String reqURL = "https://www.googleapis.com/userinfo/v2/me?access_token="+accessToken;
-//
-//        try {
-//            URL url = new URL(reqURL);
-//            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//
-//            //요청에 필요한 Header에 포함될 내용
-//            conn.setRequestProperty("Authorization", "Bearer " + accessToken);
-//            int responseCode = conn.getResponseCode();
-//            System.out.println("responseCode : "+responseCode);
-//            if(responseCode == 200) {
-//                BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-//
-//                String line = "";
-//                String result = "";
-//
-//                while ((line = br.readLine()) != null) {
-//                    result += line;
-//                }
-//                JsonParser parser = new JsonParser();
-//                System.out.println("result : " + result);
-//                JsonElement element = parser.parse(result);
-//
-//                String name = element.getAsJsonObject().get("name").getAsString();
-//                String email = element.getAsJsonObject().get("email").getAsString();
-//                String googleId = "GOOGLE_" + element.getAsJsonObject().get("id").getAsString();
-//
-//                googleUserInfo.put("name", name);
-//                googleUserInfo.put("email", email);
-//                googleUserInfo.put("googleId", googleId);
-//
-//                System.out.println("login Controller : " + googleUserInfo);
-//
-//                User existsUserInfo = null;
-//
-//                existsUserInfo = userProvider.retrieveUserInfoBySocialId(googleId);
-//                // 1-1. 존재하는 회원이 없다면 회원가입
-//                if (existsUserInfo == null) {
-//                    // 빈 값은 null 처리
-//                    User userInfo = new User(googleId, null, name,email,null);
-//
-//                    // 2. 유저 정보 저장
-//                    try {
-//                        userInfo = userRepository.save(userInfo);
-//                    } catch (Exception exception) {
-//                        throw new BaseException(DATABASE_ERROR);
-//                    }
-//                    // 3. JWT 생성
-//                    String jwt = jwtService.createJwt(userInfo.getUserIdx());
-//
-//                    // 4. UserInfoLoginRes로 변환하여 return
-//                    Integer useridx = userInfo.getUserIdx();
-//                    return new PostUserRes(useridx, jwt);
-//                }
-//                // 1-2. 존재하는 회원이 있다면 로그인
-//                if (existsUserInfo != null) {
-//                    // 2. JWT 생성
-//                    String jwt = jwtService.createJwt(existsUserInfo.getUserIdx());
-//
-//                    // 3. UserInfoLoginRes로 변환하여 return
-//                    Integer useridx = existsUserInfo.getUserIdx();
-//                    return new PostUserRes(useridx, jwt);
-//                }
-//
-//            }
-//        } catch (IOException | BaseException e) {
-//            e.printStackTrace();
-//        }
-//        return null;
-//    }
-
     public PostUserRes googleLogin (String idToken)  throws BaseException {
         BufferedReader in  = null;
         InputStream is = null;
@@ -401,30 +326,28 @@ public class UserService {
         String userId = null;
 
         try {
-//            String idToken = param.split("=")[1];
 
             String url = "https://oauth2.googleapis.com/tokeninfo";
             url += "?id_token="+idToken;
 
+            HttpURLConnection con;
             URL gUrl = new URL(url);
-            HttpURLConnection conn = (HttpURLConnection) gUrl.openConnection();
+            con = (HttpURLConnection) gUrl.openConnection();
 
-            is = conn.getInputStream();
+            is = con.getInputStream();
             isr = new InputStreamReader(is, "UTF-8");
             in = new BufferedReader(isr);
 
+            String name;
+            String email;
+            String imageUrl;
 
             JSONObject jsonObj = (JSONObject)jsonParser.parse(in);
 
-            userId = "GOOGLE_" + jsonObj.get("sub").toString();
-            String name = jsonObj.get("name").toString();
-            String email = jsonObj.get("email").toString();
-            String imageUrl = jsonObj.get("picture").toString();
-
-            System.out.println(userId);
-            System.out.println(name);
-            System.out.println(email);
-            System.out.println(imageUrl);
+            userId = "google_" + jsonObj.get("sub").toString();
+            name = jsonObj.get("name").toString();
+            email = jsonObj.get("email").toString();
+            imageUrl = jsonObj.get("picture").toString();
 
             User existsUserInfo = null;
 
@@ -438,7 +361,7 @@ public class UserService {
                 try {
                     userInfo = userRepository.save(userInfo);
                 } catch (Exception exception) {
-                    throw new BaseException(DATABASE_ERROR);
+                    throw new BaseException(FAILED_TO_GET_USER);
                 }
                 // 3. JWT 생성
                 String jwt = jwtService.createJwt(userInfo.getUserIdx());
