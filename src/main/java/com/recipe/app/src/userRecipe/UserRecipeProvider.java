@@ -3,9 +3,10 @@ package com.recipe.app.src.userRecipe;
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoProvider;
-import com.recipe.app.src.userRecipePhoto.models.UserRecipePhoto;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -33,10 +34,11 @@ public class UserRecipeProvider {
      * @return List<GetMyRecipesRes>
      * @throws BaseException
      */
-    public List<GetMyRecipesRes> retrieveMyRecipesList(Integer userIdx) throws BaseException {
-        List<UserRecipe> userRecipeList;
+    public List<GetMyRecipesRes> retrieveMyRecipesList(Integer userIdx, Pageable pageable) throws BaseException {
+
+        Page<UserRecipe> userRecipeList;
         try {
-            userRecipeList = userRecipeRepository.findByUserIdxAndStatus(userIdx, "ACTIVE");
+            userRecipeList = userRecipeRepository.findByUserIdxAndStatus(userIdx, "ACTIVE",pageable);
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_USER_RECIPES);
         }
@@ -55,6 +57,7 @@ public class UserRecipeProvider {
 
         }).collect(Collectors.toList());
     }
+
 
     /**
      * 나만의 레시피 상세조회

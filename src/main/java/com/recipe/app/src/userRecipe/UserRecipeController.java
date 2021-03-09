@@ -5,6 +5,9 @@ import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,12 +35,11 @@ public class UserRecipeController {
      * @return BaseResponse<List<GetMyRecipesRes>>
      */
     @GetMapping("")
-    public BaseResponse<List<GetMyRecipesRes>> getMyRecipes() {
+    public BaseResponse<List<GetMyRecipesRes>> getMyRecipes(@PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
 
         try {
-            Integer userIdx =1;
-//            Integer userIdx = jwtService.getUserId();
-            List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx);
+            Integer userIdx = jwtService.getUserId();
+            List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx,pageable);
 
             return new BaseResponse<>(GetMyRecipesResList);
 
