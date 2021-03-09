@@ -9,4 +9,5 @@ public class GetMyRecipesRes {
     private final Integer userRecipeIdx;
     private final String thumbnail;
     private final String title;
+    private final String content;
 }

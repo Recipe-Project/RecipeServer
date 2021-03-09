@@ -35,7 +35,8 @@ public class UserRecipeController {
     public BaseResponse<List<GetMyRecipesRes>> getMyRecipes() {
 
         try {
-            Integer userIdx = jwtService.getUserId();
+            Integer userIdx =1;
+//            Integer userIdx = jwtService.getUserId();
             List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx);
 
             return new BaseResponse<>(GetMyRecipesResList);

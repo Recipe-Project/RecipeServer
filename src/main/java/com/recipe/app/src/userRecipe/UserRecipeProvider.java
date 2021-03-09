@@ -45,9 +45,13 @@ public class UserRecipeProvider {
             int userRecipeIdx = userRecipe.getUserRecipeIdx();
             String thumbnail = userRecipe.getThumbnail();
             String title = userRecipe.getTitle();
+            String content = userRecipe.getContent() ;
+            if (content.length()>50){
+                content = content.substring(0,50);
+            }
 
 
-            return new GetMyRecipesRes(userRecipeIdx, thumbnail,title);
+            return new GetMyRecipesRes(userRecipeIdx, thumbnail,title,content);
 
         }).collect(Collectors.toList());
     }
