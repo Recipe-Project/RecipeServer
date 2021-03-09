@@ -54,7 +54,12 @@ public class UserRecipeController {
      * @return BaseResponse<GetMyRecipeRes>
      */
     @GetMapping("/{myRecipeIdx}")
-    public BaseResponse<GetMyRecipeRes> getMyRecipe(@PathVariable Integer myRecipeIdx) {
+    public BaseResponse<GetMyRecipeRes> getMyRecipe(@PathVariable Integer myRecipeIdx) throws BaseException {
+        Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
+        if (!existMyRecipe){
+            return new BaseResponse<>(NO_FOUND_MY_RECIPE);
+        }
+
         try {
             Integer userIdx = jwtService.getUserId();
             GetMyRecipeRes getMyRecipeRes = userRecipeProvider.retrieveMyRecipe(userIdx,myRecipeIdx);
@@ -72,7 +77,7 @@ public class UserRecipeController {
     @DeleteMapping("/{myRecipeIdx}")
     public BaseResponse<Void> deleteMyRecipe(@PathVariable Integer myRecipeIdx) {
         if (myRecipeIdx == null || myRecipeIdx <= 0) {
-            return new BaseResponse<>(EMPTY_USERRECIPEIDX);
+            return new BaseResponse<>(EMPTY_MY_RECIPEIDX);
         }
 
         try {
@@ -96,6 +101,7 @@ public class UserRecipeController {
     public BaseResponse<PostMyRecipeRes> postMyRecipe(@RequestBody PostMyRecipeReq parameters) {
         try {
             Integer userIdx = jwtService.getUserId();
+
             if (parameters.getPhotoUrlList() != null && parameters.getThumbnail() ==null) {
                 return new BaseResponse<>(EMPTY_THUMBNAIL);
             }
@@ -136,7 +142,7 @@ public class UserRecipeController {
         try {
             Integer userIdx = jwtService.getUserId();
             if (myRecipeIdx == null || myRecipeIdx <= 0) {
-                return new BaseResponse<>(EMPTY_USERRECIPEIDX);
+                return new BaseResponse<>(EMPTY_MY_RECIPEIDX);
             }
 
             if (parameters.getPhotoUrlList() != null && parameters.getThumbnail() ==null) {

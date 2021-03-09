@@ -41,14 +41,14 @@ public class UserRecipeService {
         try {
             userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx,myRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER_RECIPE);
+            throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
 
         List<UserRecipePhoto> userRecipePhotoList;
         try {
             userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER_RECIPE_PHOTO);
+            throw new BaseException(FAILED_TO_GET_MY_RECIPE_PHOTOS);
         }
 
 
@@ -118,14 +118,14 @@ public class UserRecipeService {
         try {
             userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx,userRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER_RECIPE);
+            throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
 
         List<UserRecipePhoto> userRecipePhotoList;
         try {
             userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(userRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER_RECIPE_PHOTO);
+            throw new BaseException(FAILED_TO_GET_MY_RECIPE_PHOTOS);
         }
 
         List<String> photoUrlList = patchMyRecipeReq.getPhotoUrlList();

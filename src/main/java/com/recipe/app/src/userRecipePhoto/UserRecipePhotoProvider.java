@@ -22,12 +22,12 @@ public class UserRecipePhotoProvider {
         this.jwtService = jwtService;
     }
 
-    public List retrieveUserRecipePhoto(Integer userRecipeIdx) throws BaseException {
+    public List retrieveUserRecipePhoto(Integer myRecipeIdx) throws BaseException {
         List<UserRecipePhoto> userRecipePhotoList;
         try {
-            userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(userRecipeIdx,"ACTIVE");
+            userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER_RECIPE_PHOTO);
+            throw new BaseException(FAILED_TO_GET_MY_RECIPE_PHOTOS);
         }
 
 

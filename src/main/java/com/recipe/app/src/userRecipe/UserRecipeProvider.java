@@ -2,6 +2,7 @@ package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.userRecipe.models.*;
+import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoProvider;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,13 +19,16 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 @Service
 public class UserRecipeProvider {
     private final UserRecipeRepository userRecipeRepository;
-    private final JwtService jwtService;
     private final UserRecipePhotoProvider userRecipePhotoProvider;
+    private final UserRecipeIngredientProvider userRecipeIngredientProvider;
+    private final JwtService jwtService;
 
     @Autowired
-    public UserRecipeProvider(UserRecipeRepository userRecipeRepository, UserRecipePhotoProvider userRecipePhotoProvider,JwtService jwtService) {
+    public UserRecipeProvider(UserRecipeRepository userRecipeRepository, UserRecipePhotoProvider userRecipePhotoProvider,
+                              UserRecipeIngredientProvider userRecipeIngredientProvider, JwtService jwtService) {
         this.userRecipeRepository = userRecipeRepository;
         this.userRecipePhotoProvider = userRecipePhotoProvider;
+        this.userRecipeIngredientProvider = userRecipeIngredientProvider;
         this.jwtService = jwtService;
     }
 
@@ -40,7 +44,7 @@ public class UserRecipeProvider {
         try {
             userRecipeList = userRecipeRepository.findByUserIdxAndStatus(userIdx, "ACTIVE",pageable);
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER_RECIPES);
+            throw new BaseException(FAILED_TO_GET_MY_RECIPES);
         }
 
         return userRecipeList.stream().map(userRecipe -> {
@@ -71,16 +75,34 @@ public class UserRecipeProvider {
         try {
             userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx, myRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_USER_RECIPE);
+            throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
 
         List photoUrlList = userRecipePhotoProvider.retrieveUserRecipePhoto(myRecipeIdx);
         String title = userRecipe.getTitle();
         String content = userRecipe.getContent();
 
-        return new GetMyRecipeRes(photoUrlList,title,content);
+        List ingredientList = userRecipeIngredientProvider.retrieveUserRecipeIngredient(myRecipeIdx);
+
+        return new GetMyRecipeRes(photoUrlList,title,content,ingredientList);
     }
 
+    /**
+     * 나만의 레시피 인덱스 존재여부
+     * @param myRecipeIdx
+     * @return Boolean
+     * @throws BaseException
+     */
+    public Boolean existMyRecipe(Integer myRecipeIdx) throws BaseException {
+        Boolean existMyRecipe;
+        try {
+            existMyRecipe = userRecipeRepository.existsByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_MY_RECIPE);
+        }
 
+
+        return existMyRecipe;
+    }
 
 }

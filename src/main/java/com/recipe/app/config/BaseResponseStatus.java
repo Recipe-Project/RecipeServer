@@ -21,7 +21,6 @@ public enum BaseResponseStatus {
     EMPTY_JWT(false, 2001, "JWT를 입력해주세요."),
     INVALID_JWT(false, 2002, "유효하지 않은 JWT입니다."),
     EMPTY_TOKEN(false, 2003, "ACCESS TOKEN 값을 입력해주세요."),
-    EMPTY_USERRECIPEIDX(false, 2004, "나만의 레시피 인덱스값을 입력해주세요."),
     // users
     USERS_EMPTY_USER_ID(false, 2010, "유저 아이디 값을 확인해주세요."),
 
@@ -59,11 +58,17 @@ public enum BaseResponseStatus {
     // [PATCH] /boards/:boardId/status
     PATCH_BOARDS_STATUS_INVALID_BOARD_STATUS(false, 2045, "상태코드를 확인해주세요."),
 
+    // [GET] /my-recipes/:myRecipeIdx
+
+
     // [POST] /my-recipes
     EMPTY_TITLE(false, 2050, "제목을 입력해주세요."),
     EMPTY_CONTENT(false, 2051, "내용을 입력해주세요."),
     EMPTY_THUMBNAIL(false, 2052, "썸네일을 입력해주세요."),
     EMPTY_PHOTO_URL_LIST(false, 2053, "사진을 입력해주세요."),
+
+    // [PATCH] /my-recipes/:myRecipeIdx
+    EMPTY_MY_RECIPEIDX(false, 2054, "나만의 레시피 인덱스값을 입력해주세요."),
 
     /**
      * 3000 : Response 오류
@@ -84,21 +89,29 @@ public enum BaseResponseStatus {
     // [POST] /users/kakao-login
     FAILED_TO_KAKAO_LOGIN(false, 3016, "카카오 로그인에 실패하였습니다."),
 
-    FAILED_TO_GET_USER_RECIPE(false, 3017, "유저레시피 상세 조회에 실패하였습니다."),
-    FAILED_TO_GET_USER_RECIPE_PHOTO(false, 3018, "유저레시피 사진 조회에 실패하였습니다."),
-    FAILED_TO_GET_USER_RECIPES(false, 3019, "유저레시피 전체 조회에 실패하였습니다."),
-
     FAILED_TO_GET_USER(false, 3020, "유저 상세 정보 조회에 실패하였습니다."),
     FAILED_TO_PATCH_USER(false, 3021, "유저 정보 수정에 실패하였습니다."),
 
+
+    // [GET] /my-recipes
+    FAILED_TO_GET_MY_RECIPES(false, 3022, "나만의 레시피 전체 조회에 실패하였습니다."),
+
+
+    // [GET] /my-recipes/:myRecipeIdx
+    FAILED_TO_GET_MY_RECIPE_PHOTOS(false, 3023, "나만의 레시피 사진 조회에 실패하였습니다."),
+    FAILED_TO_GET_MY_RECIPE_INGREDIENTS(false, 3024, "나만의 레시피 재료 조회에 실패하였습니다."),
+    FAILED_TO_GET_MY_RECIPE(false, 3025, "나만의 레시피 상세 조회에 실패하였습니다."),
+    NO_FOUND_MY_RECIPE(false, 3026, "존재하지 않는 나만의 레시피입니다."),
+
     // [POST] /my-recipes
-    FAILED_TO_POST_MY_RECIPE(false, 3022, "나만의 레시피 생성에 실패하였습니다."),
+    FAILED_TO_POST_MY_RECIPE(false, 3027, "나만의 레시피 생성에 실패하였습니다."),
 
     // [PATCH] /my-recipes/:myRecipeIdx
-    FAILED_TO_PATCH_MY_RECIPE(false, 3023, "나만의 레시피 수정에 실패하였습니다."),
+    FAILED_TO_PATCH_MY_RECIPE(false, 3028, "나만의 레시피 수정에 실패하였습니다."),
+
 
     // [DELETE] /my-recipes/:myRecipeIdx
-    FAILED_TO_DELETE_MY_RECIPE(false, 3024, "나만의 레시피 삭제에 실패하였습니다."),
+    FAILED_TO_DELETE_MY_RECIPE(false, 3029, "나만의 레시피 삭제에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */

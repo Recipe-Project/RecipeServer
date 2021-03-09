@@ -11,4 +11,5 @@ import org.springframework.stereotype.Repository;
 public interface UserRecipeRepository extends CrudRepository<UserRecipe, Integer> {
     UserRecipe findByUserIdxAndUserRecipeIdxAndStatus(Integer userIdx,Integer userRecipeIdx, String status);
     Page<UserRecipe> findByUserIdxAndStatus(Integer userIdx, String status, Pageable pageable);
+    Boolean existsByUserRecipeIdxAndStatus(Integer userRecipeIdx, String status);
 }
