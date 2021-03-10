@@ -1,8 +1,9 @@
 package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.user.models.PatchUserRes;
 import com.recipe.app.src.userRecipe.models.*;
+import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientRepository;
+import com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoRepository;
 import com.recipe.app.src.userRecipePhoto.models.UserRecipePhoto;
 import com.recipe.app.utils.JwtService;
@@ -19,13 +20,15 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 public class UserRecipeService {
     private final UserRecipeRepository userRecipeRepository;
     private final UserRecipePhotoRepository userRecipePhotoRepository;
+    private final UserRecipeIngredientRepository userRecipeIngredientRepository;
     private final UserRecipeProvider userRecipeProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public UserRecipeService(UserRecipeRepository userRecipeRepository, UserRecipePhotoRepository userRecipePhotoRepository, UserRecipeProvider userRecipeProvider, JwtService jwtService) {
+    public UserRecipeService(UserRecipeRepository userRecipeRepository, UserRecipePhotoRepository userRecipePhotoRepository,UserRecipeIngredientRepository userRecipeIngredientRepository, UserRecipeProvider userRecipeProvider, JwtService jwtService) {
         this.userRecipeRepository = userRecipeRepository;
         this.userRecipePhotoRepository = userRecipePhotoRepository;
+        this.userRecipeIngredientRepository = userRecipeIngredientRepository;
         this.userRecipeProvider = userRecipeProvider;
         this.jwtService = jwtService;
     }
@@ -84,12 +87,13 @@ public class UserRecipeService {
         String thumbnail = postMyRecipeReq.getThumbnail();
         String title = postMyRecipeReq.getTitle();
         String content = postMyRecipeReq.getContent();
-
+        List<Integer> ingredientList = postMyRecipeReq.getIngredientList();
+        Integer userRecipeIdx;
 
         try {
             UserRecipe userRecipe = new UserRecipe(userIdx, thumbnail, title, content);
             userRecipe = userRecipeRepository.save(userRecipe);
-            Integer userRecipeIdx = userRecipe.getUserRecipeIdx();
+            userRecipeIdx = userRecipe.getUserRecipeIdx();
 
 
             if (photoUrlList != null) {
@@ -99,11 +103,18 @@ public class UserRecipeService {
                 }
             }
 
+            if (ingredientList != null) {
+                for (int i = 0; i < ingredientList.size(); i++) {
+                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx, ingredientList.get(i));
+                    userRecipeIngredientRepository.save(userRecipeIngredient);
+                }
+            }
+
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_MY_RECIPE);
         }
 
-        return new PostMyRecipeRes(photoUrlList,thumbnail,title,content);
+        return new PostMyRecipeRes(userRecipeIdx,photoUrlList,thumbnail,title,content,ingredientList);
     }
 
     /**
@@ -128,34 +139,57 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE_PHOTOS);
         }
 
+        List<UserRecipeIngredient> userRecipeIngredientList;
+        try {
+            userRecipeIngredientList = userRecipeIngredientRepository.findByUserRecipeIdxAndStatus(userRecipeIdx,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_MY_RECIPE_INGREDIENTS);
+        }
+
         List<String> photoUrlList = patchMyRecipeReq.getPhotoUrlList();
         String thumbnail = patchMyRecipeReq.getThumbnail();
         String title = patchMyRecipeReq.getTitle();
         String content = patchMyRecipeReq.getContent();
-
+        List<Integer> ingredientList = patchMyRecipeReq.getIngredientList();
         try {
             userRecipe.setThumbnail(thumbnail);
             userRecipe.setTitle(title);
             userRecipe.setContent(content);
             userRecipeRepository.save(userRecipe);
 
-            // 삭제
+            // 사진 삭제
             for (int i=0;i<userRecipePhotoList.size();i++){
                 userRecipePhotoList.get(i).setStatus("INACTIVE");
             }
             userRecipePhotoRepository.saveAll(userRecipePhotoList);
 
-            // 삭제
+
             if (photoUrlList != null) {
                 for (int i = 0; i < photoUrlList.size(); i++) {
                     UserRecipePhoto userRecipePhoto = new UserRecipePhoto(userRecipeIdx, photoUrlList.get(i));
                     userRecipePhotoRepository.save(userRecipePhoto);
                 }
             }
+
+            // 재료 삭제
+            for (int i=0;i<userRecipeIngredientList.size();i++){
+                userRecipeIngredientList.get(i).setStatus("INACTIVE");
+            }
+            userRecipeIngredientRepository.saveAll(userRecipeIngredientList);
+
+
+            if (ingredientList != null) {
+                for (int i = 0; i < ingredientList.size(); i++) {
+                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx, ingredientList.get(i));
+                    userRecipeIngredientRepository.save(userRecipeIngredient);
+                }
+            }
+
+
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_PATCH_MY_RECIPE);
         }
-        return new PatchMyRecipeRes(photoUrlList,thumbnail,title,content);
+        return new PatchMyRecipeRes(photoUrlList,thumbnail,title,content,ingredientList);
 
 
     }

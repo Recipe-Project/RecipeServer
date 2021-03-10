@@ -75,7 +75,12 @@ public class UserRecipeController {
      * @return BaseResponse<GetMyRecipeRes>
      */
     @DeleteMapping("/{myRecipeIdx}")
-    public BaseResponse<Void> deleteMyRecipe(@PathVariable Integer myRecipeIdx) {
+    public BaseResponse<Void> deleteMyRecipe(@PathVariable Integer myRecipeIdx) throws BaseException {
+        Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
+        if (!existMyRecipe){
+            return new BaseResponse<>(NO_FOUND_MY_RECIPE);
+        }
+
         if (myRecipeIdx == null || myRecipeIdx <= 0) {
             return new BaseResponse<>(EMPTY_MY_RECIPEIDX);
         }
@@ -101,16 +106,12 @@ public class UserRecipeController {
     public BaseResponse<PostMyRecipeRes> postMyRecipe(@RequestBody PostMyRecipeReq parameters) {
         try {
             Integer userIdx = jwtService.getUserId();
-
             if (parameters.getPhotoUrlList() != null && parameters.getThumbnail() ==null) {
                 return new BaseResponse<>(EMPTY_THUMBNAIL);
             }
             if (parameters.getPhotoUrlList() == null && parameters.getThumbnail() !=null) {
                 return new BaseResponse<>(EMPTY_PHOTO_URL_LIST);
             }
-
-
-
             if (parameters.getTitle() == null) {
                 return new BaseResponse<>(EMPTY_TITLE);
             }
@@ -136,11 +137,15 @@ public class UserRecipeController {
      */
     @ResponseBody
     @PatchMapping("{myRecipeIdx}")
-    public BaseResponse<PatchMyRecipeRes> patchMyRecipe(@PathVariable Integer myRecipeIdx,@RequestBody PatchMyRecipeReq parameters) {
-
+    public BaseResponse<PatchMyRecipeRes> patchMyRecipe(@PathVariable Integer myRecipeIdx,@RequestBody PatchMyRecipeReq parameters) throws BaseException {
+        Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
+        if (!existMyRecipe){
+            return new BaseResponse<>(NO_FOUND_MY_RECIPE);
+        }
 
         try {
             Integer userIdx = jwtService.getUserId();
+
             if (myRecipeIdx == null || myRecipeIdx <= 0) {
                 return new BaseResponse<>(EMPTY_MY_RECIPEIDX);
             }

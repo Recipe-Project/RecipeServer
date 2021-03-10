@@ -16,5 +16,6 @@ public class PatchMyRecipeReq {
     private String thumbnail;
     private String title;
     private String content;
+    private List ingredientList;
 }
 

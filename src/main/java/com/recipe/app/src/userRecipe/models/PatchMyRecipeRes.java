@@ -15,5 +15,6 @@ public class PatchMyRecipeRes {
     private final String thumbnail;
     private final String title;
     private final String content;
+    private final List ingredientList;
 }
 
