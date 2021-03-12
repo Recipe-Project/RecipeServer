@@ -33,6 +33,7 @@ public class UserRecipeController {
      * 나만의 레시피 전체조회 API
      * [GET] /my-recipes
      * @return BaseResponse<List<GetMyRecipesRes>>
+     * @PageableDefault pageable
      */
     @GetMapping("")
     public BaseResponse<List<GetMyRecipesRes>> getMyRecipes(@PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
@@ -52,6 +53,7 @@ public class UserRecipeController {
      * 나만의 레시피 상세조회 API
      * [GET] /my-recipes/:myRecipeIdx
      * @return BaseResponse<GetMyRecipeRes>
+     * @PathVariable myRecipeIdx
      */
     @GetMapping("/{myRecipeIdx}")
     public BaseResponse<GetMyRecipeRes> getMyRecipe(@PathVariable Integer myRecipeIdx) throws BaseException {
@@ -73,6 +75,7 @@ public class UserRecipeController {
      * 나만의 레시피 삭제 API
      * [DELETE] /my-recipes/:myRecipeIdx
      * @return BaseResponse<GetMyRecipeRes>
+     * @PathVariable myRecipeIdx
      */
     @DeleteMapping("/{myRecipeIdx}")
     public BaseResponse<Void> deleteMyRecipe(@PathVariable Integer myRecipeIdx) throws BaseException {

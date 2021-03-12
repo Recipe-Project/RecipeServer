@@ -70,6 +70,10 @@ public enum BaseResponseStatus {
     // [PATCH] /my-recipes/:myRecipeIdx
     EMPTY_MY_RECIPEIDX(false, 2054, "나만의 레시피 인덱스값을 입력해주세요."),
 
+    // [POST] scraps/youtube
+    EMPTY_YOUTUBEIDX(false, 2055, "유튜브 인덱스값을 입력해주세요."),
+    EMPTY_YOUTUBEURL(false, 2056, "유튜브 url을 입력해주세요."),
+
     /**
      * 3000 : Response 오류
      */
@@ -112,6 +116,12 @@ public enum BaseResponseStatus {
 
     // [DELETE] /my-recipes/:myRecipeIdx
     FAILED_TO_DELETE_MY_RECIPE(false, 3029, "나만의 레시피 삭제에 실패하였습니다."),
+
+    // [POST] scraps/youtube
+    FAILED_TO_POST_SCRAP_YOUTUBE(false, 3030, "유튜브 스크랩하기에 실패하였습니다."),
+
+    // [GET] scraps/youtube
+    FAILED_TO_GET_SCRAP_YOUTUBE(false, 3031, "유튜브 스크랩 조회에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */

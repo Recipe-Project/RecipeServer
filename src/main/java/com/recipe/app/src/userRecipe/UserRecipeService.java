@@ -35,7 +35,7 @@ public class UserRecipeService {
 
     /**
      * 나만의 레시피 삭제
-     * @param myRecipeIdx
+     * @param userIdx,myRecipeIdx
      * @throws BaseException
      */
     @Transactional
@@ -119,7 +119,7 @@ public class UserRecipeService {
 
     /**
      * 나만의 레시피 수정
-     * @param patchMyRecipeReq,userIdx
+     * @param patchMyRecipeReq,userIdx,userRecipeIdx
      * @return PatchMyRecipeRes
      * @throws BaseException
      */

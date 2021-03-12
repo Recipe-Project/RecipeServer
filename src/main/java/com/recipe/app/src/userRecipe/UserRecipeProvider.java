@@ -34,7 +34,7 @@ public class UserRecipeProvider {
 
     /**
      * 나만의 레시피 전체조회
-     * @param userIdx
+     * @param userIdx,pageable
      * @return List<GetMyRecipesRes>
      * @throws BaseException
      */
@@ -65,7 +65,7 @@ public class UserRecipeProvider {
 
     /**
      * 나만의 레시피 상세조회
-     * @param myRecipeIdx
+     * @param userIdx,myRecipeIdx
      * @return getMyRecipeRes
      * @throws BaseException
      */
