@@ -1,6 +1,8 @@
 package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.config.BaseException;
+import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientRepository;
 import com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient;
@@ -18,6 +20,7 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
 public class UserRecipeService {
+    private final UserProvider userProvider;
     private final UserRecipeRepository userRecipeRepository;
     private final UserRecipePhotoRepository userRecipePhotoRepository;
     private final UserRecipeIngredientRepository userRecipeIngredientRepository;
@@ -25,7 +28,8 @@ public class UserRecipeService {
     private final JwtService jwtService;
 
     @Autowired
-    public UserRecipeService(UserRecipeRepository userRecipeRepository, UserRecipePhotoRepository userRecipePhotoRepository,UserRecipeIngredientRepository userRecipeIngredientRepository, UserRecipeProvider userRecipeProvider, JwtService jwtService) {
+    public UserRecipeService(UserProvider userProvider, UserRecipeRepository userRecipeRepository, UserRecipePhotoRepository userRecipePhotoRepository,UserRecipeIngredientRepository userRecipeIngredientRepository, UserRecipeProvider userRecipeProvider, JwtService jwtService) {
+        this.userProvider = userProvider;
         this.userRecipeRepository = userRecipeRepository;
         this.userRecipePhotoRepository = userRecipePhotoRepository;
         this.userRecipeIngredientRepository = userRecipeIngredientRepository;
@@ -40,9 +44,10 @@ public class UserRecipeService {
      */
     @Transactional
     public void deleteUserRecipe(Integer userIdx, Integer myRecipeIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
         UserRecipe userRecipe;
         try {
-            userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx,myRecipeIdx,"ACTIVE");
+            userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user,myRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
@@ -89,9 +94,10 @@ public class UserRecipeService {
         String content = postMyRecipeReq.getContent();
         List<Integer> ingredientList = postMyRecipeReq.getIngredientList();
         Integer userRecipeIdx;
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
 
         try {
-            UserRecipe userRecipe = new UserRecipe(userIdx, thumbnail, title, content);
+            UserRecipe userRecipe = new UserRecipe(user, thumbnail, title, content);
             userRecipe = userRecipeRepository.save(userRecipe);
             userRecipeIdx = userRecipe.getUserRecipeIdx();
 
@@ -125,9 +131,10 @@ public class UserRecipeService {
      */
     @Transactional
     public PatchMyRecipeRes updateMyRecipe(PatchMyRecipeReq patchMyRecipeReq, Integer userIdx, Integer userRecipeIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
         UserRecipe userRecipe;
         try {
-            userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx,userRecipeIdx,"ACTIVE");
+            userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user,userRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }

@@ -1,12 +1,15 @@
 package com.recipe.app.src.recipeInfo.models;
 
 import com.recipe.app.config.BaseEntity;
+import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
@@ -65,6 +68,8 @@ public class RecipeInfo extends BaseEntity {
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
+    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL)
+    private List<ScrapPublic> scrapPublics = new ArrayList<>();
 
     public RecipeInfo(String recipeNmKo,String sumry,Integer nationCode, String nationNm,Integer tyCode,String tyNm,String cookingTime,String calorie,String qnt, String levelNm,String irdntCode ,
                       String pcNm, String imgUrl, String detUrl){

@@ -1,6 +1,6 @@
-package com.recipe.app.src.scrapYoutube;
+package com.recipe.app.src.scrapBlog;
 
-
+import com.recipe.app.src.scrapBlog.models.ScrapBlog;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
 import com.recipe.app.src.user.models.User;
 import org.springframework.data.domain.Page;
@@ -10,6 +10,5 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface ScrapYoutubeRepository extends CrudRepository<ScrapYoutube, Integer> {
-    Page<ScrapYoutube> findByUserAndStatus(User user, String status, Pageable pageable);
+public interface ScrapBlogRepository extends CrudRepository<ScrapBlog, Integer> {
 }

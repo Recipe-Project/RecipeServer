@@ -2,6 +2,8 @@ package com.recipe.app.src.scrapYoutube;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.scrapYoutube.models.*;
+import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -13,12 +15,14 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
 public class ScrapYoutubeService {
+    private final UserProvider userProvider;
     private final ScrapYoutubeRepository scrapYoutubeRepository;
     private final ScrapYoutubeProvider scrapYoutubeProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapYoutubeService(ScrapYoutubeRepository scrapYoutubeRepository, ScrapYoutubeProvider scrapYoutubeProvider, JwtService jwtService) {
+    public ScrapYoutubeService(UserProvider userProvider, ScrapYoutubeRepository scrapYoutubeRepository, ScrapYoutubeProvider scrapYoutubeProvider, JwtService jwtService) {
+        this.userProvider = userProvider;
         this.scrapYoutubeRepository = scrapYoutubeRepository;
         this.scrapYoutubeProvider = scrapYoutubeProvider;
         this.jwtService = jwtService;
@@ -36,11 +40,11 @@ public class ScrapYoutubeService {
         String title = postScrapYoutubeReq.getTitle();
         String thumbnail = postScrapYoutubeReq.getThumbnail();
         String youtubeUrl = postScrapYoutubeReq.getYoutubeUrl();
-
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
 
 
         try {
-            ScrapYoutube scrapYoutube = new ScrapYoutube(userIdx, youtubeIdx, title, thumbnail, youtubeUrl);
+            ScrapYoutube scrapYoutube = new ScrapYoutube(user, youtubeIdx, title, thumbnail, youtubeUrl);
             scrapYoutube = scrapYoutubeRepository.save(scrapYoutube);
 
 

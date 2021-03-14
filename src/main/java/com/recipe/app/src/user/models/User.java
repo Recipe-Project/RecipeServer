@@ -1,8 +1,15 @@
 package com.recipe.app.src.user.models;
 
+import com.recipe.app.src.scrapBlog.models.ScrapBlog;
+import com.recipe.app.src.scrapPublic.models.ScrapPublic;
+import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
+import com.recipe.app.src.userRecipe.models.UserRecipe;
 import lombok.*;
 import javax.persistence.*;
 import com.recipe.app.config.BaseEntity;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
 @EqualsAndHashCode(callSuper = false)
@@ -32,6 +39,18 @@ public class User extends BaseEntity {
 
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<UserRecipe> userRecipes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ScrapYoutube> scrapYoutubes = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ScrapBlog> scrapBlogs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ScrapPublic> scrapPublics = new ArrayList<>();
 
     public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber){
         this.socialId = socialId;

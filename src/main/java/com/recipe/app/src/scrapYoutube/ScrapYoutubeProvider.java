@@ -4,6 +4,8 @@ package com.recipe.app.src.scrapYoutube;
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.scrapYoutube.models.GetScrapYoutubesRes;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
+import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -19,11 +21,13 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
 public class ScrapYoutubeProvider {
+    private final UserProvider userProvider;
     private final ScrapYoutubeRepository scrapYoutubeRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapYoutubeProvider( ScrapYoutubeRepository scrapYoutubeRepository, JwtService jwtService) {
+    public ScrapYoutubeProvider(UserProvider userProvider, ScrapYoutubeRepository scrapYoutubeRepository, JwtService jwtService) {
+        this.userProvider = userProvider;
         this.scrapYoutubeRepository = scrapYoutubeRepository;
         this.jwtService = jwtService;
     }
@@ -36,9 +40,10 @@ public class ScrapYoutubeProvider {
      */
     public List<GetScrapYoutubesRes> retrieveScrapYoutubeList(Integer userIdx, Pageable pageable) throws BaseException {
 
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
         Page<ScrapYoutube> scrapYoutubeList;
         try {
-            scrapYoutubeList = scrapYoutubeRepository.findByUserIdxAndStatus(userIdx, "ACTIVE", pageable);
+            scrapYoutubeList = scrapYoutubeRepository.findByUserAndStatus(user, "ACTIVE", pageable);
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_SCRAP_YOUTUBE);
         }

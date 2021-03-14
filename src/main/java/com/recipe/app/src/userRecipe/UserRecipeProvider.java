@@ -1,6 +1,8 @@
 package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.config.BaseException;
+import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoProvider;
@@ -18,14 +20,16 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
 public class UserRecipeProvider {
+    private final UserProvider userProvider;
     private final UserRecipeRepository userRecipeRepository;
     private final UserRecipePhotoProvider userRecipePhotoProvider;
     private final UserRecipeIngredientProvider userRecipeIngredientProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public UserRecipeProvider(UserRecipeRepository userRecipeRepository, UserRecipePhotoProvider userRecipePhotoProvider,
+    public UserRecipeProvider(UserProvider userProvider, UserRecipeRepository userRecipeRepository, UserRecipePhotoProvider userRecipePhotoProvider,
                               UserRecipeIngredientProvider userRecipeIngredientProvider, JwtService jwtService) {
+        this.userProvider = userProvider;
         this.userRecipeRepository = userRecipeRepository;
         this.userRecipePhotoProvider = userRecipePhotoProvider;
         this.userRecipeIngredientProvider = userRecipeIngredientProvider;
@@ -40,9 +44,10 @@ public class UserRecipeProvider {
      */
     public List<GetMyRecipesRes> retrieveMyRecipesList(Integer userIdx, Pageable pageable) throws BaseException {
 
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
         Page<UserRecipe> userRecipeList;
         try {
-            userRecipeList = userRecipeRepository.findByUserIdxAndStatus(userIdx, "ACTIVE",pageable);
+            userRecipeList = userRecipeRepository.findByUserAndStatus(user, "ACTIVE",pageable);
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_MY_RECIPES);
         }
@@ -71,9 +76,10 @@ public class UserRecipeProvider {
      */
     @Transactional
     public GetMyRecipeRes retrieveMyRecipe(Integer userIdx, Integer myRecipeIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
         UserRecipe userRecipe;
         try {
-            userRecipe = userRecipeRepository.findByUserIdxAndUserRecipeIdxAndStatus(userIdx, myRecipeIdx,"ACTIVE");
+            userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user, myRecipeIdx,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }

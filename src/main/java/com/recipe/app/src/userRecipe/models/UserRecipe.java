@@ -1,6 +1,7 @@
 package com.recipe.app.src.userRecipe.models;
 
 import com.recipe.app.config.BaseEntity;
+import com.recipe.app.src.user.models.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,8 +21,11 @@ public class UserRecipe extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userRecipeIdx;
 
-    @Column(name="userIdx", nullable = false)
-    private Integer userIdx;
+    //@Column(name="userIdx", nullable = false)
+    //private Integer userIdx;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "userIdx", nullable = false)
+    private User user;
 
     @Column(name = "thumbnail")
     private String thumbnail;
@@ -36,8 +40,8 @@ public class UserRecipe extends BaseEntity {
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public UserRecipe(Integer userIdx, String thumbnail, String title, String content){
-        this.userIdx = userIdx;
+    public UserRecipe(User user, String thumbnail, String title, String content){
+        this.user = user;
         this.thumbnail = thumbnail;
         this.title = title;
         this.content = content;
