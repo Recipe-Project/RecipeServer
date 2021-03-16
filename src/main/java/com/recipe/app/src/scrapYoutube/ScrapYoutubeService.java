@@ -7,7 +7,7 @@ import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 
 
 import static com.recipe.app.config.BaseResponseStatus.*;
@@ -35,16 +35,17 @@ public class ScrapYoutubeService {
      * @throws BaseException
      */
     public PostScrapYoutubeRes createScrapYoutube(PostScrapYoutubeReq postScrapYoutubeReq, int userIdx) throws BaseException {
-
         Integer youtubeIdx = postScrapYoutubeReq.getYoutubeIdx();
         String title = postScrapYoutubeReq.getTitle();
         String thumbnail = postScrapYoutubeReq.getThumbnail();
         String youtubeUrl = postScrapYoutubeReq.getYoutubeUrl();
+        String postDate = postScrapYoutubeReq.getPostDate();
+        String channelName = postScrapYoutubeReq.getChannelName();
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
 
         try {
-            ScrapYoutube scrapYoutube = new ScrapYoutube(user, youtubeIdx, title, thumbnail, youtubeUrl);
+            ScrapYoutube scrapYoutube = new ScrapYoutube(user, youtubeIdx, title, thumbnail, youtubeUrl, postDate, channelName);
             scrapYoutube = scrapYoutubeRepository.save(scrapYoutube);
 
 
@@ -52,9 +53,33 @@ public class ScrapYoutubeService {
             throw new BaseException(FAILED_TO_POST_SCRAP_YOUTUBE);
         }
 
-        return new PostScrapYoutubeRes(userIdx,youtubeIdx,title,thumbnail,youtubeUrl);
+        return new PostScrapYoutubeRes(userIdx,youtubeIdx, title,thumbnail,youtubeUrl,postDate,channelName);
     }
 
 
+
+    /**
+     * 유튜브 스크랩 취소
+     * @param youtubeIdx,userIdx
+     * @return PostScrapYoutubeRes
+     * @throws BaseException
+     */
+    public PostScrapYoutubeRes deleteScrapYoutube(Integer youtubeIdx, Integer userIdx) throws BaseException {
+
+        ScrapYoutube scrapYoutube = scrapYoutubeProvider.retrieveScrapYoutube(youtubeIdx, userIdx);
+        scrapYoutube.setStatus("INACTIVE");
+        String title = scrapYoutube.getTitle();
+        String thumbnail = scrapYoutube.getThumbnail();
+        String youtubeUrl = scrapYoutube.getYoutubeUrl();
+        String postDate = scrapYoutube.getPostDate();
+        String channelName = scrapYoutube.getChannelName();
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        try {
+            scrapYoutubeRepository.save(scrapYoutube);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_POST_DELETE_SCRAP_YOUTUBE);
+        }
+        return new PostScrapYoutubeRes(userIdx,youtubeIdx, title,thumbnail,youtubeUrl,postDate,channelName);
+    }
 
 }

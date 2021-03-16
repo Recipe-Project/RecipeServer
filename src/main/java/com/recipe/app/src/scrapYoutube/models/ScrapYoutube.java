@@ -5,6 +5,8 @@ import lombok.*;
 import javax.persistence.*;
 import com.recipe.app.config.BaseEntity;
 
+import java.util.Date;
+
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
 @EqualsAndHashCode(callSuper = false)
 @Data // from lombok
@@ -34,15 +36,25 @@ public class ScrapYoutube extends BaseEntity {
     @Column(name = "youtubeUrl", nullable = false)
     private String youtubeUrl;
 
+    @Column(name = "postDate", nullable = false)
+    private String postDate;
+
+    @Column(name = "channelName", nullable = false)
+    private String channelName;
+
+
+
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public ScrapYoutube(User user, Integer youtubeIdx, String title, String thumbnail, String youtubeUrl ){
+    public ScrapYoutube(User user,  Integer youtubeIdx, String title, String thumbnail, String youtubeUrl, String postDate, String channelName){
         this.user = user;
         this.youtubeIdx = youtubeIdx;
         this.title = title;
         this.thumbnail = thumbnail;
         this.youtubeUrl = youtubeUrl;
+        this.postDate = postDate;
+        this.channelName = channelName;
     }
 
 }

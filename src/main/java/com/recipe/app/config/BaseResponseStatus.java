@@ -71,9 +71,10 @@ public enum BaseResponseStatus {
     EMPTY_MY_RECIPEIDX(false, 2054, "나만의 레시피 인덱스값을 입력해주세요."),
 
     // [POST] scraps/youtube
-    EMPTY_YOUTUBEIDX(false, 2055, "유튜브 인덱스값을 입력해주세요."),
-    EMPTY_YOUTUBEURL(false, 2056, "유튜브 url을 입력해주세요."),
-
+    EMPTY_YOUTUBEURL(false, 2055, "유튜브 url을 입력해주세요."),
+    EMPTY_POST_DATE(false, 2056, "포스팅 날짜를 입력해주세요."),
+    EMPTY_CHANNEL_NAME(false, 2057, "유튜브 채널명을 입력해주세요."),
+    EMPTY_YOUTUBEIDX(false, 2058, "유튜브 인덱스를 입력해주세요."),
     /**
      * 3000 : Response 오류
      */
@@ -119,9 +120,18 @@ public enum BaseResponseStatus {
 
     // [POST] scraps/youtube
     FAILED_TO_POST_SCRAP_YOUTUBE(false, 3030, "유튜브 스크랩하기에 실패하였습니다."),
-
+    FAILED_TO_POST_DELETE_SCRAP_YOUTUBE(false, 3032, "유튜브 스크랩 취소를 실패하였습니다."),
     // [GET] scraps/youtube
     FAILED_TO_GET_SCRAP_YOUTUBE(false, 3031, "유튜브 스크랩 조회에 실패하였습니다."),
+
+
+    // [POST] scraps/recipe
+    FAILED_TO_POST_CREATE_SCRAP_PUBLIC(false, 3033, "공공 레시피 스크랩 추가에 실패하였습니다."),
+    FAILED_TO_POST_DELETE_SCRAP_PUBLIC(false, 3034, "공공 레시피 스크랩 삭제에 실패하였습니다."),
+    FAILE_TO_GET_RECIPE_INFO(false, 3035, "공공레시피 정보 조회에 실패하였습니다."),
+    NOT_FOUND_RECIPE_INFO(false, 3036, "공공레시피 정보를 찾지 못하였습니다."),
+    // [GET] scraps/recipe
+    FAILED_TO_GET_SCRAP_PUBLIC(false, 3037, "공공 레시피 스크랩 조회에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */

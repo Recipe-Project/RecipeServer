@@ -1,0 +1,10 @@
+google:
+  client:
+    clientId:
+    clientSecret:
+    accessTokenUri: https://accounts.google.com/o/oauth2/token
+    userAuthorizationUri: https://accounts.google.com/o/oauth2/auth
+    clientAuthenticationScheme: form
+    scope: email, Profile
+  resource:
+    userInfoUri: https://www.googleapis.com/oauth2/v2/userinfo

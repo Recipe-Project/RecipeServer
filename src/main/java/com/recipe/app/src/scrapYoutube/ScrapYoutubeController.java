@@ -7,10 +7,11 @@ import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.scrapYoutube.models.*;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -43,21 +44,41 @@ public class ScrapYoutubeController {
 
         try {
             Integer userIdx = jwtService.getUserId();
-            if (parameters.getYoutubeIdx() == null && parameters.getThumbnail() !=null) {
-                return new BaseResponse<>(EMPTY_YOUTUBEIDX);
-            }
-            if (parameters.getTitle() != null && parameters.getThumbnail() ==null) {
+
+            if (parameters.getTitle() != null && parameters.getTitle() ==null) {
                 return new BaseResponse<>(EMPTY_TITLE);
             }
             if (parameters.getThumbnail() == null && parameters.getThumbnail() !=null) {
                 return new BaseResponse<>(EMPTY_THUMBNAIL);
             }
-            if (parameters.getYoutubeUrl() != null && parameters.getThumbnail() ==null) {
+            if (parameters.getYoutubeUrl() != null && parameters.getYoutubeUrl() ==null) {
                 return new BaseResponse<>(EMPTY_YOUTUBEURL);
             }
+            if (parameters.getPostDate() != null && parameters.getPostDate() ==null) {
+                return new BaseResponse<>(EMPTY_POST_DATE);
+            }
+            if (parameters.getChannelName() != null && parameters.getChannelName() ==null) {
+                return new BaseResponse<>(EMPTY_CHANNEL_NAME);
+            }
+            if (parameters.getYoutubeIdx() == null && parameters.getYoutubeIdx() !=null) {
+                return new BaseResponse<>(EMPTY_YOUTUBEIDX);
+            }
 
-            PostScrapYoutubeRes postScrapYoutubeRes = scrapYoutubeService.createScrapYoutube(parameters,userIdx);
-            return new BaseResponse<>(postScrapYoutubeRes);
+            // 이미 발급 받은건지
+            ScrapYoutube scrapYoutube = null;
+            scrapYoutube = scrapYoutubeProvider.retrieveScrapYoutube(parameters.getYoutubeIdx(), userIdx);
+
+
+            PostScrapYoutubeRes postScrapYoutubeRes;
+            if (scrapYoutube != null) {
+                postScrapYoutubeRes = scrapYoutubeService.deleteScrapYoutube(parameters.getYoutubeIdx(),userIdx);
+                return new BaseResponse<>(postScrapYoutubeRes);
+            }
+            else{
+                postScrapYoutubeRes = scrapYoutubeService.createScrapYoutube(parameters,userIdx);
+                return new BaseResponse<>(postScrapYoutubeRes);
+            }
+
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
@@ -65,19 +86,23 @@ public class ScrapYoutubeController {
     }
 
 
+
     /**
      * 유튜브 스크랩 조회 API
      * [GET] /scraps/youtube
      * @return BaseResponse<List<GetScrapYoutubesRes>>
+     * @PageableDefault pageable
      */
     @GetMapping("")
-    public BaseResponse<List<GetScrapYoutubesRes>> getScrapYoutube(@PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public BaseResponse<GetScrapYoutubesRes> getScrapYoutubes(@RequestParam(value = "sort") @Nullable Integer sort) {
 
+        GetScrapYoutubesRes getScrapYoutubesRes = null;
         try {
             Integer userIdx = jwtService.getUserId();
-            List<GetScrapYoutubesRes> getScrapYoutubesResList = scrapYoutubeProvider.retrieveScrapYoutubeList(userIdx,pageable);
 
-            return new BaseResponse<>(getScrapYoutubesResList);
+            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubes(userIdx,sort);
+
+            return new BaseResponse<>(getScrapYoutubesRes);
 
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

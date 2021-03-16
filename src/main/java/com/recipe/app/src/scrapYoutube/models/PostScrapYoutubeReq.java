@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
+
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 public class PostScrapYoutubeReq {
@@ -13,4 +14,6 @@ public class PostScrapYoutubeReq {
     private String title;
     private String thumbnail;
     private String youtubeUrl;
+    private String postDate;
+    private String channelName;
 }
