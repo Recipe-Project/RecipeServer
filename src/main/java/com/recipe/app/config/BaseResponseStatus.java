@@ -142,6 +142,11 @@ public enum BaseResponseStatus {
     NOT_FOUND_RECIPE_INFO(false, 3036, "공공레시피 정보를 찾지 못하였습니다."),
     // [GET] scraps/recipe
     FAILED_TO_GET_SCRAP_PUBLIC(false, 3037, "공공 레시피 스크랩 조회에 실패하였습니다."),
+
+    // [GET] ingredients
+    FAILED_TO_GET_INGREDIENT_CATEGORY(false, 3038, "재료 카테고리 조회에 실패하였습니다."),
+    NOT_FOUND_INGREDIENT_CATEGORY(false, 3039, "재료 카테고리인덱스를 찾을 수 없습니다."),
+    FAILED_TO_GET_INGREDIENT_LIST(false, 3040, "재료 리스트 조회에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */
