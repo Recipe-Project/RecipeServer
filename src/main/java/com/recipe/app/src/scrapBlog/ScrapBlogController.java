@@ -32,80 +32,61 @@ public class ScrapBlogController {
     }
 
     /**
-     * 유튜브 스크랩하기 API
+     * 블로그 스크랩하기 API
      * [POST] /scraps/blog
      * @return BaseResponse<Void>
      * @RequestBody parameters
      */
-/*
+
     @PostMapping("")
     public BaseResponse<Void> postScrapBlog(@RequestBody PostScrapBlogReq parameters) {
+        if (parameters.getTitle() != null && parameters.getTitle() ==null) {
+            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_TITLE);
+        }
+        if (parameters.getThumbnail() == null && parameters.getThumbnail() !=null) {
+            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_THUMBNAIL);
+        }
+        if (parameters.getBlogUrl() != null && parameters.getBlogUrl() ==null) {
+            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_BLOGURL);
+        }
+        if (parameters.getDescription() == null && parameters.getDescription() !=null) {
+            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_DESCRIPTION);
+        }
+        if (parameters.getBloggerName() != null && parameters.getBloggerName() ==null) {
+            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_BLOGGER_NAME);
+        }
+        if (parameters.getPostDate() != null && parameters.getPostDate() ==null) {
+            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_POST_DATE);
+        }
 
         try {
-            Integer userIdx = jwtService.getUserId();
-
-            if (parameters.getTitle() != null && parameters.getTitle() ==null) {
-                return new BaseResponse<>(EMPTY_TITLE);
-            }
-            if (parameters.getThumbnail() == null && parameters.getThumbnail() !=null) {
-                return new BaseResponse<>(EMPTY_THUMBNAIL);
-            }
-            if (parameters.getYoutubeUrl() != null && parameters.getYoutubeUrl() ==null) {
-                return new BaseResponse<>(EMPTY_YOUTUBEURL);
-            }
-            if (parameters.getPostDate() != null && parameters.getPostDate() ==null) {
-                return new BaseResponse<>(EMPTY_POST_DATE);
-            }
-            if (parameters.getChannelName() != null && parameters.getChannelName() ==null) {
-                return new BaseResponse<>(EMPTY_CHANNEL_NAME);
-            }
-            if (parameters.getYoutubeIdx() == null && parameters.getYoutubeIdx() !=null) {
-                return new BaseResponse<>(EMPTY_YOUTUBEIDX);
-            }
-
-            // 이미 발급 받은건지
-            ScrapYoutube scrapYoutube = null;
-            scrapYoutube = scrapYoutubeProvider.retrieveScrapYoutube(parameters.getYoutubeIdx(), userIdx);
-
-
-            PostScrapYoutubeRes postScrapYoutubeRes;
-            if (scrapYoutube != null) {
-                postScrapYoutubeRes = scrapYoutubeService.deleteScrapYoutube(parameters.getYoutubeIdx(),userIdx);
-                return new BaseResponse<>(postScrapYoutubeRes);
-            }
-            else{
-                postScrapYoutubeRes = scrapYoutubeService.createScrapYoutube(parameters,userIdx);
-                return new BaseResponse<>(postScrapYoutubeRes);
-            }
-
+            Integer jwtUserIdx = jwtService.getUserId();
+            scrapBlogService.createOrDeleteScrapBlog(jwtUserIdx, parameters);
+            return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
 
     }
-*/
+
 
 
     /**
-     * 유튜브 스크랩 조회 API
-     * [GET] /scraps/youtube
-     * @return BaseResponse<List<GetScrapYoutubesRes>>
+     * 블로그 스크랩 조회 API
+     * [GET] /scraps/blog
+     * @return BaseResponse<List<GetScrapBlogsRes>>
      * @PageableDefault pageable
      */
-    /*
+
     @GetMapping("")
-    public BaseResponse<GetScrapYoutubesRes> getScrapYoutubes(@RequestParam(value = "sort") @Nullable Integer sort) {
+    public BaseResponse<List<GetScrapBlogsRes>> getScrapBlogs(@RequestParam(value = "sort", required = false) Integer sort) {
 
-        GetScrapYoutubesRes getScrapYoutubesRes = null;
         try {
-            Integer userIdx = jwtService.getUserId();
-
-            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubes(userIdx,sort);
-
-            return new BaseResponse<>(getScrapYoutubesRes);
-
+            Integer jwtUserIdx = jwtService.getUserId();
+            List<GetScrapBlogsRes> getScrapBlogsResList = scrapBlogProvider.retrieveScrapBlogs(jwtUserIdx, sort);
+            return new BaseResponse<>(getScrapBlogsResList);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
-    }*/
+    }
 }

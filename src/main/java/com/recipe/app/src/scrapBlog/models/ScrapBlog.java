@@ -5,7 +5,9 @@ import lombok.*;
 import javax.persistence.*;
 import com.recipe.app.config.BaseEntity;
 
-import java.sql.Date;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
 @EqualsAndHashCode(callSuper = false)
@@ -33,8 +35,11 @@ public class ScrapBlog extends BaseEntity {
     @Column(name = "blogUrl", nullable = false)
     private String blogUrl;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description", nullable = false, length=200)
     private String description;
+
+    @Column(name = "bloggerName", nullable = false, length=45)
+    private String bloggerName;
 
     @Column(name = "postDate", nullable = false)
     private Date postDate;
@@ -42,12 +47,13 @@ public class ScrapBlog extends BaseEntity {
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public ScrapBlog(User user, String title, String thumbnail, String blogUrl, String description, Date postDate){
+    public ScrapBlog(User user, String title, String thumbnail, String blogUrl, String description, String bloggerName, Date postDate){
         this.user = user;
         this.title = title;
         this.thumbnail = thumbnail;
         this.blogUrl = blogUrl;
         this.description = description;
+        this.bloggerName = bloggerName;
         this.postDate = postDate;
     }
 

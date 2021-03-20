@@ -75,6 +75,16 @@ public enum BaseResponseStatus {
     EMPTY_POST_DATE(false, 2056, "포스팅 날짜를 입력해주세요."),
     EMPTY_CHANNEL_NAME(false, 2057, "유튜브 채널명을 입력해주세요."),
     EMPTY_YOUTUBEIDX(false, 2058, "유튜브 인덱스를 입력해주세요."),
+
+    // [POST] scraps/blog
+    POST_SCRAP_BLOG_EMPTY_TITLE(false, 2059, "제목을 입력해주세요."),
+    POST_SCRAP_BLOG_EMPTY_THUMBNAIL(false, 2060, "썸네일을 입력해주세요.."),
+    POST_SCRAP_BLOG_EMPTY_BLOGURL(false, 2061, "블로그 url을 입력해주세요."),
+    POST_SCRAP_BLOG_EMPTY_DESCRIPTION(false, 2062, "내용을 입력해주세요."),
+    POST_SCRAP_BLOG_EMPTY_BLOGGER_NAME(false, 2063, "블로거명을 입력해주세요."),
+    POST_SCRAP_BLOG_EMPTY_POST_DATE(false, 2064, "포스팅 날짜를 입력해주세요."),
+
+
     /**
      * 3000 : Response 오류
      */
@@ -137,6 +147,7 @@ public enum BaseResponseStatus {
      */
     DATABASE_ERROR(false, 4000, "데이터베이스 연결에 실패하였습니다."),
     SERVER_ERROR(false, 4001, "서버와의 연결에 실패하였습니다."),
+    DATE_PARSE_ERROR(false, 4002, "Date형 변환에 실패하였습니다."),
 
     PASSWORD_ENCRYPTION_ERROR(false, 4011, "비밀번호 암호화에 실패하였습니다."),
     PASSWORD_DECRYPTION_ERROR(false, 4012, "비밀번호 복호화에 실패하였습니다."),
