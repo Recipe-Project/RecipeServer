@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipeProcess.models;
 
 import com.recipe.app.config.BaseEntity;
+import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -20,8 +21,9 @@ public class RecipeProcess extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;
 
-    @Column(name="recipeId", nullable = false)
-    private Integer recipeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipeId", nullable = false)
+    private RecipeInfo recipeInfo;
 
     @Column(name = "cookingNo", nullable = false)
     private Integer cookingNo;
@@ -38,8 +40,8 @@ public class RecipeProcess extends BaseEntity {
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public RecipeProcess(Integer recipeId, Integer cookingNo, String cookingDc, String streStepImageUrl, String stepTip){
-        this.recipeId = recipeId;
+    public RecipeProcess(RecipeInfo recipeInfo, Integer cookingNo, String cookingDc, String streStepImageUrl, String stepTip){
+        this.recipeInfo = recipeInfo;
         this.cookingNo = cookingNo;
         this.cookingDc = cookingDc;
         this.streStepImageUrl = streStepImageUrl;

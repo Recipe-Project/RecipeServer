@@ -1,6 +1,8 @@
 package com.recipe.app.src.recipeIngredient.models;
 
 import com.recipe.app.config.BaseEntity;
+import com.recipe.app.src.recipeInfo.models.RecipeInfo;
+import com.recipe.app.src.user.models.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -19,8 +21,9 @@ public class RecipeIngredient extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;
 
-    @Column(name="recipeId", nullable = false)
-    private Integer recipeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipeId", nullable = false)
+    private RecipeInfo recipeInfo;
 
     @Column(name = "irdntSn", nullable = false)
     private Integer irdntSn;
@@ -41,8 +44,8 @@ public class RecipeIngredient extends BaseEntity {
     private String status="ACTIVE";
 
 
-    public RecipeIngredient(Integer recipeId,Integer irdntSn, String irdntNm,String irdntCpcty,Integer irdntTyCode,String irdntTyNm){
-        this.recipeId = recipeId;
+    public RecipeIngredient(RecipeInfo recipeInfo,Integer irdntSn, String irdntNm,String irdntCpcty,Integer irdntTyCode,String irdntTyNm){
+        this.recipeInfo = recipeInfo;
         this.irdntSn = irdntSn;
         this.irdntNm = irdntNm;
         this.irdntCpcty = irdntCpcty;
