@@ -53,16 +53,6 @@ public class UserProvider {
     }
 
     /**
-     * 자동 로그인
-     * @return void
-     * @throws BaseException
-     */
-    public void autoLogin() throws BaseException {
-        Integer userIdx = jwtService.getUserId();
-        retrieveUserByUserIdx(userIdx);
-    }
-
-    /**
      * 유저조회
      * @return User
      * @throws BaseException
@@ -95,11 +85,11 @@ public class UserProvider {
      * @return GetUserRes
      * @throws BaseException
      */
-    public GetUserRes retrieveUser(Integer userIdx) throws BaseException {
-        User user = retrieveUserByUserIdx(jwtService.getUserId());
-        if(userIdx != user.getUserIdx()){
+    public GetUserRes retrieveUser(Integer jwtUserIdx, Integer userIdx) throws BaseException {
+        if(userIdx != jwtUserIdx){
             throw new BaseException(FORBIDDEN_USER);
         }
+        User user = retrieveUserByUserIdx(jwtUserIdx);
 
         try {
             String profilePhoto = user.getProfilePhoto();
@@ -123,9 +113,6 @@ public class UserProvider {
                 }
             }
 
-            List<String> myRecipeTitles = new ArrayList<>();
-            List<String> myRecipeThumbnails = new ArrayList<>();
-            List<String> myRecipeDate = new ArrayList<>();
             List<UserRecipe> userRecipes = user.getUserRecipes();
             Collections.sort(userRecipes, new Comparator<UserRecipe>() {
                 @Override
@@ -138,17 +125,21 @@ public class UserProvider {
                 size = userRecipes.size();
             }
 
+            List<MypageMyRecipeList> myRecipeList= new ArrayList<>();
             for(int i=0;i<size;i++){
-                myRecipeTitles.add(userRecipes.get(i).getTitle());
-                myRecipeThumbnails.add(userRecipes.get(i).getThumbnail());
+                Integer myRecipeIdx = userRecipes.get(i).getUserRecipeIdx();
+                String myRecipeTitle = userRecipes.get(i).getTitle();
+                String myRecipeThumbnail = userRecipes.get(i).getThumbnail();
                 Date date = userRecipes.get(i).getCreatedAt();
                 SimpleDateFormat datetime = new SimpleDateFormat("yyyy.M.d", Locale.KOREA);
                 datetime.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
                 String postDate = datetime.format(date);
-                myRecipeDate.add(postDate);
+                MypageMyRecipeList mypageMyRecipe = new MypageMyRecipeList(myRecipeIdx, myRecipeTitle, myRecipeThumbnail, postDate);
+
+                myRecipeList.add(mypageMyRecipe);
             }
 
-            return new GetUserRes(userIdx, profilePhoto, userName, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt, myRecipeTitles, myRecipeThumbnails, myRecipeDate);
+            return new GetUserRes(userIdx, profilePhoto, userName, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt, size, myRecipeList);
         }catch(Exception e){
             throw new BaseException(FAILED_TO_GET_USER);
         }

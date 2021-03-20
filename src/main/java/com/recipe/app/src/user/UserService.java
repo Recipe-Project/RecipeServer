@@ -392,12 +392,12 @@ public class UserService {
      * @return PatchUserRes
      * @throws BaseException
      */
-    public PatchUserRes updateUser(Integer userIdx, PatchUserReq patchUserReq) throws BaseException {
+    public PatchUserRes updateUser(Integer jwtUserIdx, Integer userIdx, PatchUserReq patchUserReq) throws BaseException {
         //jwt 확인
-        User user = userProvider.retrieveUserByUserIdx(jwtService.getUserId());
-        if(userIdx != user.getUserIdx()){
+        if(userIdx != jwtUserIdx){
             throw new BaseException(FORBIDDEN_USER);
         }
+        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
         //유저 정보 수정
         user.setProfilePhoto(patchUserReq.getProfilePhoto());
@@ -428,12 +428,12 @@ public class UserService {
      * @param userIdx
      * @throws BaseException
      */
-    public void deleteUser(Integer userIdx) throws BaseException {
+    public void deleteUser(Integer jwtUserIdx, Integer userIdx) throws BaseException {
         //jwt 확인
-        User user = userProvider.retrieveUserByUserIdx(jwtService.getUserId());
-        if(userIdx != user.getUserIdx()){
+        if(userIdx != jwtUserIdx){
             throw new BaseException(FORBIDDEN_USER);
         }
+        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
         user.setStatus("INACTIVE");
         try {

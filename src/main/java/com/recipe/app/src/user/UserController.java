@@ -39,7 +39,8 @@ public class UserController {
     public BaseResponse<Void> postAutoLogin() {
 
         try {
-            userProvider.autoLogin();
+            Integer userIdx = jwtService.getUserId();
+            userProvider.retrieveUserByUserIdx(userIdx);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -112,7 +113,7 @@ public class UserController {
     }
 
     /**
-     * 회원 정보 조회 API
+     * 마이페이지 조회 API
      * [GET] /users/:userIdx
      * @return BaseResponse<GetUserRes>
      */
@@ -123,8 +124,15 @@ public class UserController {
             return new BaseResponse<>(USERS_EMPTY_USER_ID);
         }
 
+        int jwtUserIdx;
         try {
-            GetUserRes getUserRes = userProvider.retrieveUser(userIdx);
+            jwtUserIdx = jwtService.getUserId();
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+        try {
+            GetUserRes getUserRes = userProvider.retrieveUser(jwtUserIdx, userIdx);
             return new BaseResponse<>(getUserRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -143,8 +151,15 @@ public class UserController {
             return new BaseResponse<>(USERS_EMPTY_USER_ID);
         }
 
+        int jwtUserIdx;
         try {
-            PatchUserRes patchUserRes = userService.updateUser(userIdx, parameters);
+            jwtUserIdx = jwtService.getUserId();
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+        try {
+            PatchUserRes patchUserRes = userService.updateUser(jwtUserIdx, userIdx, parameters);
             return new BaseResponse<>(patchUserRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -162,8 +177,15 @@ public class UserController {
             return new BaseResponse<>(USERS_EMPTY_USER_ID);
         }
 
+        int jwtUserIdx;
         try {
-            userService.deleteUser(userIdx);
+            jwtUserIdx = jwtService.getUserId();
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+
+        try {
+            userService.deleteUser(jwtUserIdx, userIdx);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
