@@ -2,6 +2,8 @@ package com.recipe.app.src.recipeInfo;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.recipeInfo.models.*;
+import com.recipe.app.src.recipeIngredient.models.RecipeIngredient;
+import com.recipe.app.src.recipeProcess.models.RecipeProcess;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
@@ -100,4 +102,58 @@ public class RecipeInfoProvider {
     }
 
 
+    /**
+     * 레시피 검색 상세 조회
+     * @param jwtUserIdx, recipeIdx
+     * @return GetRecipeInfoRes
+     * @throws BaseException
+     */
+
+    public GetRecipeInfoRes retrieveRecipeInfo(Integer jwtUserIdx, Integer recipeIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+
+        RecipeInfo recipeInfo= retrieveRecipeByRecipeId(recipeIdx);
+
+        String recipeName= recipeInfo.getRecipeNmKo();
+        String summary = recipeInfo.getSumry();
+        String thumbnail = recipeInfo.getImgUrl();
+        String cookingTime = recipeInfo.getCookingTime();
+        String level = recipeInfo.getLevelNm();
+
+        List<RecipeIngredient> recipeIngredients = recipeInfo.getRecipeIngredients();
+        List<RecipeIngredientList> recipeIngredientList = new ArrayList<>();
+        for(int i=0;i<recipeIngredients.size();i++){
+            RecipeIngredient ingredient = recipeIngredients.get(i);
+            Integer recipeIngredientIdx = ingredient.getIdx();
+            String recipeIngredientName = ingredient.getIrdntNm();
+            String recipeIngredientCpcty = ingredient.getIrdntCpcty();
+            recipeIngredientList.add(new RecipeIngredientList(recipeIngredientIdx, recipeIngredientName, recipeIngredientCpcty));
+        }
+        List<RecipeProcess> recipeProcesses = recipeInfo.getRecipeProcesses();
+        List<RecipeProcessList> recipeProcessList = new ArrayList<>();
+        for(int i=0;i<recipeProcesses.size();i++){
+            RecipeProcess process = recipeProcesses.get(i);
+            Integer recipeProcessIdx = process.getIdx();
+            Integer recipeProcessNo = process.getCookingNo();
+            String recipeProcessDc = process.getCookingDc();
+            String recipeProcessImg = process.getStreStepImageUrl();
+            recipeProcessList.add(new RecipeProcessList(recipeProcessIdx, recipeProcessNo, recipeProcessDc, recipeProcessImg));
+        }
+
+        String userScrapYN = "N";
+        for(int j=0;j<user.getScrapPublics().size();j++){
+            if(user.getScrapPublics().get(j).getRecipeInfo().getRecipeId()==recipeIdx && user.getScrapPublics().get(j).getStatus().equals("ACTIVE")){
+                userScrapYN = "Y";
+            }
+        }
+
+        Integer userScrapCnt = 0;
+        try{
+            userScrapCnt = Math.toIntExact(scrapPublicRepository.countByRecipeInfoAndStatus(recipeInfo, "ACTIVE"));
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        return new GetRecipeInfoRes(recipeIdx, recipeName, summary, thumbnail, cookingTime, level, recipeIngredientList, recipeProcessList, userScrapYN, userScrapCnt);
+    }
 }

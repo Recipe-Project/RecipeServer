@@ -35,7 +35,7 @@ public class RecipeInfoController {
     /**
      * 레시피 검색 API
      * [GET] /recipes?keyword=
-     * @return BaseResponse<List<GetMyRecipesRes>>
+     * @return BaseResponse<List<GetRecipeInfosRes>>
      * @PageableDefault pageable
      */
 
@@ -52,4 +52,24 @@ public class RecipeInfoController {
         }
     }
 
+
+    /**
+     * 레시피 검색 상세 조회 API
+     * [GET] /recipes/:recipeIdx
+     * @return BaseResponse<GetMyRecipeRes>
+     * @PageableDefault pageable
+     */
+
+    @GetMapping("/{recipeIdx}")
+    public BaseResponse<GetRecipeInfoRes> getRecipeInfo(@PathVariable Integer recipeIdx) {
+
+        try {
+            Integer jwtUserIdx = jwtService.getUserId();
+            GetRecipeInfoRes GetRecipeInfo = recipeInfoProvider.retrieveRecipeInfo(jwtUserIdx, recipeIdx);
+
+            return new BaseResponse<>(GetRecipeInfo);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }
