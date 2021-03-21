@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 
-
 @RestController
 @RequestMapping("/ingredients")
 public class IngredientController {
@@ -55,27 +54,4 @@ public class IngredientController {
         }
     }
 
-//    /**
-//     * 재료 직접입력 API
-//     * [POST] /ingredients
-//     * @RequestParam keyword
-//     * @return BaseResponse<List<PostIngredientsRes>>
-//     * @PageableDefault pageable
-//     */
-//    @PostMapping("")
-//    public BaseResponse<PostIngredientsRes> postIngredients(@RequestBody PostIngredientsReq parameters) {
-//
-//        try {
-//            Integer userIdx = jwtService.getUserId();
-//            if (parameters.getIngredientList() == null) {
-//                return new BaseResponse<>(EMPTY_INGREDIENT_LIST);
-//            }
-//
-//            PostIngredientsRes postIngredientsRes = IngredientService.createMyFridge(parameters,userIdx);
-//
-//            return new BaseResponse<>(postIngredientsRes);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
 }

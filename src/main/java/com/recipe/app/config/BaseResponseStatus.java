@@ -84,7 +84,12 @@ public enum BaseResponseStatus {
     POST_SCRAP_BLOG_EMPTY_BLOGGER_NAME(false, 2063, "블로거명을 입력해주세요."),
     POST_SCRAP_BLOG_EMPTY_POST_DATE(false, 2064, "포스팅 날짜를 입력해주세요."),
 
-
+    // [POST] /fridges/direct-basket
+    POST_FRIDGES_BASKET_EMPTY_INGREDIENT_NAME(false, 2065, "재료명을 입력하세요."),
+    POST_FRIDGES_BASKET_EMPTY_INGREDIENT_ICON(false, 2066, "재료 아이콘을 입력하세요."),
+    POST_FRIDGES_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX(false, 2067, "재료 카테고리 인덱스를 입력하세요."),
+    POST_FRIDGES_BASKET_DUPLICATED_INGREDIENT_NAME_IN_BASKET(false, 2068, "냉장고 바구니 안에 재료명이 존재합니다."),
+    POST_FRIDGES_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS(false, 2069, "재료안에 재료명이 존재합니다."),
     /**
      * 3000 : Response 오류
      */
@@ -147,6 +152,11 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_INGREDIENT_CATEGORY(false, 3038, "재료 카테고리 조회에 실패하였습니다."),
     NOT_FOUND_INGREDIENT_CATEGORY(false, 3039, "재료 카테고리인덱스를 찾을 수 없습니다."),
     FAILED_TO_GET_INGREDIENT_LIST(false, 3040, "재료 리스트 조회에 실패하였습니다."),
+
+    // [POST] /fridges/direct-basket
+    FAILED_TO_POST_FRIDGES_BASKET(false, 3041, "재료 직접 입력으로 냉장고 바구니 담기에 실패하였습니다."),
+    FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME(false, 3042, "재료명으로 냉장고 바구니 조회에 실패하였습니다."),
+    FAILED_TO_RETREIVE_INGREDIENT_BY_NAME(false, 3043, "재료명으로 재료 조회에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */

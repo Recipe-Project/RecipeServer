@@ -1,6 +1,7 @@
 package com.recipe.app.src.ingredient;
 
 import com.recipe.app.config.BaseException;
+import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.ingredient.models.*;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
@@ -171,4 +172,23 @@ public class IngredientProvider {
 
         }).collect(Collectors.toList());
     }
+
+    /**
+     * Ingredient에서 재료명으로 재료 조회하기
+     *
+     * @param
+     * @return FridgeBasket
+     * @throws BaseException
+     */
+    public Ingredient retreiveIngredientByName(String name) throws BaseException {
+        Ingredient ingredient;
+        try {
+            ingredient = ingredientRepository.findByNameAndStatus(name,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_RETREIVE_INGREDIENT_BY_NAME);
+        }
+
+        return ingredient;
+    }
+
 }

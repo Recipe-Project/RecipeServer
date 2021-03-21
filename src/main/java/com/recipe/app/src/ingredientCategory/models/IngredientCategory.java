@@ -1,6 +1,7 @@
 package com.recipe.app.src.ingredientCategory.models;
 
 import com.recipe.app.config.BaseEntity;
+import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -27,6 +28,9 @@ public class IngredientCategory extends BaseEntity {
 
     @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
     private List<Ingredient> ingredients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
+    private List<FridgeBasket> fridgeBasket = new ArrayList<>();
 
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
