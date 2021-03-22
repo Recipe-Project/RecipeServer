@@ -70,7 +70,7 @@ public class UserRecipeProvider {
     /**
      * 나만의 레시피 상세조회
      * @param userIdx,myRecipeIdx
-     * @return getMyRecipeRes
+     * @return GetMyRecipeRes
      * @throws BaseException
      */
     @Transactional
@@ -83,13 +83,14 @@ public class UserRecipeProvider {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
 
-        List photoUrlList = userRecipePhotoProvider.retrieveUserRecipePhoto(myRecipeIdx);
+//        List photoUrlList = userRecipePhotoProvider.retrieveUserRecipePhoto(myRecipeIdx);
+        String thumbnail = userRecipe.getThumbnail();
         String title = userRecipe.getTitle();
         String content = userRecipe.getContent();
 
         List ingredientList = userRecipeIngredientProvider.retrieveUserRecipeIngredient(myRecipeIdx);
 
-        return new GetMyRecipeRes(photoUrlList,title,content,ingredientList);
+        return new GetMyRecipeRes(thumbnail,title,content,ingredientList);
     }
 
     /**

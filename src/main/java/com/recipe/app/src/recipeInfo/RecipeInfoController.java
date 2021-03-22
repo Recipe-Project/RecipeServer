@@ -40,11 +40,11 @@ public class RecipeInfoController {
      */
 
     @GetMapping("")
-    public BaseResponse<List<GetRecipeInfosRes>> getRecipeInfos(@RequestParam(value="keyword") String keyword, @PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public BaseResponse<List<GetRecipeInfosRes>> getRecipeInfos(@RequestParam(value="keyword") String keyword) {
 
         try {
             Integer jwtUserIdx = jwtService.getUserId();
-            List<GetRecipeInfosRes> GetRecipeInfoList = recipeInfoProvider.retrieveRecipeInfos(jwtUserIdx, keyword, pageable);
+            List<GetRecipeInfosRes> GetRecipeInfoList = recipeInfoProvider.retrieveRecipeInfos(jwtUserIdx, keyword);
 
             return new BaseResponse<>(GetRecipeInfoList);
         } catch (BaseException exception) {
