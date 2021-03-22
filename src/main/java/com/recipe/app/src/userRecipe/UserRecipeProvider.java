@@ -83,7 +83,6 @@ public class UserRecipeProvider {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
 
-//        List photoUrlList = userRecipePhotoProvider.retrieveUserRecipePhoto(myRecipeIdx);
         String thumbnail = userRecipe.getThumbnail();
         String title = userRecipe.getTitle();
         String content = userRecipe.getContent();

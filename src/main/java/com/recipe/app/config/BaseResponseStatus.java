@@ -65,7 +65,6 @@ public enum BaseResponseStatus {
     EMPTY_TITLE(false, 2050, "제목을 입력해주세요."),
     EMPTY_CONTENT(false, 2051, "내용을 입력해주세요."),
     EMPTY_THUMBNAIL(false, 2052, "썸네일을 입력해주세요."),
-    EMPTY_PHOTO_URL_LIST(false, 2053, "사진을 입력해주세요."),
 
     // [PATCH] /my-recipes/:myRecipeIdx
     EMPTY_MY_RECIPEIDX(false, 2054, "나만의 레시피 인덱스값을 입력해주세요."),
@@ -125,7 +124,6 @@ public enum BaseResponseStatus {
 
 
     // [GET] /my-recipes/:myRecipeIdx
-    FAILED_TO_GET_MY_RECIPE_PHOTOS(false, 3023, "나만의 레시피 사진 조회에 실패하였습니다."),
     FAILED_TO_GET_MY_RECIPE_INGREDIENTS(false, 3024, "나만의 레시피 재료 조회에 실패하였습니다."),
     FAILED_TO_GET_MY_RECIPE(false, 3025, "나만의 레시피 상세 조회에 실패하였습니다."),
     NO_FOUND_MY_RECIPE(false, 3026, "존재하지 않는 나만의 레시피입니다."),
