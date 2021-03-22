@@ -3,18 +3,12 @@ package com.recipe.app.src.fridgeBasket;
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
-import com.recipe.app.src.ingredient.models.GetIngredientsRes;
 import com.recipe.app.src.ingredient.models.IngredientList;
-import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
-import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
-import com.recipe.app.src.scrapYoutube.models.ScrapYoutubeList;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -36,7 +30,7 @@ public class FridgeBasketProvider {
 
     /**
      * FridgeBasket에서 재료명으로 재료 조회하기
-     * @param
+     * @param name
      * @return FridgeBasket
      * @throws BaseException
      */
@@ -53,7 +47,7 @@ public class FridgeBasketProvider {
 
     /**
      *냉장고 바구니 조회 API
-     * @param
+     * @param userIdx
      * @return GetFridgesBasketRes
      * @throws BaseException
      */
@@ -76,8 +70,8 @@ public class FridgeBasketProvider {
 
     /**
      * 유저 인덱스로 냉장고 바구니 조회
-     * @param
-     * @return GetFridgesBasketRes
+     * @param userIdx
+     * @return List<IngredientList>
      * @throws BaseException
      */
     public List<IngredientList> retrieveIngredientList(int userIdx) throws BaseException {

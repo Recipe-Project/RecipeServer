@@ -191,4 +191,28 @@ public class IngredientProvider {
         return ingredient;
     }
 
+
+    /**
+     * ingredientIdx로 재료 조회
+     *
+     * @param ingredientIdx
+     * @return ingredient
+     * @throws BaseException
+     */
+    public Ingredient retrieveIngredientByIngredientIdx(Integer ingredientIdx) throws BaseException {
+        Ingredient ingredient;
+
+        try {
+            ingredient = ingredientRepository.findById(ingredientIdx).orElse(null);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_INGREDIENT);
+        }
+
+        if (ingredient == null || !ingredient.getStatus().equals("ACTIVE")) {
+            throw new BaseException(NOT_FOUND_INGREDIENT);
+        }
+
+        return ingredient;
+    }
+
 }

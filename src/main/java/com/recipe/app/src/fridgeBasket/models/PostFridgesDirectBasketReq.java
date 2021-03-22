@@ -4,11 +4,11 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PostFridgesBasketReq {
-    private List ingredientList;
+public class PostFridgesDirectBasketReq {
+    private String ingredientName;
+    private String ingredientIcon;
+    private Integer ingredientCategoryIdx;
 }
