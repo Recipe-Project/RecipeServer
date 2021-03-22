@@ -3,13 +3,18 @@ package com.recipe.app.src.fridgeBasket;
 import com.recipe.app.config.BaseException;
 import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
+import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
 import com.recipe.app.src.fridgeBasket.models.PostFridgesBasketReq;
 import com.recipe.app.src.fridgeBasket.models.PostFridgesBasketRes;
 import com.recipe.app.src.ingredient.IngredientProvider;
+import com.recipe.app.src.ingredient.models.GetIngredientsRes;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
 
@@ -73,4 +78,28 @@ public class FridgeBasketController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
+
+    /**
+     * 냉장고 바구니 조회 API
+     * [GET] /fridges/basket
+     * @RequestParam
+     * @return BaseResponse<GetFridgesBasketRes>
+     * @PageableDefault pageable
+     */
+    @GetMapping("/basket")
+    public BaseResponse<GetFridgesBasketRes> getFridgesBasket() {
+
+        try {
+            Integer userIdx = jwtService.getUserId();
+            GetFridgesBasketRes getFridgesBasketRes = fridgeBasketProvider.retreiveFridgeBasket(userIdx);
+
+
+            return new BaseResponse<>(getFridgesBasketRes);
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
 }

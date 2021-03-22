@@ -2,12 +2,17 @@ package com.recipe.app.src.fridgeBasket;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
+import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
 import com.recipe.app.src.ingredient.models.GetIngredientsRes;
 import com.recipe.app.src.ingredient.models.IngredientList;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
+import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
+import com.recipe.app.src.scrapYoutube.models.ScrapYoutubeList;
 import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,7 +36,6 @@ public class FridgeBasketProvider {
 
     /**
      * FridgeBasket에서 재료명으로 재료 조회하기
-     *
      * @param
      * @return FridgeBasket
      * @throws BaseException
@@ -46,4 +50,58 @@ public class FridgeBasketProvider {
 
         return fridgeBasket;
     }
+
+    /**
+     *냉장고 바구니 조회 API
+     * @param
+     * @return GetFridgesBasketRes
+     * @throws BaseException
+     */
+    public GetFridgesBasketRes retreiveFridgeBasket(int userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+
+        Long ingredientCount;
+        try {
+            ingredientCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_COUNT_FRIDGE_BASKET_BY_USER);
+        }
+
+        List ingredientList = retrieveIngredientList(userIdx);;
+
+
+        return new GetFridgesBasketRes(ingredientCount,ingredientList);
+    }
+
+
+    /**
+     * 유저 인덱스로 냉장고 바구니 조회
+     * @param
+     * @return GetFridgesBasketRes
+     * @throws BaseException
+     */
+    public List<IngredientList> retrieveIngredientList(int userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+
+        List<FridgeBasket> fridgeBasketList;
+        try {
+            fridgeBasketList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");//, Sort.by("createdAt").descending()
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_RETREIVE_INGREDIENT_LIST_BY_USER);
+        }
+
+        return fridgeBasketList.stream().map(fridgeBasket -> {
+            Integer ingredientIdx=null;
+            if(fridgeBasket.getIngredient()!=null){
+                ingredientIdx = fridgeBasket.getIngredient().getIngredientIdx();
+            }
+
+            String ingredientName = fridgeBasket.getIngredientName();
+            String ingredientIcon = fridgeBasket.getIngredientIcon();
+
+            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon);
+
+        }).collect(Collectors.toList());
+    }
+
 }

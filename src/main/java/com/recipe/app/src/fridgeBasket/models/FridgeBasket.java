@@ -27,7 +27,7 @@ public class FridgeBasket extends BaseEntity {
     private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredientIdx", nullable = false)
+    @JoinColumn(name = "ingredientIdx")
     private Ingredient ingredient;
 
     @Column(name="ingredientName", nullable = false,length = 45)

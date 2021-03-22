@@ -157,6 +157,10 @@ public enum BaseResponseStatus {
     FAILED_TO_POST_FRIDGES_BASKET(false, 3041, "재료 직접 입력으로 냉장고 바구니 담기에 실패하였습니다."),
     FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME(false, 3042, "재료명으로 냉장고 바구니 조회에 실패하였습니다."),
     FAILED_TO_RETREIVE_INGREDIENT_BY_NAME(false, 3043, "재료명으로 재료 조회에 실패하였습니다."),
+
+    // [GET] /fridges/basket
+    FAILED_TO_RETREIVE_INGREDIENT_LIST_BY_USER(false, 3044, "재료명으로 재료 조회에 실패하였습니다."),
+    FAILED_TO_COUNT_FRIDGE_BASKET_BY_USER(false, 3045, "유저로 바구니 속 개수 세기에 실패하였습니다."),
     /**
      * 4000 : Database, Server 오류
      */
