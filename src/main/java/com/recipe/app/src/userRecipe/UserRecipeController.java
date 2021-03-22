@@ -36,11 +36,11 @@ public class UserRecipeController {
      * @PageableDefault pageable
      */
     @GetMapping("")
-    public BaseResponse<List<GetMyRecipesRes>> getMyRecipes(@PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
+//    public BaseResponse<List<GetMyRecipesRes>> getMyRecipes(@PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public BaseResponse<List<GetMyRecipesRes>> getMyRecipes() {
         try {
             Integer userIdx = jwtService.getUserId();
-            List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx,pageable);
+            List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx);
 
             return new BaseResponse<>(GetMyRecipesResList);
 
