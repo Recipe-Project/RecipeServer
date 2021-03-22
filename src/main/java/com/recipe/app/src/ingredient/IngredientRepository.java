@@ -14,5 +14,5 @@ public interface IngredientRepository extends CrudRepository<Ingredient, Integer
     List<Ingredient> findByIngredientCategoryAndStatus(IngredientCategory ingredientCategory, String status);
     List<Ingredient> findByNameContainingAndIngredientCategoryAndStatus(String name,IngredientCategory ingredientCategory,String status);
     Ingredient findByNameAndStatus(String name, String status);
-    Ingredient findByIngredientAndStatus(Ingredient ingredient, String status);
+    //Ingredient findByIngredientAndStatus(Ingredient ingredient, String status);
 }

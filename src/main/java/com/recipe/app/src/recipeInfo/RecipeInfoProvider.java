@@ -63,11 +63,11 @@ public class RecipeInfoProvider {
      * @throws BaseException
      */
 
-    public List<GetRecipeInfosRes> retrieveRecipeInfos(Integer jwtUserIdx, String keyword, Pageable pageable) throws BaseException {
+    public List<GetRecipeInfosRes> retrieveRecipeInfos(Integer jwtUserIdx, String keyword) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
         List<RecipeInfo> recipeInfoList;
         try {
-            recipeInfoList= recipeInfoRepository.searchRecipeInfos(keyword, "ACTIVE", pageable);
+            recipeInfoList= recipeInfoRepository.searchRecipeInfos(keyword, "ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(DATABASE_ERROR);
         }
