@@ -192,6 +192,8 @@ public enum BaseResponseStatus {
     FAILED_TO_READ_RESPONSE(false, 4023, "API 응답을 읽는데 실패했습니다."),
     FAILED_TO_PARSE(false, 4024, "JSON 파싱에 실패했습니다."),
     FORBIDDEN_ACCESS(false, 4025, "접근 권한이 없습니다."),
+    FAILED_TO_URL_ENCODER(false, 4026, "검색어 인코딩에 실패했습니다."),
+    FAILED_TO_CRAWLING(false, 4027, "크롤링에 실패했습니다.")
     ;
 
 

@@ -36,7 +36,6 @@ public class RecipeInfoController {
      * 레시피 검색 API
      * [GET] /recipes?keyword=
      * @return BaseResponse<List<GetRecipeInfosRes>>
-     * @PageableDefault pageable
      */
 
     @GetMapping("")
@@ -57,7 +56,6 @@ public class RecipeInfoController {
      * 레시피 검색 상세 조회 API
      * [GET] /recipes/:recipeIdx
      * @return BaseResponse<GetMyRecipeRes>
-     * @PageableDefault pageable
      */
 
     @GetMapping("/{recipeIdx}")
@@ -65,9 +63,28 @@ public class RecipeInfoController {
 
         try {
             Integer jwtUserIdx = jwtService.getUserId();
-            GetRecipeInfoRes GetRecipeInfo = recipeInfoProvider.retrieveRecipeInfo(jwtUserIdx, recipeIdx);
+            GetRecipeInfoRes getRecipeInfo = recipeInfoProvider.retrieveRecipeInfo(jwtUserIdx, recipeIdx);
 
-            return new BaseResponse<>(GetRecipeInfo);
+            return new BaseResponse<>(getRecipeInfo);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
+    /**
+     * 블로그 검색 API
+     * [GET] /recipes/blog?keyword=
+     * @return BaseResponse<List<GetRecipeBlogsRes>>
+     */
+    @GetMapping("/blog")
+    public BaseResponse<List<GetRecipeBlogsRes>> getRecipeBlogs(@RequestParam(value="keyword") String keyword) {
+
+        try {
+            Integer jwtUserIdx = jwtService.getUserId();
+            List<GetRecipeBlogsRes> getRecipeBlogList = recipeInfoProvider.retrieveRecipeBlogs(jwtUserIdx, keyword);
+
+            return new BaseResponse<>(getRecipeBlogList);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
