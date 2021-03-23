@@ -95,6 +95,9 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_INGREDIENT(false, 2071, "재료조회에 실패했습니다."),
     NOT_FOUND_INGREDIENT(false, 2072, "재료를 찾을 수 없습니다."),
 
+    // [POST] /fridges
+    POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST(false, 2073, "냉장고 바구니 리스트를 입력해주세요."),
+    FAILED_TO_POST_FRIDGES(false, 2074, "냉장고에 재료넣기를 실패했습니다."),
 
     /**
      * 3000 : Response 오류
@@ -169,6 +172,10 @@ public enum BaseResponseStatus {
 
     // [POST] /fridges/basket
     FAILED_TO_POST_FRIDGES_BASKET(false, 3046, "재료 선택으로 냉장고 바구니 담기에 실패했습니다."),
+
+
+    // [GET] /fridges
+    FAILED_TO_RETREIVE_FRIDGE_BY_USER(false, 3047, "유저로 냉장고 조회에 실패했습니다."),
     /**
      * 4000 : Database, Server 오류
      */
