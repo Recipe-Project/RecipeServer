@@ -8,8 +8,7 @@ import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoProvider;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,16 +37,16 @@ public class UserRecipeProvider {
 
     /**
      * 나만의 레시피 전체조회
-     * @param userIdx,pageable
+     * @param userIdx
      * @return List<GetMyRecipesRes>
      * @throws BaseException
      */
-    public List<GetMyRecipesRes> retrieveMyRecipesList(Integer userIdx, Pageable pageable) throws BaseException {
+    public List<GetMyRecipesRes> retrieveMyRecipesList(Integer userIdx) throws BaseException {
 
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        Page<UserRecipe> userRecipeList;
+        List<UserRecipe> userRecipeList;
         try {
-            userRecipeList = userRecipeRepository.findByUserAndStatus(user, "ACTIVE",pageable);
+            userRecipeList = userRecipeRepository.findByUserAndStatus(user, "ACTIVE", Sort.by("createdAt").descending());
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_MY_RECIPES);
         }
@@ -71,7 +70,7 @@ public class UserRecipeProvider {
     /**
      * 나만의 레시피 상세조회
      * @param userIdx,myRecipeIdx
-     * @return getMyRecipeRes
+     * @return GetMyRecipeRes
      * @throws BaseException
      */
     @Transactional
@@ -84,13 +83,13 @@ public class UserRecipeProvider {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
 
-        List photoUrlList = userRecipePhotoProvider.retrieveUserRecipePhoto(myRecipeIdx);
+        String thumbnail = userRecipe.getThumbnail();
         String title = userRecipe.getTitle();
         String content = userRecipe.getContent();
 
         List ingredientList = userRecipeIngredientProvider.retrieveUserRecipeIngredient(myRecipeIdx);
 
-        return new GetMyRecipeRes(photoUrlList,title,content,ingredientList);
+        return new GetMyRecipeRes(thumbnail,title,content,ingredientList);
     }
 
     /**

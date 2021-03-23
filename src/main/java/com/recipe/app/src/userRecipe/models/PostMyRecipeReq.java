@@ -13,7 +13,6 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 public class PostMyRecipeReq {
-    private  List photoUrlList;
     private String thumbnail;
     private String title;
     private String content;

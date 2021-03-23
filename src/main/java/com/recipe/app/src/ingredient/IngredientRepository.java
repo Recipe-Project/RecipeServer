@@ -1,6 +1,5 @@
 package com.recipe.app.src.ingredient;
 
-import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import org.springframework.data.repository.CrudRepository;
@@ -14,5 +13,5 @@ public interface IngredientRepository extends CrudRepository<Ingredient, Integer
     List<Ingredient> findByIngredientCategoryAndStatus(IngredientCategory ingredientCategory, String status);
     List<Ingredient> findByNameContainingAndIngredientCategoryAndStatus(String name,IngredientCategory ingredientCategory,String status);
     Ingredient findByNameAndStatus(String name, String status);
-    //Ingredient findByIngredientAndStatus(Ingredient ingredient, String status);
+
 }

@@ -52,23 +52,13 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
 
-        List<UserRecipePhoto> userRecipePhotoList;
-        try {
-            userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_MY_RECIPE_PHOTOS);
-        }
-
 
 
         try {
             userRecipe.setStatus("INACTIVE");
             userRecipeRepository.save(userRecipe);
 
-            for (int i=0;i<userRecipePhotoList.size();i++){
-                userRecipePhotoList.get(i).setStatus("INACTIVE");
-            }
-            userRecipePhotoRepository.saveAll(userRecipePhotoList);
+
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_MY_RECIPE);
         }
@@ -88,7 +78,6 @@ public class UserRecipeService {
     public PostMyRecipeRes createMyRecipe(PostMyRecipeReq postMyRecipeReq, int userIdx) throws BaseException {
 
 
-        List<String> photoUrlList = postMyRecipeReq.getPhotoUrlList();
         String thumbnail = postMyRecipeReq.getThumbnail();
         String title = postMyRecipeReq.getTitle();
         String content = postMyRecipeReq.getContent();
@@ -102,12 +91,6 @@ public class UserRecipeService {
             userRecipeIdx = userRecipe.getUserRecipeIdx();
 
 
-            if (photoUrlList != null) {
-                for (int i = 0; i < photoUrlList.size(); i++) {
-                    UserRecipePhoto userRecipePhoto = new UserRecipePhoto(userRecipeIdx, photoUrlList.get(i));
-                    userRecipePhotoRepository.save(userRecipePhoto);
-                }
-            }
 
             if (ingredientList != null) {
                 for (int i = 0; i < ingredientList.size(); i++) {
@@ -120,7 +103,7 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_POST_MY_RECIPE);
         }
 
-        return new PostMyRecipeRes(userRecipeIdx,photoUrlList,thumbnail,title,content,ingredientList);
+        return new PostMyRecipeRes(userRecipeIdx,thumbnail,title,content,ingredientList);
     }
 
     /**
@@ -139,12 +122,6 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE);
         }
 
-        List<UserRecipePhoto> userRecipePhotoList;
-        try {
-            userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(userRecipeIdx,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_MY_RECIPE_PHOTOS);
-        }
 
         List<UserRecipeIngredient> userRecipeIngredientList;
         try {
@@ -153,7 +130,6 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE_INGREDIENTS);
         }
 
-        List<String> photoUrlList = patchMyRecipeReq.getPhotoUrlList();
         String thumbnail = patchMyRecipeReq.getThumbnail();
         String title = patchMyRecipeReq.getTitle();
         String content = patchMyRecipeReq.getContent();
@@ -164,19 +140,6 @@ public class UserRecipeService {
             userRecipe.setContent(content);
             userRecipeRepository.save(userRecipe);
 
-            // 사진 삭제
-            for (int i=0;i<userRecipePhotoList.size();i++){
-                userRecipePhotoList.get(i).setStatus("INACTIVE");
-            }
-            userRecipePhotoRepository.saveAll(userRecipePhotoList);
-
-
-            if (photoUrlList != null) {
-                for (int i = 0; i < photoUrlList.size(); i++) {
-                    UserRecipePhoto userRecipePhoto = new UserRecipePhoto(userRecipeIdx, photoUrlList.get(i));
-                    userRecipePhotoRepository.save(userRecipePhoto);
-                }
-            }
 
             // 재료 삭제
             for (int i=0;i<userRecipeIngredientList.size();i++){
@@ -196,7 +159,7 @@ public class UserRecipeService {
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_PATCH_MY_RECIPE);
         }
-        return new PatchMyRecipeRes(photoUrlList,thumbnail,title,content,ingredientList);
+        return new PatchMyRecipeRes(thumbnail,title,content,ingredientList);
 
 
     }

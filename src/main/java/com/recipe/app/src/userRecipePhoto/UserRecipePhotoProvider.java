@@ -22,20 +22,20 @@ public class UserRecipePhotoProvider {
         this.jwtService = jwtService;
     }
 
-    public List retrieveUserRecipePhoto(Integer myRecipeIdx) throws BaseException {
-        List<UserRecipePhoto> userRecipePhotoList;
-        try {
-            userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_MY_RECIPE_PHOTOS);
-        }
-
-
-        List list= userRecipePhotoList.stream().map(userRecipePhoto -> {
-            String photoUrl = userRecipePhoto.getPhotoUrl();
-            return photoUrl;
-        }).collect(Collectors.toList());
-
-        return list;
-    }
+//    public List retrieveUserRecipePhoto(Integer myRecipeIdx) throws BaseException {
+//        List<UserRecipePhoto> userRecipePhotoList;
+//        try {
+//            userRecipePhotoList = userRecipePhotoRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
+//        } catch (Exception ignored) {
+//            throw new BaseException(FAILED_TO_GET_MY_RECIPE_PHOTOS);
+//        }
+//
+//
+//        List list= userRecipePhotoList.stream().map(userRecipePhoto -> {
+//            String photoUrl = userRecipePhoto.getPhotoUrl();
+//            return photoUrl;
+//        }).collect(Collectors.toList());
+//
+//        return list;
+//    }
 }

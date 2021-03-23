@@ -36,11 +36,10 @@ public class UserRecipeController {
      * @PageableDefault pageable
      */
     @GetMapping("")
-    public BaseResponse<List<GetMyRecipesRes>> getMyRecipes(@PageableDefault(size=10, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-
+    public BaseResponse<List<GetMyRecipesRes>> getMyRecipes() {
         try {
             Integer userIdx = jwtService.getUserId();
-            List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx,pageable);
+            List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx);
 
             return new BaseResponse<>(GetMyRecipesResList);
 
@@ -109,11 +108,9 @@ public class UserRecipeController {
     public BaseResponse<PostMyRecipeRes> postMyRecipe(@RequestBody PostMyRecipeReq parameters) {
         try {
             Integer userIdx = jwtService.getUserId();
-            if (parameters.getPhotoUrlList() != null && parameters.getThumbnail() ==null) {
+
+            if (parameters.getThumbnail() ==null) {
                 return new BaseResponse<>(EMPTY_THUMBNAIL);
-            }
-            if (parameters.getPhotoUrlList() == null && parameters.getThumbnail() !=null) {
-                return new BaseResponse<>(EMPTY_PHOTO_URL_LIST);
             }
             if (parameters.getTitle() == null) {
                 return new BaseResponse<>(EMPTY_TITLE);
@@ -152,13 +149,16 @@ public class UserRecipeController {
             if (myRecipeIdx == null || myRecipeIdx <= 0) {
                 return new BaseResponse<>(EMPTY_MY_RECIPEIDX);
             }
-
-            if (parameters.getPhotoUrlList() != null && parameters.getThumbnail() ==null) {
+            if (parameters.getThumbnail() ==null) {
                 return new BaseResponse<>(EMPTY_THUMBNAIL);
             }
-            if (parameters.getPhotoUrlList() == null && parameters.getThumbnail() !=null) {
-                return new BaseResponse<>(EMPTY_PHOTO_URL_LIST);
+            if (parameters.getTitle() == null) {
+                return new BaseResponse<>(EMPTY_TITLE);
             }
+            if (parameters.getContent() == null) {
+                return new BaseResponse<>(EMPTY_CONTENT);
+            }
+
 
 
             PatchMyRecipeRes patchMyRecipeRes = userRecipeService.updateMyRecipe(parameters,userIdx,myRecipeIdx);

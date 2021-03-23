@@ -79,7 +79,7 @@ public class FridgeBasketProvider {
 
         List<FridgeBasket> fridgeBasketList;
         try {
-            fridgeBasketList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");//, Sort.by("createdAt").descending()
+            fridgeBasketList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_RETREIVE_INGREDIENT_LIST_BY_USER);
         }
