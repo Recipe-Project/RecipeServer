@@ -11,6 +11,7 @@ import java.util.Date;
 public class FridgeBasketList {
     private final String ingredientName ;
     private final String ingredientIcon;
+    private final Integer ingredientCategoryIdx;
     private final String expiredAt;
     private final String storageMethod;
     private final Integer count;

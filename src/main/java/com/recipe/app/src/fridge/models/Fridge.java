@@ -34,6 +34,10 @@ public class Fridge extends BaseEntity {
     @Column(name="ingredientIcon") //null 임시허용
     private String ingredientIcon;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ingredientCategoryIdx", nullable = false)
+    private IngredientCategory ingredientCategory;
+
     @Column(name="storageMethod", nullable = false,length = 2)
     private String storageMethod;
 
@@ -46,10 +50,11 @@ public class Fridge extends BaseEntity {
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public Fridge(User user,String ingredientName,String ingredientIcon,String storageMethod,Date expiredAt, Integer count){
+    public Fridge(User user,String ingredientName,String ingredientIcon,IngredientCategory ingredientCategory,String storageMethod,Date expiredAt, Integer count){
         this.user = user;
         this.ingredientName = ingredientName;
         this.ingredientIcon = ingredientIcon;
+        this.ingredientCategory = ingredientCategory;
         this.storageMethod = storageMethod;
         this.expiredAt = expiredAt;
         this.count = count;
