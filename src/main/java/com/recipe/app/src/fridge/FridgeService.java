@@ -2,11 +2,14 @@ package com.recipe.app.src.fridge;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridge.models.*;
+import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
+import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -20,12 +23,14 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 public class FridgeService {
     private final UserProvider userProvider;
     private final FridgeRepository fridgeRepository;
+    private final FridgeBasketRepository fridgeBasketRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeService(UserProvider userProvider, FridgeRepository fridgeRepository, JwtService jwtService) {
+    public FridgeService(UserProvider userProvider, FridgeRepository fridgeRepository, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
         this.userProvider = userProvider;
         this.fridgeRepository = fridgeRepository;
+        this.fridgeBasketRepository = fridgeBasketRepository;
         this.jwtService = jwtService;
     }
 
@@ -35,6 +40,7 @@ public class FridgeService {
      * @return List<PostFridgesRes>
      * @throws BaseException
      */
+    @Transactional
     public List<PostFridgesRes> createFridges(PostFridgesReq postFridgesReq, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         List<FridgeBasketList> fridgeBasketList = postFridgesReq.getFridgeBasketList();
@@ -43,7 +49,10 @@ public class FridgeService {
         try {
             for (int i = 0; i < fridgeBasketList.size(); i++) {
 
+
                 String ingredientName = fridgeBasketList.get(i).getIngredientName();
+
+
                 String ingredientIcon = fridgeBasketList.get(i).getIngredientIcon();
                 String expiredAtTmp = fridgeBasketList.get(i).getExpiredAt();
 
@@ -57,6 +66,15 @@ public class FridgeService {
                 fridge = fridgeRepository.save(fridge);
 
             }
+
+            List<FridgeBasket> fbList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
+
+
+            // 재료 삭제
+            for (int i=0;i<fbList.size();i++){
+                fbList.get(i).setStatus("INACTIVE");
+            }
+            fridgeBasketRepository.saveAll(fbList);
 
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_FRIDGES);

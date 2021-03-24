@@ -11,5 +11,6 @@ import java.util.List;
 @Repository
 public interface FridgeRepository extends CrudRepository<Fridge, Integer> {
     List<Fridge> findByUserAndStatus(User user, String status);
+    Boolean existsByIngredientNameAndStatus(String ingredientName,String status);
 
 }

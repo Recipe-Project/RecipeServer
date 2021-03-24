@@ -98,6 +98,7 @@ public enum BaseResponseStatus {
     // [POST] /fridges
     POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST(false, 2073, "냉장고 바구니 리스트를 입력해주세요."),
     FAILED_TO_POST_FRIDGES(false, 2074, "냉장고에 재료넣기를 실패했습니다."),
+    POST_FRIDGES_EXIST_INGREDIENT_NAME(false, 2075, "냉장고에 이미 있는 재료입니다."),
 
     /**
      * 3000 : Response 오류

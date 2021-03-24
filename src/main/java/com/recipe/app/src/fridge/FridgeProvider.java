@@ -72,7 +72,6 @@ public class FridgeProvider {
                 Date endDate = sdf.parse(expiredAt);
                 //두날짜 사이의 시간 차이(ms)를 하루 동안의 ms(24시*60분*60초*1000밀리초) 로 나눈다.
                 diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
-                //System.out.println(diffDay+"일");
             }catch(ParseException e){
                 e.printStackTrace();
             }
