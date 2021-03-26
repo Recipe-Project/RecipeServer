@@ -1,11 +1,12 @@
 package com.recipe.app.src.scrapBlog.models;
 
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-@AllArgsConstructor
 public class PostScrapBlogReq {
     private String title;
     private String thumbnail;

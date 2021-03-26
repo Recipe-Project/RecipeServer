@@ -37,25 +37,25 @@ public class ScrapBlogController {
      * @return BaseResponse<Void>
      * @RequestBody parameters
      */
-
+    @ResponseBody
     @PostMapping("")
     public BaseResponse<Void> postScrapBlog(@RequestBody PostScrapBlogReq parameters) {
-        if (parameters.getTitle() != null && parameters.getTitle() ==null) {
+        if (parameters.getTitle() == null || parameters.getTitle().length()==0) {
             return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_TITLE);
         }
-        if (parameters.getThumbnail() == null && parameters.getThumbnail() !=null) {
+        if (parameters.getThumbnail() == null || parameters.getThumbnail().length()==0) {
             return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_THUMBNAIL);
         }
-        if (parameters.getBlogUrl() != null && parameters.getBlogUrl() ==null) {
+        if (parameters.getBlogUrl() == null || parameters.getBlogUrl().length()==0) {
             return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_BLOGURL);
         }
-        if (parameters.getDescription() == null && parameters.getDescription() !=null) {
+        if (parameters.getDescription() == null || parameters.getDescription().length()==0) {
             return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_DESCRIPTION);
         }
-        if (parameters.getBloggerName() != null && parameters.getBloggerName() ==null) {
+        if (parameters.getBloggerName() == null || parameters.getBloggerName().length()==0) {
             return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_BLOGGER_NAME);
         }
-        if (parameters.getPostDate() != null && parameters.getPostDate() ==null) {
+        if (parameters.getPostDate() == null || parameters.getPostDate().length()==0) {
             return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_POST_DATE);
         }
 
@@ -77,7 +77,7 @@ public class ScrapBlogController {
      * @return BaseResponse<List<GetScrapBlogsRes>>
      * @PageableDefault pageable
      */
-
+    @ResponseBody
     @GetMapping("")
     public BaseResponse<List<GetScrapBlogsRes>> getScrapBlogs(@RequestParam(value = "sort", required = false) Integer sort) {
 

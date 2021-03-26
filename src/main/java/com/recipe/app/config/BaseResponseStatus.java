@@ -100,6 +100,9 @@ public enum BaseResponseStatus {
     FAILED_TO_POST_FRIDGES(false, 2074, "냉장고에 재료넣기를 실패했습니다."),
     POST_FRIDGES_EXIST_INGREDIENT_NAME(false, 2075, "냉장고에 이미 있는 재료입니다."),
 
+    // [POST] /views/blog
+    POST_VIEW_BLOG_EMPTY_BLOGURL(false, 2076, "블로그 url을 입력해주세요."),
+
     /**
      * 3000 : Response 오류
      */
@@ -177,6 +180,7 @@ public enum BaseResponseStatus {
 
     // [GET] /fridges
     FAILED_TO_RETREIVE_FRIDGE_BY_USER(false, 3047, "유저로 냉장고 조회에 실패했습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
