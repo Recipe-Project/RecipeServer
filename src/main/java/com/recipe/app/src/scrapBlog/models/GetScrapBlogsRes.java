@@ -7,7 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class GetScrapBlogsRes {
-    private final Integer scrapBlogdx;
+    private final Integer scrapBlogIdx;
     private final String title;
     private final String blogUrl;
     private final String description;
