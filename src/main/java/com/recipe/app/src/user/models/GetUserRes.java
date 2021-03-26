@@ -13,6 +13,6 @@ public class GetUserRes {
     private final Integer youtubeScrapCnt;
     private final Integer blogScrapCnt;
     private final Integer recipeScrapCnt;
-    private final Integer myRecipeListSize;
+    private final Integer myRecipeTotalSize;
     private final List<MypageMyRecipeList> myRecipeList;
 }

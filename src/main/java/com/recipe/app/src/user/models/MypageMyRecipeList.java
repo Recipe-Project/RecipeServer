@@ -7,7 +7,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MypageMyRecipeList {
     private final Integer myRecipeIdx;
-    private final String myRecipeTitle;
     private final String myRecipeThumbnail;
-    private final String myRecipeDate;
 }

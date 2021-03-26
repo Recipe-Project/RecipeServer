@@ -120,26 +120,22 @@ public class UserProvider {
                     return -(o1.getCreatedAt().toString().compareTo(o2.getCreatedAt().toString()));
                 }
             });
-            int size=5;
-            if(userRecipes.size()<5){
+            int totalSize = userRecipes.size();
+            int size=6;
+            if(userRecipes.size()<6){
                 size = userRecipes.size();
             }
 
             List<MypageMyRecipeList> myRecipeList= new ArrayList<>();
             for(int i=0;i<size;i++){
                 Integer myRecipeIdx = userRecipes.get(i).getUserRecipeIdx();
-                String myRecipeTitle = userRecipes.get(i).getTitle();
                 String myRecipeThumbnail = userRecipes.get(i).getThumbnail();
-                Date date = userRecipes.get(i).getCreatedAt();
-                SimpleDateFormat datetime = new SimpleDateFormat("yyyy.M.d", Locale.KOREA);
-                datetime.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
-                String postDate = datetime.format(date);
-                MypageMyRecipeList mypageMyRecipe = new MypageMyRecipeList(myRecipeIdx, myRecipeTitle, myRecipeThumbnail, postDate);
+                MypageMyRecipeList mypageMyRecipe = new MypageMyRecipeList(myRecipeIdx, myRecipeThumbnail);
 
                 myRecipeList.add(mypageMyRecipe);
             }
 
-            return new GetUserRes(userIdx, profilePhoto, userName, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt, size, myRecipeList);
+            return new GetUserRes(userIdx, profilePhoto, userName, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt, totalSize, myRecipeList);
         }catch(Exception e){
             throw new BaseException(FAILED_TO_GET_USER);
         }
