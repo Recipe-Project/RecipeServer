@@ -1,5 +1,6 @@
 package com.recipe.app.src.receipt.models;
 
+import com.recipe.app.src.buy.models.Buy;
 import com.recipe.app.src.user.models.User;
 import lombok.*;
 import javax.persistence.*;
@@ -30,24 +31,15 @@ public class Receipt extends BaseEntity {
     @Column(name = "receiptDate", nullable = false, length = 45)
     private Date receiptDate;
 
-    @Column(name = "buyName", nullable = false, length = 45)
-    private String buyName;
-
-    @Column(name = "buyCnt", nullable = false)
-    private Integer buyCnt;
-
-    @Column(name = "buyPrice", nullable = false)
-    private Integer buyPrice;
-
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public Receipt(User user, String title, Date receiptDate, String buyName, Integer buyCnt, Integer buyPrice){
+    @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL)
+    private List<Buy> buys = new ArrayList<>();
+
+    public Receipt(User user, String title, Date receiptDate){
         this.user = user;
         this.title = title;
         this.receiptDate = receiptDate;
-        this.buyName = buyName;
-        this.buyCnt = buyCnt;
-        this.buyPrice = buyPrice;
     }
 }

@@ -1,10 +1,12 @@
 package com.recipe.app.src.user.models;
 
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
+import com.recipe.app.src.receipt.models.Receipt;
 import com.recipe.app.src.scrapBlog.models.ScrapBlog;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
+import com.recipe.app.src.viewBlog.models.ViewBlog;
 import lombok.*;
 import javax.persistence.*;
 import com.recipe.app.config.BaseEntity;
@@ -55,6 +57,12 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<FridgeBasket> fridgeBasket = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ViewBlog> viewBlogs = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Receipt> receipts = new ArrayList<>();
 
     public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber){
         this.socialId = socialId;

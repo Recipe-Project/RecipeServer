@@ -103,6 +103,10 @@ public enum BaseResponseStatus {
     // [POST] /views/blog
     POST_VIEW_BLOG_EMPTY_BLOGURL(false, 2076, "블로그 url을 입력해주세요."),
 
+    // receipts
+    RECEIPTS_EMPTY_RECEIPT_IDX(false, 2077, "영수증 인덱스 값을 확인해주세요."),
+
+
     /**
      * 3000 : Response 오류
      */
@@ -180,6 +184,10 @@ public enum BaseResponseStatus {
 
     // [GET] /fridges
     FAILED_TO_RETREIVE_FRIDGE_BY_USER(false, 3047, "유저로 냉장고 조회에 실패했습니다."),
+
+    // receipts
+    NOT_FOUND_RECEIPT(false, 3048, "존재하지 않는 영수증입니다."),
+    NOT_FOUND_BUY(false, 3049, "존재하지 않는 구매 품목입니다."),
 
     /**
      * 4000 : Database, Server 오류
