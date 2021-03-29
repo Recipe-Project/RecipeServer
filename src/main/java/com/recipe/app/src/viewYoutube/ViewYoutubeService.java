@@ -1,7 +1,6 @@
 package com.recipe.app.src.viewYoutube;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeRes;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeReq;

@@ -7,14 +7,9 @@ import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.scrapYoutube.models.*;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
 
@@ -40,7 +35,7 @@ public class ScrapYoutubeController {
      * @RequestBody parameters
      */
     @PostMapping("")
-    public BaseResponse<PostScrapYoutubeRes> postScrapYoutube(@RequestBody PostScrapYoutubeReq parameters) {
+    public BaseResponse<PostScrapYoutubeRes> postScrapsYoutube(@RequestBody PostScrapYoutubeReq parameters) {
 
         try {
             Integer userIdx = jwtService.getUserId();
@@ -94,13 +89,13 @@ public class ScrapYoutubeController {
      * @PageableDefault pageable
      */
     @GetMapping("")
-    public BaseResponse<GetScrapYoutubesRes> getScrapYoutubes(@RequestParam(value = "sort") @Nullable Integer sort) {
+    public BaseResponse<GetScrapYoutubesRes> getScrapsYoutube(@RequestParam(value = "sort") @Nullable Integer sort) {
 
         GetScrapYoutubesRes getScrapYoutubesRes = null;
         try {
             Integer userIdx = jwtService.getUserId();
 
-            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubes(userIdx,sort);
+            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubeList(userIdx,sort);
 
             return new BaseResponse<>(getScrapYoutubesRes);
 

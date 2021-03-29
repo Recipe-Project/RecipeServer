@@ -28,6 +28,9 @@ public class ViewYoutube extends BaseEntity {
     @Column(name = "youtubeIdx", nullable = false)
     private Integer youtubeIdx;
 
+    @Column(name="status", nullable=false, length=10)
+    private String status="ACTIVE";
+
     public ViewYoutube(User user, Integer youtubeIdx){
         this.user = user;
         this.youtubeIdx = youtubeIdx;

@@ -2,17 +2,12 @@ package com.recipe.app.src.viewYoutube;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.config.BaseResponse;
-import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeReq;
-import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeRes;
-import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
-import com.recipe.app.src.viewBlog.models.PostViewBlogReq;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeReq;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeRes;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
 import static com.recipe.app.config.BaseResponseStatus.EMPTY_YOUTUBEIDX;
 
 
