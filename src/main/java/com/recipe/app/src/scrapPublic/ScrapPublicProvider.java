@@ -6,14 +6,12 @@ import com.recipe.app.src.scrapPublic.models.GetScrapPublicsRes;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicList;
 import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.viewPublic.ViewPublicRepository;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.user.models.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -27,13 +25,15 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 public class ScrapPublicProvider {
     private final UserProvider userProvider;
     private final RecipeInfoProvider recipeInfoProvider;
+    private final ViewPublicRepository viewPublicRepository;
     private final ScrapPublicRepository scrapPublicRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapPublicProvider(UserProvider userProvider, RecipeInfoProvider recipeInfoProvider, ScrapPublicRepository scrapPublicRepository, JwtService jwtService) {
+    public ScrapPublicProvider(UserProvider userProvider, RecipeInfoProvider recipeInfoProvider, ViewPublicRepository viewPublicRepository, ScrapPublicRepository scrapPublicRepository, JwtService jwtService) {
         this.userProvider = userProvider;
         this.recipeInfoProvider = recipeInfoProvider;
+        this.viewPublicRepository = viewPublicRepository;
         this.scrapPublicRepository = scrapPublicRepository;
         this.jwtService = jwtService;
     }
@@ -101,25 +101,45 @@ public class ScrapPublicProvider {
     public List<ScrapPublicList> retrieveScrapRecipesSortedByViewCount(Integer userIdx) throws BaseException {
 
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        List<ScrapPublic> scrapPublicList;
 
+
+        // 유저가 스크랩한 레시피 리스트 조회
+        List<ScrapPublic> scrapPublicList;
         try {
-            scrapPublicList = scrapPublicRepository.findByUserAndStatus(user, "ACTIVE",Sort.by("createdAt").descending());
+            scrapPublicList = scrapPublicRepository.findByUserAndStatus(user, "ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_SCRAP_PUBLIC);
         }
 
-        return scrapPublicList.stream().map(scrapPublic -> {
-            RecipeInfo recipeInfo = scrapPublic.getRecipeInfo();
+        // 레시피 스크랩개수와 레시피 아이디와 매핑
+        Map<RecipeInfo,Long> map = new HashMap<RecipeInfo,Long>();
+        Long count;
+        for(ScrapPublic sc : scrapPublicList) {
+            RecipeInfo recipeInfo =  sc.getRecipeInfo();
+            count = viewPublicRepository.countByRecipeInfoAndStatus(recipeInfo,"ACTIVE");
+            Integer recipeId = sc.getRecipeInfo().getRecipeId();
+            map.put(recipeInfo,count);
+        }
+
+        // 매핑->리스트로
+        List<RecipeInfo> keySetList = new ArrayList<>(map.keySet());
+        // 내림차순
+        Collections.sort(keySetList, (o1, o2) -> (map.get(o2).compareTo(map.get(o1))));
+        // 결과 keySetList
+        List<ScrapPublicList> spList = new ArrayList<>();
+        ScrapPublic scrapPublic;
+        for(RecipeInfo recipeInfo : keySetList) {
+            scrapPublic = scrapPublicRepository.findByUserAndRecipeInfoAndStatus(user,recipeInfo,"ACTIVE");
             Integer recipeId = scrapPublic.getRecipeInfo().getRecipeId();
             String title = scrapPublic.getRecipeInfo().getRecipeNmKo();
             String content = scrapPublic.getRecipeInfo().getSumry();
             String thumbnail = scrapPublic.getRecipeInfo().getImgUrl();
-            Long scrapCount = scrapPublicRepository.countByRecipeInfoAndStatus(recipeInfo,"ACTIVE");
+            Long scrapCount = map.get(recipeInfo);
 
-            return new ScrapPublicList(recipeId,title,content,thumbnail,scrapCount);
-
-        }).collect(Collectors.toList());
+            ScrapPublicList sp = new ScrapPublicList(recipeId,title,content,thumbnail,scrapCount);
+            spList.add(sp);
+        }
+        return spList;
     }
 
 

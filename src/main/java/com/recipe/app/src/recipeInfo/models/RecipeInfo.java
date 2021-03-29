@@ -4,6 +4,7 @@ import com.recipe.app.config.BaseEntity;
 import com.recipe.app.src.recipeIngredient.models.RecipeIngredient;
 import com.recipe.app.src.recipeProcess.models.RecipeProcess;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
+import com.recipe.app.src.viewPublic.models.ViewPublic;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -78,6 +79,9 @@ public class RecipeInfo extends BaseEntity {
 
     @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL)
     private List<RecipeProcess> recipeProcesses = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL)
+    private List<ViewPublic> viewPublics = new ArrayList<>();
 
     public RecipeInfo(String recipeNmKo,String sumry,Integer nationCode, String nationNm,Integer tyCode,String tyNm,String cookingTime,String calorie,String qnt, String levelNm,String irdntCode ,
                       String pcNm, String imgUrl, String detUrl){
