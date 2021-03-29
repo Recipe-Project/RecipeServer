@@ -41,11 +41,12 @@ public class ScrapYoutubeService {
         String youtubeUrl = postScrapYoutubeReq.getYoutubeUrl();
         String postDate = postScrapYoutubeReq.getPostDate();
         String channelName = postScrapYoutubeReq.getChannelName();
+        String playTime = postScrapYoutubeReq.getPlayTime();
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
 
         try {
-            ScrapYoutube scrapYoutube = new ScrapYoutube(user, youtubeIdx, title, thumbnail, youtubeUrl, postDate, channelName);
+            ScrapYoutube scrapYoutube = new ScrapYoutube(user, youtubeIdx, title, thumbnail, youtubeUrl, postDate, channelName,playTime);
             scrapYoutube = scrapYoutubeRepository.save(scrapYoutube);
 
 
@@ -53,7 +54,7 @@ public class ScrapYoutubeService {
             throw new BaseException(FAILED_TO_POST_SCRAP_YOUTUBE);
         }
 
-        return new PostScrapYoutubeRes(userIdx,youtubeIdx, title,thumbnail,youtubeUrl,postDate,channelName);
+        return new PostScrapYoutubeRes(userIdx,youtubeIdx, title,thumbnail,youtubeUrl,postDate,channelName,playTime);
     }
 
 
@@ -73,13 +74,14 @@ public class ScrapYoutubeService {
         String youtubeUrl = scrapYoutube.getYoutubeUrl();
         String postDate = scrapYoutube.getPostDate();
         String channelName = scrapYoutube.getChannelName();
+        String playTime = scrapYoutube.getPlayTime();
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         try {
             scrapYoutubeRepository.save(scrapYoutube);
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_POST_DELETE_SCRAP_YOUTUBE);
         }
-        return new PostScrapYoutubeRes(userIdx,youtubeIdx, title,thumbnail,youtubeUrl,postDate,channelName);
+        return new PostScrapYoutubeRes(userIdx,youtubeIdx, title,thumbnail,youtubeUrl,postDate,channelName,playTime);
     }
 
 }

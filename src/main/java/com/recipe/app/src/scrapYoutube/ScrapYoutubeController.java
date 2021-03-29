@@ -7,7 +7,6 @@ import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.scrapYoutube.models.*;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -58,6 +57,9 @@ public class ScrapYoutubeController {
             if (parameters.getYoutubeIdx() == null && parameters.getYoutubeIdx() !=null) {
                 return new BaseResponse<>(EMPTY_YOUTUBEIDX);
             }
+            if (parameters.getPlayTime() == null && parameters.getPlayTime() !=null) {
+                return new BaseResponse<>(EMPTY_PLAY_TIME);
+            }
 
             // 이미 발급 받은건지
             ScrapYoutube scrapYoutube = null;
@@ -81,7 +83,6 @@ public class ScrapYoutubeController {
     }
 
 
-
     /**
      * 유튜브 스크랩 조회 API
      * [GET] /scraps/youtube
@@ -89,13 +90,13 @@ public class ScrapYoutubeController {
      * @PageableDefault pageable
      */
     @GetMapping("")
-    public BaseResponse<GetScrapYoutubesRes> getScrapsYoutube(@RequestParam(value = "sort") @Nullable Integer sort) {
+    public BaseResponse<GetScrapYoutubesRes> getScrapsYoutube() {
 
         GetScrapYoutubesRes getScrapYoutubesRes = null;
         try {
             Integer userIdx = jwtService.getUserId();
 
-            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubeList(userIdx,sort);
+            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubeList(userIdx);
 
             return new BaseResponse<>(getScrapYoutubesRes);
 
@@ -103,6 +104,28 @@ public class ScrapYoutubeController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+//
+//    /**
+//     * 유튜브 스크랩 조회 API
+//     * [GET] /scraps/youtube
+//     * @return BaseResponse<List<GetScrapYoutubesRes>>
+//     * @PageableDefault pageable
+//     */
+//    @GetMapping("")
+//    public BaseResponse<GetScrapYoutubesRes> getScrapsYoutube(@RequestParam(value = "sort") @Nullable Integer sort) {
+//
+//        GetScrapYoutubesRes getScrapYoutubesRes = null;
+//        try {
+//            Integer userIdx = jwtService.getUserId();
+//
+//            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubeList(userIdx,sort);
+//
+//            return new BaseResponse<>(getScrapYoutubesRes);
+//
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
 
 
 }

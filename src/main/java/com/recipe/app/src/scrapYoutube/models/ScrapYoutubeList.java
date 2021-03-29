@@ -14,4 +14,5 @@ public class ScrapYoutubeList {
     private final String youtubeUrl;
     private final String postDate;
     private final String channelName;
+    private final String playTime;
 }

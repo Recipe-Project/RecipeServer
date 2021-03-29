@@ -16,4 +16,5 @@ public class PostScrapYoutubeReq {
     private String youtubeUrl;
     private String postDate;
     private String channelName;
+    private String playTime;
 }

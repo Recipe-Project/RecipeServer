@@ -5,16 +5,8 @@ import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.scrapPublic.models.*;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
-import static com.recipe.app.config.BaseResponseStatus.*;
 
 
 @RestController
@@ -34,7 +26,7 @@ public class ScrapPublicController {
     /**
      * 레시피 스크랩하기 API
      * [POST] /scraps/recipe
-     * @return BaseResponse<PostScrapRecipeRes>
+     * @return BaseResponse<PostScrapPublicRes>
      * @RequestBody parameters
      */
     @ResponseBody
@@ -63,8 +55,6 @@ public class ScrapPublicController {
 
 
     }
-
-    // 페이징생략
     /**
      * 레시피 스크랩 조회 API
      * [GET] /scraps/recipe
@@ -72,13 +62,13 @@ public class ScrapPublicController {
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse <GetScrapPublicsRes> getScrapRecipes(@RequestParam(value = "sort") @Nullable Integer sort) throws BaseException {
+    public BaseResponse <GetScrapPublicsRes> getScrapRecipes() throws BaseException {
 
 
         try {
             Integer userIdx = jwtService.getUserId();
 
-            GetScrapPublicsRes getScrapPublicsRes = scrapPublicProvider.retrieveScrapRecipes(userIdx,sort);
+            GetScrapPublicsRes getScrapPublicsRes = scrapPublicProvider.retrieveScrapRecipes(userIdx);
 
 
             return new BaseResponse<>(getScrapPublicsRes);
@@ -86,6 +76,28 @@ public class ScrapPublicController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+//    /**
+//     * 레시피 스크랩 조회 API
+//     * [GET] /scraps/recipe
+//     * @return BaseResponse<List<GetScrapRecipesRes>>
+//     */
+//    @ResponseBody
+//    @GetMapping("")
+//    public BaseResponse <GetScrapPublicsRes> getScrapRecipes(@RequestParam(value = "sort") @Nullable Integer sort) throws BaseException {
+//
+//
+//        try {
+//            Integer userIdx = jwtService.getUserId();
+//
+//            GetScrapPublicsRes getScrapPublicsRes = scrapPublicProvider.retrieveScrapRecipes(userIdx,sort);
+//
+//
+//            return new BaseResponse<>(getScrapPublicsRes);
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
+
 
 
 }

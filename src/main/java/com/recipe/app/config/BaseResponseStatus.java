@@ -74,6 +74,7 @@ public enum BaseResponseStatus {
     EMPTY_POST_DATE(false, 2056, "포스팅 날짜를 입력해주세요."),
     EMPTY_CHANNEL_NAME(false, 2057, "유튜브 채널명을 입력해주세요."),
     EMPTY_YOUTUBEIDX(false, 2058, "유튜브 인덱스를 입력해주세요."),
+    EMPTY_PLAY_TIME(false, 2053, "영상 재생시간을 입력해주세요."),
 
     // [POST] scraps/blog
     POST_SCRAP_BLOG_EMPTY_TITLE(false, 2059, "제목을 입력해주세요."),

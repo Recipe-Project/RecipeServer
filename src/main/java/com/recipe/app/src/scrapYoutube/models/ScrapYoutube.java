@@ -36,18 +36,19 @@ public class ScrapYoutube extends BaseEntity {
     @Column(name = "youtubeUrl", nullable = false)
     private String youtubeUrl;
 
-    @Column(name = "postDate", nullable = false)
+    @Column(name = "postDate", nullable = false, length = 20)
     private String postDate;
 
-    @Column(name = "channelName", nullable = false)
+    @Column(name = "channelName", nullable = false, length = 30)
     private String channelName;
 
-
+    @Column(name = "playTime", nullable = false, length = 20)
+    private String playTime;
 
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public ScrapYoutube(User user,  Integer youtubeIdx, String title, String thumbnail, String youtubeUrl, String postDate, String channelName){
+    public ScrapYoutube(User user,  Integer youtubeIdx, String title, String thumbnail, String youtubeUrl, String postDate, String channelName,String playTime){
         this.user = user;
         this.youtubeIdx = youtubeIdx;
         this.title = title;
@@ -55,6 +56,7 @@ public class ScrapYoutube extends BaseEntity {
         this.youtubeUrl = youtubeUrl;
         this.postDate = postDate;
         this.channelName = channelName;
+        this.playTime = playTime;
     }
 
 }
