@@ -7,6 +7,7 @@ import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
 import com.recipe.app.src.viewBlog.models.ViewBlog;
+import com.recipe.app.src.viewYoutube.models.ViewYoutube;
 import lombok.*;
 import javax.persistence.*;
 import com.recipe.app.config.BaseEntity;
@@ -63,6 +64,9 @@ public class User extends BaseEntity {
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Receipt> receipts = new ArrayList<>();
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<ViewYoutube> viewYoutubes = new ArrayList<>();
 
     public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber){
         this.socialId = socialId;

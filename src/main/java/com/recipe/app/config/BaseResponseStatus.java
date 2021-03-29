@@ -185,9 +185,13 @@ public enum BaseResponseStatus {
     // [GET] /fridges
     FAILED_TO_RETREIVE_FRIDGE_BY_USER(false, 3047, "유저로 냉장고 조회에 실패했습니다."),
 
+
     // receipts
     NOT_FOUND_RECEIPT(false, 3048, "존재하지 않는 영수증입니다."),
     NOT_FOUND_BUY(false, 3049, "존재하지 않는 구매 품목입니다."),
+
+    //[POST] views/youtube
+    FAILED_TO_POST_VIEWS_YOUTUBE(false, 3050, "유튜브 조회로그를 저장에 실패습니다."),
 
     /**
      * 4000 : Database, Server 오류

@@ -53,7 +53,6 @@ public class FridgeProvider {
 
         List<IngredientCategory> ingredientCategoryList;
         try {
-            // 카테고리 리스트 뽑기
             ingredientCategoryList = ingredientCategoryRepository.findByStatus("ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
@@ -63,13 +62,11 @@ public class FridgeProvider {
 
         return ingredientCategoryList.stream().map(ic -> {
 
-            // 카테고리당 인덱스와 카테고리명 뽑기
             Integer ingredientCategoryIdx = ic.getIngredientCategoryIdx();
             String ingredientCategoryName = ic.getName();
 
             List<FridgeList> fridgeList = null;
             try {
-                // 카테고리에 해당하는 재료 리스트 가져오기
                 fridgeList = retreiveFridgeList(ingredientCategoryIdx,userIdx);
             } catch (BaseException e) {
                 e.printStackTrace();
@@ -80,61 +77,7 @@ public class FridgeProvider {
 
 
         }).collect(Collectors.toList());
-//        User user = userProvider.retrieveUserByUserIdx(userIdx);
-//        List<Fridge> fridgeList;
-//        try {
-//            fridgeList = fridgeRepository.findByUserAndStatus(user,"ACTIVE");
-//        } catch (Exception ignored) {
-//            throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BY_USER);
-//        }
-//
-//        return fridgeList.stream().map(fridge -> {
-//
-//            String ingredientName = fridge.getIngredientName();
-//            String ingredientIcon = fridge.getIngredientIcon();
-//            Date tmpDate = fridge.getExpiredAt();
-//
-//            DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
-//            String expiredAt = sdFormat.format(tmpDate);
-//
-//            String storageMethod = fridge.getStorageMethod();
-//            Integer count = fridge.getCount();
-//
-//            Integer freshness;
-//
-//            Date tempDate = new Date();
-//            String nowDate = sdFormat.format(tempDate);
-//
-//            SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
-//
-//            long diffDay = 0;
-//            try{
-//                Date startDate = sdf.parse(nowDate);
-//                Date endDate = sdf.parse(expiredAt);
-//                //두날짜 사이의 시간 차이(ms)를 하루 동안의 ms(24시*60분*60초*1000밀리초) 로 나눈다.
-//                diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
-//            }catch(ParseException e){
-//                e.printStackTrace();
-//            }
-//
-//            if (diffDay<0){
-//                freshness=444;
-//            }
-//            else if(diffDay<=3){
-//                freshness=1;
-//            }
-//            else if( diffDay <=7){
-//                freshness=2;
-//            }
-//            else{
-//                freshness=3;
-//            }
-//
-//
-//
-//            return new GetFridgesRes(ingredientName,ingredientIcon,expiredAt+"까지",storageMethod,count,freshness);
-//
-//        }).collect(Collectors.toList());
+
     }
 
 
@@ -156,7 +99,6 @@ public class FridgeProvider {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_LIST);
         }
 
-        // 카테고리에 해당하는 재료 리스트 생성
         return fridgeList.stream().map(fl -> {
             String ingredientName = fl.getIngredientName();
             String ingredientIcon = fl.getIngredientIcon();
