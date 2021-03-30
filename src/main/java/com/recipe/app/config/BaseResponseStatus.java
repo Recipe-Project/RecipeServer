@@ -110,6 +110,10 @@ public enum BaseResponseStatus {
 
     // [DELETE] fridges/ingredient
     EMPTY_INGREDIENT_LIST(false, 2078, "삭제할 재료 리스트를 입력하세요."),
+
+    // [PATCH] fridge/ingredient
+    EMPTY_PATCH_FRIDGE_LIST(false, 2079, "수정할 냉장고 재료 리스트를 입력하세요."),
+    INVALID_STORAGE_METHOD(false, 2080, "냉장,냉동,실온만 입력하세요."),
     /**
      * 3000 : Response 오류
      */
@@ -200,6 +204,12 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_INGREDIENT_NAME(false, 3051, "재료명 조회에 실패했습니다."),
     FAILED_TO_GET_FRIDGE(false, 3052, "냉장고 조회에 실패했습니다."),
     FAILED_TO_DELETE_FRIDGE(false, 3053, "냉장고 재료 삭제에 실패했습니다."),
+
+
+    // [PATCH] fridge/ingredient
+    FAILED_TO_SAVE_FRIDGE(false, 3054, "냉장고 재료 수정 저장에 실패했습니다."),
+    FAILED_TO_PATCH_FRIDGES_INGREDIENT(false, 3055, "냉장고 재료 수정에 실패했습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */

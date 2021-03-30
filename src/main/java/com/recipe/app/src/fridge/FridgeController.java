@@ -8,9 +8,11 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
+import static org.hibernate.query.criteria.internal.ValueHandlerFactory.isNumeric;
 
 @RestController
 @RequestMapping("/fridges")
@@ -37,14 +39,12 @@ public class FridgeController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<List<PostFridgesRes>> postFridges(@RequestBody PostFridgesReq parameters) {
-        // 중복되는거 처리해줘
-        // 입력받은 재료이름을 for 문해서 if 있다면 에러 이미 있는 재료이다
         try {
 
             List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
             Integer userIdx = jwtService.getUserId();
 
-            if (fridgeBasketList == null) {
+            if (fridgeBasketList.isEmpty()) {
                 return new BaseResponse<>(POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST);
             }
 
@@ -123,25 +123,54 @@ public class FridgeController {
     }
 
 
-//    /**
-//     * 냉장고 재료 수정 API
-//     * [PATCH] /fridges/ingredient
-//     * @return BaseResponse<PatchFridgesIngredientRes>
-//     * @RequestBody PatchFridgesIngredientReq parameters
-//     */
-//    @ResponseBody
-//    @PatchMapping("/ingredient")
-//    public BaseResponse<PatchFridgesIngredientRes> patchFridgesIngredient(@RequestBody PatchFridgesIngredientReq parameters) throws BaseException {
-//
-//        try {
-//            Integer userIdx = jwtService.getUserId();
-//
-//
-//            PatchFridgesIngredientRes patchFridgesIngredientRes = fridgeService.updateFridgeIngredient(parameters,userIdx);
-//            return new BaseResponse<>(patchFridgesIngredientRes);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
+    /**
+     * 냉장고 재료 수정 API
+     * [PATCH] /fridges/ingredient
+     * @return BaseResponse<Void>
+     * @RequestBody PatchFridgesIngredientReq parameters
+     */
+    @ResponseBody
+    @PatchMapping("/ingredient")
+    public BaseResponse<Void> patchFridgesIngredient(@RequestBody PatchFridgesIngredientReq parameters) throws BaseException {
+
+        try {
+            Integer userIdx = jwtService.getUserId();
+
+            List<PatchFridgeList> patchFridgeList = parameters.getPatchFridgeList();
+
+            if (patchFridgeList.isEmpty()) {
+                return new BaseResponse<>(EMPTY_PATCH_FRIDGE_LIST);
+            }
+
+
+            for (int i = 0; i < patchFridgeList.size(); i++) {
+                String ingredientName = patchFridgeList.get(i).getIngredientName();
+
+                Boolean existIngredientName = fridgeRepository.existsByIngredientNameAndStatus(ingredientName, "ACTIVE");
+
+                if (!existIngredientName) {
+                    return new BaseResponse<>(NOT_FOUND_INGREDIENT);
+                }
+
+                ArrayList storageMethods = new ArrayList();
+                storageMethods.add("냉장");
+                storageMethods.add("냉동");
+                storageMethods.add("실온");
+
+                String storageMethod = patchFridgeList.get(i).getStorageMethod();
+                if (!storageMethods.contains(storageMethod)){
+                    return new BaseResponse<>(INVALID_STORAGE_METHOD);
+                }
+
+
+            }
+
+            fridgeService.updateFridgeIngredient(parameters,userIdx);
+
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
 }

@@ -145,69 +145,56 @@ public class FridgeService {
 
     }
 
-//    /**
-//     * 냉장고 재료 수정 API
-//     * @param patchFridgesIngredientReq,userIdx
-//     * @return PatchMyRecipeRes
-//     * @throws BaseException
-//     */
-//    @Transactional
-//    public PatchFridgesIngredientRes updateFridgeIngredient(PatchFridgesIngredientReq patchFridgesIngredientReq, Integer userIdx) throws BaseException {
-//        User user = userProvider.retrieveUserByUserIdx(userIdx);
-//
-//        UserRecipe userRecipe;
-//        try {
-//            userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user,userRecipeIdx,"ACTIVE");
-//        } catch (Exception ignored) {
-//            throw new BaseException(FAILED_TO_GET_MY_RECIPE);
-//        }
-//
-//        List<UserRecipeIngredient> userRecipeIngredientList;
-//        try {
-//            userRecipeIngredientList = userRecipeIngredientRepository.findByUserRecipeIdxAndStatus(userRecipeIdx,"ACTIVE");
-//        } catch (Exception ignored) {
-//            throw new BaseException(FAILED_TO_GET_MY_RECIPE_INGREDIENTS);
-//        }
-//
-//        String thumbnail = patchMyRecipeReq.getThumbnail();
-//        String title = patchMyRecipeReq.getTitle();
-//        String content = patchMyRecipeReq.getContent();
-//        List<Integer> ingredientList = patchMyRecipeReq.getIngredientList();
-//        try {
-//            userRecipe.setThumbnail(thumbnail);
-//            userRecipe.setTitle(title);
-//            userRecipe.setContent(content);
-//            userRecipeRepository.save(userRecipe);
-//
-//
-//            // 재료 삭제
-//            for (int i=0;i<userRecipeIngredientList.size();i++){
-//                userRecipeIngredientList.get(i).setStatus("INACTIVE");
-//            }
-//            userRecipeIngredientRepository.saveAll(userRecipeIngredientList);
-//
-//
-//            if (ingredientList != null) {
-//                for (int i = 0; i < ingredientList.size(); i++) {
-//                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx, ingredientList.get(i));
-//                    userRecipeIngredientRepository.save(userRecipeIngredient);
-//                }
-//            }
-//
-//
-//        } catch (Exception ignored) {
-//            throw new BaseException(FAILED_TO_PATCH_MY_RECIPE);
-//        }
-//        return new PatchMyRecipeRes(thumbnail,title,content,ingredientList);
-//
-//        // 냉장고 바구니 조회
-//
-//        // for 문 돌려
-//        // 입력한 순서대로 수정해
-//        //
-//
-//
-//
-//    }
+    /**
+     * 냉장고 재료 수정 API
+     * @param patchFridgesIngredientReq,userIdx
+     * @return void
+     * @throws BaseException
+     */
+    @Transactional
+    public void updateFridgeIngredient(PatchFridgesIngredientReq patchFridgesIngredientReq, Integer userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+
+        List<PatchFridgeList> patchFridgeList = patchFridgesIngredientReq.getPatchFridgeList();
+
+
+
+        try {
+            for (int i = 0; i < patchFridgeList.size(); i++) {
+
+                String ingredientName = patchFridgeList.get(i).getIngredientName();
+
+                String expiredAtTmp = patchFridgeList.get(i).getExpiredAt();
+                DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
+                Date expiredAt = sdFormat.parse(expiredAtTmp);
+
+                String storageMethod = patchFridgeList.get(i).getStorageMethod();
+                Integer count = patchFridgeList.get(i).getCount();
+
+                Fridge fridge;
+                try {
+                    fridge = fridgeRepository.findByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
+                } catch (Exception ignored) {
+                    throw new BaseException(FAILED_TO_GET_FRIDGE);
+                }
+
+
+                try {
+                    fridge.setExpiredAt(expiredAt);
+                    fridge.setStorageMethod(storageMethod);
+                    fridge.setCount(count);
+                    fridgeRepository.save(fridge);
+
+                } catch (Exception ignored) {
+                    throw new BaseException(FAILED_TO_SAVE_FRIDGE);
+                }
+
+            }
+
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_PATCH_FRIDGES_INGREDIENT);
+        }
+
+    }
 
 }

@@ -14,6 +14,6 @@ public interface FridgeRepository extends CrudRepository<Fridge, Integer> {
     List<Fridge> findByUserAndStatus(User user, String status);
     Boolean existsByIngredientNameAndStatus(String ingredientName,String status);
     List<Fridge>  findByUserAndIngredientCategoryAndStatus(User user, IngredientCategory ingredientCategory, String status);
-
     Fridge findByIngredientNameAndStatus(String ingredientName, String status);
+    Fridge findByUserAndIngredientNameAndStatus(User user, String ingredientName, String status);
 }
