@@ -100,43 +100,131 @@ public class FridgeProvider {
         return fridgeList.stream().map(fl -> {
             String ingredientName = fl.getIngredientName();
             String ingredientIcon = fl.getIngredientIcon();
-
-            Date tmpDate = fl.getExpiredAt();
-            DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
-            String expiredAt = sdFormat.format(tmpDate);
-
             String storageMethod = fl.getStorageMethod();
             Integer count =fl.getCount();
+
+            Date tmpDate = fl.getExpiredAt();
+            String expiredAt;
+            String expiredAtResult;
             Integer freshness;
-
-            Date tempDate = new Date();
-            String nowDate = sdFormat.format(tempDate);
-            SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
-            long diffDay = 0;
-            try{
-                Date startDate = sdf.parse(nowDate);
-                Date endDate = sdf.parse(expiredAt);
-                //두날짜 사이의 시간 차이(ms)를 하루 동안의 ms(24시*60분*60초*1000밀리초) 로 나눈다.
-                diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
-            }catch(ParseException e){
-                e.printStackTrace();
-            }
-
-            if (diffDay<0){
-                freshness=444;
-            }
-            else if(diffDay<=3){
-                freshness=1;
-            }
-            else if( diffDay <=7){
-                freshness=2;
+            if (tmpDate == null || tmpDate.equals("")){
+                expiredAt=null;
+                expiredAtResult=null;
+                freshness=555;
             }
             else{
-                freshness=3;
+                DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
+                expiredAt = sdFormat.format(tmpDate);
+                expiredAtResult = sdFormat.format(tmpDate)+"까지";
+                Date tempDate = new Date();
+                String nowDate = sdFormat.format(tempDate);
+                SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
+                long diffDay = 0;
+                try{
+                    Date startDate = sdf.parse(nowDate);
+                    Date endDate = sdf.parse(expiredAt);
+                    //두날짜 사이의 시간 차이(ms)를 하루 동안의 ms(24시*60분*60초*1000밀리초) 로 나눈다.
+                    diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
+                }catch(ParseException e){
+                    e.printStackTrace();
+                }
+
+                if (diffDay<0){
+                    freshness=444;
+                }
+                else if(diffDay<=3){
+                    freshness=1;
+                }
+                else if( diffDay <=7){
+                    freshness=2;
+                }
+                else{
+                    freshness=3;
+                }
+
+//
+//                DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
+//                expiredAt = sdFormat.parse(tmpDate);
             }
 
-            return new FridgeList(ingredientName,ingredientIcon,expiredAt+"까지",storageMethod,count,freshness);
+//            DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
+//            String expiredAt = sdFormat.format(tmpDate);
+
+
+
+//
+//            Date tempDate = new Date();
+//            String nowDate = sdFormat.format(tempDate);
+//            SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
+//            long diffDay = 0;
+//            try{
+//                Date startDate = sdf.parse(nowDate);
+//                Date endDate = sdf.parse(expiredAt);
+//                //두날짜 사이의 시간 차이(ms)를 하루 동안의 ms(24시*60분*60초*1000밀리초) 로 나눈다.
+//                diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
+//            }catch(ParseException e){
+//                e.printStackTrace();
+//            }
+//
+//            if (diffDay<0){
+//                freshness=444;
+//            }
+//            else if(diffDay<=3){
+//                freshness=1;
+//            }
+//            else if( diffDay <=7){
+//                freshness=2;
+//            }
+//            else{
+//                freshness=3;
+//            }
+
+            return new FridgeList(ingredientName,ingredientIcon,expiredAtResult,storageMethod,count,freshness);
         }).collect(Collectors.toList());
+
+//        return fridgeList.stream().map(fl -> {
+//            String ingredientName = fl.getIngredientName();
+//            String ingredientIcon = fl.getIngredientIcon();
+//
+//            Date tmpDate = fl.getExpiredAt();
+//
+//
+//
+//            DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
+//            String expiredAt = sdFormat.format(tmpDate);
+//
+//            String storageMethod = fl.getStorageMethod();
+//            Integer count =fl.getCount();
+//            Integer freshness;
+//
+//            Date tempDate = new Date();
+//            String nowDate = sdFormat.format(tempDate);
+//            SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
+//            long diffDay = 0;
+//            try{
+//                Date startDate = sdf.parse(nowDate);
+//                Date endDate = sdf.parse(expiredAt);
+//                //두날짜 사이의 시간 차이(ms)를 하루 동안의 ms(24시*60분*60초*1000밀리초) 로 나눈다.
+//                diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
+//            }catch(ParseException e){
+//                e.printStackTrace();
+//            }
+//
+//            if (diffDay<0){
+//                freshness=444;
+//            }
+//            else if(diffDay<=3){
+//                freshness=1;
+//            }
+//            else if( diffDay <=7){
+//                freshness=2;
+//            }
+//            else{
+//                freshness=3;
+//            }
+//
+//            return new FridgeList(ingredientName,ingredientIcon,expiredAt+"까지",storageMethod,count,freshness);
+//        }).collect(Collectors.toList());
     }
 
 

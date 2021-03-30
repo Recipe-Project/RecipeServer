@@ -67,8 +67,15 @@ public class FridgeService {
 
                 String expiredAtTmp = fridgeBasketList.get(i).getExpiredAt();
 
-                DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
-                Date expiredAt = sdFormat.parse(expiredAtTmp);
+                Date expiredAt;
+                if (expiredAtTmp == null || expiredAtTmp.equals("")){
+                    expiredAt=null;
+                }
+                else{
+                    DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
+                    expiredAt = sdFormat.parse(expiredAtTmp);
+                }
+
 
                 String storageMethod = fridgeBasketList.get(i).getStorageMethod();
                 Integer count = fridgeBasketList.get(i).getCount();
