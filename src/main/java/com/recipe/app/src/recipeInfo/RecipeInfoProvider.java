@@ -188,7 +188,7 @@ public class RecipeInfoProvider {
      * @throws BaseException
      */
 
-    public List<GetRecipeBlogsRes> retrieveRecipeBlogs(Integer jwtUserIdx, String keyword) throws BaseException {
+    public List<GetRecipeBlogsRes> retrieveRecipeBlogs(Integer jwtUserIdx, String keyword, Integer display, Integer start) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
         JSONObject jsonObject;
@@ -198,7 +198,7 @@ public class RecipeInfoProvider {
         }catch(Exception e){
             throw new BaseException(FAILED_TO_URL_ENCODER);
         }
-        String apiURL = "https://openapi.naver.com/v1/search/blog?display=100&sort=sim&query="+text;
+        String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&query="+text+"&display="+display+"&start="+start;
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("X-Naver-Client-Id", NAVER_CLIENT_ID);
@@ -251,12 +251,6 @@ public class RecipeInfoProvider {
 
 
         List<GetRecipeBlogsRes> getRecipeBlogsResList = new ArrayList<>();
-        String title=null;
-        String blogUrl=null;
-        String description=null;
-        String bloggerName=null;
-        String postDate = null;
-        String thumbnail=null;
 
         JSONArray arr;
         try{
@@ -269,6 +263,13 @@ public class RecipeInfoProvider {
         }
 
         for(int i=0;i<arr.size();i++){
+            String title=null;
+            String blogUrl=null;
+            String description=null;
+            String bloggerName=null;
+            String postDate = null;
+            String thumbnail=null;
+
             JSONObject tmp = (JSONObject) arr.get(i);
             title = tmp.get("title").toString();
             title = title.replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
@@ -279,43 +280,67 @@ public class RecipeInfoProvider {
             postDate = tmp.get("postdate").toString();
             System.out.println(blogUrl);
 
-            try {
-                URL url = new URL(blogUrl);
-                Document doc = Jsoup.parse(url, 5000);
+            if(blogUrl.contains("naver")) {
+                try {
+                    URL url = new URL(blogUrl);
+                    Document doc = Jsoup.parse(url, 5000);
 
-                String src = doc.getElementById("mainFrame").toString().replace("&amp;", "&");
-                System.out.println(src);
+                    String src = doc.getElementById("mainFrame").toString().replace("&amp;", "&");
+                    System.out.println(src);
 
-                int start = src.indexOf("src=") + 5;
-                int end = src.indexOf("&from=");
-                src = src.substring(start, end);
-                src = "http://blog.naver.com" + src;
-                start = src.indexOf("logNo=") + 6;
-                String logNo = src.substring(start);
+                    int s = src.indexOf("src=") + 5;
+                    int e = src.indexOf("&from=");
+                    src = src.substring(s, e);
+                    src = "http://blog.naver.com" + src;
+                    s = src.indexOf("logNo=") + 6;
+                    String logNo = src.substring(s);
 
-                doc= Jsoup.connect(src).get();
+                    doc = Jsoup.connect(src).get();
 
 
-                // 본문에서 img태그를 모두 파싱한 후 "_photoImage" class 속성을 포함한 이미지의 URL을 파싱
-                Elements imageLinks = doc.getElementById("post-view" + logNo).getElementsByTag("img");
-                String result=null;
-                for(Element image : imageLinks) {
-                    String temp = image.attr("src");
-                    if(temp.contains("postfiles")) {
-                        result = temp;
-                        result = result.replace("w80_blur", "w966");
-                        break;
+                    // 본문에서 img태그를 모두 파싱한 후 "_photoImage" class 속성을 포함한 이미지의 URL을 파싱
+                    Elements imageLinks = doc.getElementById("post-view" + logNo).getElementsByTag("img");
+                    String result = null;
+                    for (Element image : imageLinks) {
+                        String temp = image.attr("src");
+                        if (temp.contains("postfiles")) {
+                            result = temp;
+                            result = result.replace("w80_blur", "w966");
+                            break;
+                        }
                     }
+
+                    thumbnail = result;
+
+                } catch (Exception e) {
+                    throw new BaseException(FAILED_TO_CRAWLING);
                 }
+            }
+            else if(blogUrl.contains("tistory")){
+                try {
+                    Document doc = Jsoup.connect(blogUrl).get();
 
-                thumbnail = result;
+                    Elements imageLinks = doc.getElementsByTag("img");
+                    String result = null;
+                    for (Element image : imageLinks) {
+                        String temp = image.attr("src");
+                        System.out.println(temp);
 
-            }catch(Exception e){
-                throw new BaseException(FAILED_TO_CRAWLING);
+                        if (!temp.contains("admin")) {
+                            result = temp;
+                            break;
+                        }
+                    }
+
+                    thumbnail = result;
+
+                } catch (Exception e) {
+                    throw new BaseException(FAILED_TO_CRAWLING);
+                }
             }
 
             String userScrapYN = "N";
-            for(int j=0;j<user.getScrapPublics().size();j++){
+            for(int j=0;j<user.getScrapBlogs().size();j++){
                 if(user.getScrapBlogs().get(j).getBlogUrl().equals(blogUrl) && user.getScrapBlogs().get(j).getStatus().equals("ACTIVE")){
                     userScrapYN = "Y";
                 }

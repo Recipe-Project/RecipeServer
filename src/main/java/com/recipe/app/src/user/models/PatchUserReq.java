@@ -10,8 +10,4 @@ import javax.validation.constraints.*;
 @Getter
 public class PatchUserReq {
     private String profilePhoto;
-    @Size(min=1)
-    private String userName;
-    private String email;
-    private String phoneNumber;
 }

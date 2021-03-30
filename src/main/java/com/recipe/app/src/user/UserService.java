@@ -401,9 +401,6 @@ public class UserService {
 
         //유저 정보 수정
         user.setProfilePhoto(patchUserReq.getProfilePhoto());
-        user.setUserName(patchUserReq.getUserName());
-        user.setEmail(patchUserReq.getEmail());
-        user.setPhoneNumber(patchUserReq.getPhoneNumber());
         try {
             user = userRepository.save(user);
         } catch (Exception exception) {
@@ -414,10 +411,8 @@ public class UserService {
             String socialId = user.getSocialId();
             String profilePhoto = user.getProfilePhoto();
             String userName = user.getUserName();
-            String email = user.getEmail();
-            String phoneNumber = user.getPhoneNumber();
 
-            return new PatchUserRes(userIdx, socialId, profilePhoto, userName, email, phoneNumber);
+            return new PatchUserRes(userIdx, socialId, profilePhoto, userName);
         }catch(Exception e){
             throw new BaseException(FAILED_TO_PATCH_USER);
         }

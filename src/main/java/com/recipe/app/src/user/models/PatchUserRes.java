@@ -9,6 +9,4 @@ public class PatchUserRes {
     private final String socialId;
     private final String profilePhoto;
     private final String userName;
-    private final String email;
-    private final String phoneNumber;
 }
