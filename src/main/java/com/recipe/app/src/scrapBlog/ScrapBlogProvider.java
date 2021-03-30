@@ -38,30 +38,14 @@ public class ScrapBlogProvider {
      * @return GetScrapBlogsRes
      * @throws BaseException
      */
-    public List<GetScrapBlogsRes> retrieveScrapBlogs(Integer jwtUserIdx, Integer sort) throws BaseException {
+    public List<GetScrapBlogsRes> retrieveScrapBlogs(Integer jwtUserIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
         List<ScrapBlog> scrapBlogList;
-        if(sort==2){ //최신순
-            try{
-                scrapBlogList = scrapBlogRepository.findByUserAndStatusOrderByPostDateDesc(user, "ACTIVE");
-            }catch(Exception e){
-                throw new BaseException(DATABASE_ERROR);
-            }
-        }
-        else if(sort==3){ //좋아요순
-            try{
-                scrapBlogList = scrapBlogRepository.findByBlogUrlAndUserAndStatusOrderByScrapBlogCount(user.getUserIdx(), "ACTIVE");
-            }catch(Exception e){
-                throw new BaseException(DATABASE_ERROR);
-            }
-        }
-        else { //조회순
-            try{
-                scrapBlogList = scrapBlogRepository.findByUserAndStatusOrderByViewBlogCount(user.getUserIdx(), "ACTIVE");
-            }catch(Exception e){
-                throw new BaseException(DATABASE_ERROR);
-            }
+        try{
+            scrapBlogList = scrapBlogRepository.findByUserAndStatusOrderByCreatedAtDesc(user, "ACTIVE");
+        }catch(Exception e){
+            throw new BaseException(DATABASE_ERROR);
         }
 
         List<GetScrapBlogsRes> getScrapBlogsResList = new ArrayList<>();

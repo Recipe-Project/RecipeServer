@@ -17,6 +17,8 @@ import java.util.List;
 public interface ScrapBlogRepository extends CrudRepository<ScrapBlog, Integer> {
     ScrapBlog findByUserAndBlogUrlAndStatus(User user, String blogUrl, String status);
     Integer countByBlogUrlAndStatus(String blogUrl, String status);
+    List<ScrapBlog> findByUserAndStatusOrderByCreatedAtDesc(User user, String status);
+
     //조회순
     @Query(value = "SELECT b From ScrapBlog b LEFT OUTER JOIN ViewBlog v ON b.blogUrl = v.blogUrl WHERE b.user.userIdx = :userIdx AND b.status = :status GROUP BY b.blogUrl ORDER BY count(v.blogUrl) DESC")
     List<ScrapBlog> findByUserAndStatusOrderByViewBlogCount(@Param("userIdx")Integer userIdx, @Param("status")String status);

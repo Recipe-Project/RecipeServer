@@ -79,11 +79,11 @@ public class ScrapBlogController {
      */
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<List<GetScrapBlogsRes>> getScrapBlogs(@RequestParam(value = "sort", required = false) Integer sort) {
+    public BaseResponse<List<GetScrapBlogsRes>> getScrapBlogs() {
 
         try {
             Integer jwtUserIdx = jwtService.getUserId();
-            List<GetScrapBlogsRes> getScrapBlogsResList = scrapBlogProvider.retrieveScrapBlogs(jwtUserIdx, sort);
+            List<GetScrapBlogsRes> getScrapBlogsResList = scrapBlogProvider.retrieveScrapBlogs(jwtUserIdx);
             return new BaseResponse<>(getScrapBlogsResList);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
