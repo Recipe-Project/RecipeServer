@@ -33,7 +33,6 @@ public class UserRecipeController {
      * 나만의 레시피 전체조회 API
      * [GET] /my-recipes
      * @return BaseResponse<List<GetMyRecipesRes>>
-     * @PageableDefault pageable
      */
     @GetMapping("")
     public BaseResponse<List<GetMyRecipesRes>> getMyRecipes() {
@@ -73,7 +72,7 @@ public class UserRecipeController {
     /**
      * 나만의 레시피 삭제 API
      * [DELETE] /my-recipes/:myRecipeIdx
-     * @return BaseResponse<GetMyRecipeRes>
+     * @return BaseResponse<Void>
      * @PathVariable myRecipeIdx
      */
     @DeleteMapping("/{myRecipeIdx}")
@@ -166,8 +165,6 @@ public class UserRecipeController {
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
-
-
     }
 
 

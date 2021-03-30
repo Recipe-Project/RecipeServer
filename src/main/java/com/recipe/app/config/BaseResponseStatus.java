@@ -108,6 +108,8 @@ public enum BaseResponseStatus {
     RECEIPTS_EMPTY_RECEIPT_IDX(false, 2077, "영수증 인덱스 값을 확인해주세요."),
 
 
+    // [DELETE] fridges/ingredient
+    EMPTY_INGREDIENT_LIST(false, 2078, "삭제할 재료 리스트를 입력하세요."),
     /**
      * 3000 : Response 오류
      */
@@ -194,6 +196,10 @@ public enum BaseResponseStatus {
     //[POST] views/youtube
     FAILED_TO_POST_VIEWS_YOUTUBE(false, 3050, "유튜브 조회로그를 저장에 실패습니다."),
 
+    // [DELETE] fridges/ingredient
+    FAILED_TO_GET_INGREDIENT_NAME(false, 3051, "재료명 조회에 실패했습니다."),
+    FAILED_TO_GET_FRIDGE(false, 3052, "냉장고 조회에 실패했습니다."),
+    FAILED_TO_DELETE_FRIDGE(false, 3053, "냉장고 재료 삭제에 실패했습니다."),
     /**
      * 4000 : Database, Server 오류
      */

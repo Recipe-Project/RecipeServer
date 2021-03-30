@@ -5,8 +5,6 @@ import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridge.models.Fridge;
 import com.recipe.app.src.fridge.models.FridgeList;
 import com.recipe.app.src.fridge.models.GetFridgesRes;
-import com.recipe.app.src.ingredient.models.Ingredient;
-import com.recipe.app.src.ingredient.models.IngredientList;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
@@ -141,5 +139,23 @@ public class FridgeProvider {
         }).collect(Collectors.toList());
     }
 
+
+    /**
+     * 재료명 존재여부
+     * @param ingredientName
+     * @return Boolean
+     * @throws BaseException
+     */
+    public Boolean existIngredient(String ingredientName) throws BaseException {
+        Boolean existIngredient;
+        try {
+            existIngredient = fridgeRepository.existsByIngredientNameAndStatus(ingredientName,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_INGREDIENT_NAME);
+        }
+
+
+        return existIngredient;
+    }
 
 }
