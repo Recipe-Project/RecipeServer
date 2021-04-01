@@ -28,19 +28,11 @@ public class Buy extends BaseEntity {
     @Column(name = "buyName", nullable = false, length = 45)
     private String buyName;
 
-    @Column(name = "buyCnt", nullable = false)
-    private Integer buyCnt;
-
-    @Column(name = "buyPrice", nullable = false)
-    private Integer buyPrice;
-
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public Buy(Receipt receipt, String buyName, Integer buyCnt, Integer buyPrice){
+    public Buy(Receipt receipt, String buyName){
         this.receipt = receipt;
         this.buyName = buyName;
-        this.buyCnt = buyCnt;
-        this.buyPrice = buyPrice;
     }
 }

@@ -12,5 +12,6 @@ import java.util.List;
 public class PatchReceiptReq {
     private String title;
     private String receiptDate;
-    private List<PatchBuyList> buyList;
+    private List<PatchBuyList> patchBuyList;
+    private List<DeleteBuyList> deleteBuyList;
 }

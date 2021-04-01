@@ -79,7 +79,7 @@ public class ReceiptService {
      * @throws BaseException
      */
     @Transactional(rollbackFor = Exception.class)
-    public void updateReceipt(Integer jwtUserIdx, Integer receiptIdx, PatchReceiptReq patchReceiptReq) throws BaseException {
+    public void updateReceipt(int jwtUserIdx, int receiptIdx, PatchReceiptReq patchReceiptReq) throws BaseException {
         Receipt receipt = receiptProvider.retrieveReceiptByReceiptIdx(receiptIdx);
         //jwt 확인
         if(receipt.getUser().getUserIdx() != jwtUserIdx){
@@ -103,12 +103,12 @@ public class ReceiptService {
             throw new BaseException(DATABASE_ERROR);
         }
 
-        List<PatchBuyList> buyList = patchReceiptReq.getBuyList();
-        for(int i=0;i< buyList.size();i++){
-            PatchBuyList list = buyList.get(i);
+        List<PatchBuyList> patchBuyList = patchReceiptReq.getPatchBuyList();
+        for(int i=0;i< patchBuyList.size();i++){
+            PatchBuyList patchBuy = patchBuyList.get(i);
             Buy buy;
             try {
-                buy = buyRepository.findById(list.getBuyIdx()).orElse(null);
+                buy = buyRepository.findById(patchBuy.getBuyIdx()).orElse(null);
             } catch (Exception exception) {
                 throw new BaseException(DATABASE_ERROR);
             }
@@ -116,10 +116,30 @@ public class ReceiptService {
             if(buy==null || buy.getReceipt().getReceiptIdx()!=receiptIdx){
                 throw new BaseException(NOT_FOUND_BUY);
             }
-            buy.setBuyName(list.getBuyName());
-            buy.setBuyCnt(list.getBuyCnt());
-            buy.setBuyPrice(list.getBuyPrice());
+            buy.setBuyName(patchBuy.getBuyName());
 
+            try {
+                buy = buyRepository.save(buy);
+            } catch (Exception exception) {
+                throw new BaseException(DATABASE_ERROR);
+            }
+        }
+
+        List<DeleteBuyList> deleteBuyList = patchReceiptReq.getDeleteBuyList();
+        for(int i=0;i< deleteBuyList.size();i++){
+            DeleteBuyList deleteBuy = deleteBuyList.get(i);
+            Buy buy;
+            try {
+                buy = buyRepository.findById(deleteBuy.getBuyIdx()).orElse(null);
+            } catch (Exception exception) {
+                throw new BaseException(DATABASE_ERROR);
+            }
+
+            if(buy==null || buy.getReceipt().getReceiptIdx()!=receiptIdx){
+                throw new BaseException(NOT_FOUND_BUY);
+            }
+
+            buy.setStatus("INACTIVE");
             try {
                 buy = buyRepository.save(buy);
             } catch (Exception exception) {
@@ -162,10 +182,8 @@ public class ReceiptService {
         for(int i = 0; i< postBuyList.size(); i++){
             PostBuyList buys = postBuyList.get(i);
             String buyName = buys.getBuyName();
-            Integer buyCnt = buys.getBuyCnt();
-            Integer buyPrice = buys.getBuyPrice();
 
-            Buy buy = new Buy(receipt, buyName, buyCnt, buyPrice);
+            Buy buy = new Buy(receipt, buyName);
 
             try {
                 buy = buyRepository.save(buy);

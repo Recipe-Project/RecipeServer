@@ -6,10 +6,8 @@ import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
-public class PatchBuyList {
+public class DeleteBuyList {
     private Integer buyIdx;
-    private String buyName;
 }

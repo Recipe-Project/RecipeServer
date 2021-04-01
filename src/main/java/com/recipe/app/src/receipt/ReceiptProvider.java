@@ -76,10 +76,8 @@ public class ReceiptProvider {
                 if(buy.getStatus().equals("ACTIVE")) {
                     Integer buyIdx = buy.getBuyIdx();
                     String buyName = buy.getBuyName();
-                    Integer buyCnt = buy.getBuyCnt();
-                    Integer buyPrice = buy.getBuyPrice();
 
-                    buyList.add(new GetBuyList(buyIdx, buyName, buyCnt, buyPrice));
+                    buyList.add(new GetBuyList(buyIdx, buyName));
                 }
             }
 
@@ -108,10 +106,8 @@ public class ReceiptProvider {
             if(buy.getStatus().equals("ACTIVE")) {
                 Integer buyIdx = buy.getBuyIdx();
                 String buyName = buy.getBuyName();
-                Integer buyCnt = buy.getBuyCnt();
-                Integer buyPrice = buy.getBuyPrice();
 
-                buyList.add(new GetBuyList(buyIdx, buyName, buyCnt, buyPrice));
+                buyList.add(new GetBuyList(buyIdx, buyName));
             }
         }
 

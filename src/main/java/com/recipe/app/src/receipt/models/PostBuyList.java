@@ -11,6 +11,4 @@ import java.util.List;
 @Getter
 public class PostBuyList {
     private String buyName;
-    private Integer buyCnt;
-    private Integer buyPrice;
 }

@@ -10,6 +10,4 @@ import java.util.List;
 public class GetBuyList {
     private final Integer buyIdx;
     private final String buyName;
-    private final Integer buyCnt;
-    private final Integer buyPrice;
 }
