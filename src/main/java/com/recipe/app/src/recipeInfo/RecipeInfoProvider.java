@@ -1,6 +1,8 @@
 package com.recipe.app.src.recipeInfo;
 
 import com.recipe.app.config.BaseException;
+import com.recipe.app.src.fridge.FridgeRepository;
+import com.recipe.app.src.fridge.models.Fridge;
 import com.recipe.app.src.recipeInfo.models.*;
 import com.recipe.app.src.recipeIngredient.models.RecipeIngredient;
 import com.recipe.app.src.recipeProcess.models.RecipeProcess;
@@ -42,6 +44,7 @@ import static com.sun.el.util.MessageFactory.get;
 
 @Service
 public class RecipeInfoProvider {
+    private final FridgeRepository fridgeRepository;
     private final ScrapBlogRepository scrapBlogRepository;
     private final ScrapPublicRepository scrapPublicRepository;
     private final UserProvider userProvider;
@@ -49,7 +52,8 @@ public class RecipeInfoProvider {
     private final JwtService jwtService;
 
     @Autowired
-    public RecipeInfoProvider(ScrapBlogRepository scrapBlogRepository, ScrapPublicRepository scrapPublicRepository, UserProvider userProvider, RecipeInfoRepository recipeInfoRepository, JwtService jwtService) {
+    public RecipeInfoProvider(FridgeRepository fridgeRepository, ScrapBlogRepository scrapBlogRepository, ScrapPublicRepository scrapPublicRepository, UserProvider userProvider, RecipeInfoRepository recipeInfoRepository, JwtService jwtService) {
+        this.fridgeRepository = fridgeRepository;
         this.scrapBlogRepository = scrapBlogRepository;
         this.scrapPublicRepository = scrapPublicRepository;
         this.userProvider = userProvider;
@@ -142,7 +146,9 @@ public class RecipeInfoProvider {
         String thumbnail = recipeInfo.getImgUrl();
         String cookingTime = recipeInfo.getCookingTime();
         String level = recipeInfo.getLevelNm();
+        System.out.println(recipeInfo.getRecipeId());
 
+        List<Fridge> fridges = fridgeRepository.findByUserAndStatus(user, "ACTIVE");
         List<RecipeIngredient> recipeIngredients = recipeInfo.getRecipeIngredients();
         List<RecipeIngredientList> recipeIngredientList = new ArrayList<>();
         for(int i=0;i<recipeIngredients.size();i++){
@@ -150,7 +156,14 @@ public class RecipeInfoProvider {
             Integer recipeIngredientIdx = ingredient.getIdx();
             String recipeIngredientName = ingredient.getIrdntNm();
             String recipeIngredientCpcty = ingredient.getIrdntCpcty();
-            recipeIngredientList.add(new RecipeIngredientList(recipeIngredientIdx, recipeIngredientName, recipeIngredientCpcty));
+            String inFridgeYN = "N";
+            for(int j=0;j<fridges.size();j++){
+                if(recipeIngredientName.equals(fridges.get(j).getIngredientName())){
+                    inFridgeYN="Y";
+                    break;
+                }
+            }
+            recipeIngredientList.add(new RecipeIngredientList(recipeIngredientIdx, recipeIngredientName, recipeIngredientCpcty, inFridgeYN));
         }
         List<RecipeProcess> recipeProcesses = recipeInfo.getRecipeProcesses();
         List<RecipeProcessList> recipeProcessList = new ArrayList<>();

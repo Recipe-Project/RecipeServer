@@ -9,4 +9,5 @@ public class RecipeIngredientList {
     private final Integer recipeIngredientIdx;
     private final String recipeIngredientName;
     private final String recipeIngredientCpcty;
+    private final String inFridgeYN;
 }
