@@ -8,12 +8,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class GetRecipeBlogsRes {
-    private final String title;
-    private final String blogUrl;
-    private final String description;
-    private final String bloggerName;
-    private final String postDate;
-    private final String thumbnail;
-    private final String userScrapYN;
-    private final Integer userScrapCnt;
+    private final Integer total;
+    private final List<BlogList> blogList;
 }

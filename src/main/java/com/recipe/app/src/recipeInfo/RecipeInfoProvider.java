@@ -201,7 +201,7 @@ public class RecipeInfoProvider {
      * @throws BaseException
      */
 
-    public List<GetRecipeBlogsRes> retrieveRecipeBlogs(Integer jwtUserIdx, String keyword, Integer display, Integer start) throws BaseException {
+    public GetRecipeBlogsRes retrieveRecipeBlogs(Integer jwtUserIdx, String keyword, Integer display, Integer start) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
         JSONObject jsonObject;
@@ -263,17 +263,20 @@ public class RecipeInfoProvider {
         System.out.println(body);
 
 
-        List<GetRecipeBlogsRes> getRecipeBlogsResList = new ArrayList<>();
-
+        Integer total;
         JSONArray arr;
         try{
             JSONParser jsonParser = new JSONParser();
             jsonObject = (JSONObject) jsonParser.parse(body);
             arr = (JSONArray) jsonObject.get("items");
+            total = Integer.parseInt(jsonObject.get("total").toString());
+            System.out.println(total);
         }
         catch (Exception e){
             throw new BaseException(FAILED_TO_PARSE);
         }
+
+        List<BlogList> blogList = new ArrayList<>();
 
         for(int i=0;i<arr.size();i++){
             String title=null;
@@ -291,7 +294,7 @@ public class RecipeInfoProvider {
             description = description.replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
             bloggerName = tmp.get("bloggername").toString();
             postDate = tmp.get("postdate").toString();
-            System.out.println(blogUrl);
+            //System.out.println(blogUrl);
 
             if(blogUrl.contains("naver")) {
                 try {
@@ -299,7 +302,7 @@ public class RecipeInfoProvider {
                     Document doc = Jsoup.parse(url, 5000);
 
                     String src = doc.getElementById("mainFrame").toString().replace("&amp;", "&");
-                    System.out.println(src);
+                    //System.out.println(src);
 
                     int s = src.indexOf("src=") + 5;
                     int e = src.indexOf("&from=");
@@ -366,11 +369,11 @@ public class RecipeInfoProvider {
                 throw new BaseException(DATABASE_ERROR);
             }
 
-            getRecipeBlogsResList.add(new GetRecipeBlogsRes(title, blogUrl, description, bloggerName, postDate, thumbnail, userScrapYN, userScrapCnt));
+            blogList.add(new BlogList(title, blogUrl, description, bloggerName, postDate, thumbnail, userScrapYN, userScrapCnt));
         }
 
 
-        return getRecipeBlogsResList;
+        return new GetRecipeBlogsRes(total, blogList);
 
     }
 }

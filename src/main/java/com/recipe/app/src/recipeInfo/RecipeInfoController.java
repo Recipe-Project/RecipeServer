@@ -78,13 +78,13 @@ public class RecipeInfoController {
      * @return BaseResponse<List<GetRecipeBlogsRes>>
      */
     @GetMapping("/blog")
-    public BaseResponse<List<GetRecipeBlogsRes>> getRecipeBlogs(@RequestParam(value="keyword") String keyword, @RequestParam(value="display") Integer display, @RequestParam(value="start") Integer start) {
+    public BaseResponse<GetRecipeBlogsRes> getRecipeBlogs(@RequestParam(value="keyword") String keyword, @RequestParam(value="display") Integer display, @RequestParam(value="start") Integer start) {
 
         try {
             int jwtUserIdx = jwtService.getUserId();
-            List<GetRecipeBlogsRes> getRecipeBlogList = recipeInfoProvider.retrieveRecipeBlogs(jwtUserIdx, keyword, display, start);
+            GetRecipeBlogsRes getRecipeBlog = recipeInfoProvider.retrieveRecipeBlogs(jwtUserIdx, keyword, display, start);
 
-            return new BaseResponse<>(getRecipeBlogList);
+            return new BaseResponse<>(getRecipeBlog);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
