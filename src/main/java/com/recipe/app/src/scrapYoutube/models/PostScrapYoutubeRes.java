@@ -10,7 +10,7 @@ import lombok.Getter;
 @AllArgsConstructor
 public class PostScrapYoutubeRes {
     private final Integer userIdx;
-    private final Integer youtubeIdx;
+    private final String youtubeId;
     private final String title;
     private final String thumbnail;
     private final String youtubeUrl;

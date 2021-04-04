@@ -35,7 +35,7 @@ public class ScrapYoutubeService {
      * @throws BaseException
      */
     public PostScrapYoutubeRes createScrapYoutube(PostScrapYoutubeReq postScrapYoutubeReq, int userIdx) throws BaseException {
-        Integer youtubeIdx = postScrapYoutubeReq.getYoutubeIdx();
+        String youtubeId = postScrapYoutubeReq.getYoutubeId();
         String title = postScrapYoutubeReq.getTitle();
         String thumbnail = postScrapYoutubeReq.getThumbnail();
         String youtubeUrl = postScrapYoutubeReq.getYoutubeUrl();
@@ -46,7 +46,7 @@ public class ScrapYoutubeService {
 
 
         try {
-            ScrapYoutube scrapYoutube = new ScrapYoutube(user, youtubeIdx, title, thumbnail, youtubeUrl, postDate, channelName,playTime);
+            ScrapYoutube scrapYoutube = new ScrapYoutube(user, youtubeId, title, thumbnail, youtubeUrl, postDate, channelName,playTime);
             scrapYoutube = scrapYoutubeRepository.save(scrapYoutube);
 
 
@@ -54,20 +54,20 @@ public class ScrapYoutubeService {
             throw new BaseException(FAILED_TO_POST_SCRAP_YOUTUBE);
         }
 
-        return new PostScrapYoutubeRes(userIdx,youtubeIdx, title,thumbnail,youtubeUrl,postDate,channelName,playTime);
+        return new PostScrapYoutubeRes(userIdx,youtubeId, title,thumbnail,youtubeUrl,postDate,channelName,playTime);
     }
 
 
 
     /**
      * 유튜브 스크랩 취소
-     * @param youtubeIdx,userIdx
+     * @param youtubeId,userIdx
      * @return PostScrapYoutubeRes
      * @throws BaseException
      */
-    public PostScrapYoutubeRes deleteScrapYoutube(Integer youtubeIdx, Integer userIdx) throws BaseException {
+    public PostScrapYoutubeRes deleteScrapYoutube(String youtubeId, Integer userIdx) throws BaseException {
 
-        ScrapYoutube scrapYoutube = scrapYoutubeProvider.retrieveScrapYoutube(youtubeIdx, userIdx);
+        ScrapYoutube scrapYoutube = scrapYoutubeProvider.retrieveScrapYoutube(youtubeId, userIdx);
         scrapYoutube.setStatus("INACTIVE");
         String title = scrapYoutube.getTitle();
         String thumbnail = scrapYoutube.getThumbnail();
@@ -81,7 +81,7 @@ public class ScrapYoutubeService {
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_POST_DELETE_SCRAP_YOUTUBE);
         }
-        return new PostScrapYoutubeRes(userIdx,youtubeIdx, title,thumbnail,youtubeUrl,postDate,channelName,playTime);
+        return new PostScrapYoutubeRes(userIdx,youtubeId, title,thumbnail,youtubeUrl,postDate,channelName,playTime);
     }
 
 }

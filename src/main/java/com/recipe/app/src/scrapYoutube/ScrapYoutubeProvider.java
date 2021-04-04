@@ -72,7 +72,7 @@ public class ScrapYoutubeProvider {
         }
 
         return scrapYoutubeList.stream().map(scrapYoutube -> {
-            Integer youtubeIdx = scrapYoutube.getYoutubeIdx();
+            String youtubeId = scrapYoutube.getYoutubeId();
             String title = scrapYoutube.getTitle(); //제목 30자
             if (title.length()>30){
                 title = title.substring(0,30)+"...";
@@ -82,27 +82,28 @@ public class ScrapYoutubeProvider {
             String postDate = scrapYoutube.getPostDate();
             String channelName = scrapYoutube.getChannelName();
             String playTime = scrapYoutube.getPlayTime();
-            Long heartCount = scrapYoutubeRepository.countByYoutubeIdxAndStatus(youtubeIdx,"ACTIVE");
+            Long heartCount = scrapYoutubeRepository.countByYoutubeIdAndStatus(youtubeId,"ACTIVE");
 
-            return new ScrapYoutubeList(userIdx,youtubeIdx,title,thumbnail,heartCount,youtubeUrl,postDate,channelName,playTime);
+            return new ScrapYoutubeList(userIdx,youtubeId,title,thumbnail,heartCount,youtubeUrl,postDate,channelName,playTime);
 
         }).collect(Collectors.toList());
     }
 
     /**
      * 유튜브 스크랩 하기에서 특정게시글 스크랩 조회
-     * @param userIdx
+     * @param youtubeId,userIdx
      * @return ScrapYoutube
      * @throws BaseException
      */
-    public ScrapYoutube retrieveScrapYoutube(Integer youtubeIdx, Integer userIdx) throws BaseException {
+    public ScrapYoutube retrieveScrapYoutube(String youtubeId, Integer userIdx) throws BaseException {
         ScrapYoutube scrapYoutube;
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         try {
-            scrapYoutube = scrapYoutubeRepository.findByYoutubeIdxAndUserAndStatus(youtubeIdx,user,"ACTIVE");
+            scrapYoutube = scrapYoutubeRepository.findByYoutubeIdAndUserAndStatus(youtubeId,user,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_SCRAP_YOUTUBE);
         }
+
 
 
         return scrapYoutube;

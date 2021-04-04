@@ -24,8 +24,8 @@ public class ScrapYoutube extends BaseEntity {
     @JoinColumn(name = "userIdx", nullable = false)
     private User user;
 
-    @Column(name = "youtubeIdx", nullable = false)
-    private Integer youtubeIdx;
+    @Column(name = "youtubeId", nullable = false, length = 45)
+    private String youtubeId;
 
     @Column(name = "title", nullable = false, length = 45)
     private String title;
@@ -48,9 +48,9 @@ public class ScrapYoutube extends BaseEntity {
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public ScrapYoutube(User user,  Integer youtubeIdx, String title, String thumbnail, String youtubeUrl, String postDate, String channelName,String playTime){
+    public ScrapYoutube(User user,  String youtubeId, String title, String thumbnail, String youtubeUrl, String postDate, String channelName,String playTime){
         this.user = user;
-        this.youtubeIdx = youtubeIdx;
+        this.youtubeId = youtubeId;
         this.title = title;
         this.thumbnail = thumbnail;
         this.youtubeUrl = youtubeUrl;
