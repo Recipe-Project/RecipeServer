@@ -41,8 +41,8 @@ public class ScrapPublicController {
             scrapPublic = scrapPublicProvider.retrieveScrapRecipe(parameters.getRecipeId(), userIdx);
 
 
-            PostScrapPublicRes postScrapPublicRes;
-            if (scrapPublic != null) {
+                PostScrapPublicRes postScrapPublicRes;
+                if (scrapPublic != null) {
                 postScrapPublicRes =  scrapPublicService.deleteScrapRecipe(parameters.getRecipeId(),userIdx);
             }
             else{

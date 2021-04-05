@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 public class PostScrapYoutubeReq {
-    private Integer youtubeIdx;
+    private String youtubeId;
     private String title;
     private String thumbnail;
     private String youtubeUrl;

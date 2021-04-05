@@ -54,7 +54,7 @@ public class ScrapYoutubeController {
             if (parameters.getChannelName() != null && parameters.getChannelName() ==null) {
                 return new BaseResponse<>(EMPTY_CHANNEL_NAME);
             }
-            if (parameters.getYoutubeIdx() == null && parameters.getYoutubeIdx() !=null) {
+            if (parameters.getYoutubeId() == null && parameters.getYoutubeId() !=null) {
                 return new BaseResponse<>(EMPTY_YOUTUBEIDX);
             }
             if (parameters.getPlayTime() == null && parameters.getPlayTime() !=null) {
@@ -63,12 +63,12 @@ public class ScrapYoutubeController {
 
             // 이미 발급 받은건지
             ScrapYoutube scrapYoutube = null;
-            scrapYoutube = scrapYoutubeProvider.retrieveScrapYoutube(parameters.getYoutubeIdx(), userIdx);
+            scrapYoutube = scrapYoutubeProvider.retrieveScrapYoutube(parameters.getYoutubeId(), userIdx);
 
 
             PostScrapYoutubeRes postScrapYoutubeRes;
             if (scrapYoutube != null) {
-                postScrapYoutubeRes = scrapYoutubeService.deleteScrapYoutube(parameters.getYoutubeIdx(),userIdx);
+                postScrapYoutubeRes = scrapYoutubeService.deleteScrapYoutube(parameters.getYoutubeId(),userIdx);
                 return new BaseResponse<>(postScrapYoutubeRes);
             }
             else{
