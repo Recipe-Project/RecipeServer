@@ -31,10 +31,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
@@ -294,6 +292,17 @@ public class RecipeInfoProvider {
             description = description.replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
             bloggerName = tmp.get("bloggername").toString();
             postDate = tmp.get("postdate").toString();
+            SimpleDateFormat datetime = new SimpleDateFormat("yyyyMMdd", Locale.KOREA);
+            datetime.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+            Date date;
+            try {
+                date = datetime.parse(postDate);
+            }catch (Exception e){
+                throw new BaseException(DATE_PARSE_ERROR);
+            }
+            SimpleDateFormat datetime2 = new SimpleDateFormat("yyyy.M.d", Locale.KOREA);
+            datetime2.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
+            String postdate = datetime2.format(date);
             //System.out.println(blogUrl);
 
             if(blogUrl.contains("naver")) {
@@ -369,7 +378,7 @@ public class RecipeInfoProvider {
                 throw new BaseException(DATABASE_ERROR);
             }
 
-            blogList.add(new BlogList(title, blogUrl, description, bloggerName, postDate, thumbnail, userScrapYN, userScrapCnt));
+            blogList.add(new BlogList(title, blogUrl, description, bloggerName, postdate, thumbnail, userScrapYN, userScrapCnt));
         }
 
 
