@@ -5,29 +5,43 @@ import com.recipe.app.config.BaseException;
 import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.utils.JwtService;
+import lombok.extern.slf4j.Slf4j;
+import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
-import static org.hibernate.query.criteria.internal.ValueHandlerFactory.isNumeric;
 
+@Slf4j
 @RestController
 @RequestMapping("/fridges")
 public class FridgeController {
+    Logger logger = LoggerFactory.getLogger(this.getClass());
+
     private final FridgeProvider fridgeProvider;
     private final FridgeService fridgeService;
     private final FridgeRepository fridgeRepository;
     private final JwtService jwtService;
+    private final AndroidPushNotificationsService androidPushNotificationsService;
 
     @Autowired
-    public FridgeController(FridgeProvider fridgeProvider, FridgeService fridgeService,FridgeRepository fridgeRepository, JwtService jwtService) {
+    public FridgeController(FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, JwtService jwtService, AndroidPushNotificationsService androidPushNotificationsService) {
         this.fridgeProvider = fridgeProvider;
         this.fridgeService = fridgeService;
         this.fridgeRepository = fridgeRepository;
         this.jwtService = jwtService;
+        this.androidPushNotificationsService = androidPushNotificationsService;
     }
 
     /**
@@ -54,7 +68,7 @@ public class FridgeController {
                 Boolean existIngredientName = fridgeRepository.existsByIngredientNameAndStatus(ingredientName, "ACTIVE");
 
                 if (existIngredientName) {
-                    return new BaseResponse<>(POST_FRIDGES_EXIST_INGREDIENT_NAME);
+                    return new BaseResponse<>(POST_FRIDGES_EXIST_INGREDIENT_NAME); // 재료명보여줄수있나
                 }
             }
 
@@ -171,6 +185,61 @@ public class FridgeController {
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
+    }
+
+
+    /**
+     * 냉장고 파먹기 API
+     * [GET] /fridges/recipe
+     * @return BaseResponse<GetFridgesRecipeRes>
+     */
+    @ResponseBody
+    @GetMapping("/recipe")
+    public BaseResponse<List<GetFridgesRecipeRes>> getFridgesRecipe()  {
+
+        try {
+            Integer userIdx = jwtService.getUserId();
+
+
+            List<GetFridgesRecipeRes> getFridgesRecipeRes = fridgeProvider.retreiveFridgesRecipe(userIdx);
+
+            return new BaseResponse<>(getFridgesRecipeRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+//    @Scheduled(fixedDelay = 10000) //10초마다
+    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분
+    public  @ResponseBody ResponseEntity<String>  notification() throws BaseException, JSONException,InterruptedException {
+        log.info("This job is executed per a second.");
+
+        ArrayList userList = new ArrayList();
+        userList = fridgeProvider.retreiveShelfLifeUserList();
+
+        String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userList);
+
+        HttpEntity<String> request = new HttpEntity<>(notifications);
+
+        CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
+        CompletableFuture.allOf(pushNotification).join();
+
+        try{
+            String firebaseResponse = pushNotification.get();
+            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+        }
+        catch (InterruptedException e){
+            logger.debug("got interrupted!");
+            throw new InterruptedException();
+        }
+        catch (ExecutionException e){
+            logger.debug("execution error!");
+        }
+
+        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
+
+
+
     }
 
 }

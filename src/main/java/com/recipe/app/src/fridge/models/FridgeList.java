@@ -7,6 +7,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class FridgeList {
+
     private final String ingredientName;
     private final String ingredientIcon;
     private final String expiredAt;

@@ -3,7 +3,7 @@ package com.recipe.app.src.fridgeBasket;
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
-import com.recipe.app.src.ingredient.models.IngredientList;
+import com.recipe.app.src.fridgeBasket.models.IngredientList;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
@@ -92,8 +92,9 @@ public class FridgeBasketProvider {
 
             String ingredientName = fridgeBasket.getIngredientName();
             String ingredientIcon = fridgeBasket.getIngredientIcon();
+            Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategory().getIngredientCategoryIdx();
 
-            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon);
+            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon,ingredientCategoryIdx);
 
         }).collect(Collectors.toList());
     }

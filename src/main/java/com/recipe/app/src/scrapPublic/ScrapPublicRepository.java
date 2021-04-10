@@ -17,4 +17,5 @@ public interface ScrapPublicRepository extends CrudRepository<ScrapPublic, Integ
     List<ScrapPublic> findByUserAndStatus(User user, String status);
     List<ScrapPublic> findByUserAndStatus(User user, String status, Sort sort);
     long countByRecipeInfoAndStatus(RecipeInfo recipeInfo,String status);
+
 }

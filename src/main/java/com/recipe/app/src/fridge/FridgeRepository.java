@@ -16,4 +16,6 @@ public interface FridgeRepository extends CrudRepository<Fridge, Integer> {
     List<Fridge>  findByUserAndIngredientCategoryAndStatus(User user, IngredientCategory ingredientCategory, String status);
     Fridge findByIngredientNameAndStatus(String ingredientName, String status);
     Fridge findByUserAndIngredientNameAndStatus(User user, String ingredientName, String status);
+
+    List<Fridge> findByStatus(String active);
 }

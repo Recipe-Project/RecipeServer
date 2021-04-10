@@ -11,4 +11,5 @@ public class IngredientList {
     private final Integer ingredientIdx;
     private final String ingredientName;
     private final String ingredientIcon;
+    private final Integer ingredientCategoryIdx;
 }
