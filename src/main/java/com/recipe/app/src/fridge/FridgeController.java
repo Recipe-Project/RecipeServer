@@ -13,7 +13,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -210,7 +209,7 @@ public class FridgeController {
     }
 
 //    @Scheduled(fixedDelay = 10000) //10초마다
-    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분
+//    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분
     public  @ResponseBody ResponseEntity<String>  notification() throws BaseException, JSONException,InterruptedException {
         log.info("This job is executed per a second.");
 
@@ -237,8 +236,6 @@ public class FridgeController {
         }
 
         return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
-
-
 
     }
 

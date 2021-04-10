@@ -9,7 +9,6 @@ nohup.out
 /logs/*
 application.yml
 Secret.java
-recipeapp-firebase-service-key.json
 
 ### STS ###
 .apt_generated
