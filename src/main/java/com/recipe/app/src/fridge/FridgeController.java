@@ -11,12 +11,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -32,15 +32,14 @@ public class FridgeController {
     private final FridgeService fridgeService;
     private final FridgeRepository fridgeRepository;
     private final JwtService jwtService;
-    private final AndroidPushNotificationsService androidPushNotificationsService;
+//    private final AndroidPushNotificationsService androidPushNotificationsService;
 
     @Autowired
-    public FridgeController(FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, JwtService jwtService, AndroidPushNotificationsService androidPushNotificationsService) {
+    public FridgeController(FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, JwtService jwtService) {
         this.fridgeProvider = fridgeProvider;
         this.fridgeService = fridgeService;
         this.fridgeRepository = fridgeRepository;
         this.jwtService = jwtService;
-        this.androidPushNotificationsService = androidPushNotificationsService;
     }
 
     /**
@@ -208,35 +207,81 @@ public class FridgeController {
         }
     }
 
+    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분
 //    @Scheduled(fixedDelay = 10000) //10초마다
-//    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분
-    public  @ResponseBody ResponseEntity<String>  notification() throws BaseException, JSONException,InterruptedException {
+    @PostMapping("/notification")
+    public  BaseResponse<Void> postFridgesNotification() throws BaseException, JSONException,InterruptedException {
         log.info("This job is executed per a second.");
 
-        ArrayList userList = new ArrayList();
-        userList = fridgeProvider.retreiveShelfLifeUserList();
+//        List<Integer> userList = new ArrayList<>();
+//        userList = fridgeProvider.retreiveShelfLifeUserList();
 
-        String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userList);
+        Map<Integer, String> userMapList  = fridgeProvider.retreiveShelfLifeUserList();
+
+//        if(userList.isEmpty()){
+//            return new BaseResponse<>(EMPTY_USER_LIST);
+//        }
+
+        if(userMapList.isEmpty()){
+            return new BaseResponse<>(EMPTY_USER_LIST);
+        }
+
+        String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userMapList);
 
         HttpEntity<String> request = new HttpEntity<>(notifications);
 
-        CompletableFuture<String> pushNotification = androidPushNotificationsService.send(request);
+        CompletableFuture<String> pushNotification = fridgeService.sendNotification(request);
         CompletableFuture.allOf(pushNotification).join();
 
         try{
             String firebaseResponse = pushNotification.get();
-            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
         }
         catch (InterruptedException e){
             logger.debug("got interrupted!");
             throw new InterruptedException();
+
         }
         catch (ExecutionException e){
             logger.debug("execution error!");
         }
-
-        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
+        return new BaseResponse<>(SUCCESS);
 
     }
+//    //    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분
+//    @Scheduled(fixedDelay = 10000) //10초마다
+//    @PostMapping("/notification")
+//    public  @ResponseBody ResponseEntity<String>  postFridgesNotification() throws BaseException, JSONException,InterruptedException {
+//        log.info("This job is executed per a second.");
+//        List<Integer> userList = new ArrayList<>();
+//
+//        userList = fridgeProvider.retreiveShelfLifeUserList();
+//
+//        if(userList.isEmpty()){
+//
+//        }
+//        // 유저리스트가 비었다면 ? 유저리스트가 비었습니다.
+//
+//        String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userList);
+//
+//        HttpEntity<String> request = new HttpEntity<>(notifications);
+//
+//        CompletableFuture<String> pushNotification = fridgeService.sendNotification(request);
+//        CompletableFuture.allOf(pushNotification).join();
+//
+//        try{
+//            String firebaseResponse = pushNotification.get();
+//            return new ResponseEntity<>(firebaseResponse, HttpStatus.OK);
+//        }
+//        catch (InterruptedException e){
+//            logger.debug("got interrupted!");
+//            throw new InterruptedException();
+//        }
+//        catch (ExecutionException e){
+//            logger.debug("execution error!");
+//        }
+//
+//        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
+//
+//    }
 
 }

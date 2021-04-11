@@ -229,13 +229,11 @@ public class FridgeProvider {
                     throw new BaseException(FAILED_TO_GET_RECIPE_INGREDIENTS_LIST);
                 }
 
-//                System.out.println("recipeId:"+recipeId); // test
 
                 //재료들을 arrayList에 저장
                 List<String> recipeIngredients = new ArrayList<>();
                 for (RecipeIngredient recipeIngredient : recipeIngredientList){
                     recipeIngredients.add(recipeIngredient.getIrdntNm());
-//                    System.out.println(recipeIngredient.getIrdntNm()); //test
 
                 }
 
@@ -250,7 +248,7 @@ public class FridgeProvider {
                     }
                 }
 
-                // 3-3. count가 0이 아닐때 (레시피인덱스, count) (1,5),(2,3)를 map 에 추가
+                // 3-3. count가 0이 아닐때 (레시피인덱스, count) (1,5),(2,3)를 map에 추가
                 if(count!=0){
                     map.put(recipeId, count);
                 }
@@ -262,13 +260,11 @@ public class FridgeProvider {
         }
 
 
-        // 4.count 많은 수대로 정렬한다.
+        // 4.count 많은 수 대로 정렬한다.
         List<Integer> keySetList = new ArrayList<>(map.keySet());
         //내림차순
         Collections.sort(keySetList, (o1, o2) -> (map.get(o2).compareTo(map.get(o1))));
         List<GetFridgesRecipeRes> getFridgesRecipeResList = new ArrayList<>();
-//        System.out.println("result");
-//        System.out.println(keySetList);
         for (Integer recipeId : keySetList) {
             System.out.println(String.format("Key : %s, Value : %s", recipeId, map.get(recipeId)));
             RecipeInfo recipeInfo = recipeInfoRepository.findByRecipeIdAndStatus(recipeId, "ACTIVE");
@@ -293,9 +289,11 @@ public class FridgeProvider {
      * @return List
      * @throws BaseException
      */
-    public ArrayList retreiveShelfLifeUserList() throws BaseException {
+    public Map<Integer, String> retreiveShelfLifeUserList() throws BaseException {
         List<Fridge> fridgeList;
-        ArrayList userList = new ArrayList();
+        List<Integer> userList = new ArrayList<>();
+        Map<Integer, String> userMapList = new HashMap<Integer, String>();
+
         try {
             fridgeList = fridgeRepository.findByStatus("ACTIVE");
 
@@ -321,8 +319,9 @@ public class FridgeProvider {
 
                if(diffDay>2 && diffDay<=3){
                    //리스트에 추가
+                   Integer userIdx = fridgeList.get(i).getUser().getUserIdx();
                    String ingredientName = fridgeList.get(i).getIngredientName();
-                   userList.add(fridgeList.get(i).getUser().getUserIdx());
+                   userMapList.put(userIdx,ingredientName);
                 }
             }
 
@@ -333,7 +332,7 @@ public class FridgeProvider {
         }
 
 
-        return userList;
+        return userMapList;
     }
 
 }

@@ -2,7 +2,6 @@ package com.recipe.app.src.user.models;
 
 import com.recipe.app.config.BaseEntity;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
-import com.recipe.app.src.keywordYoutube.models.KeywordYoutube;
 import com.recipe.app.src.receipt.models.Receipt;
 import com.recipe.app.src.scrapBlog.models.ScrapBlog;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
@@ -76,8 +75,6 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ViewPublic> viewPublics = new ArrayList<>();
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<KeywordYoutube> keywordYoutube = new ArrayList<>();
 
     public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber){
         this.socialId = socialId;

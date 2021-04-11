@@ -10,16 +10,22 @@ import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.config.secret.Secret.FIREBASE_SERVER_KEY;
 
 @Service
 public class FridgeService {
@@ -29,6 +35,8 @@ public class FridgeService {
     private final FridgeBasketRepository fridgeBasketRepository;
     private final IngredientCategoryProvider ingredientCategoryProvider;
     private final JwtService jwtService;
+
+    private static final String FIREBASE_API_URL="https://fcm.googleapis.com/fcm/send";
 
     @Autowired
     public FridgeService(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeRepository fridgeRepository, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, JwtService jwtService) {
@@ -203,5 +211,22 @@ public class FridgeService {
         }
 
     }
+
+    @Async
+    public CompletableFuture<String> sendNotification(HttpEntity<String> entity) {
+
+        RestTemplate restTemplate = new RestTemplate();
+
+        ArrayList<ClientHttpRequestInterceptor> interceptors = new ArrayList<>();
+
+        interceptors.add(new HeaderRequestInterceptor("Authorization",  "key=" + FIREBASE_SERVER_KEY));
+        interceptors.add(new HeaderRequestInterceptor("Content-Type", "application/json; UTF-8 "));
+        restTemplate.setInterceptors(interceptors);
+
+        String firebaseResponse = restTemplate.postForObject(FIREBASE_API_URL, entity, String.class);
+
+        return CompletableFuture.completedFuture(firebaseResponse);
+    }
+
 
 }

@@ -210,8 +210,8 @@ public enum BaseResponseStatus {
     FAILED_TO_SAVE_FRIDGE(false, 3054, "냉장고 재료 수정 저장에 실패했습니다."),
     FAILED_TO_PATCH_FRIDGES_INGREDIENT(false, 3055, "냉장고 재료 수정에 실패했습니다."),
 
-    // [POST] recipes/youtube?keyword=
-    FAILED_TO_POST_YOUTUBE_KEYWORD(false, 3056, "유튜브 검색어 저장에 실패했습니다."),
+    // [POST] recipes?keyword=
+    FAILED_TO_POST_RECIPE_KEYWORD(false, 3056, "레시피 검색어 저장에 실패했습니다."),
 
     // notification
     FAILED_TO_GET_SHELF_LIFE_USER_LIST(false, 3057, "유통기한 지난 재료를 가진 유저리스트 조회에 실패했습니다."),
@@ -221,6 +221,13 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_FRIDGE_LIST(false, 3059, "냉장고 재료 조회에 실패했습니다."),
     FAILED_TO_GET_RECIPE_INFO_LIST(false, 3060, "레시피 조회에 실패했습니다."),
     FAILED_TO_GET_RECIPE_INGREDIENTS_LIST(false, 3061, "레시피 재료 조회에 실패했습니다."),
+
+    // [POST] fridges/notification
+    EMPTY_USER_LIST(false, 3062, "유저리스트가 비었습니다."),
+    PUSH_NOTIFICATION_ERROR(false, 3063, "푸시알림에 실패했습니다."),
+
+    // [GET] recipes/best-keyword
+    FAILE_TO_GET_BEST_KEYWORD(false, 3064, "인기검색어 조회에 실패했습니다."),
 
     /**
      * 4000 : Database, Server 오류
