@@ -2,6 +2,8 @@ package com.recipe.app.src.receipt;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.buy.models.Buy;
+import com.recipe.app.src.ingredient.IngredientRepository;
+import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.receipt.models.*;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.*;
@@ -18,9 +20,11 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 public class ReceiptProvider {
     private final UserProvider userProvider;
     private final ReceiptRepository receiptRepository;
+    private final IngredientRepository ingredientRepository;
 
     @Autowired
-    public ReceiptProvider(UserProvider userProvider, ReceiptRepository receiptRepository){
+    public ReceiptProvider(IngredientRepository ingredientRepository, UserProvider userProvider, ReceiptRepository receiptRepository){
+        this.ingredientRepository = ingredientRepository;
         this.userProvider = userProvider;
         this.receiptRepository = receiptRepository;
     }
@@ -66,7 +70,7 @@ public class ReceiptProvider {
             Integer receiptIdx = receipt.getReceiptIdx();
             String title = receipt.getTitle();
             Date date = receipt.getReceiptDate();
-            SimpleDateFormat datetime = new SimpleDateFormat("yyyy.M.d", Locale.KOREA);
+            SimpleDateFormat datetime = new SimpleDateFormat("yy.M.d", Locale.KOREA);
             datetime.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
             String receiptDate = datetime.format(date);
             List<GetBuyList> buyList = new ArrayList<>();
@@ -96,7 +100,7 @@ public class ReceiptProvider {
 
         String title = receipt.getTitle();
         Date date = receipt.getReceiptDate();
-        SimpleDateFormat datetime = new SimpleDateFormat("yyyy.M.d", Locale.KOREA);
+        SimpleDateFormat datetime = new SimpleDateFormat("yy.M.d", Locale.KOREA);
         datetime.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
         String receiptDate = datetime.format(date);
         List<GetBuyList> buyList = new ArrayList<>();
@@ -113,5 +117,37 @@ public class ReceiptProvider {
 
         return new GetReceiptRes(receiptIdx, jwtUserIdx, title, receiptDate, buyList);
 
+    }
+
+    /**
+     * 영수증으로 재료 입력
+     * @param postReceiptIngredientReq
+     * @return List<PostReceiptIngredientRes>
+     * @throws BaseException
+     */
+    public List<PostReceiptIngredientRes> createReceiptIngredient(Integer jwtUserIdx, PostReceiptIngredientReq postReceiptIngredientReq) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+
+        String receipt = postReceiptIngredientReq.getReceipt();
+
+        List<Ingredient> ingredientList;
+        try{
+            ingredientList=ingredientRepository.findByStatus("ACTIVE");
+        } catch (Exception exception) {
+            throw new BaseException(DATABASE_ERROR);
+        }
+
+        List<PostReceiptIngredientRes> postReceiptIngredientRes = new ArrayList<>();
+        for(Ingredient ingredient : ingredientList){
+            String name = ingredient.getName();
+            if(receipt.contains(name)){
+                Integer ingredientIdx = ingredient.getIngredientIdx();
+                String icon = ingredient.getIcon();
+                Integer categoryIdx = ingredient.getIngredientCategory().getIngredientCategoryIdx();
+                postReceiptIngredientRes.add(new PostReceiptIngredientRes(ingredientIdx, name, icon, categoryIdx));
+            }
+        }
+
+        return postReceiptIngredientRes;
     }
 }

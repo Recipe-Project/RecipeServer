@@ -5,6 +5,8 @@ import com.recipe.app.src.buy.BuyRepository;
 import com.recipe.app.src.buy.models.Buy;
 import com.recipe.app.src.fridge.FridgeRepository;
 import com.recipe.app.src.fridge.models.Fridge;
+import com.recipe.app.src.ingredient.IngredientRepository;
+import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.receipt.models.*;
@@ -15,26 +17,23 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
 public class ReceiptService {
     private final BuyRepository buyRepository;
-    private final IngredientCategoryProvider ingredientCategoryProvider;
+    private final IngredientRepository ingredientRepository;
     private final FridgeRepository fridgeRepository;
     private final UserProvider userProvider;
     private final ReceiptProvider receiptProvider;
     private final ReceiptRepository receiptRepository;
 
     @Autowired
-    public ReceiptService(BuyRepository buyRepository, IngredientCategoryProvider ingredientCategoryProvider, FridgeRepository fridgeRepository, UserProvider userProvider, ReceiptProvider receiptProvider, ReceiptRepository receiptRepository){
+    public ReceiptService(BuyRepository buyRepository, IngredientRepository ingredientRepository, FridgeRepository fridgeRepository, UserProvider userProvider, ReceiptProvider receiptProvider, ReceiptRepository receiptRepository){
         this.buyRepository = buyRepository;
-        this.ingredientCategoryProvider = ingredientCategoryProvider;
+        this.ingredientRepository = ingredientRepository;
         this.fridgeRepository = fridgeRepository;
         this.userProvider = userProvider;
         this.receiptProvider = receiptProvider;
@@ -193,44 +192,4 @@ public class ReceiptService {
         }
     }
 
-
-    /**
-     * 영수증으로 재료 입력
-     * @param postReceiptIngredientReq
-     * @return void
-     * @throws BaseException
-     */
-    public void createReceiptIngredient(Integer jwtUserIdx, PostReceiptIngredientReq postReceiptIngredientReq) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
-
-        List<ReceiptIngredientList> receiptIngredientList = postReceiptIngredientReq.getReceiptIngredientList();
-
-        for(int i=0;i<receiptIngredientList.size();i++) {
-            //유저 정보 수정
-            ReceiptIngredientList ingredientList = receiptIngredientList.get(i);
-            String ingredientName = ingredientList.getIngredientName();
-            String ingredientIcon = ingredientList.getIngredientIcon();
-            Integer ingredientCategoryIdx = ingredientList.getIngredientCategoryIdx();
-            String storageMethod = ingredientList.getStorageMethod();
-            String expiredAt = ingredientList.getExpiredAt();
-            Integer count = ingredientList.getCount();
-            SimpleDateFormat datetime = new SimpleDateFormat("yyyy.M.d", Locale.KOREA);
-            datetime.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
-            Date date;
-            try {
-                date = datetime.parse(expiredAt);
-            } catch (Exception e) {
-                throw new BaseException(DATE_PARSE_ERROR);
-            }
-            IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
-
-            Fridge fridge = new Fridge(user, ingredientName, ingredientIcon, ingredientCategory, storageMethod, date, count);
-
-            try {
-                fridge = fridgeRepository.save(fridge);
-            } catch (Exception exception) {
-                throw new BaseException(DATABASE_ERROR);
-            }
-        }
-    }
 }

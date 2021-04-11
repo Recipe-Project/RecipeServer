@@ -134,16 +134,16 @@ public class ReceiptController {
     /**
      * 영수증으로 재료 입력 API
      * [POST] /receipts/ingredient
-     * @return BaseResponse<Void>
+     * @return BaseResponse<List<PostReceiptIngredientRes>>
      */
     @ResponseBody
     @PostMapping("/ingredient")
-    public BaseResponse<Void> postReceiptIngredient(@RequestBody PostReceiptIngredientReq parameters) {
+    public BaseResponse<List<PostReceiptIngredientRes>> postReceiptIngredient(@RequestBody PostReceiptIngredientReq parameters) {
         try {
             int jwtUserIdx;
             jwtUserIdx = jwtService.getUserId();
-            receiptService.createReceiptIngredient(jwtUserIdx, parameters);
-            return new BaseResponse<>(SUCCESS);
+            List<PostReceiptIngredientRes> postReceiptIngredientRes = receiptProvider.createReceiptIngredient(jwtUserIdx, parameters);
+            return new BaseResponse<>(postReceiptIngredientRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

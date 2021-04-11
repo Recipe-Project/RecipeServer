@@ -10,5 +10,5 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 public class PostReceiptIngredientReq {
-    private List<ReceiptIngredientList> receiptIngredientList;
+    private String receipt;
 }
