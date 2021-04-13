@@ -33,4 +33,11 @@ public class BaseResponse<T> {
         this.message = status.getMessage();
         this.code = status.getCode();
     }
+
+    // 냉장고 채우기 API - 존재하는 재료가 있을 때 그 재료를 validation message에 추가
+    public BaseResponse(BaseResponseStatus status,String ingredientName) {
+        this.isSuccess = status.isSuccess();
+        this.message = status.getMessage()+"("+ingredientName+")입니다.";
+        this.code = status.getCode();
+    }
 }

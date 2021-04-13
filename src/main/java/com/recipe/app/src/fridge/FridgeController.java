@@ -66,7 +66,7 @@ public class FridgeController {
                 Boolean existIngredientName = fridgeRepository.existsByIngredientNameAndStatus(ingredientName, "ACTIVE");
 
                 if (existIngredientName) {
-                    return new BaseResponse<>(POST_FRIDGES_EXIST_INGREDIENT_NAME); // 재료명보여줄수있나
+                    return new BaseResponse<>(POST_FRIDGES_EXIST_INGREDIENT_NAME,ingredientName);
                 }
             }
 
