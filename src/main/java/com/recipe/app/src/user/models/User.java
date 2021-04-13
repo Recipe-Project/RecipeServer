@@ -45,6 +45,10 @@ public class User extends BaseEntity {
     @Column(name = "phoneNumber", nullable = false, length = 45)
     private String phoneNumber;
 
+
+//    @Column(name = "deviceToken", length = 500)
+//    private String deviceToken;
+
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
@@ -82,6 +86,7 @@ public class User extends BaseEntity {
         this.userName = userName;
         this.email = email;
         this.phoneNumber = phoneNumber;
+//        this.deviceToken = deviceToken;
     }
 
 }

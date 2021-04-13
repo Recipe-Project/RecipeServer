@@ -2,10 +2,7 @@ package com.recipe.app.src.fridge;
 
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.fridge.models.Fridge;
-import com.recipe.app.src.fridge.models.FridgeList;
-import com.recipe.app.src.fridge.models.GetFridgesRecipeRes;
-import com.recipe.app.src.fridge.models.GetFridgesRes;
+import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
@@ -289,11 +286,9 @@ public class FridgeProvider {
      * @return List
      * @throws BaseException
      */
-    public Map<Integer, String> retreiveShelfLifeUserList() throws BaseException {
+    public List<ShelfLifeUser> retreiveShelfLifeUserList() throws BaseException {
         List<Fridge> fridgeList;
-        List<Integer> userList = new ArrayList<>();
-        Map<Integer, String> userMapList = new HashMap<Integer, String>();
-
+        List<ShelfLifeUser> shelfLifeUsers = new ArrayList<>();
         try {
             fridgeList = fridgeRepository.findByStatus("ACTIVE");
 
@@ -318,13 +313,15 @@ public class FridgeProvider {
                 }
 
                if(diffDay>2 && diffDay<=3){
-                   //리스트에 추가
-                   Integer userIdx = fridgeList.get(i).getUser().getUserIdx();
-                   String ingredientName = fridgeList.get(i).getIngredientName();
-                   userMapList.put(userIdx,ingredientName);
-                }
-            }
 
+                   Integer userIdx = fridgeList.get(i).getUser().getUserIdx(); //테스트
+//                   String deviceToken = fridgeList.get(i).getUser().getDeviceToken(); //디바이스토큰
+                   String ingredientName = fridgeList.get(i).getIngredientName();
+
+                   ShelfLifeUser shelfLifeUser = new ShelfLifeUser(userIdx,ingredientName); //디바이스토큰으로 바꿔
+                   shelfLifeUsers.add(shelfLifeUser);
+               }
+            }
 
 
         } catch (Exception ignored) {
@@ -332,7 +329,7 @@ public class FridgeProvider {
         }
 
 
-        return userMapList;
+        return shelfLifeUsers;
     }
 
 }

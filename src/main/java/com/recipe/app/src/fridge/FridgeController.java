@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 
@@ -207,34 +206,75 @@ public class FridgeController {
         }
     }
 
-    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분
-//    @Scheduled(fixedDelay = 10000) //10초마다
+    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
     @PostMapping("/notification")
     public  BaseResponse<Void> postFridgesNotification() throws BaseException, JSONException,InterruptedException {
         log.info("This job is executed per a second.");
 
-//        List<Integer> userList = new ArrayList<>();
-//        userList = fridgeProvider.retreiveShelfLifeUserList();
+        List<ShelfLifeUser> shelfLifeUsers =  fridgeProvider.retreiveShelfLifeUserList();
 
-        Map<Integer, String> userMapList  = fridgeProvider.retreiveShelfLifeUserList();
+        // 유저인덱스말고 로그인할때마다 디바이스토큰을 디비에 저장하고 그 토큰을 불러오기
 
-//        if(userList.isEmpty()){
-//            return new BaseResponse<>(EMPTY_USER_LIST);
-//        }
 
-        if(userMapList.isEmpty()){
+        if(shelfLifeUsers.isEmpty()){
             return new BaseResponse<>(EMPTY_USER_LIST);
         }
 
-        String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userMapList);
 
-        HttpEntity<String> request = new HttpEntity<>(notifications);
+//        for (String deviceToken : userMapList.keySet() ){
+//            String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userMapList);
+//
+//            HttpEntity<String> request = new HttpEntity<>(notifications);
+//
+//            CompletableFuture<String> pushNotification = fridgeService.sendNotification(request);
+//            CompletableFuture.allOf(pushNotification).join();
+//
+//            try{
+//                String firebaseResponse = pushNotification.get();
+//            }
+//            catch (InterruptedException e){
+//                logger.debug("got interrupted!");
+//                throw new InterruptedException();
+//
+//            }
+//            catch (ExecutionException e){
+//                logger.debug("execution error!");
+//            }
+//            return new BaseResponse<>(SUCCESS);
+//        }
 
-        CompletableFuture<String> pushNotification = fridgeService.sendNotification(request);
-        CompletableFuture.allOf(pushNotification).join();
 
+        // 디바이스 토큰 추가하려면 로그인 회원가입시에 디바이스토큰까지 저장하도록 로직 변경해야함 안드에게 얘기도 해야함
         try{
-            String firebaseResponse = pushNotification.get();
+//            for (String deviceToken : userMapList.keySet() ){
+//                String ingredientName = userMapList.get(deviceToken);
+//
+//                String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(deviceToken,ingredientName);
+//
+//                HttpEntity<String> request = new HttpEntity<>(notifications);
+//
+//                CompletableFuture<String> pushNotification = fridgeService.sendNotification(request);
+//                CompletableFuture.allOf(pushNotification).join();
+//
+//                String firebaseResponse = pushNotification.get();
+//            }
+
+            //테스트
+            for (ShelfLifeUser shelfLifeUser : shelfLifeUsers ){
+                Integer userIdx = shelfLifeUser.getUserIdx();  //디바이스토큰으로
+                String ingredientName = shelfLifeUser.getIngredientName();
+
+                String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userIdx,ingredientName); //디바이스토큰으로
+
+
+                HttpEntity<String> request = new HttpEntity<>(notifications);
+
+                CompletableFuture<String> pushNotification = fridgeService.sendNotification(request);
+                CompletableFuture.allOf(pushNotification).join();
+
+                String firebaseResponse = pushNotification.get();
+            }
+
         }
         catch (InterruptedException e){
             logger.debug("got interrupted!");
@@ -245,6 +285,7 @@ public class FridgeController {
             logger.debug("execution error!");
         }
         return new BaseResponse<>(SUCCESS);
+
 
     }
 //    //    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분
