@@ -1,20 +1,19 @@
 package com.recipe.app.src.ingredient;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
-import com.recipe.app.src.ingredient.models.*;
+import com.recipe.app.src.ingredient.models.GetIngredientsRes;
+import com.recipe.app.src.ingredient.models.Ingredient;
+import com.recipe.app.src.ingredient.models.IngredientList;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -56,23 +55,18 @@ public class IngredientProvider {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
         }
 
-        return ingredientCategories.stream().map(ic -> {
+        List<GetIngredientsRes> getIngredientsResList = new ArrayList<>();
+        for (int i=0;i<ingredientCategories.size()-1;i++){
+            int ingredientCategoryIdx = ingredientCategories.get(i).getIngredientCategoryIdx();
+            String ingredientCategoryName = ingredientCategories.get(i).getName();
 
-            int ingredientCategoryIdx = ic.getIngredientCategoryIdx();
-            String ingredientCategoryName = ic.getName();
+            List<IngredientList> ingredientList = retrieveKeywordIngredients(ingredientCategoryIdx,keyword);
 
-            List<IngredientList> ingredientList = null;
-            try {
-                ingredientList = retrieveKeywordIngredients(ingredientCategoryIdx,keyword);
-            } catch (BaseException e) {
-                e.printStackTrace();
-            }
+            GetIngredientsRes getIngredientsRes = new GetIngredientsRes(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
+            getIngredientsResList.add(getIngredientsRes);
+        }
 
-            return new GetIngredientsRes(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
-
-
-
-        }).collect(Collectors.toList());
+        return getIngredientsResList;
     }
 
     /**
@@ -95,26 +89,20 @@ public class IngredientProvider {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
         }
 
-        return ingredientCategories.stream().map(ic -> {
+        List<GetIngredientsRes> getIngredientsResList = new ArrayList<>();
+        for (int i=0;i<ingredientCategories.size()-1;i++){
+            int ingredientCategoryIdx = ingredientCategories.get(i).getIngredientCategoryIdx();
+            String ingredientCategoryName = ingredientCategories.get(i).getName();
 
-            // 카테고리당 인덱스와 카테고리명 뽑기
-            int ingredientCategoryIdx = ic.getIngredientCategoryIdx();
-            String ingredientCategoryName = ic.getName();
+            List<IngredientList> ingredientList = retrieveIngredients(ingredientCategoryIdx);
 
-            List<IngredientList> ingredientList = null;
-            try {
-                // 카테고리에 해당하는 재료 리스트 가져오기
-                ingredientList = retrieveIngredients(ingredientCategoryIdx);
-            } catch (BaseException e) {
-                e.printStackTrace();
-            }
+            GetIngredientsRes getIngredientsRes = new GetIngredientsRes(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
+            getIngredientsResList.add(getIngredientsRes);
+        }
 
-
-            return new GetIngredientsRes(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
-
-
-        }).collect(Collectors.toList());
+        return getIngredientsResList;
     }
+
     /**
      * 카테고리에 해당하는 재료리스트 추출
      *
