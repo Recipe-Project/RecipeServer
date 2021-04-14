@@ -111,4 +111,33 @@ public class FridgeBasketService {
     }
 
 
+    /**
+     * 냉장고 바구니 재료 삭제 API
+     * @param userIdx,ingredient
+     * @throws BaseException
+     */
+    public void deleteFridgeBasket(Integer userIdx, String ingredient) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        FridgeBasket fridgeBasket;
+        try {
+            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user,ingredient,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
+        }
+
+
+
+        try {
+            fridgeBasket.setStatus("INACTIVE");
+            fridgeBasketRepository.save(fridgeBasket);
+
+
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_FRIDGE_BASKET);
+        }
+
+
+
+    }
+
 }

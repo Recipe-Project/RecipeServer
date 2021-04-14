@@ -119,4 +119,33 @@ public class FridgeBasketController {
         }
     }
 
+    /**
+     * 냉장고 바구니 재료 삭제 API
+     * [DELETE] /fridges/basket?ingredient=
+     * @RequestParam ingredient
+     * @return BaseResponse<Void>
+     */
+    @DeleteMapping("/basket")
+    public BaseResponse<Void> deleteFridgesBasket(@RequestParam(value="ingredient") String ingredient) {
+
+        if (ingredient == null || ingredient.equals("")){
+
+            return new BaseResponse<>(EMPTY_INGREDIENT);
+        }
+
+        try {
+            Integer userIdx = jwtService.getUserId();
+
+            fridgeBasketService.deleteFridgeBasket(userIdx,ingredient);
+
+
+            return new BaseResponse<>(SUCCESS);
+
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
+
+
+
 }

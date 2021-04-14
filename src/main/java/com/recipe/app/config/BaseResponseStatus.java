@@ -69,14 +69,14 @@ public enum BaseResponseStatus {
     // [PATCH] /my-recipes/:myRecipeIdx
     EMPTY_MY_RECIPEIDX(false, 2054, "나만의 레시피 인덱스값을 입력해주세요."),
 
-    // [POST] scraps/youtube
+    // [POST] /scraps/youtube
     EMPTY_YOUTUBEURL(false, 2055, "유튜브 url을 입력해주세요."),
     EMPTY_POST_DATE(false, 2056, "포스팅 날짜를 입력해주세요."),
     EMPTY_CHANNEL_NAME(false, 2057, "유튜브 채널명을 입력해주세요."),
     EMPTY_YOUTUBEIDX(false, 2058, "유튜브 인덱스를 입력해주세요."),
     EMPTY_PLAY_TIME(false, 2053, "영상 재생시간을 입력해주세요."),
 
-    // [POST] scraps/blog
+    // [POST] /scraps/blog
     POST_SCRAP_BLOG_EMPTY_TITLE(false, 2059, "제목을 입력해주세요."),
     POST_SCRAP_BLOG_EMPTY_THUMBNAIL(false, 2060, "썸네일을 입력해주세요.."),
     POST_SCRAP_BLOG_EMPTY_BLOGURL(false, 2061, "블로그 url을 입력해주세요."),
@@ -108,10 +108,10 @@ public enum BaseResponseStatus {
     RECEIPTS_EMPTY_RECEIPT_IDX(false, 2077, "영수증 인덱스 값을 확인해주세요."),
 
 
-    // [DELETE] fridges/ingredient
+    // [DELETE] /fridges/ingredient
     EMPTY_INGREDIENT_LIST(false, 2078, "삭제할 재료 리스트를 입력하세요."),
 
-    // [PATCH] fridge/ingredient
+    // [PATCH] /fridge/ingredient
     EMPTY_PATCH_FRIDGE_LIST(false, 2079, "수정할 냉장고 재료 리스트를 입력하세요."),
     INVALID_STORAGE_METHOD(false, 2080, "냉장,냉동,실온만 입력하세요."),
     /**
@@ -156,22 +156,22 @@ public enum BaseResponseStatus {
     // [DELETE] /my-recipes/:myRecipeIdx
     FAILED_TO_DELETE_MY_RECIPE(false, 3029, "나만의 레시피 삭제에 실패하였습니다."),
 
-    // [POST] scraps/youtube
+    // [POST] /scraps/youtube
     FAILED_TO_POST_SCRAP_YOUTUBE(false, 3030, "유튜브 스크랩하기에 실패하였습니다."),
     FAILED_TO_POST_DELETE_SCRAP_YOUTUBE(false, 3032, "유튜브 스크랩 취소를 실패하였습니다."),
-    // [GET] scraps/youtube
+    // [GET] /scraps/youtube
     FAILED_TO_GET_SCRAP_YOUTUBE(false, 3031, "유튜브 스크랩 조회에 실패하였습니다."),
 
 
-    // [POST] scraps/recipe
+    // [POST] /scraps/recipe
     FAILED_TO_POST_CREATE_SCRAP_PUBLIC(false, 3033, "공공 레시피 스크랩 추가에 실패하였습니다."),
     FAILED_TO_POST_DELETE_SCRAP_PUBLIC(false, 3034, "공공 레시피 스크랩 삭제에 실패하였습니다."),
     FAILE_TO_GET_RECIPE_INFO(false, 3035, "공공레시피 정보 조회에 실패하였습니다."),
     NOT_FOUND_RECIPE_INFO(false, 3036, "공공레시피 정보를 찾지 못하였습니다."),
-    // [GET] scraps/recipe
+    // [GET] /scraps/recipe
     FAILED_TO_GET_SCRAP_PUBLIC(false, 3037, "공공 레시피 스크랩 조회에 실패하였습니다."),
 
-    // [GET] ingredients
+    // [GET] /ingredients
     FAILED_TO_GET_INGREDIENT_CATEGORY(false, 3038, "재료 카테고리 조회에 실패하였습니다."),
     NOT_FOUND_INGREDIENT_CATEGORY(false, 3039, "재료 카테고리인덱스를 찾을 수 없습니다."),
     FAILED_TO_GET_INGREDIENT_LIST(false, 3040, "재료 리스트 조회에 실패하였습니다."),
@@ -197,37 +197,43 @@ public enum BaseResponseStatus {
     NOT_FOUND_RECEIPT(false, 3048, "존재하지 않는 영수증입니다."),
     NOT_FOUND_BUY(false, 3049, "존재하지 않는 구매 품목입니다."),
 
-    //[POST] views/youtube
+    //[POST] /views/youtube
     FAILED_TO_POST_VIEWS_YOUTUBE(false, 3050, "유튜브 조회로그를 저장에 실패습니다."),
 
-    // [DELETE] fridges/ingredient
+    // [DELETE] /fridges/ingredient
     FAILED_TO_GET_INGREDIENT_NAME(false, 3051, "재료명 조회에 실패했습니다."),
     FAILED_TO_GET_FRIDGE(false, 3052, "냉장고 조회에 실패했습니다."),
     FAILED_TO_DELETE_FRIDGE(false, 3053, "냉장고 재료 삭제에 실패했습니다."),
 
 
-    // [PATCH] fridge/ingredient
+    // [PATCH] /fridge/ingredient
     FAILED_TO_SAVE_FRIDGE(false, 3054, "냉장고 재료 수정 저장에 실패했습니다."),
     FAILED_TO_PATCH_FRIDGES_INGREDIENT(false, 3055, "냉장고 재료 수정에 실패했습니다."),
 
-    // [POST] recipes?keyword=
+    // [POST] /recipes?keyword=
     FAILED_TO_POST_RECIPE_KEYWORD(false, 3056, "레시피 검색어 저장에 실패했습니다."),
 
     // notification
     FAILED_TO_GET_SHELF_LIFE_USER_LIST(false, 3057, "유통기한 지난 재료를 가진 유저리스트 조회에 실패했습니다."),
 
-    // [GET] fridges/recipe
+    // [GET] /fridges/recipe
     NO_INGREDIENT_THAT_MATCH_THE_RECIPE(false, 3058, "레시피와 일치하는 재료가 없습니다."),
     FAILED_TO_GET_FRIDGE_LIST(false, 3059, "냉장고 재료 조회에 실패했습니다."),
     FAILED_TO_GET_RECIPE_INFO_LIST(false, 3060, "레시피 조회에 실패했습니다."),
     FAILED_TO_GET_RECIPE_INGREDIENTS_LIST(false, 3061, "레시피 재료 조회에 실패했습니다."),
 
-    // [POST] fridges/notification
+    // [POST] /fridges/notification
     EMPTY_USER_LIST(false, 3062, "유저리스트가 비었습니다."),
     PUSH_NOTIFICATION_ERROR(false, 3063, "푸시알림에 실패했습니다."),
 
-    // [GET] recipes/best-keyword
+    // [GET] /recipes/best-keyword
     FAILE_TO_GET_BEST_KEYWORD(false, 3064, "인기검색어 조회에 실패했습니다."),
+
+
+    // [DELETE] /fridges/basket?ingredient=
+    FAILED_TO_GET_FRIDGE_BASKET(false, 3065, "냉장고 바구니 조회에 실패했습니다."),
+    FAILED_TO_DELETE_FRIDGE_BASKET(false, 3066, "냉장고 바구니 삭제에 실패했습니다."),
+    EMPTY_INGREDIENT(false, 3067, "삭제할 재료를 입력해주세요."),
 
     /**
      * 4000 : Database, Server 오류
