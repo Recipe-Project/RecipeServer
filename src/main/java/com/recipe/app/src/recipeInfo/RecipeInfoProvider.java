@@ -3,8 +3,12 @@ package com.recipe.app.src.recipeInfo;
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridge.FridgeRepository;
 import com.recipe.app.src.fridge.models.Fridge;
+import com.recipe.app.src.ingredient.IngredientRepository;
+import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.recipeInfo.models.*;
 import com.recipe.app.src.recipeIngredient.models.RecipeIngredient;
+import com.recipe.app.src.recipeKeyword.RecipeKeywordRepository;
+import com.recipe.app.src.recipeKeyword.models.RecipeKeyword;
 import com.recipe.app.src.recipeProcess.models.RecipeProcess;
 import com.recipe.app.src.scrapBlog.ScrapBlogRepository;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
@@ -42,6 +46,8 @@ import static com.sun.el.util.MessageFactory.get;
 
 @Service
 public class RecipeInfoProvider {
+    private final IngredientRepository ingredientRepository;
+    private final RecipeKeywordRepository recipeKeywordRepository;
     private final FridgeRepository fridgeRepository;
     private final ScrapBlogRepository scrapBlogRepository;
     private final ScrapPublicRepository scrapPublicRepository;
@@ -50,7 +56,9 @@ public class RecipeInfoProvider {
     private final JwtService jwtService;
 
     @Autowired
-    public RecipeInfoProvider(FridgeRepository fridgeRepository, ScrapBlogRepository scrapBlogRepository, ScrapPublicRepository scrapPublicRepository, UserProvider userProvider, RecipeInfoRepository recipeInfoRepository, JwtService jwtService) {
+    public RecipeInfoProvider(IngredientRepository ingredientRepository, RecipeKeywordRepository recipeKeywordRepository, FridgeRepository fridgeRepository, ScrapBlogRepository scrapBlogRepository, ScrapPublicRepository scrapPublicRepository, UserProvider userProvider, RecipeInfoRepository recipeInfoRepository, JwtService jwtService) {
+        this.ingredientRepository = ingredientRepository;
+        this.recipeKeywordRepository = recipeKeywordRepository;
         this.fridgeRepository = fridgeRepository;
         this.scrapBlogRepository = scrapBlogRepository;
         this.scrapPublicRepository = scrapPublicRepository;
@@ -122,6 +130,13 @@ public class RecipeInfoProvider {
 
         }
 
+        RecipeKeyword recipeKeyword = new RecipeKeyword(keyword);
+        try{
+            recipeKeyword = recipeKeywordRepository.save(recipeKeyword);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
+
         return getRecipeInfosResList;
 
     }
@@ -146,6 +161,7 @@ public class RecipeInfoProvider {
         String level = recipeInfo.getLevelNm();
         System.out.println(recipeInfo.getRecipeId());
 
+        List<Ingredient> ingredientList = ingredientRepository.findByStatus("ACTIVE");
         List<Fridge> fridges = fridgeRepository.findByUserAndStatus(user, "ACTIVE");
         List<RecipeIngredient> recipeIngredients = recipeInfo.getRecipeIngredients();
         List<RecipeIngredientList> recipeIngredientList = new ArrayList<>();
@@ -161,7 +177,16 @@ public class RecipeInfoProvider {
                     break;
                 }
             }
-            recipeIngredientList.add(new RecipeIngredientList(recipeIngredientIdx, recipeIngredientName, recipeIngredientCpcty, inFridgeYN));
+
+            String recipeIngredientIcon = null;
+            for(int j=0;j<ingredientList.size();j++){
+                if(recipeIngredientName.equals(ingredientList.get(j).getName())){
+                    //System.out.println(recipeIngredientName +","+ingredientList.get(j).getName());
+                    recipeIngredientIcon = ingredientList.get(j).getIcon();
+                }
+            }
+
+            recipeIngredientList.add(new RecipeIngredientList(recipeIngredientIdx, recipeIngredientName, recipeIngredientIcon, recipeIngredientCpcty, inFridgeYN));
         }
         List<RecipeProcess> recipeProcesses = recipeInfo.getRecipeProcesses();
         List<RecipeProcessList> recipeProcessList = new ArrayList<>();
@@ -381,6 +406,12 @@ public class RecipeInfoProvider {
             blogList.add(new BlogList(title, blogUrl, description, bloggerName, postdate, thumbnail, userScrapYN, userScrapCnt));
         }
 
+        RecipeKeyword recipeKeyword = new RecipeKeyword(keyword);
+        try{
+            recipeKeyword = recipeKeywordRepository.save(recipeKeyword);
+        }catch (Exception e){
+            throw new BaseException(DATABASE_ERROR);
+        }
 
         return new GetRecipeBlogsRes(total, blogList);
 
