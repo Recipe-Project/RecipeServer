@@ -15,6 +15,7 @@ public class PostMyRecipeRes {
     private final String thumbnail;
     private final String title;
     private final String content;
-    private final List ingredientList;
+    private List ingredientList;
+    private List<MyRecipeIngredient> directIngredientList;
 }
 

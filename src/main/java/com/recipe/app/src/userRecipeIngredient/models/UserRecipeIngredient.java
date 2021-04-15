@@ -1,8 +1,8 @@
 package com.recipe.app.src.userRecipeIngredient.models;
 
 
-
 import com.recipe.app.config.BaseEntity;
+import com.recipe.app.src.ingredient.models.Ingredient;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,14 +25,24 @@ public class UserRecipeIngredient extends BaseEntity {
     @Column(name="userRecipeIdx", nullable = false)
     private Integer userRecipeIdx;
 
-    @Column(name = "ingredientIdx")
-    private Integer ingredientIdx;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ingredientIdx")
+    private Ingredient ingredient;
+
+
+    @Column(name = "ingredientIcon" , nullable=false)
+    private String ingredientIcon;
+
+    @Column(name = "ingredientName" , nullable=false, length = 10)
+    private String ingredientName;
 
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public UserRecipeIngredient(Integer userRecipeIdx, Integer ingredientIdx){
+    public UserRecipeIngredient(Integer userRecipeIdx, Ingredient ingredient,String ingredientIcon,String ingredientName){
         this.userRecipeIdx = userRecipeIdx;
-        this.ingredientIdx = ingredientIdx;
+        this.ingredient = ingredient;
+        this.ingredientIcon = ingredientIcon;
+        this.ingredientName = ingredientName;
     }
 }

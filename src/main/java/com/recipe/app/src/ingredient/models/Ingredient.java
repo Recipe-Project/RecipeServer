@@ -3,7 +3,7 @@ package com.recipe.app.src.ingredient.models;
 import com.recipe.app.config.BaseEntity;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
-import com.recipe.app.src.scrapPublic.models.ScrapPublic;
+import com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +28,7 @@ public class Ingredient extends BaseEntity {
     @Column(name="name", nullable = false,length = 45)
     private String name;
 
-    @Column(name="icon")
+    @Column(name="icon", nullable=false) //널 허용 x
     private String icon;
 
 
@@ -44,6 +44,8 @@ public class Ingredient extends BaseEntity {
     @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
     private List<FridgeBasket> fridgeBasket = new ArrayList<>();
 
+    @OneToMany(mappedBy = "ingredient", cascade = CascadeType.ALL)
+    private List<UserRecipeIngredient> userRecipeIngredient = new ArrayList<>();
 
     public Ingredient(String name,  String icon, IngredientCategory ingredientCategory){
         this.name = name;

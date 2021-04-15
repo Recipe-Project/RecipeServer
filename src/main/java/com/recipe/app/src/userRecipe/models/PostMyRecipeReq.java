@@ -1,10 +1,6 @@
 package com.recipe.app.src.userRecipe.models;
 
 import lombok.AccessLevel;
-
-
-
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -17,4 +13,5 @@ public class PostMyRecipeReq {
     private String title;
     private String content;
     private List ingredientList;
+    private List<MyRecipeIngredient> directIngredientList;
 }

@@ -155,6 +155,7 @@ public enum BaseResponseStatus {
 
     // [DELETE] /my-recipes/:myRecipeIdx
     FAILED_TO_DELETE_MY_RECIPE(false, 3029, "나만의 레시피 삭제에 실패하였습니다."),
+    FAILED_TO_DELETE_MY_RECIPE_INGREDIENT(false, 3068, "나만의 레시피 재료 삭제에 실패하였습니다."),
 
     // [POST] /scraps/youtube
     FAILED_TO_POST_SCRAP_YOUTUBE(false, 3030, "유튜브 스크랩하기에 실패하였습니다."),
@@ -235,6 +236,7 @@ public enum BaseResponseStatus {
     FAILED_TO_DELETE_FRIDGE_BASKET(false, 3066, "냉장고 바구니 삭제에 실패했습니다."),
     EMPTY_INGREDIENT(false, 3067, "삭제할 재료를 입력해주세요."),
 
+    // 코드번호 3069부터 사용
     /**
      * 4000 : Database, Server 오류
      */

@@ -68,7 +68,7 @@ public class UserRecipeProvider {
 
 
     /**
-     * 나만의 레시피 상세조회
+     * 나만의 레시피 상세조회 API
      * @param userIdx,myRecipeIdx
      * @return GetMyRecipeRes
      * @throws BaseException
@@ -87,9 +87,9 @@ public class UserRecipeProvider {
         String title = userRecipe.getTitle();
         String content = userRecipe.getContent();
 
-        List ingredientList = userRecipeIngredientProvider.retrieveUserRecipeIngredient(myRecipeIdx);
+        List<MyRecipeIngredient> myRecipeIngredientList = userRecipeIngredientProvider.retrieveUserRecipeIngredient(myRecipeIdx);
 
-        return new GetMyRecipeRes(thumbnail,title,content,ingredientList);
+        return new GetMyRecipeRes(thumbnail,title,content, myRecipeIngredientList);
     }
 
     /**
