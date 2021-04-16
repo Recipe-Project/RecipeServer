@@ -54,7 +54,7 @@ public class FridgeBasketController {
                 String ingredientName = ingredient.getName();
                 Boolean existIngredientName = fridgeBasketRepository.existsByIngredientNameAndStatus(ingredientName,"ACTIVE");
                 if(existIngredientName){
-                    return new BaseResponse<>(EXIST_INGREDIENT_NAME);
+                    return new BaseResponse<>(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME,ingredientName);
                 }
             }
 //            List<PostFridgesBasketRes> postFridgesBasketRes = fridgeBasketService.createFridgesBasket(parameters,userIdx);
@@ -93,12 +93,12 @@ public class FridgeBasketController {
             // name 이 이미 바구니에 있다면
             FridgeBasket fridgeBasket = fridgeBasketProvider.retreiveFridgeBasketByName(parameters.getIngredientName());
             if (fridgeBasket != null) {
-                return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_BASKET);
+                return new BaseResponse<>(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME,parameters.getIngredientName());
             }
             // name 이 재료리스트에 있다면
             Ingredient ingredient = ingredientProvider.retreiveIngredientByName(parameters.getIngredientName());
             if (ingredient != null) {
-                return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS);
+                return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS,parameters.getIngredientName());
             }
 
             PostFridgesDirectBasketRes postFridgesBasketRes = fridgeBasketService.createFridgesDirectBasket(parameters,userIdx);

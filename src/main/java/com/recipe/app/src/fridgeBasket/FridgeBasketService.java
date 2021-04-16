@@ -60,7 +60,7 @@ public class FridgeBasketService {
 
                 String ingredientName = ingredient.getName();
 
-//
+
 
                 String ingredientIcon = ingredient.getIcon();
                 Integer ingredientCategoryIdx = ingredient.getIngredientCategory().getIngredientCategoryIdx();

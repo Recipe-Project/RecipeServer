@@ -206,6 +206,11 @@ public class FridgeController {
         }
     }
 
+    /**
+     * 푸시알림 API
+     * [POST] /fridges/notification
+     * @return BaseResponse<Void>
+     */
     @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
     @PostMapping("/notification")
     public  BaseResponse<Void> postFridgesNotification() throws BaseException, JSONException,InterruptedException {
@@ -279,6 +284,7 @@ public class FridgeController {
         catch (InterruptedException e){
             logger.debug("got interrupted!");
             throw new InterruptedException();
+
 
         }
         catch (ExecutionException e){
