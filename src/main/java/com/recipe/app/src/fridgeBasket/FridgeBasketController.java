@@ -9,8 +9,6 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 import static com.recipe.app.config.BaseResponseStatus.*;
 
 @RestController
@@ -29,6 +27,7 @@ public class FridgeBasketController {
         this.ingredientProvider = ingredientProvider;
         this.jwtService = jwtService;
     }
+
     /**
      * 재료 선택으로 냉장고 바구니 담기 API
      * [POST] /fridges/basket
@@ -37,19 +36,19 @@ public class FridgeBasketController {
      */
     @ResponseBody
     @PostMapping("/basket")
-    public BaseResponse<List<PostFridgesBasketRes>> postFridgesBasket(@RequestBody PostFridgesBasketReq parameters) {
+    public BaseResponse<Void> postFridgesBasket(@RequestBody PostFridgesBasketReq parameters) {
 
         try {
             Integer userIdx = jwtService.getUserId();
 
-            if (parameters.getIngredientList() == null) {
+            if (parameters.getIngredientList().isEmpty()) {
                 return new BaseResponse<>(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
             }
 
+//            List<PostFridgesBasketRes> postFridgesBasketRes = fridgeBasketService.createFridgesBasket(parameters,userIdx);
+            fridgeBasketService.createFridgesBasket(parameters,userIdx);
 
-            List<PostFridgesBasketRes> postFridgesBasketRes = fridgeBasketService.createFridgesBasket(parameters,userIdx);
-
-            return new BaseResponse<>(postFridgesBasketRes);
+            return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }

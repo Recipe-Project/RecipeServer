@@ -1,7 +1,10 @@
 package com.recipe.app.src.fridgeBasket;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.fridgeBasket.models.*;
+import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
+import com.recipe.app.src.fridgeBasket.models.PostFridgesBasketReq;
+import com.recipe.app.src.fridgeBasket.models.PostFridgesDirectBasketReq;
+import com.recipe.app.src.fridgeBasket.models.PostFridgesDirectBasketRes;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.ingredient.IngredientRepository;
 import com.recipe.app.src.ingredient.models.Ingredient;
@@ -13,7 +16,6 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
@@ -38,13 +40,15 @@ public class FridgeBasketService {
         this.jwtService = jwtService;
     }
 
+
+
     /**
      * 재료 선택으로 냉장고 바구니 담기 API
      * @param postFridgesBasketReq,userIdx
      * @return List<PostFridgesBasketRes>
      * @throws BaseException
      */
-    public List<PostFridgesBasketRes> createFridgesBasket(PostFridgesBasketReq postFridgesBasketReq, int userIdx) throws BaseException {
+    public void createFridgesBasket(PostFridgesBasketReq postFridgesBasketReq, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         List<Integer> ingredientList = postFridgesBasketReq.getIngredientList();
 
@@ -56,32 +60,30 @@ public class FridgeBasketService {
 
                 String ingredientName = ingredient.getName();
                 String ingredientIcon = ingredient.getIcon();
-                IngredientCategory ingredientCategory = ingredient.getIngredientCategory();
-
+                Integer ingredientCategoryIdx = ingredient.getIngredientCategory().getIngredientCategoryIdx();
+                IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
                 FridgeBasket fridgeBasket = new FridgeBasket(user,ingredient,ingredientName,ingredientIcon,ingredientCategory);
-                fridgeBasket = fridgeBasketRepository.save(fridgeBasket);
+                fridgeBasketRepository.save(fridgeBasket);
 
             }
 
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_FRIDGES_BASKET);
         }
-
-        List<PostFridgesBasketRes> postFridgesBasketResList = new ArrayList<>();
-
-        for (int i = 0; i < ingredientList.size(); i++) {
-            Integer ingredientIdx = ingredientList.get(i);
-            Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
-            FridgeBasket fridgeBasket = fridgeBasketRepository.findByIngredientAndStatus(ingredient,"ACTIVE");
-            String ingredientName = fridgeBasket.getIngredientName();
-            String ingredientIcon = fridgeBasket.getIngredientIcon();
-            Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategory().getIngredientCategoryIdx();
-
-            PostFridgesBasketRes postFridgesBasketRes = new PostFridgesBasketRes(ingredientName,ingredientIcon,ingredientCategoryIdx);
-            postFridgesBasketResList.add(postFridgesBasketRes);
-
-        }
-        return postFridgesBasketResList;
+//        List<PostFridgesBasketRes> postFridgesBasketResList = new ArrayList<>();
+//        for (int i = 0; i < ingredientList.size(); i++) {
+//            Integer ingredientIdx = ingredientList.get(i);
+//            Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
+//            FridgeBasket fridgeBasket = fridgeBasketRepository.findByIngredientAndStatus(ingredient,"ACTIVE");
+//            String ingredientName = fridgeBasket.getIngredientName();
+//            String ingredientIcon = fridgeBasket.getIngredientIcon();
+//            Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategory().getIngredientCategoryIdx();
+//
+//            PostFridgesBasketRes postFridgesBasketRes = new PostFridgesBasketRes(ingredientName,ingredientIcon,ingredientCategoryIdx);
+//            postFridgesBasketResList.add(postFridgesBasketRes);
+//
+//        }
+//        return postFridgesBasketResList;
 
     }
 
