@@ -59,6 +59,9 @@ public class FridgeBasketService {
                 Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
 
                 String ingredientName = ingredient.getName();
+
+//
+
                 String ingredientIcon = ingredient.getIcon();
                 Integer ingredientCategoryIdx = ingredient.getIngredientCategory().getIngredientCategoryIdx();
                 IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
@@ -96,6 +99,7 @@ public class FridgeBasketService {
     public PostFridgesDirectBasketRes createFridgesDirectBasket(PostFridgesDirectBasketReq postFridgesDirectBasketReq, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         String ingredientName = postFridgesDirectBasketReq.getIngredientName();
+
         String ingredientIcon = postFridgesDirectBasketReq.getIngredientIcon();
         Integer ingredientCategoryIdx = postFridgesDirectBasketReq.getIngredientCategoryIdx();
 
@@ -132,7 +136,6 @@ public class FridgeBasketService {
         try {
             fridgeBasket.setStatus("INACTIVE");
             fridgeBasketRepository.save(fridgeBasket);
-
 
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_FRIDGE_BASKET);

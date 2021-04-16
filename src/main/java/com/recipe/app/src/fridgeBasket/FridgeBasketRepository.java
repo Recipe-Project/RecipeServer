@@ -16,4 +16,6 @@ public interface FridgeBasketRepository extends CrudRepository<FridgeBasket, Int
     FridgeBasket findByIngredientAndStatus(Ingredient ingredient,String status);
 
     FridgeBasket findByUserAndIngredientNameAndStatus(User user, String ingredient, String active);
+
+    Boolean existsByIngredientName(String ingredientName);
 }

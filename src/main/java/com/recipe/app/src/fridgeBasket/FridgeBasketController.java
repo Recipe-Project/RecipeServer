@@ -9,6 +9,8 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.recipe.app.config.BaseResponseStatus.*;
 
 @RestController
@@ -16,14 +18,16 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 public class FridgeBasketController {
     private final FridgeBasketProvider fridgeBasketProvider;
     private final FridgeBasketService fridgeBasketService;
+    private final FridgeBasketRepository fridgeBasketRepository;
     private final IngredientProvider ingredientProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeBasketController(FridgeBasketProvider fridgeBasketProvider, FridgeBasketService fridgeBasketService, IngredientProvider ingredientProvider, JwtService jwtService) {
+    public FridgeBasketController(FridgeBasketProvider fridgeBasketProvider, FridgeBasketService fridgeBasketService, FridgeBasketRepository fridgeBasketRepository, IngredientProvider ingredientProvider, JwtService jwtService) {
 
         this.fridgeBasketProvider = fridgeBasketProvider;
         this.fridgeBasketService = fridgeBasketService;
+        this.fridgeBasketRepository = fridgeBasketRepository;
         this.ingredientProvider = ingredientProvider;
         this.jwtService = jwtService;
     }
@@ -40,11 +44,19 @@ public class FridgeBasketController {
 
         try {
             Integer userIdx = jwtService.getUserId();
-
-            if (parameters.getIngredientList().isEmpty()) {
+            List<Integer> ingredientList = parameters.getIngredientList();
+            if (ingredientList.isEmpty()) {
                 return new BaseResponse<>(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
             }
 
+            for(Integer ingredientIdx : ingredientList){
+                Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
+                String ingredientName = ingredient.getName();
+                Boolean existIngredientName = fridgeBasketRepository.existsByIngredientName(ingredientName);
+                if(existIngredientName){
+                    return new BaseResponse<>(EXIST_INGREDIENT_NAME);
+                }
+            }
 //            List<PostFridgesBasketRes> postFridgesBasketRes = fridgeBasketService.createFridgesBasket(parameters,userIdx);
             fridgeBasketService.createFridgesBasket(parameters,userIdx);
 
