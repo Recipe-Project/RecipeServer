@@ -52,7 +52,7 @@ public class FridgeBasketController {
             for(Integer ingredientIdx : ingredientList){
                 Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
                 String ingredientName = ingredient.getName();
-                Boolean existIngredientName = fridgeBasketRepository.existsByIngredientName(ingredientName);
+                Boolean existIngredientName = fridgeBasketRepository.existsByIngredientNameAndStatus(ingredientName,"ACTIVE");
                 if(existIngredientName){
                     return new BaseResponse<>(EXIST_INGREDIENT_NAME);
                 }
