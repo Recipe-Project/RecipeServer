@@ -176,6 +176,7 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_INGREDIENT_CATEGORY(false, 3038, "재료 카테고리 조회에 실패하였습니다."),
     NOT_FOUND_INGREDIENT_CATEGORY(false, 3039, "재료 카테고리인덱스를 찾을 수 없습니다."),
     FAILED_TO_GET_INGREDIENT_LIST(false, 3040, "재료 리스트 조회에 실패하였습니다."),
+    FAILED_TO_GET_FRIDGE_BASKET_COUNT(false, 3070, "냉장고 바구니 개수 조회에 실패하였습니다."),
 
     // [POST] /fridges/direct-basket
     FAILED_TO_POST_FRIDGES_DIRECT_BASKET(false, 3041, "재료 직접 입력으로 냉장고 바구니 담기에 실패하였습니다."),
@@ -236,7 +237,7 @@ public enum BaseResponseStatus {
     FAILED_TO_DELETE_FRIDGE_BASKET(false, 3066, "냉장고 바구니 삭제에 실패했습니다."),
     EMPTY_INGREDIENT(false, 3067, "삭제할 재료를 입력해주세요."),
 
-    // 코드번호 3070부터 사용
+    // 코드번호 3071부터 사용
     /**
      * 4000 : Database, Server 오류
      */

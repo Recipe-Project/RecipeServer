@@ -2,13 +2,14 @@ package com.recipe.app.src.ingredient;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.config.BaseResponse;
-import com.recipe.app.src.ingredient.models.*;
+import com.recipe.app.src.ingredient.models.GetIngredientsRes;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
-import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 
 @RestController
@@ -29,21 +30,21 @@ public class IngredientController {
      * 재료 조회 API
      * [GET] /ingredients
      * @RequestParam keyword
-     * @return BaseResponse<List<GetIngredientsRes>>
+     * @return BaseResponse<GetIngredientsRes>
      * @PageableDefault pageable
      */
     @GetMapping("")
-    public BaseResponse<List<GetIngredientsRes>> getIngredients(@RequestParam(value = "keyword") @Nullable String keyword) {
+    public BaseResponse<GetIngredientsRes> getIngredients(@RequestParam(value = "keyword") @Nullable String keyword) {
 
         try {
             Integer userIdx = jwtService.getUserId();
 
-            List<GetIngredientsRes> getIngredientsRes;
+            GetIngredientsRes getIngredientsRes;
             if (keyword != null && keyword.length() != 0){
-                getIngredientsRes = ingredientProvider.retrieveKeywordIngredientsList(keyword);
+                getIngredientsRes = ingredientProvider.retrieveKeywordIngredientsList(keyword,userIdx);
             }
             else{
-                getIngredientsRes = ingredientProvider.retrieveIngredientsList();
+                getIngredientsRes = ingredientProvider.retrieveIngredientsList(userIdx);
             }
 
 

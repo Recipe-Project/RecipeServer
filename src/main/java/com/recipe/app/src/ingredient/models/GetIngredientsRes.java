@@ -9,7 +9,6 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class GetIngredientsRes {
-    private final Integer ingredientCategoryIdx;
-    private final String ingredientCategoryName;
-    private final List ingredientList;
+    private final long fridgeBasketCount;
+    private final List ingredients;
 }

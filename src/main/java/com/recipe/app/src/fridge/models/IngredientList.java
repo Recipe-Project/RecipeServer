@@ -6,7 +6,7 @@ import lombok.Getter;
 
 @Getter
 @AllArgsConstructor
-public class FridgeList {
+public class IngredientList {
 
     private final String ingredientName;
     private final String ingredientIcon;

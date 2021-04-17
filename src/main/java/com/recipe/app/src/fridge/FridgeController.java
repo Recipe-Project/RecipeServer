@@ -86,11 +86,12 @@ public class FridgeController {
      * @return BaseResponse<GetFridgesBasketRes>
      */
     @GetMapping("")
-    public BaseResponse<List<GetFridgesRes>> getFridges() {
+    public BaseResponse<GetFridgesRes> getFridges() {
 
         try {
             Integer userIdx = jwtService.getUserId();
-            List<GetFridgesRes> getFridgesRes = fridgeProvider.retreiveFridges(userIdx);
+
+            GetFridgesRes getFridgesRes = fridgeProvider.retreiveFridges(userIdx);
 
 
             return new BaseResponse<>(getFridgesRes);

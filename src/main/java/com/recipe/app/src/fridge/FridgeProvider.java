@@ -3,6 +3,7 @@ package com.recipe.app.src.fridge;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridge.models.*;
+import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
@@ -36,10 +37,11 @@ public class FridgeProvider {
     private final RecipeIngredientRepository recipeIngredientRepository;
     private final ScrapPublicRepository scrapPublicRepository;
     private final RecipeInfoProvider recipeInfoProvider;
+    private final FridgeBasketRepository fridgeBasketRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeProvider(UserProvider userProvider, FridgeRepository fridgeRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientCategoryRepository ingredientCategoryRepository, RecipeInfoRepository recipeInfoRepository, RecipeIngredientRepository recipeIngredientRepository, ScrapPublicRepository scrapPublicRepository, RecipeInfoProvider recipeInfoProvider, JwtService jwtService) {
+    public FridgeProvider(UserProvider userProvider, FridgeRepository fridgeRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientCategoryRepository ingredientCategoryRepository, RecipeInfoRepository recipeInfoRepository, RecipeIngredientRepository recipeIngredientRepository, ScrapPublicRepository scrapPublicRepository, RecipeInfoProvider recipeInfoProvider, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
         this.userProvider = userProvider;
         this.fridgeRepository = fridgeRepository;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
@@ -48,44 +50,49 @@ public class FridgeProvider {
         this.recipeIngredientRepository = recipeIngredientRepository;
         this.scrapPublicRepository = scrapPublicRepository;
         this.recipeInfoProvider = recipeInfoProvider;
+        this.fridgeBasketRepository = fridgeBasketRepository;
         this.jwtService = jwtService;
     }
 
     /**
      * 냉장고 조회 API
      * @param userIdx
-     * @return List<GetFridgesRes>
+     * @return GetFridgesRes
      * @throws BaseException
      */
-    public List<GetFridgesRes> retreiveFridges(int userIdx) throws BaseException {
-
-
-        List<IngredientCategory> ingredientCategoryList;
+    public GetFridgesRes retreiveFridges(int userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        long fridgeBasketCount;
         try {
-            ingredientCategoryList = ingredientCategoryRepository.findByStatus("ACTIVE");
+            fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
+            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET_COUNT);
         }
 
 
 
-        return ingredientCategoryList.stream().map(ic -> {
+        List<IngredientCategory> ingredientCategories;
+        try {
+            ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
+        }
 
-            Integer ingredientCategoryIdx = ic.getIngredientCategoryIdx();
-            String ingredientCategoryName = ic.getName();
+        List<Fridges> fridges = new ArrayList<>();
+        for (int i=0;i<ingredientCategories.size()-1;i++){
+            int ingredientCategoryIdx = ingredientCategories.get(i).getIngredientCategoryIdx();
+            String ingredientCategoryName = ingredientCategories.get(i).getName();
 
-            List<FridgeList> fridgeList = null;
-            try {
-                fridgeList = retreiveFridgeList(ingredientCategoryIdx,userIdx);
-            } catch (BaseException e) {
-                e.printStackTrace();
-            }
+            List<IngredientList> ingredientList = retreiveFridgeList(ingredientCategoryIdx,userIdx);
+
+            Fridges fridge = new Fridges(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
+            fridges.add(fridge);
+
+        }
 
 
-            return new GetFridgesRes(ingredientCategoryIdx, ingredientCategoryName, fridgeList);
 
-
-        }).collect(Collectors.toList());
+        return new GetFridgesRes(fridgeBasketCount,fridges);
 
     }
 
@@ -93,11 +100,11 @@ public class FridgeProvider {
     /**
      * 카테고리에 해당하는 냉장고 재료 리스트 추출
      *
-     * @param ingredientCategoryIdx
-     * @return List<FridgeList>
+     * @param ingredientCategoryIdx,userIdx
+     * @return List<IngredientList>
      * @throws BaseException
      */
-    public List<FridgeList> retreiveFridgeList(Integer ingredientCategoryIdx,int userIdx) throws BaseException {
+    public List<IngredientList> retreiveFridgeList(Integer ingredientCategoryIdx, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
 
@@ -155,7 +162,7 @@ public class FridgeProvider {
 
             }
 
-            return new FridgeList(ingredientName,ingredientIcon,expiredAtResult,storageMethod,count,freshness);
+            return new IngredientList(ingredientName,ingredientIcon,expiredAtResult,storageMethod,count,freshness);
         }).collect(Collectors.toList());
 
     }

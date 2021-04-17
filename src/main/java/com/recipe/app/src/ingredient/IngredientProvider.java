@@ -1,13 +1,16 @@
 package com.recipe.app.src.ingredient;
 
 import com.recipe.app.config.BaseException;
+import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.ingredient.models.GetIngredientsRes;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.ingredient.models.IngredientList;
+import com.recipe.app.src.ingredient.models.Ingredients;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,26 +29,36 @@ public class IngredientProvider {
     private final IngredientCategoryProvider ingredientCategoryProvider;
     private final IngredientRepository ingredientRepository;
     private final IngredientCategoryRepository ingredientCategoryRepository;
+    private final FridgeBasketRepository fridgeBasketRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public IngredientProvider(UserProvider userProvider, IngredientCategoryProvider ingredientCategoryProvider, IngredientRepository ingredientRepository, IngredientCategoryRepository ingredientCategoryRepository, JwtService jwtService) {
+    public IngredientProvider(UserProvider userProvider, IngredientCategoryProvider ingredientCategoryProvider, IngredientRepository ingredientRepository, IngredientCategoryRepository ingredientCategoryRepository, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
         this.userProvider = userProvider;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
         this.ingredientRepository = ingredientRepository;
         this.ingredientCategoryRepository = ingredientCategoryRepository;
+        this.fridgeBasketRepository = fridgeBasketRepository;
         this.jwtService = jwtService;
     }
+
 
     /**
      * 재료 조회 API - 키워드 있는경우
      *
-     * @param
-     * @return List<GetIngredientsRes>
+     * @param keyword,userIdx
+     * @return GetIngredientsRes
      * @throws BaseException
      */
     @Transactional
-    public List<GetIngredientsRes> retrieveKeywordIngredientsList(String keyword) throws BaseException {
+    public GetIngredientsRes retrieveKeywordIngredientsList(String keyword,Integer userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        long fridgeBasketCount;
+        try {
+            fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET_COUNT);
+        }
 
         List<IngredientCategory> ingredientCategories;
 
@@ -55,32 +68,38 @@ public class IngredientProvider {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
         }
 
-        List<GetIngredientsRes> getIngredientsResList = new ArrayList<>();
+        List<Ingredients> ingredients = new ArrayList<>();
         for (int i=0;i<ingredientCategories.size()-1;i++){
             int ingredientCategoryIdx = ingredientCategories.get(i).getIngredientCategoryIdx();
             String ingredientCategoryName = ingredientCategories.get(i).getName();
 
             List<IngredientList> ingredientList = retrieveKeywordIngredients(ingredientCategoryIdx,keyword);
 
-            GetIngredientsRes getIngredientsRes = new GetIngredientsRes(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
-            getIngredientsResList.add(getIngredientsRes);
+            Ingredients ingredient = new Ingredients(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
+            ingredients.add(ingredient);
         }
 
-        return getIngredientsResList;
+        return new GetIngredientsRes(fridgeBasketCount,ingredients);
     }
 
     /**
      * 재료 조회 API - 키워드 없는경우
      *
-     * @param
-     * @return List<GetIngredientsRes>
+     * @param userIdx
+     * @return GetIngredientsRes
      * @throws BaseException
      */
     @Transactional
-    public List<GetIngredientsRes> retrieveIngredientsList() throws BaseException {
+    public GetIngredientsRes retrieveIngredientsList(Integer userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        long fridgeBasketCount;
+        try {
+            fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET_COUNT);
+        }
 
         List<IngredientCategory> ingredientCategories;
-
 
         try {
             // 카테고리 리스트 뽑기
@@ -89,25 +108,24 @@ public class IngredientProvider {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
         }
 
-        List<GetIngredientsRes> getIngredientsResList = new ArrayList<>();
+        List<Ingredients> ingredients = new ArrayList<>();
         for (int i=0;i<ingredientCategories.size()-1;i++){
             int ingredientCategoryIdx = ingredientCategories.get(i).getIngredientCategoryIdx();
             String ingredientCategoryName = ingredientCategories.get(i).getName();
 
             List<IngredientList> ingredientList = retrieveIngredients(ingredientCategoryIdx);
 
-            GetIngredientsRes getIngredientsRes = new GetIngredientsRes(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
-            getIngredientsResList.add(getIngredientsRes);
+            Ingredients ingredient = new Ingredients(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
+            ingredients.add(ingredient);
         }
 
-        return getIngredientsResList;
+        return new GetIngredientsRes(fridgeBasketCount,ingredients);
     }
-
     /**
      * 카테고리에 해당하는 재료리스트 추출
      *
      * @param ingredientCategoryIdx
-     * @return List<GetIngredientsRes>
+     * @return List<IngredientList>
      * @throws BaseException
      */
     public List<IngredientList> retrieveIngredients(Integer ingredientCategoryIdx) throws BaseException {
@@ -136,7 +154,7 @@ public class IngredientProvider {
      * 카테고리에 해당하는+키워드에 해당하는 재료리스트 추출
      *
      * @param ingredientCategoryIdx
-     * @return List<GetIngredientsRes>
+     * @return List<IngredientList>
      * @throws BaseException
      */
     public List<IngredientList> retrieveKeywordIngredients(Integer ingredientCategoryIdx,String keyword) throws BaseException {
