@@ -10,4 +10,6 @@ import java.util.List;
 public interface UserRepository extends CrudRepository<User, Integer> {
     User findBySocialId(String socialId);
     List<User> findBySocialIdAndStatus(String socialId, String status);
+
+    User findByUserIdxAndStatus(Integer userIdx, String active);
 }

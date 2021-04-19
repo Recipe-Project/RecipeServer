@@ -114,6 +114,9 @@ public enum BaseResponseStatus {
     // [PATCH] /fridge/ingredient
     EMPTY_PATCH_FRIDGE_LIST(false, 2079, "수정할 냉장고 재료 리스트를 입력하세요."),
     INVALID_STORAGE_METHOD(false, 2080, "냉장,냉동,실온만 입력하세요."),
+
+    // [PATCH] /fcm/token
+    EMPTY_FCM_TOKEN(false, 2081, "FCM 토큰을 입력하세요."),
     /**
      * 3000 : Response 오류
      */
@@ -237,7 +240,9 @@ public enum BaseResponseStatus {
     FAILED_TO_DELETE_FRIDGE_BASKET(false, 3066, "냉장고 바구니 삭제에 실패했습니다."),
     EMPTY_INGREDIENT(false, 3067, "삭제할 재료를 입력해주세요."),
 
-    // 코드번호 3071부터 사용
+    // [PATCH] /fcm/token
+    FAILED_TO_PATCH_FCM_TOKEN(false, 3072, "fcm 토큰 수정에 실패했습니다."),
+    // 코드번호 3072부터 사용
     /**
      * 4000 : Database, Server 오류
      */

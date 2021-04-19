@@ -1,22 +1,27 @@
 package com.recipe.app.src.user;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.recipe.app.config.BaseException;
-import com.recipe.app.config.secret.Secret;
-import com.recipe.app.src.user.models.*;
+import com.recipe.app.src.user.models.PatchUserReq;
+import com.recipe.app.src.user.models.PatchUserRes;
+import com.recipe.app.src.user.models.PostUserRes;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
-
-import java.io.*;
-import java.net.*;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
+
+import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
 public class UserService {
@@ -31,13 +36,14 @@ public class UserService {
         this.jwtService = jwtService;
     }
 
+
     /**
      * 네이버 로그인
-     * @param accessToken
+     * @param accessToken,fcmToken
      * @return PostUserRes
      * @throws BaseException
      */
-    public PostUserRes naverLogin(String accessToken) throws BaseException {
+    public PostUserRes naverLogin(String accessToken,String fcmToken) throws BaseException {
         JSONObject jsonObject;
         String resultcode;
 
@@ -144,7 +150,7 @@ public class UserService {
 
         // 이미 존재하는 회원이 없다면 유저 정보 저장
         if (user == null) {
-            user = new User(socialId, profilePhoto, userName, email, phoneNumber);
+            user = new User(socialId, profilePhoto, userName, email, phoneNumber,fcmToken);
 
             try {
                 user = userRepository.save(user);
@@ -176,11 +182,11 @@ public class UserService {
 
     /**
      * 카카오 로그인
-     * @param accessToken
+     * @param accessToken,fcmToken
      * @return PostUserRes
      * @throws BaseException
      */
-    public PostUserRes kakaoLogin(String accessToken) throws BaseException {
+    public PostUserRes kakaoLogin(String accessToken,String fcmToken) throws BaseException {
         JSONObject jsonObject;
 
         String header = "Bearer " + accessToken; // Bearer 다음에 공백 추가
@@ -280,7 +286,7 @@ public class UserService {
 
         // 이미 존재하는 회원이 없다면 유저 정보 저장
         if (user == null) {
-            user = new User(socialId, profilePhoto, userName, email, phoneNumber);
+            user = new User(socialId, profilePhoto, userName, email, phoneNumber,fcmToken);
 
             try {
                 user = userRepository.save(user);
@@ -310,14 +316,13 @@ public class UserService {
         }
     }
 
-
     /**
      * 구글 로그인
-     * @param idToken
+     * @param idToken,fcmToken
      * @return PostUserRes
      * @throws BaseException
      */
-    public PostUserRes googleLogin (String idToken)  throws BaseException {
+    public PostUserRes googleLogin (String idToken,String fcmToken)  throws BaseException {
         BufferedReader in  = null;
         InputStream is = null;
         InputStreamReader isr = null;
@@ -355,7 +360,7 @@ public class UserService {
             // 1-1. 존재하는 회원이 없다면 회원가입
             if (existsUserInfo == null) {
                 // 빈 값은 null 처리
-                User userInfo = new User(userId, imageUrl, name,email,null);
+                User userInfo = new User(userId, imageUrl, name, email,null,fcmToken);
 
                 // 2. 유저 정보 저장
                 try {
@@ -385,7 +390,6 @@ public class UserService {
 
         return null;
     }
-
     /**
      * 회원 정보 수정
      * @param patchUserReq

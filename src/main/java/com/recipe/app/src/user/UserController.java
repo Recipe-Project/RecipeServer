@@ -2,16 +2,19 @@ package com.recipe.app.src.user;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.config.BaseResponse;
-import com.recipe.app.src.user.models.*;
+import com.recipe.app.src.user.models.GetUserRes;
+import com.recipe.app.src.user.models.PatchUserReq;
+import com.recipe.app.src.user.models.PatchUserRes;
+import com.recipe.app.src.user.models.PostUserRes;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import static com.recipe.app.config.BaseResponseStatus.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
-import org.springframework.web.context.request.*;
+import static com.recipe.app.config.BaseResponseStatus.*;
 
 
 
@@ -57,12 +60,15 @@ public class UserController {
     public BaseResponse<PostUserRes> postNaverLogin() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String accessToken = request.getHeader("NAVER-ACCESS-TOKEN");
+        String fcmToken = request.getHeader("FCM-TOKEN");
         if (accessToken == null || accessToken.length() == 0) {
             return new BaseResponse<>(EMPTY_TOKEN);
         }
-
+        if (fcmToken == null || fcmToken.length() == 0) {
+            return new BaseResponse<>(EMPTY_FCM_TOKEN);
+        }
         try {
-            PostUserRes postUserRes = userService.naverLogin(accessToken);
+            PostUserRes postUserRes = userService.naverLogin(accessToken,fcmToken);
             return new BaseResponse<>(postUserRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -80,12 +86,15 @@ public class UserController {
     public BaseResponse<PostUserRes> postKakaoLogin() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
         String accessToken = request.getHeader("KAKAO-ACCESS-TOKEN");
+        String fcmToken = request.getHeader("FCM-TOKEN");
         if (accessToken == null || accessToken.length() == 0) {
             return new BaseResponse<>(EMPTY_TOKEN);
         }
-
+        if (fcmToken == null || fcmToken.length() == 0) {
+            return new BaseResponse<>(EMPTY_FCM_TOKEN);
+        }
         try {
-            PostUserRes postUserRes = userService.kakaoLogin(accessToken);
+            PostUserRes postUserRes = userService.kakaoLogin(accessToken,fcmToken);
             return new BaseResponse<>(postUserRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
@@ -100,12 +109,17 @@ public class UserController {
     @PostMapping("/google-login")
     public BaseResponse<PostUserRes> postGoogleLogin() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String idToken = request.getHeader("GOOGLE-ID-TOKEN");
-        if (idToken == null || idToken.length() == 0) {
+        String googleIdToken = request.getHeader("GOOGLE-ID-TOKEN");
+        String fcmToken = request.getHeader("FCM-TOKEN");
+
+        if (googleIdToken == null || googleIdToken.length() == 0) {
             return new BaseResponse<>(EMPTY_TOKEN);
         }
+        if (fcmToken == null || fcmToken.length() == 0) {
+            return new BaseResponse<>(EMPTY_FCM_TOKEN);
+        }
         try {
-            PostUserRes postUserRes = userService.googleLogin(idToken);
+            PostUserRes postUserRes = userService.googleLogin(googleIdToken,fcmToken);
             return new BaseResponse<>(postUserRes);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());

@@ -7,6 +7,7 @@ import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.UserRepository;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,17 +35,19 @@ public class FridgeService {
     private final FridgeRepository fridgeRepository;
     private final FridgeBasketRepository fridgeBasketRepository;
     private final IngredientCategoryProvider ingredientCategoryProvider;
+    private final UserRepository userRepository;
     private final JwtService jwtService;
 
     private static final String FIREBASE_API_URL="https://fcm.googleapis.com/fcm/send";
 
     @Autowired
-    public FridgeService(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeRepository fridgeRepository, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, JwtService jwtService) {
+    public FridgeService(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeRepository fridgeRepository, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, UserRepository userRepository, JwtService jwtService) {
         this.userProvider = userProvider;
         this.fridgeProvider = fridgeProvider;
         this.fridgeRepository = fridgeRepository;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
+        this.userRepository = userRepository;
         this.jwtService = jwtService;
     }
 
@@ -226,6 +229,32 @@ public class FridgeService {
         String firebaseResponse = restTemplate.postForObject(FIREBASE_API_URL, entity, String.class);
 
         return CompletableFuture.completedFuture(firebaseResponse);
+    }
+
+
+    /**
+     * fcm 토큰 수정 API
+     * @param patchFcmTokenReq,userIdx
+     * @return void
+     * @throws BaseException
+     */
+    @Transactional
+    public void updateFcmToken(PatchFcmTokenReq patchFcmTokenReq, Integer userIdx) throws BaseException {
+        String fcmToken = patchFcmTokenReq.getFcmToken();
+
+        User userinfo ;
+        try{
+            userinfo = userRepository.findByUserIdxAndStatus(userIdx,"ACTIVE");
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_USER);
+        }
+
+        try{
+            userinfo.setDeviceToken(fcmToken);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_PATCH_FCM_TOKEN);
+        }
+
     }
 
 

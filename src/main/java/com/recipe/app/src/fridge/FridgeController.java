@@ -23,7 +23,7 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Slf4j
 @RestController
-@RequestMapping("/fridges")
+//@RequestMapping("/fridges")
 public class FridgeController {
     Logger logger = LoggerFactory.getLogger(this.getClass());
 
@@ -31,7 +31,6 @@ public class FridgeController {
     private final FridgeService fridgeService;
     private final FridgeRepository fridgeRepository;
     private final JwtService jwtService;
-//    private final AndroidPushNotificationsService androidPushNotificationsService;
 
     @Autowired
     public FridgeController(FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, JwtService jwtService) {
@@ -48,7 +47,7 @@ public class FridgeController {
      * @return BaseResponse<List<PostFridgesRes>>
      */
     @ResponseBody
-    @PostMapping("")
+    @PostMapping("/fridges")
     public BaseResponse<List<PostFridgesRes>> postFridges(@RequestBody PostFridgesReq parameters) {
         try {
 
@@ -85,7 +84,7 @@ public class FridgeController {
      * [GET] /fridges
      * @return BaseResponse<GetFridgesBasketRes>
      */
-    @GetMapping("")
+    @GetMapping("/fridges")
     public BaseResponse<GetFridgesRes> getFridges() {
 
         try {
@@ -107,7 +106,7 @@ public class FridgeController {
      * @return BaseResponse<Void>
      * @PathVariable myRecipeIdx
      */
-    @DeleteMapping("/ingredient")
+    @DeleteMapping("/fridges/ingredient")
     public BaseResponse<Void> deleteFridgesIngredient(@RequestBody DeleteFridgesIngredientReq parameters) throws BaseException {
 
         // 리스트가 널일때
@@ -142,7 +141,7 @@ public class FridgeController {
      * @RequestBody PatchFridgesIngredientReq parameters
      */
     @ResponseBody
-    @PatchMapping("/ingredient")
+    @PatchMapping("/fridges/ingredient")
     public BaseResponse<Void> patchFridgesIngredient(@RequestBody PatchFridgesIngredientReq parameters) throws BaseException {
 
         try {
@@ -192,7 +191,7 @@ public class FridgeController {
      * @return BaseResponse<GetFridgesRecipeRes>
      */
     @ResponseBody
-    @GetMapping("/recipe")
+    @GetMapping("/fridges/recipe")
     public BaseResponse<List<GetFridgesRecipeRes>> getFridgesRecipe()  {
 
         try {
@@ -213,7 +212,7 @@ public class FridgeController {
      * @return BaseResponse<Void>
      */
     @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
-    @PostMapping("/notification")
+    @PostMapping("/fridges/notification")
     public  BaseResponse<Void> postFridgesNotification() throws BaseException, JSONException,InterruptedException {
         log.info("This job is executed per a second.");
 
@@ -331,5 +330,31 @@ public class FridgeController {
 //        return new ResponseEntity<>("Push Notification ERROR!", HttpStatus.BAD_REQUEST);
 //
 //    }
+
+
+    /**
+     * fcm 토큰 수정 API
+     * [PATCH] /fcm/token
+     * @RequestBody parameters
+     * @return BaseResponse<Void>
+     */
+    @PatchMapping("/fcm/token")
+    public BaseResponse<Void> patchFcmToken(@RequestBody PatchFcmTokenReq parameters)  {
+
+        try {
+            Integer userIdx = jwtService.getUserId();
+            String fcmToken = parameters.getFcmToken();
+
+            if (fcmToken == null || fcmToken.equals("")){
+                return new BaseResponse<>(EMPTY_FCM_TOKEN);
+            }
+
+            fridgeService.updateFcmToken(parameters,userIdx);
+
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
 }

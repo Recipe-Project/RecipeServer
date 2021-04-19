@@ -45,9 +45,9 @@ public class User extends BaseEntity {
     @Column(name = "phoneNumber", nullable = false, length = 45)
     private String phoneNumber;
 
-
-//    @Column(name = "deviceToken", length = 500)
-//    private String deviceToken;
+    //추가
+    @Column(name = "deviceToken", length = 500)
+    private String deviceToken;
 
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
@@ -80,13 +80,13 @@ public class User extends BaseEntity {
     private List<ViewPublic> viewPublics = new ArrayList<>();
 
 
-    public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber){
+    public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber, String deviceToken){
         this.socialId = socialId;
         this.profilePhoto = profilePhoto;
         this.userName = userName;
         this.email = email;
         this.phoneNumber = phoneNumber;
-//        this.deviceToken = deviceToken;
+        this.deviceToken = deviceToken;//추가
     }
 
 }
