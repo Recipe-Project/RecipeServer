@@ -16,7 +16,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -33,16 +32,15 @@ public class FridgeController {
     private final FridgeProvider fridgeProvider;
     private final FridgeService fridgeService;
     private final FridgeRepository fridgeRepository;
-    private final FirebaseCloudMessageService firebaseCloudMessageService;
+//    private final FirebaseCloudMessageService firebaseCloudMessageService;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeController(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, FirebaseCloudMessageService firebaseCloudMessageService, JwtService jwtService) {
+    public FridgeController(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, JwtService jwtService) {
         this.userProvider = userProvider;
         this.fridgeProvider = fridgeProvider;
         this.fridgeService = fridgeService;
         this.fridgeRepository = fridgeRepository;
-        this.firebaseCloudMessageService = firebaseCloudMessageService;
         this.jwtService = jwtService;
     }
 
@@ -365,23 +363,23 @@ public class FridgeController {
     }
 
 
-    /**
-     * 푸시알림 API
-     * [POST] /fcm
-     * @return BaseResponse<Void>
-     */
-//    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
-    @PostMapping("/fcm")
-    public  BaseResponse<Void> postFcm() throws BaseException,IOException {
-
-        String targetToken = "dsiQzbjDS9SQYyQFyiwGkM:APA91bHMq0mUdROfC-bmWXJ9-wq09MvvwFyZPO0UooU8jJibdzYoDpFONaXt8yNPBs36fRToy4vSlZHkbI4mCFss06o6uu8gC0U5EZqzxKe-_lB2S78BgdnUsmbmheTef3SMgueJUX5G";
-        String title = "title-test";
-        String body = "body-test";
-
-        firebaseCloudMessageService.sendMessageTo(targetToken,title,body);
-
-        return new BaseResponse<>(SUCCESS);
-
-    }
+//    /**
+//     * 푸시알림 API
+//     * [POST] /fcm
+//     * @return BaseResponse<Void>
+//     */
+////    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
+//    @PostMapping("/fcm")
+//    public  BaseResponse<Void> postFcm() throws BaseException,IOException {
+//
+//        String targetToken = "dsiQzbjDS9SQYyQFyiwGkM:APA91bHMq0mUdROfC-bmWXJ9-wq09MvvwFyZPO0UooU8jJibdzYoDpFONaXt8yNPBs36fRToy4vSlZHkbI4mCFss06o6uu8gC0U5EZqzxKe-_lB2S78BgdnUsmbmheTef3SMgueJUX5G";
+//        String title = "title-test";
+//        String body = "body-test";
+//
+//        firebaseCloudMessageService.sendMessageTo(targetToken,title,body);
+//
+//        return new BaseResponse<>(SUCCESS);
+//
+//    }
 
 }
