@@ -4,6 +4,8 @@ package com.recipe.app.src.fridge;
 import com.recipe.app.config.BaseException;
 import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.fridge.models.*;
+import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.json.JSONException;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -26,17 +29,20 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 //@RequestMapping("/fridges")
 public class FridgeController {
     Logger logger = LoggerFactory.getLogger(this.getClass());
-
+    private final UserProvider userProvider;
     private final FridgeProvider fridgeProvider;
     private final FridgeService fridgeService;
     private final FridgeRepository fridgeRepository;
+    private final FirebaseCloudMessageService firebaseCloudMessageService;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeController(FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, JwtService jwtService) {
+    public FridgeController(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, FirebaseCloudMessageService firebaseCloudMessageService, JwtService jwtService) {
+        this.userProvider = userProvider;
         this.fridgeProvider = fridgeProvider;
         this.fridgeService = fridgeService;
         this.fridgeRepository = fridgeRepository;
+        this.firebaseCloudMessageService = firebaseCloudMessageService;
         this.jwtService = jwtService;
     }
 
@@ -109,18 +115,17 @@ public class FridgeController {
     @DeleteMapping("/fridges/ingredient")
     public BaseResponse<Void> deleteFridgesIngredient(@RequestBody DeleteFridgesIngredientReq parameters) throws BaseException {
 
-        // 리스트가 널일때
-        if (parameters.getIngredientList().isEmpty()) {
-            return new BaseResponse<>(EMPTY_INGREDIENT_LIST);
+        String ingrdientName = parameters.getIngredientName();
+
+        if (ingrdientName == null || ingrdientName.equals("")) {
+            return new BaseResponse<>(EMPTY_INGREDIENT);
         }
 
-        // 입력받은 리스트에서 이상한 값일때
-        for (int i=0;i<parameters.getIngredientList().size();i++){
-            Boolean existIngredient = fridgeProvider.existIngredient(parameters.getIngredientList().get(i));
-            if (!existIngredient){
+        Boolean existIngredient = fridgeProvider.existIngredient(ingrdientName);
+        if (!existIngredient){
             return new BaseResponse<>(NOT_FOUND_INGREDIENT);
-            }
         }
+
 
 
         try {
@@ -268,9 +273,11 @@ public class FridgeController {
             for (ShelfLifeUser shelfLifeUser : shelfLifeUsers ){
                 Integer userIdx = shelfLifeUser.getUserIdx();  //디바이스토큰으로
                 String ingredientName = shelfLifeUser.getIngredientName();
+                User user = userProvider.retrieveUserByUserIdx(userIdx);
+                String deviceToken = user.getDeviceToken();
 
-                String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userIdx,ingredientName); //디바이스토큰으로
-
+//                String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(userIdx,ingredientName); //디바이스토큰으로
+                String notifications = AndroidPushPeriodicNotifications.PeriodicNotificationJson(deviceToken,ingredientName); //디바이스토큰으로
 
                 HttpEntity<String> request = new HttpEntity<>(notifications);
 
@@ -355,6 +362,26 @@ public class FridgeController {
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
+    }
+
+
+    /**
+     * 푸시알림 API
+     * [POST] /fcm
+     * @return BaseResponse<Void>
+     */
+//    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
+    @PostMapping("/fcm")
+    public  BaseResponse<Void> postFcm() throws BaseException,IOException {
+
+        String targetToken = "dsiQzbjDS9SQYyQFyiwGkM:APA91bHMq0mUdROfC-bmWXJ9-wq09MvvwFyZPO0UooU8jJibdzYoDpFONaXt8yNPBs36fRToy4vSlZHkbI4mCFss06o6uu8gC0U5EZqzxKe-_lB2S78BgdnUsmbmheTef3SMgueJUX5G";
+        String title = "title-test";
+        String body = "body-test";
+
+        firebaseCloudMessageService.sendMessageTo(targetToken,title,body);
+
+        return new BaseResponse<>(SUCCESS);
+
     }
 
 }

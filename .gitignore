@@ -9,6 +9,7 @@ nohup.out
 /logs/*
 application.yml
 Secret.java
+recipeapp-key.json
 
 ### STS ###
 .apt_generated

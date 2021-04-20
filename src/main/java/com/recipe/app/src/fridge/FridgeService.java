@@ -138,24 +138,19 @@ public class FridgeService {
     public void deleteFridgeIngredient(Integer userIdx, DeleteFridgesIngredientReq parameters) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-        for (int i=0;i<parameters.getIngredientList().size();i++){
-            String ingredientName = parameters.getIngredientList().get(i);
-            Fridge fridge;
-            try {
-                fridge = fridgeRepository.findByIngredientNameAndStatus(ingredientName,"ACTIVE");
-            } catch (Exception ignored) {
-                throw new BaseException(FAILED_TO_GET_FRIDGE);
-            }
+        String ingredientName = parameters.getIngredientName();
+        Fridge fridge;
+        try {
+            fridge = fridgeRepository.findByIngredientNameAndStatus(ingredientName,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_FRIDGE);
+        }
 
-            try {
-                fridge.setStatus("INACTIVE");
-                fridgeRepository.save(fridge);
-
-
-            } catch (Exception exception) {
-                throw new BaseException(FAILED_TO_DELETE_FRIDGE);
-            }
-
+        try {
+            fridge.setStatus("INACTIVE");
+            fridgeRepository.save(fridge);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_DELETE_FRIDGE);
         }
 
 

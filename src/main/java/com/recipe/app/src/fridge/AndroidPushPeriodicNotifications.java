@@ -5,7 +5,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class AndroidPushPeriodicNotifications {
-    public static String PeriodicNotificationJson(Integer userIdx,String ingredientName) throws JSONException {
+//    public static String PeriodicNotificationJson(Integer userIdx,String ingredientName) throws JSONException {
+    public static String PeriodicNotificationJson(String deviceToken,String ingredientName) throws JSONException {
 
 //        String sampleData[] = {"device token value 1","device token value 2","device token value 3"};
 
@@ -27,7 +28,7 @@ public class AndroidPushPeriodicNotifications {
 
         JSONObject body = new JSONObject();
         JSONArray array = new JSONArray();
-        array.put(userIdx);
+        array.put(deviceToken);
 
 //        for(int i=0; i<tokenlist.size(); i++) {
 //            array.put(tokenlist.get(i));

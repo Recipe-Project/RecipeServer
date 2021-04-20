@@ -109,7 +109,7 @@ public enum BaseResponseStatus {
 
 
     // [DELETE] /fridges/ingredient
-    EMPTY_INGREDIENT_LIST(false, 2078, "삭제할 재료 리스트를 입력하세요."),
+    EMPTY_INGREDIENT(false, 2078, "삭제할 재료를 입력하세요."),
 
     // [PATCH] /fridge/ingredient
     EMPTY_PATCH_FRIDGE_LIST(false, 2079, "수정할 냉장고 재료 리스트를 입력하세요."),
@@ -238,7 +238,6 @@ public enum BaseResponseStatus {
     // [DELETE] /fridges/basket?ingredient=
     FAILED_TO_GET_FRIDGE_BASKET(false, 3065, "냉장고 바구니 조회에 실패했습니다."),
     FAILED_TO_DELETE_FRIDGE_BASKET(false, 3066, "냉장고 바구니 삭제에 실패했습니다."),
-    EMPTY_INGREDIENT(false, 3067, "삭제할 재료를 입력해주세요."),
 
     // [PATCH] /fcm/token
     FAILED_TO_PATCH_FCM_TOKEN(false, 3072, "fcm 토큰 수정에 실패했습니다."),
