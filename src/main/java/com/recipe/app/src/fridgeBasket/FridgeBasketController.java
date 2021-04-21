@@ -5,6 +5,8 @@ import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.fridgeBasket.models.*;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.ingredient.models.Ingredient;
+import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,15 +20,17 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 public class FridgeBasketController {
     private final FridgeBasketProvider fridgeBasketProvider;
     private final FridgeBasketService fridgeBasketService;
+    private final UserProvider userProvider;
     private final FridgeBasketRepository fridgeBasketRepository;
     private final IngredientProvider ingredientProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeBasketController(FridgeBasketProvider fridgeBasketProvider, FridgeBasketService fridgeBasketService, FridgeBasketRepository fridgeBasketRepository, IngredientProvider ingredientProvider, JwtService jwtService) {
+    public FridgeBasketController(FridgeBasketProvider fridgeBasketProvider, FridgeBasketService fridgeBasketService, UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository, IngredientProvider ingredientProvider, JwtService jwtService) {
 
         this.fridgeBasketProvider = fridgeBasketProvider;
         this.fridgeBasketService = fridgeBasketService;
+        this.userProvider = userProvider;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.ingredientProvider = ingredientProvider;
         this.jwtService = jwtService;
@@ -49,10 +53,12 @@ public class FridgeBasketController {
                 return new BaseResponse<>(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
             }
 
+            User user = userProvider.retrieveUserByUserIdx(userIdx);
+
             for(Integer ingredientIdx : ingredientList){
                 Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
                 String ingredientName = ingredient.getName();
-                Boolean existIngredientName = fridgeBasketRepository.existsByIngredientNameAndStatus(ingredientName,"ACTIVE");
+                Boolean existIngredientName = fridgeBasketRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
                 if(existIngredientName){
                     return new BaseResponse<>(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME,ingredientName);
                 }
@@ -91,7 +97,7 @@ public class FridgeBasketController {
             }
 
             // name 이 이미 바구니에 있다면
-            FridgeBasket fridgeBasket = fridgeBasketProvider.retreiveFridgeBasketByName(parameters.getIngredientName());
+            FridgeBasket fridgeBasket = fridgeBasketProvider.retreiveFridgeBasketByName(parameters.getIngredientName(),userIdx);
             if (fridgeBasket != null) {
                 return new BaseResponse<>(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME,parameters.getIngredientName());
             }

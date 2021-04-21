@@ -170,14 +170,15 @@ public class FridgeProvider {
 
     /**
      * 재료명 존재여부
-     * @param ingredientName
+     * @param ingredientName,userIdx
      * @return Boolean
      * @throws BaseException
      */
-    public Boolean existIngredient(String ingredientName) throws BaseException {
+    public Boolean existIngredient(String ingredientName,int userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
         Boolean existIngredient;
         try {
-            existIngredient = fridgeRepository.existsByIngredientNameAndStatus(ingredientName,"ACTIVE");
+            existIngredient = fridgeRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_NAME);
         }

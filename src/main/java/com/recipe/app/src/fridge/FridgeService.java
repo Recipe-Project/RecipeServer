@@ -141,7 +141,7 @@ public class FridgeService {
         String ingredientName = parameters.getIngredientName();
         Fridge fridge;
         try {
-            fridge = fridgeRepository.findByIngredientNameAndStatus(ingredientName,"ACTIVE");
+            fridge = fridgeRepository.findByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_FRIDGE);
         }

@@ -30,14 +30,15 @@ public class FridgeBasketProvider {
 
     /**
      * FridgeBasket에서 재료명으로 재료 조회하기
-     * @param name
+     * @param name,userIdx
      * @return FridgeBasket
      * @throws BaseException
      */
-    public FridgeBasket retreiveFridgeBasketByName(String name) throws BaseException {
+    public FridgeBasket retreiveFridgeBasketByName(String name,int userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
         FridgeBasket fridgeBasket;
         try {
-            fridgeBasket = fridgeBasketRepository.findByIngredientNameAndStatus(name,"ACTIVE");
+            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user,name,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
         }

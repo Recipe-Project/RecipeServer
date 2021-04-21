@@ -61,11 +61,11 @@ public class FridgeController {
             if (fridgeBasketList.isEmpty()) {
                 return new BaseResponse<>(POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST);
             }
-
+            User user = userProvider.retrieveUserByUserIdx(userIdx);
             for (int i = 0; i < fridgeBasketList.size(); i++) {
                 String ingredientName = fridgeBasketList.get(i).getIngredientName();
 
-                Boolean existIngredientName = fridgeRepository.existsByIngredientNameAndStatus(ingredientName, "ACTIVE");
+                Boolean existIngredientName = fridgeRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName, "ACTIVE");
 
                 if (existIngredientName) {
                     return new BaseResponse<>(POST_FRIDGES_EXIST_INGREDIENT_NAME,ingredientName);
@@ -118,8 +118,8 @@ public class FridgeController {
         if (ingrdientName == null || ingrdientName.equals("")) {
             return new BaseResponse<>(EMPTY_INGREDIENT);
         }
-
-        Boolean existIngredient = fridgeProvider.existIngredient(ingrdientName);
+        Integer userIdx = jwtService.getUserId();
+        Boolean existIngredient = fridgeProvider.existIngredient(ingrdientName,userIdx);
         if (!existIngredient){
             return new BaseResponse<>(NOT_FOUND_INGREDIENT);
         }
@@ -127,7 +127,7 @@ public class FridgeController {
 
 
         try {
-            Integer userIdx = jwtService.getUserId();
+
             fridgeService.deleteFridgeIngredient(userIdx,parameters);
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
@@ -159,8 +159,8 @@ public class FridgeController {
 
             for (int i = 0; i < patchFridgeList.size(); i++) {
                 String ingredientName = patchFridgeList.get(i).getIngredientName();
-
-                Boolean existIngredientName = fridgeRepository.existsByIngredientNameAndStatus(ingredientName, "ACTIVE");
+                User user = userProvider.retrieveUserByUserIdx(userIdx);
+                Boolean existIngredientName = fridgeRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName, "ACTIVE");
 
                 if (!existIngredientName) {
                     return new BaseResponse<>(NOT_FOUND_INGREDIENT);
