@@ -139,9 +139,12 @@ public class UserRecipeService {
             UserRecipe userRecipe = new UserRecipe(user, thumbnail, title, content);
             userRecipe = userRecipeRepository.save(userRecipe);
             userRecipeIdx = userRecipe.getUserRecipeIdx();
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE);
+        }
 
 
-
+        try {
             if (ingredientList!=null) {
                 for (int i = 0; i < ingredientList.size(); i++) {
                     Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientList.get(i));
@@ -152,7 +155,11 @@ public class UserRecipeService {
                     userRecipeIngredientRepository.save(userRecipeIngredient);
                 }
             }
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_INGREDIENT);
+        }
 
+        try {
             if (direcIngredientList !=null) {
                 for (int i = 0; i < direcIngredientList.size(); i++) {
                     String ingredientIcon = direcIngredientList.get(i).getIngredientIcon();
@@ -161,10 +168,8 @@ public class UserRecipeService {
                     userRecipeIngredientRepository.save(userRecipeIngredient);
                 }
             }
-
-
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_MY_RECIPE);
+            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_DIRECT_INGREDIENT);
         }
 
         return new PostMyRecipeRes(userRecipeIdx,thumbnail,title,content,ingredientList,direcIngredientList);

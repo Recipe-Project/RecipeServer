@@ -221,4 +221,22 @@ public class IngredientProvider {
         return ingredient;
     }
 
+    /**
+     * ingredientIdx로 재료 존재 여부 확인
+     *
+     * @param ingredientIdx
+     * @return existIngredient
+     * @throws BaseException
+     */
+    public Boolean existIngredient(Integer ingredientIdx) throws BaseException {
+        Boolean existIngredient;
+
+        try {
+            existIngredient = ingredientRepository.existsByIngredientIdxAndStatus(ingredientIdx,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_GET_INGREDIENT);
+        }
+
+        return existIngredient;
+    }
 }

@@ -65,6 +65,9 @@ public enum BaseResponseStatus {
     EMPTY_TITLE(false, 2050, "제목을 입력해주세요."),
     EMPTY_CONTENT(false, 2051, "내용을 입력해주세요."),
     EMPTY_THUMBNAIL(false, 2052, "썸네일을 입력해주세요."),
+    INVALID_INGREDIENT_IDX(false, 2053, "재료리스트에 존재하지 않는 재료인덱스입니다."),
+    EMPTY_INGREDIENT_NAME(false, 2082, "재료 직접입력 - 재료명을 입력하세요."),
+    EMPTY_INGREDIENT_ICON(false, 2083, "재료 직접입력 - 재료 아이콘을 입력하세요."),
 
     // [PATCH] /my-recipes/:myRecipeIdx
     EMPTY_MY_RECIPEIDX(false, 2054, "나만의 레시피 인덱스값을 입력해주세요."),
@@ -120,6 +123,8 @@ public enum BaseResponseStatus {
 
     // [PATCH] /fcm/token
     EMPTY_FCM_TOKEN(false, 2081, "FCM 토큰을 입력하세요."),
+
+    // 2084부터 가능
     /**
      * 3000 : Response 오류
      */
@@ -153,7 +158,9 @@ public enum BaseResponseStatus {
     NO_FOUND_MY_RECIPE(false, 3026, "존재하지 않는 나만의 레시피입니다."),
 
     // [POST] /my-recipes
-    FAILED_TO_POST_MY_RECIPE(false, 3027, "나만의 레시피 생성에 실패하였습니다."),
+    FAILED_TO_SAVE_MY_RECIPE(false, 3027, "나만의 레시피 생성 저장에 실패하였습니다."),
+    FAILED_TO_SAVE_MY_RECIPE_INGREDIENT(false, 3072, "나만의 레시피 재료 저장에 실패하였습니다."),
+    FAILED_TO_SAVE_MY_RECIPE_DIRECT_INGREDIENT(false, 3073, "나만의 레시피 직접입력 재료 저장에 실패하였습니다."),
 
     // [PATCH] /my-recipes/:myRecipeIdx
     FAILED_TO_PATCH_MY_RECIPE(false, 3028, "나만의 레시피 수정에 실패하였습니다."),
@@ -244,7 +251,7 @@ public enum BaseResponseStatus {
 
     // [PATCH] /fcm/token
     FAILED_TO_PATCH_FCM_TOKEN(false, 3072, "fcm 토큰 수정에 실패했습니다."),
-    // 코드번호 3072부터 사용
+    // 코드번호 3074부터 사용
     /**
      * 4000 : Database, Server 오류
      */

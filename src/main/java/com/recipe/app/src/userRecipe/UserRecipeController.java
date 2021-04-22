@@ -2,6 +2,7 @@ package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.config.BaseResponse;
+import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,12 +18,14 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 public class UserRecipeController {
     private final UserRecipeProvider userRecipeProvider;
     private final UserRecipeService userRecipeService;
+    private final IngredientProvider ingredientProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public UserRecipeController(UserRecipeProvider userRecipeProvider, UserRecipeService userRecipeService, JwtService jwtService) {
+    public UserRecipeController(UserRecipeProvider userRecipeProvider, UserRecipeService userRecipeService, IngredientProvider ingredientProvider, JwtService jwtService) {
         this.userRecipeProvider = userRecipeProvider;
         this.userRecipeService = userRecipeService;
+        this.ingredientProvider = ingredientProvider;
         this.jwtService = jwtService;
     }
 
@@ -203,11 +206,36 @@ public class UserRecipeController {
 //                return new BaseResponse<>(EMPTY_THUMBNAIL);
 //            }
 
-            if (parameters.getTitle() == null) {
+            if (parameters.getTitle() == null) { //가능
                 return new BaseResponse<>(EMPTY_TITLE);
             }
             if (parameters.getContent() == null) {
                 return new BaseResponse<>(EMPTY_CONTENT);
+            }
+
+            List<Integer> ingredientList = parameters.getIngredientList();
+
+            // 재료리스트 올바른지
+            for (int i=0;i<ingredientList.size();i++){
+                Boolean existIngredient = ingredientProvider.existIngredient(ingredientList.get(i));
+                if(!existIngredient){
+                    return new BaseResponse<>(INVALID_INGREDIENT_IDX);
+                }
+            }
+
+
+            // 직접입력 재료리스트
+            List<MyRecipeIngredient> directIngredientList = parameters.getDirectIngredientList();
+            if (directIngredientList != null) {
+                for(int i=0;i<directIngredientList.size();i++){
+                    if(directIngredientList.get(i).getIngredientName()==null){
+                        return new BaseResponse<>(EMPTY_INGREDIENT_NAME);
+                    }
+                    if(directIngredientList.get(i).getIngredientIcon()==null){
+                        return new BaseResponse<>(EMPTY_INGREDIENT_ICON);
+                    }
+
+                }
             }
 
             PostMyRecipeRes postMyRecipeRes = userRecipeService.createMyRecipe(parameters,userIdx);
