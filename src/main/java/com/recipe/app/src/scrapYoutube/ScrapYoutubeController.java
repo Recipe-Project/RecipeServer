@@ -42,25 +42,25 @@ public class ScrapYoutubeController {
             Integer userIdx = jwtService.getUserId();
 
 
-            if (parameters.getTitle() != null && parameters.getTitle() ==null) {
+            if (parameters.getTitle() == null || parameters.getTitle().length()==0) {
                 return new BaseResponse<>(EMPTY_TITLE);
             }
-            if (parameters.getThumbnail() == null && parameters.getThumbnail() !=null) {
+            if (parameters.getThumbnail() == null || parameters.getThumbnail().length()==0) {
                 return new BaseResponse<>(EMPTY_THUMBNAIL);
             }
-            if (parameters.getYoutubeUrl() != null && parameters.getYoutubeUrl() ==null) {
+            if (parameters.getYoutubeUrl() == null || parameters.getYoutubeUrl().length()==0) {
                 return new BaseResponse<>(EMPTY_YOUTUBEURL);
             }
-            if (parameters.getPostDate() != null && parameters.getPostDate() ==null) {
+            if (parameters.getPostDate() == null || parameters.getPostDate().length()==0) {
                 return new BaseResponse<>(EMPTY_POST_DATE);
             }
-            if (parameters.getChannelName() != null && parameters.getChannelName() ==null) {
+            if (parameters.getChannelName() == null || parameters.getChannelName().length()==0) {
                 return new BaseResponse<>(EMPTY_CHANNEL_NAME);
             }
-            if (parameters.getYoutubeId() == null && parameters.getYoutubeId() !=null) {
+            if (parameters.getYoutubeId() == null || parameters.getYoutubeId().length()==0) {
                 return new BaseResponse<>(EMPTY_YOUTUBEIDX);
             }
-            if (parameters.getPlayTime() == null && parameters.getPlayTime() !=null) {
+            if (parameters.getPlayTime() == null || parameters.getPlayTime().length()==0) {
                 return new BaseResponse<>(EMPTY_PLAY_TIME);
             }
             if(!parameters.getThumbnail().matches("([^\\s]+(\\.(?i)(jpg|png|gif|pdf))$)")){

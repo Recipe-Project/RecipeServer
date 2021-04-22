@@ -36,7 +36,7 @@ public class UserRecipeProvider {
     }
 
     /**
-     * 나만의 레시피 전체조회
+     * 나만의 레시피 전체조회 API
      * @param userIdx
      * @return List<GetMyRecipesRes>
      * @throws BaseException
