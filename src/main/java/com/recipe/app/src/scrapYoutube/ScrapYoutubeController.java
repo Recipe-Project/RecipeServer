@@ -4,11 +4,13 @@ package com.recipe.app.src.scrapYoutube;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.config.BaseResponse;
-import com.recipe.app.src.scrapYoutube.models.*;
+import com.recipe.app.src.scrapYoutube.models.GetScrapYoutubesRes;
+import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeReq;
+import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeRes;
+import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
 
 import static com.recipe.app.config.BaseResponseStatus.*;
 
@@ -39,6 +41,7 @@ public class ScrapYoutubeController {
         try {
             Integer userIdx = jwtService.getUserId();
 
+
             if (parameters.getTitle() != null && parameters.getTitle() ==null) {
                 return new BaseResponse<>(EMPTY_TITLE);
             }
@@ -60,6 +63,19 @@ public class ScrapYoutubeController {
             if (parameters.getPlayTime() == null && parameters.getPlayTime() !=null) {
                 return new BaseResponse<>(EMPTY_PLAY_TIME);
             }
+            if(!parameters.getThumbnail().matches("([^\\s]+(\\.(?i)(jpg|png|gif|pdf))$)")){
+                return new BaseResponse<>(INVALID_THUMBNAIL);
+            }
+            if (!parameters.getYoutubeUrl().matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
+                return new BaseResponse<>(INVALID_YOUTUBE_URL);
+            }
+            if (!parameters.getPostDate().matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
+                return new BaseResponse<>(INVALID_POST_DATE);
+            }
+//            if (!parameters.getPlayTime().matches("^([0-5]?[0-9]:[0-5][0-9]):[0-5][0-9]$")|!parameters.getPlayTime().matches("^([1-2]?[0-9]:[0-5][0-9]):[0-5][0-9]:[0-5][0-9]$")) { // 1~23
+//                return new BaseResponse<>(INVALID_PLAY_TIME);
+//            }
+
 
             // 이미 발급 받은건지
             ScrapYoutube scrapYoutube = null;
@@ -72,6 +88,7 @@ public class ScrapYoutubeController {
                 return new BaseResponse<>(postScrapYoutubeRes);
             }
             else{
+                // 새로 만들지
                 postScrapYoutubeRes = scrapYoutubeService.createScrapYoutube(parameters,userIdx);
                 return new BaseResponse<>(postScrapYoutubeRes);
             }

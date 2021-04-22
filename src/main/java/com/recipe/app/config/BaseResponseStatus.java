@@ -75,6 +75,9 @@ public enum BaseResponseStatus {
     EMPTY_CHANNEL_NAME(false, 2057, "유튜브 채널명을 입력해주세요."),
     EMPTY_YOUTUBEIDX(false, 2058, "유튜브 인덱스를 입력해주세요."),
     EMPTY_PLAY_TIME(false, 2053, "영상 재생시간을 입력해주세요."),
+    INVALID_THUMBNAIL(false, 2054, "유효하지 않은 이미지타입-jpg,png,gif,pdf 형식의 이미지를 입력하세요."),
+    INVALID_YOUTUBE_URL(false, 2055, "유효하지 않은 url 타입입니다."),
+    INVALID_POST_DATE(false, 2056, "유효하지 않은 날짜 타입-YYYY.MM.DD 형식으로 입력하세요."),
 
     // [POST] /scraps/blog
     POST_SCRAP_BLOG_EMPTY_TITLE(false, 2059, "제목을 입력해주세요."),
