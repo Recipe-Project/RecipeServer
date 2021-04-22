@@ -184,6 +184,13 @@ public class UserRecipeService {
     @Transactional
     public PatchMyRecipeRes updateMyRecipe(PatchMyRecipeReq patchMyRecipeReq, Integer userIdx, Integer userRecipeIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
+
+        String thumbnail = patchMyRecipeReq.getThumbnail();
+        String title = patchMyRecipeReq.getTitle();
+        String content = patchMyRecipeReq.getContent();
+        List<Integer> ingredientList = patchMyRecipeReq.getIngredientList();
+        List<MyRecipeIngredient> direcIngredientList = patchMyRecipeReq.getDirectIngredientList();
+
         UserRecipe userRecipe;
         try {
             userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user,userRecipeIdx,"ACTIVE");
@@ -198,24 +205,26 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_GET_MY_RECIPE_INGREDIENTS);
         }
 
-        String thumbnail = patchMyRecipeReq.getThumbnail();
-        String title = patchMyRecipeReq.getTitle();
-        String content = patchMyRecipeReq.getContent();
-        List<Integer> ingredientList = patchMyRecipeReq.getIngredientList();
-        List<MyRecipeIngredient> direcIngredientList = patchMyRecipeReq.getDirectIngredientList();
         try {
             userRecipe.setThumbnail(thumbnail);
             userRecipe.setTitle(title);
             userRecipe.setContent(content);
             userRecipeRepository.save(userRecipe);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_PATCH_MY_RECIPE);
+        }
 
-
+        try {
             // 재료 삭제
             for (int i=0;i<userRecipeIngredientList.size();i++){
                 userRecipeIngredientList.get(i).setStatus("INACTIVE");
             }
             userRecipeIngredientRepository.saveAll(userRecipeIngredientList);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_DELETE_MY_RECIPE_INGREDIENT);
+        }
 
+        try {
             if (ingredientList!=null) {
                 for (int i = 0; i < ingredientList.size(); i++) {
                     Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientList.get(i));
@@ -227,6 +236,11 @@ public class UserRecipeService {
                 }
             }
 
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_INGREDIENT);
+        }
+
+        try {
             if (direcIngredientList !=null) {
                 for (int i = 0; i < direcIngredientList.size(); i++) {
                     String ingredientIcon = direcIngredientList.get(i).getIngredientIcon();
@@ -235,14 +249,50 @@ public class UserRecipeService {
                     userRecipeIngredientRepository.save(userRecipeIngredient);
                 }
             }
-
-
-
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_PATCH_MY_RECIPE);
+            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_DIRECT_INGREDIENT);
         }
-        return new PatchMyRecipeRes(thumbnail,title,content,ingredientList,direcIngredientList);
 
+
+//        try {
+//            userRecipe.setThumbnail(thumbnail);
+//            userRecipe.setTitle(title);
+//            userRecipe.setContent(content);
+//            userRecipeRepository.save(userRecipe);
+//
+//
+//            // 재료 삭제
+//            for (int i=0;i<userRecipeIngredientList.size();i++){
+//                userRecipeIngredientList.get(i).setStatus("INACTIVE");
+//            }
+//            userRecipeIngredientRepository.saveAll(userRecipeIngredientList);
+//
+//            if (ingredientList!=null) {
+//                for (int i = 0; i < ingredientList.size(); i++) {
+//                    Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientList.get(i));
+//                    String ingredientIcon = ingredient.getIcon();
+//                    String ingredientName = ingredient.getName();
+//
+//                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx,ingredient,ingredientIcon,ingredientName);
+//                    userRecipeIngredientRepository.save(userRecipeIngredient);
+//                }
+//            }
+//
+//            if (direcIngredientList !=null) {
+//                for (int i = 0; i < direcIngredientList.size(); i++) {
+//                    String ingredientIcon = direcIngredientList.get(i).getIngredientIcon();
+//                    String ingredientName = direcIngredientList.get(i).getIngredientName();
+//                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx,null,ingredientIcon,ingredientName);
+//                    userRecipeIngredientRepository.save(userRecipeIngredient);
+//                }
+//            }
+//
+//
+//
+//        } catch (Exception ignored) {
+//            throw new BaseException(FAILED_TO_PATCH_MY_RECIPE);
+//        }
+        return new PatchMyRecipeRes(thumbnail,title,content,ingredientList,direcIngredientList);
 
     }
 

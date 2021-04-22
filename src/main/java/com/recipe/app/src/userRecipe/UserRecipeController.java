@@ -205,33 +205,36 @@ public class UserRecipeController {
 //            if (parameters.getThumbnail() ==null) {
 //                return new BaseResponse<>(EMPTY_THUMBNAIL);
 //            }
-
-            if (parameters.getTitle() == null) { //가능
+            if (parameters.getTitle() == null || parameters.getTitle().length()==0 ) {
                 return new BaseResponse<>(EMPTY_TITLE);
             }
-            if (parameters.getContent() == null) {
+            if (parameters.getContent() == null || parameters.getContent().length()==0 ) {
                 return new BaseResponse<>(EMPTY_CONTENT);
             }
 
+
             List<Integer> ingredientList = parameters.getIngredientList();
 
-            // 재료리스트 올바른지
-            for (int i=0;i<ingredientList.size();i++){
-                Boolean existIngredient = ingredientProvider.existIngredient(ingredientList.get(i));
-                if(!existIngredient){
-                    return new BaseResponse<>(INVALID_INGREDIENT_IDX);
+            if (ingredientList !=null) {
+                // 재료리스트 올바른지
+                for (int i=0;i<ingredientList.size();i++){
+                    Boolean existIngredient = ingredientProvider.existIngredient(ingredientList.get(i));
+                    if(!existIngredient){
+                        return new BaseResponse<>(INVALID_INGREDIENT_IDX);
+                    }
                 }
             }
 
 
+
             // 직접입력 재료리스트
             List<MyRecipeIngredient> directIngredientList = parameters.getDirectIngredientList();
-            if (directIngredientList != null) {
+            if (directIngredientList!=null) {
                 for(int i=0;i<directIngredientList.size();i++){
-                    if(directIngredientList.get(i).getIngredientName()==null){
+                    if(directIngredientList.get(i).getIngredientName()==null || directIngredientList.get(i).getIngredientName().length()==0 ){
                         return new BaseResponse<>(EMPTY_INGREDIENT_NAME);
                     }
-                    if(directIngredientList.get(i).getIngredientIcon()==null){
+                    if(directIngredientList.get(i).getIngredientIcon()==null || directIngredientList.get(i).getIngredientIcon().length()==0 ){
                         return new BaseResponse<>(EMPTY_INGREDIENT_ICON);
                     }
 
@@ -257,28 +260,58 @@ public class UserRecipeController {
     @ResponseBody
     @PatchMapping("{myRecipeIdx}")
     public BaseResponse<PatchMyRecipeRes> patchMyRecipe(@PathVariable Integer myRecipeIdx, @RequestBody PatchMyRecipeReq parameters) throws BaseException {
-        Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
-        if (!existMyRecipe){
-            return new BaseResponse<>(NO_FOUND_MY_RECIPE);
-        }
+
 
         try {
+
             Integer userIdx = jwtService.getUserId();
+
+
+            Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
+            if (!existMyRecipe){
+                return new BaseResponse<>(NO_FOUND_MY_RECIPE);
+            }
+
 
             if (myRecipeIdx == null || myRecipeIdx <= 0) {
                 return new BaseResponse<>(EMPTY_MY_RECIPEIDX);
             }
+
 //            if (parameters.getThumbnail() ==null) {
 //                return new BaseResponse<>(EMPTY_THUMBNAIL);
 //            }
-            if (parameters.getTitle() == null) {
+
+            if (parameters.getTitle() == null || parameters.getTitle().length()==0 ) {
                 return new BaseResponse<>(EMPTY_TITLE);
             }
-            if (parameters.getContent() == null) {
+            if (parameters.getContent() == null || parameters.getContent().length()==0 ) {
                 return new BaseResponse<>(EMPTY_CONTENT);
             }
 
+            List<Integer> ingredientList = parameters.getIngredientList();
+            if (ingredientList !=null) {
+                // 재료리스트 올바른지
+                for (int i=0;i<ingredientList.size();i++){
+                    Boolean existIngredient = ingredientProvider.existIngredient(ingredientList.get(i));
+                    if(!existIngredient){
+                        return new BaseResponse<>(INVALID_INGREDIENT_IDX);
+                    }
+                }
+            }
 
+            // 직접입력 재료리스트
+            List<MyRecipeIngredient> directIngredientList = parameters.getDirectIngredientList();
+            if (directIngredientList !=null) {
+                for(int i=0;i<directIngredientList.size();i++){
+                    if(directIngredientList.get(i).getIngredientName()==null || directIngredientList.get(i).getIngredientName().length()==0 ){
+                        return new BaseResponse<>(EMPTY_INGREDIENT_NAME);
+                    }
+                    if(directIngredientList.get(i).getIngredientIcon()==null || directIngredientList.get(i).getIngredientIcon().length()==0 ){
+                        return new BaseResponse<>(EMPTY_INGREDIENT_ICON);
+                    }
+
+                }
+            }
 
             PatchMyRecipeRes patchMyRecipeRes = userRecipeService.updateMyRecipe(parameters,userIdx,myRecipeIdx);
             return new BaseResponse<>(patchMyRecipeRes);
