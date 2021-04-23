@@ -4,6 +4,8 @@ import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
 import com.recipe.app.src.fridgeBasket.models.IngredientList;
+import com.recipe.app.src.ingredient.IngredientProvider;
+import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
@@ -18,14 +20,37 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 @Service
 public class FridgeBasketProvider {
     private final UserProvider userProvider;
+    private final IngredientProvider ingredientProvider;
     private final FridgeBasketRepository fridgeBasketRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeBasketProvider(UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository,JwtService jwtService) {
+    public FridgeBasketProvider(UserProvider userProvider, IngredientProvider ingredientProvider, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
         this.userProvider = userProvider;
+        this.ingredientProvider = ingredientProvider;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.jwtService = jwtService;
+    }
+
+    /**
+     * 유저 냉장고 바구니에 이미 가지고 있는 재료인지 확인
+     * @param userIdx,ingredientIdx
+     * @return existIngredient
+     * @throws BaseException
+     */
+    public Boolean existIngredient(int userIdx,int ingredientIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
+        String ingredientName = ingredient.getName();
+
+        Boolean existIngredient;
+        try {
+            existIngredient = fridgeBasketRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
+        }
+
+        return existIngredient;
     }
 
     /**

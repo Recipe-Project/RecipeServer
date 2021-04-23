@@ -6,7 +6,6 @@ import com.recipe.app.src.fridgeBasket.models.*;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -36,6 +35,42 @@ public class FridgeBasketController {
         this.jwtService = jwtService;
     }
 
+//    /**
+//     * 재료 선택으로 냉장고 바구니 담기 API
+//     * [POST] /fridges/basket
+//     * @RequestBody parameters
+//     * @return BaseResponse<PostFridgesBasketRes>
+//     */
+//    @ResponseBody
+//    @PostMapping("/basket")
+//    public BaseResponse<Void> postFridgesBasket(@RequestBody PostFridgesBasketReq parameters) {
+//
+//        try {
+//            Integer userIdx = jwtService.getUserId();
+//            List<Integer> ingredientList = parameters.getIngredientList();
+//            if (ingredientList ==null || ingredientList.isEmpty()) {
+//                return new BaseResponse<>(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
+//            }
+//
+//            User user = userProvider.retrieveUserByUserIdx(userIdx);
+//
+//            for(Integer ingredientIdx : ingredientList){
+//                Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
+//                String ingredientName = ingredient.getName();
+//                Boolean existIngredientName = fridgeBasketRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
+//                if(existIngredientName){
+//                    return new BaseResponse<>(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME,ingredientName);
+//                }
+//            }
+////            List<PostFridgesBasketRes> postFridgesBasketRes = fridgeBasketService.createFridgesBasket(parameters,userIdx);
+//            fridgeBasketService.createFridgesBasket(parameters,userIdx);
+//
+//            return new BaseResponse<>(SUCCESS);
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//    }
+
     /**
      * 재료 선택으로 냉장고 바구니 담기 API
      * [POST] /fridges/basket
@@ -49,21 +84,18 @@ public class FridgeBasketController {
         try {
             Integer userIdx = jwtService.getUserId();
             List<Integer> ingredientList = parameters.getIngredientList();
-            if (ingredientList.isEmpty()) {
+            if (ingredientList == null || ingredientList.isEmpty()) {
                 return new BaseResponse<>(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
             }
 
-            User user = userProvider.retrieveUserByUserIdx(userIdx);
-
             for(Integer ingredientIdx : ingredientList){
+                Boolean existIngredientName = fridgeBasketProvider.existIngredient(userIdx,ingredientIdx);
                 Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
                 String ingredientName = ingredient.getName();
-                Boolean existIngredientName = fridgeBasketRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
                 if(existIngredientName){
                     return new BaseResponse<>(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME,ingredientName);
                 }
             }
-//            List<PostFridgesBasketRes> postFridgesBasketRes = fridgeBasketService.createFridgesBasket(parameters,userIdx);
             fridgeBasketService.createFridgesBasket(parameters,userIdx);
 
             return new BaseResponse<>(SUCCESS);
@@ -71,7 +103,6 @@ public class FridgeBasketController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
     /**
      * 재료 직접 입력으로 냉장고 바구니 담기 API
      * [POST] /fridges/direct-basket
