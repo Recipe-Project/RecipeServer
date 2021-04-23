@@ -80,7 +80,7 @@ public enum BaseResponseStatus {
     EMPTY_PLAY_TIME(false, 2053, "영상 재생시간을 입력해주세요."),
     INVALID_THUMBNAIL(false, 2054, "유효하지 않은 이미지타입-jpg,png,gif,pdf 형식의 이미지를 입력하세요."),
     INVALID_YOUTUBE_URL(false, 2055, "유효하지 않은 url 타입입니다."),
-    INVALID_POST_DATE(false, 2056, "유효하지 않은 날짜 타입-YYYY.MM.DD 형식으로 입력하세요."),
+    INVALID_DATE(false, 2056, "유효하지 않은 날짜 타입-YYYY.MM.DD 형식으로 입력하세요."),
 
     // [POST] /scraps/blog
     POST_SCRAP_BLOG_EMPTY_TITLE(false, 2059, "제목을 입력해주세요."),
@@ -106,6 +106,10 @@ public enum BaseResponseStatus {
     POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST(false, 2073, "냉장고 바구니 리스트를 입력해주세요."),
     FAILED_TO_POST_FRIDGES(false, 2074, "냉장고에 재료넣기를 실패했습니다."),
     POST_FRIDGES_EXIST_INGREDIENT_NAME(false, 2075, ""),
+    POST_FRIDGES_EMPTY_INGREDIENT_NAME(false, 2084, "재료명을 입력하세요."),
+    POST_FRIDGES_EMPTY_INGREDIENT_ICON(false, 2085, "재료 아이콘을 입력하세요."),
+    EMPTY_STORAGE_METHOD(false, 2086, "재료 보관방법을 입력하세요."),
+    EMPTY_INGREDIENT_COUNT(false, 2087, "재료 개수를 입력하세요."),
 
     // [POST] /views/blog
     POST_VIEW_BLOG_EMPTY_BLOGURL(false, 2076, "블로그 url을 입력해주세요."),
@@ -124,7 +128,7 @@ public enum BaseResponseStatus {
     // [PATCH] /fcm/token
     EMPTY_FCM_TOKEN(false, 2081, "FCM 토큰을 입력하세요."),
 
-    // 2084부터 가능
+    // 2088부터 가능
     /**
      * 3000 : Response 오류
      */
@@ -205,6 +209,9 @@ public enum BaseResponseStatus {
 
     // [GET] /fridges
     FAILED_TO_RETREIVE_FRIDGE_BY_USER(false, 3047, "유저로 냉장고 조회에 실패했습니다."),
+
+    // [POST] /fridges
+
 
 
     // receipts

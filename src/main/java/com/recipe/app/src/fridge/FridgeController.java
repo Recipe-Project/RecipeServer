@@ -58,21 +58,43 @@ public class FridgeController {
             List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
             Integer userIdx = jwtService.getUserId();
 
-            if (fridgeBasketList.isEmpty()) {
+            if (fridgeBasketList==null || fridgeBasketList.isEmpty()) {
                 return new BaseResponse<>(POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST);
             }
-            User user = userProvider.retrieveUserByUserIdx(userIdx);
+
+
             for (int i = 0; i < fridgeBasketList.size(); i++) {
                 String ingredientName = fridgeBasketList.get(i).getIngredientName();
+                String ingredientIcon = fridgeBasketList.get(i).getIngredientIcon();
+                Integer ingredientCategoryIdx = fridgeBasketList.get(i).getIngredientCategoryIdx();
+                String expiredAt = fridgeBasketList.get(i).getExpiredAt();
+                String storageMethod = fridgeBasketList.get(i).getStorageMethod();
+                Integer count = fridgeBasketList.get(i).getCount();
 
-                Boolean existIngredientName = fridgeRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName, "ACTIVE");
-
+                if (ingredientName == null || ingredientName.length()==0 ) {
+                    return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_NAME);
+                }
+                if (ingredientIcon == null || ingredientIcon.length()==0 ) {
+                    return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_ICON);
+                }
+                if (ingredientCategoryIdx == null || ingredientCategoryIdx<=0 ) {
+                    return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
+                }
+                if (storageMethod == null || storageMethod.length()==0 ) {
+                    return new BaseResponse<>(EMPTY_STORAGE_METHOD);
+                }
+                if (count == null || count<=0  ) {
+                    return new BaseResponse<>(EMPTY_INGREDIENT_COUNT);
+                }
+                if (expiredAt !=null && ingredientName.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
+                    return new BaseResponse<>(INVALID_DATE);
+                }
+                Boolean existIngredientName = fridgeProvider.existIngredient(ingredientName,userIdx);
                 if (existIngredientName) {
                     return new BaseResponse<>(POST_FRIDGES_EXIST_INGREDIENT_NAME,ingredientName);
                 }
+
             }
-
-
 
             List<PostFridgesRes> postFridgesBasketRes = fridgeService.createFridges(parameters,userIdx);
 
@@ -81,7 +103,6 @@ public class FridgeController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
-
 
     /**
      * 냉장고 조회 API

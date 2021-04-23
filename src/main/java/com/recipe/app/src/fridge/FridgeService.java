@@ -65,10 +65,7 @@ public class FridgeService {
 
         try {
             for (int i = 0; i < fridgeBasketList.size(); i++) {
-
-
                 String ingredientName = fridgeBasketList.get(i).getIngredientName();
-
 
                 String ingredientIcon = fridgeBasketList.get(i).getIngredientIcon();
 
@@ -87,7 +84,6 @@ public class FridgeService {
                     expiredAt = sdFormat.parse(expiredAtTmp);
                 }
 
-
                 String storageMethod = fridgeBasketList.get(i).getStorageMethod();
                 Integer count = fridgeBasketList.get(i).getCount();
 
@@ -96,17 +92,29 @@ public class FridgeService {
 
             }
 
-            List<FridgeBasket> fbList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_POST_FRIDGES);
+        }
 
 
+        // 냉장고 바구니 삭제
+        List<FridgeBasket> fbList;
+        try{
+            fbList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
+        }
+
+
+
+        try{
             // 재료 삭제
             for (int i=0;i<fbList.size();i++){
                 fbList.get(i).setStatus("INACTIVE");
             }
             fridgeBasketRepository.saveAll(fbList);
-
         } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_FRIDGES);
+            throw new BaseException(FAILED_TO_DELETE_FRIDGE_BASKET);
         }
 
         List<PostFridgesRes> postFridgesResList = new ArrayList<>();
@@ -127,7 +135,6 @@ public class FridgeService {
         return postFridgesResList;
 
     }
-
 
     /**
      * 냉장고 재료 삭제 API

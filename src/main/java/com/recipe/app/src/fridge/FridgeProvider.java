@@ -183,7 +183,6 @@ public class FridgeProvider {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_NAME);
         }
 
-
         return existIngredient;
     }
 

@@ -70,7 +70,7 @@ public class ScrapYoutubeController {
                 return new BaseResponse<>(INVALID_YOUTUBE_URL);
             }
             if (!parameters.getPostDate().matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
-                return new BaseResponse<>(INVALID_POST_DATE);
+                return new BaseResponse<>(INVALID_DATE);
             }
 //            if (!parameters.getPlayTime().matches("^([0-5]?[0-9]:[0-5][0-9]):[0-5][0-9]$")|!parameters.getPlayTime().matches("^([1-2]?[0-9]:[0-5][0-9]):[0-5][0-9]:[0-5][0-9]$")) { // 1~23
 //                return new BaseResponse<>(INVALID_PLAY_TIME);
