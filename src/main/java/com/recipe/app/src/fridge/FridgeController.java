@@ -10,7 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -268,55 +267,55 @@ public class FridgeController {
     }
 
 
-    /**
-     * 푸시알림 API - test
-     * [POST] /fcm-test
-     * @return BaseResponse<Void>
-     */
-//    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
-//    @Scheduled(fixedDelay = 10000) //10초마다
-    @PostMapping("/fcm-test")
-    public  BaseResponse<Void> posFcmTest() throws BaseException, IOException {
-
-        String targetToken = "dsiQzbjDS9SQYyQFyiwGkM:APA91bHMq0mUdROfC-bmWXJ9-wq09MvvwFyZPO0UooU8jJibdzYoDpFONaXt8yNPBs36fRToy4vSlZHkbI4mCFss06o6uu8gC0U5EZqzxKe-_lB2S78BgdnUsmbmheTef3SMgueJUX5G";
-        String title = "title-test";
-        String body = "body-test";
-
-        firebaseCloudMessageService.sendMessageTo(targetToken,title,body);
-
-        return new BaseResponse<>(SUCCESS);
-
-    }
-
-
-    /**
-     * 푸시알림 API
-     * [POST] /notification
-     * @return BaseResponse<Void>
-     */
-//    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
-    @PostMapping("/notification")
-    public  BaseResponse<Void> postNotification() throws BaseException ,IOException{
-
-        try {
-            // 유통기한 리스트 조회한다.
-            List<ShelfLifeUser> shelfLifeUsers =  fridgeProvider.retreiveShelfLifeUserList();
-
-            // 그 리스트로 알림 보낸다
-            for (ShelfLifeUser shelfLifeUser : shelfLifeUsers ){
-                String deviceToken = shelfLifeUser.getDeviceToken();
-                String title = "유통기한 알림";
-                String body = shelfLifeUser.getIngredientName()+"의 유통기한이 3일 남았습니다.";
-                System.out.println(deviceToken+"/"+title+"/"+body);
-                firebaseCloudMessageService.sendMessageTo(deviceToken,title,body);
-            }
-
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-
-    }
+//    /**
+//     * 푸시알림 API - test
+//     * [POST] /fcm-test
+//     * @return BaseResponse<Void>
+//     */
+////    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
+////    @Scheduled(fixedDelay = 10000) //10초마다
+//    @PostMapping("/fcm-test")
+//    public  BaseResponse<Void> posFcmTest() throws BaseException, IOException {
+//
+//        String targetToken = "dsiQzbjDS9SQYyQFyiwGkM:APA91bHMq0mUdROfC-bmWXJ9-wq09MvvwFyZPO0UooU8jJibdzYoDpFONaXt8yNPBs36fRToy4vSlZHkbI4mCFss06o6uu8gC0U5EZqzxKe-_lB2S78BgdnUsmbmheTef3SMgueJUX5G";
+//        String title = "title-test";
+//        String body = "body-test";
+//
+//        firebaseCloudMessageService.sendMessageTo(targetToken,title,body);
+//
+//        return new BaseResponse<>(SUCCESS);
+//
+//    }
+//
+//
+//    /**
+//     * 푸시알림 API
+//     * [POST] /notification
+//     * @return BaseResponse<Void>
+//     */
+////    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시 0 15 10 * * * 매일 10시 15분 //@Scheduled(fixedDelay = 10000) //10초마다
+//    @PostMapping("/notification")
+//    public  BaseResponse<Void> postNotification() throws BaseException ,IOException{
+//
+//        try {
+//            // 유통기한 리스트 조회한다.
+//            List<ShelfLifeUser> shelfLifeUsers =  fridgeProvider.retreiveShelfLifeUserList();
+//
+//            // 그 리스트로 알림 보낸다
+//            for (ShelfLifeUser shelfLifeUser : shelfLifeUsers ){
+//                String deviceToken = shelfLifeUser.getDeviceToken();
+//                String title = "유통기한 알림";
+//                String body = shelfLifeUser.getIngredientName()+"의 유통기한이 3일 남았습니다.";
+//                System.out.println(deviceToken+"/"+title+"/"+body);
+//                firebaseCloudMessageService.sendMessageTo(deviceToken,title,body);
+//            }
+//
+//            return new BaseResponse<>(SUCCESS);
+//        } catch (BaseException exception) {
+//            return new BaseResponse<>(exception.getStatus());
+//        }
+//
+//    }
 
 
 
