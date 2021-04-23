@@ -55,13 +55,8 @@ public class FridgeBasketService {
         try {
             for (int i = 0; i < ingredientList.size(); i++) {
                 Integer ingredientIdx = ingredientList.get(i);
-
                 Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
-
                 String ingredientName = ingredient.getName();
-
-
-
                 String ingredientIcon = ingredient.getIcon();
                 Integer ingredientCategoryIdx = ingredient.getIngredientCategory().getIngredientCategoryIdx();
                 IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
@@ -73,20 +68,7 @@ public class FridgeBasketService {
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_FRIDGES_BASKET);
         }
-//        List<PostFridgesBasketRes> postFridgesBasketResList = new ArrayList<>();
-//        for (int i = 0; i < ingredientList.size(); i++) {
-//            Integer ingredientIdx = ingredientList.get(i);
-//            Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
-//            FridgeBasket fridgeBasket = fridgeBasketRepository.findByIngredientAndStatus(ingredient,"ACTIVE");
-//            String ingredientName = fridgeBasket.getIngredientName();
-//            String ingredientIcon = fridgeBasket.getIngredientIcon();
-//            Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategory().getIngredientCategoryIdx();
-//
-//            PostFridgesBasketRes postFridgesBasketRes = new PostFridgesBasketRes(ingredientName,ingredientIcon,ingredientCategoryIdx);
-//            postFridgesBasketResList.add(postFridgesBasketRes);
-//
-//        }
-//        return postFridgesBasketResList;
+
 
     }
 

@@ -35,41 +35,6 @@ public class FridgeBasketController {
         this.jwtService = jwtService;
     }
 
-//    /**
-//     * 재료 선택으로 냉장고 바구니 담기 API
-//     * [POST] /fridges/basket
-//     * @RequestBody parameters
-//     * @return BaseResponse<PostFridgesBasketRes>
-//     */
-//    @ResponseBody
-//    @PostMapping("/basket")
-//    public BaseResponse<Void> postFridgesBasket(@RequestBody PostFridgesBasketReq parameters) {
-//
-//        try {
-//            Integer userIdx = jwtService.getUserId();
-//            List<Integer> ingredientList = parameters.getIngredientList();
-//            if (ingredientList ==null || ingredientList.isEmpty()) {
-//                return new BaseResponse<>(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
-//            }
-//
-//            User user = userProvider.retrieveUserByUserIdx(userIdx);
-//
-//            for(Integer ingredientIdx : ingredientList){
-//                Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
-//                String ingredientName = ingredient.getName();
-//                Boolean existIngredientName = fridgeBasketRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
-//                if(existIngredientName){
-//                    return new BaseResponse<>(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME,ingredientName);
-//                }
-//            }
-////            List<PostFridgesBasketRes> postFridgesBasketRes = fridgeBasketService.createFridgesBasket(parameters,userIdx);
-//            fridgeBasketService.createFridgesBasket(parameters,userIdx);
-//
-//            return new BaseResponse<>(SUCCESS);
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
 
     /**
      * 재료 선택으로 냉장고 바구니 담기 API
@@ -103,6 +68,7 @@ public class FridgeBasketController {
             return new BaseResponse<>(exception.getStatus());
         }
     }
+
     /**
      * 재료 직접 입력으로 냉장고 바구니 담기 API
      * [POST] /fridges/direct-basket
@@ -116,17 +82,16 @@ public class FridgeBasketController {
         try {
             Integer userIdx = jwtService.getUserId();
 
-            if (parameters.getIngredientName() == null) {
+            if (parameters.getIngredientName() == null || parameters.getIngredientName().length()==0) {
                 return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_NAME);
             }
 
-            if (parameters.getIngredientIcon() == null) {
+            if (parameters.getIngredientIcon() == null || parameters.getIngredientIcon().length()==0) {
                 return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_ICON);
             }
-            if (parameters.getIngredientCategoryIdx() == null) {
+            if (parameters.getIngredientCategoryIdx() == null || parameters.getIngredientCategoryIdx() <= 0) {
                 return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
             }
-
             // name 이 이미 바구니에 있다면
             FridgeBasket fridgeBasket = fridgeBasketProvider.retreiveFridgeBasketByName(parameters.getIngredientName(),userIdx);
             if (fridgeBasket != null) {
