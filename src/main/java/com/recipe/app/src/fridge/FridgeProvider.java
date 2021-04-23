@@ -290,7 +290,7 @@ public class FridgeProvider {
 
     /**
      * 유통기한 3일 남은 재료를 소유한 유저들 리스트 조회
-     * @return List
+     * @return shelfLifeUsers
      * @throws BaseException
      */
     public List<ShelfLifeUser> retreiveShelfLifeUserList() throws BaseException {
@@ -321,11 +321,11 @@ public class FridgeProvider {
 
                if(diffDay>2 && diffDay<=3){
 
-                   Integer userIdx = fridgeList.get(i).getUser().getUserIdx(); //테스트
-//                   String deviceToken = fridgeList.get(i).getUser().getDeviceToken(); //디바이스토큰
+//                   Integer userIdx = fridgeList.get(i).getUser().getUserIdx(); //테스트
+                   String deviceToken = fridgeList.get(i).getUser().getDeviceToken();
                    String ingredientName = fridgeList.get(i).getIngredientName();
 
-                   ShelfLifeUser shelfLifeUser = new ShelfLifeUser(userIdx,ingredientName); //디바이스토큰으로 바꿔
+                   ShelfLifeUser shelfLifeUser = new ShelfLifeUser(deviceToken,ingredientName);
                    shelfLifeUsers.add(shelfLifeUser);
                }
             }

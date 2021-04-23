@@ -7,6 +7,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class ShelfLifeUser {
-    private final Integer userIdx; //디바이스토큰으로
+    private final String deviceToken;
     private final String ingredientName;
 }
