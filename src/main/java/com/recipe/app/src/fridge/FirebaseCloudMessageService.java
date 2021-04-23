@@ -61,8 +61,7 @@ public class FirebaseCloudMessageService {
 
     private String getAccessToken() throws IOException {
 
-        String firebaseConfigPath = "/home/ubuntu/RecipeServer/src/main/resources/recipeapp-key.json";
-//        String firebaseConfigPath = "recipeapp-key.json";
+        String firebaseConfigPath = "recipeapp-key.json";
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
