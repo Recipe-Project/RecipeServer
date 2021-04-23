@@ -77,6 +77,7 @@ public class FridgeController {
                 if (ingredientIcon == null || ingredientIcon.length()==0 ) {
                     return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_ICON);
                 }
+                //int만 입력하도록?
                 if (ingredientCategoryIdx == null || ingredientCategoryIdx<=0 ) {
                     return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
                 }
@@ -86,12 +87,20 @@ public class FridgeController {
                 if (count == null || count<=0  ) {
                     return new BaseResponse<>(EMPTY_INGREDIENT_COUNT);
                 }
-                if (expiredAt !=null && ingredientName.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
+                if (expiredAt !=null && expiredAt.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
                     return new BaseResponse<>(INVALID_DATE);
                 }
                 Boolean existIngredientName = fridgeProvider.existIngredient(ingredientName,userIdx);
                 if (existIngredientName) {
                     return new BaseResponse<>(POST_FRIDGES_EXIST_INGREDIENT_NAME,ingredientName);
+                }
+                ArrayList storageMethods = new ArrayList();
+                storageMethods.add("냉장");
+                storageMethods.add("냉동");
+                storageMethods.add("실온");
+
+                if (!storageMethods.contains(storageMethod)){
+                    return new BaseResponse<>(INVALID_STORAGE_METHOD);
                 }
 
             }
@@ -157,7 +166,6 @@ public class FridgeController {
 
     }
 
-
     /**
      * 냉장고 재료 수정 API
      * [PATCH] /fridges/ingredient
@@ -173,30 +181,40 @@ public class FridgeController {
 
             List<PatchFridgeList> patchFridgeList = parameters.getPatchFridgeList();
 
-            if (patchFridgeList.isEmpty()) {
+            if (patchFridgeList==null || patchFridgeList.isEmpty()) {
                 return new BaseResponse<>(EMPTY_PATCH_FRIDGE_LIST);
             }
 
 
             for (int i = 0; i < patchFridgeList.size(); i++) {
                 String ingredientName = patchFridgeList.get(i).getIngredientName();
-                User user = userProvider.retrieveUserByUserIdx(userIdx);
-                Boolean existIngredientName = fridgeRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName, "ACTIVE");
+                String expiredAt = patchFridgeList.get(i).getExpiredAt();
+                String storageMethod = patchFridgeList.get(i).getStorageMethod();
+                Integer count = patchFridgeList.get(i).getCount();
 
+                if (ingredientName == null || ingredientName.length()==0 ) {
+                    return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_NAME);
+                }
+                if (storageMethod == null || storageMethod.length()==0 ) {
+                    return new BaseResponse<>(EMPTY_STORAGE_METHOD);
+                }
+                if (count == null || count<=0  ) {
+                    return new BaseResponse<>(EMPTY_INGREDIENT_COUNT);
+                }
+                if (expiredAt !=null && ingredientName.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
+                    return new BaseResponse<>(INVALID_DATE);
+                }
+                Boolean existIngredientName = fridgeProvider.existIngredient(ingredientName, userIdx);
                 if (!existIngredientName) {
                     return new BaseResponse<>(NOT_FOUND_INGREDIENT);
                 }
-
                 ArrayList storageMethods = new ArrayList();
                 storageMethods.add("냉장");
                 storageMethods.add("냉동");
                 storageMethods.add("실온");
-
-                String storageMethod = patchFridgeList.get(i).getStorageMethod();
                 if (!storageMethods.contains(storageMethod)){
                     return new BaseResponse<>(INVALID_STORAGE_METHOD);
                 }
-
 
             }
 
@@ -210,7 +228,7 @@ public class FridgeController {
 
 
     /**
-     * 냉장고 파먹기 API
+     * 냉장고 파먹기 조회 API
      * [GET] /fridges/recipe
      * @return BaseResponse<GetFridgesRecipeRes>
      */

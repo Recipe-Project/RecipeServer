@@ -177,16 +177,23 @@ public class FridgeService {
 
         List<PatchFridgeList> patchFridgeList = patchFridgesIngredientReq.getPatchFridgeList();
 
-
-
         try {
             for (int i = 0; i < patchFridgeList.size(); i++) {
 
                 String ingredientName = patchFridgeList.get(i).getIngredientName();
 
+
                 String expiredAtTmp = patchFridgeList.get(i).getExpiredAt();
-                DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
-                Date expiredAt = sdFormat.parse(expiredAtTmp);
+
+                Date expiredAt;
+                if (expiredAtTmp == null || expiredAtTmp.equals("")){
+                    expiredAt=null;
+                }
+                else{
+                    DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
+                    expiredAt = sdFormat.parse(expiredAtTmp);
+                }
+
 
                 String storageMethod = patchFridgeList.get(i).getStorageMethod();
                 Integer count = patchFridgeList.get(i).getCount();
