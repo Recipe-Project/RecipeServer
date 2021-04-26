@@ -125,9 +125,10 @@ public class UserService {
             JSONParser jsonParser = new JSONParser();
             JSONObject responObj = (JSONObject) jsonParser.parse(response);
             socialId = "naver_"+responObj.get("id").toString();
+            /*
             if(responObj.get("profile_image")!=null) {
                 profilePhoto = responObj.get("profile_image").toString();
-            }
+            }*/
             userName = responObj.get("name").toString();
             if(responObj.get("email")!=null) {
                 email = responObj.get("email").toString();
@@ -267,9 +268,10 @@ public class UserService {
             JSONObject profileObj = (JSONObject) jsonParser.parse(profile);
             userName = profileObj.get("nickname").toString();
 
+            /*
             if(profileObj.get("profile_image")!=null) {
                 profilePhoto = profileObj.get("profile_image").toString();
-            }
+            }*/
 
         }
         catch (Exception e){
@@ -346,14 +348,14 @@ public class UserService {
 
             String name;
             String email;
-            String imageUrl;
+            String imageUrl=null;
 
             JSONObject jsonObj = (JSONObject)jsonParser.parse(in);
 
             userId = "google_" + jsonObj.get("sub").toString();
             name = jsonObj.get("name").toString();
             email = jsonObj.get("email").toString();
-            imageUrl = jsonObj.get("picture").toString();
+            //imageUrl = jsonObj.get("picture").toString();
 
             User existsUserInfo = null;
 
