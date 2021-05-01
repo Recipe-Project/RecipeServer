@@ -90,33 +90,20 @@ public class UserRecipeController {
             }
 
 
-            List<Integer> ingredientList = parameters.getIngredientList();
 
-            if (ingredientList !=null) {
-                // 재료리스트 올바른지
-                for (int i=0;i<ingredientList.size();i++){
-                    Boolean existIngredient = ingredientProvider.existIngredient(ingredientList.get(i));
-                    if(!existIngredient){
-                        return new BaseResponse<>(INVALID_INGREDIENT_IDX);
-                    }
-                }
-            }
-
-
-
-            // 직접입력 재료리스트
-            List<MyRecipeIngredient> directIngredientList = parameters.getDirectIngredientList();
-            if (directIngredientList!=null) {
-                for(int i=0;i<directIngredientList.size();i++){
-                    if(directIngredientList.get(i).getIngredientName()==null || directIngredientList.get(i).getIngredientName().length()==0 ){
+            List<MyRecipeIngredient> ingredientList = parameters.getIngredientList();
+            if (ingredientList!=null) {
+                for(int i=0;i<ingredientList.size();i++){
+                    if(ingredientList.get(i).getIngredientName()==null || ingredientList.get(i).getIngredientName().length()==0 ){
                         return new BaseResponse<>(EMPTY_INGREDIENT_NAME);
                     }
-                    if(directIngredientList.get(i).getIngredientIcon()==null || directIngredientList.get(i).getIngredientIcon().length()==0 ){
+                    if(ingredientList.get(i).getIngredientIcon()==null || ingredientList.get(i).getIngredientIcon().length()==0 ){
                         return new BaseResponse<>(EMPTY_INGREDIENT_ICON);
                     }
 
                 }
             }
+
 
             PostMyRecipeRes postMyRecipeRes = userRecipeService.createMyRecipe(parameters,userIdx);
             return new BaseResponse<>(postMyRecipeRes);
@@ -126,7 +113,6 @@ public class UserRecipeController {
 
 
     }
-
     /**
      * 나만의 레시피 수정 API
      * [PATCH] /my-recipes/:myRecipeIdx
@@ -162,25 +148,14 @@ public class UserRecipeController {
                 return new BaseResponse<>(EMPTY_CONTENT);
             }
 
-            List<Integer> ingredientList = parameters.getIngredientList();
-            if (ingredientList !=null) {
-                // 재료리스트 올바른지
-                for (int i=0;i<ingredientList.size();i++){
-                    Boolean existIngredient = ingredientProvider.existIngredient(ingredientList.get(i));
-                    if(!existIngredient){
-                        return new BaseResponse<>(INVALID_INGREDIENT_IDX);
-                    }
-                }
-            }
 
-            // 직접입력 재료리스트
-            List<MyRecipeIngredient> directIngredientList = parameters.getDirectIngredientList();
-            if (directIngredientList !=null) {
-                for(int i=0;i<directIngredientList.size();i++){
-                    if(directIngredientList.get(i).getIngredientName()==null || directIngredientList.get(i).getIngredientName().length()==0 ){
+            List<MyRecipeIngredient> ingredientList = parameters.getIngredientList();
+            if (ingredientList !=null) {
+                for(int i=0;i<ingredientList.size();i++){
+                    if(ingredientList.get(i).getIngredientName()==null || ingredientList.get(i).getIngredientName().length()==0 ){
                         return new BaseResponse<>(EMPTY_INGREDIENT_NAME);
                     }
-                    if(directIngredientList.get(i).getIngredientIcon()==null || directIngredientList.get(i).getIngredientIcon().length()==0 ){
+                    if(ingredientList.get(i).getIngredientIcon()==null || ingredientList.get(i).getIngredientIcon().length()==0 ){
                         return new BaseResponse<>(EMPTY_INGREDIENT_ICON);
                     }
 

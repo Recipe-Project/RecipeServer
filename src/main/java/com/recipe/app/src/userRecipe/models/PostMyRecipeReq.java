@@ -12,6 +12,5 @@ public class PostMyRecipeReq {
     private String thumbnail;
     private String title;
     private String content;
-    private List ingredientList;
-    private List<MyRecipeIngredient> directIngredientList;
+    private List<MyRecipeIngredient> ingredientList;
 }

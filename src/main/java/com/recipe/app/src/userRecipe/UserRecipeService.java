@@ -2,7 +2,6 @@ package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.ingredient.IngredientProvider;
-import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.src.userRecipe.models.*;
@@ -55,8 +54,7 @@ public class UserRecipeService {
         String thumbnail = postMyRecipeReq.getThumbnail();
         String title = postMyRecipeReq.getTitle();
         String content = postMyRecipeReq.getContent();
-        List<Integer> ingredientList = postMyRecipeReq.getIngredientList();
-        List<MyRecipeIngredient> direcIngredientList = postMyRecipeReq.getDirectIngredientList();
+        List<MyRecipeIngredient> ingredientList = postMyRecipeReq.getIngredientList();
 
 
 
@@ -72,14 +70,14 @@ public class UserRecipeService {
         }
 
 
-        try {
-            if (ingredientList!=null) {
-                for (int i = 0; i < ingredientList.size(); i++) {
-                    Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientList.get(i));
-                    String ingredientIcon = ingredient.getIcon();
-                    String ingredientName = ingredient.getName();
 
-                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx,ingredient,ingredientIcon,ingredientName);
+
+        try {
+            if (ingredientList !=null) {
+                for (int i = 0; i < ingredientList.size(); i++) {
+                    String ingredientIcon = ingredientList.get(i).getIngredientIcon();
+                    String ingredientName = ingredientList.get(i).getIngredientName();
+                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx,null,ingredientIcon,ingredientName);
                     userRecipeIngredientRepository.save(userRecipeIngredient);
                 }
             }
@@ -87,22 +85,8 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_INGREDIENT);
         }
 
-        try {
-            if (direcIngredientList !=null) {
-                for (int i = 0; i < direcIngredientList.size(); i++) {
-                    String ingredientIcon = direcIngredientList.get(i).getIngredientIcon();
-                    String ingredientName = direcIngredientList.get(i).getIngredientName();
-                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx,null,ingredientIcon,ingredientName);
-                    userRecipeIngredientRepository.save(userRecipeIngredient);
-                }
-            }
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_DIRECT_INGREDIENT);
-        }
-
-        return new PostMyRecipeRes(userRecipeIdx,thumbnail,title,content,ingredientList,direcIngredientList);
+        return new PostMyRecipeRes(userRecipeIdx,thumbnail,title,content,ingredientList);
     }
-
     /**
      * 나만의 레시피 수정 API
      * @param patchMyRecipeReq,userIdx,userRecipeIdx
@@ -116,8 +100,7 @@ public class UserRecipeService {
         String thumbnail = patchMyRecipeReq.getThumbnail();
         String title = patchMyRecipeReq.getTitle();
         String content = patchMyRecipeReq.getContent();
-        List<Integer> ingredientList = patchMyRecipeReq.getIngredientList();
-        List<MyRecipeIngredient> direcIngredientList = patchMyRecipeReq.getDirectIngredientList();
+        List<MyRecipeIngredient> ingredientList = patchMyRecipeReq.getIngredientList();
 
         UserRecipe userRecipe;
         try {
@@ -152,38 +135,25 @@ public class UserRecipeService {
             throw new BaseException(FAILED_TO_DELETE_MY_RECIPE_INGREDIENT);
         }
 
+
+
         try {
-            if (ingredientList!=null) {
+            if (ingredientList !=null) {
                 for (int i = 0; i < ingredientList.size(); i++) {
-                    Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientList.get(i));
-                    String ingredientIcon = ingredient.getIcon();
-                    String ingredientName = ingredient.getName();
-
-                    UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx,ingredient,ingredientIcon,ingredientName);
-                    userRecipeIngredientRepository.save(userRecipeIngredient);
-                }
-            }
-
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_INGREDIENT);
-        }
-
-        try {
-            if (direcIngredientList !=null) {
-                for (int i = 0; i < direcIngredientList.size(); i++) {
-                    String ingredientIcon = direcIngredientList.get(i).getIngredientIcon();
-                    String ingredientName = direcIngredientList.get(i).getIngredientName();
+                    String ingredientIcon = ingredientList.get(i).getIngredientIcon();
+                    String ingredientName = ingredientList.get(i).getIngredientName();
                     UserRecipeIngredient userRecipeIngredient = new UserRecipeIngredient(userRecipeIdx,null,ingredientIcon,ingredientName);
                     userRecipeIngredientRepository.save(userRecipeIngredient);
                 }
             }
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_DIRECT_INGREDIENT);
+            throw new BaseException(FAILED_TO_SAVE_MY_RECIPE_INGREDIENT);
         }
 
-        return new PatchMyRecipeRes(thumbnail,title,content,ingredientList,direcIngredientList);
+        return new PatchMyRecipeRes(thumbnail,title,content,ingredientList);
 
     }
+
 
     /**
      * 나만의 레시피 삭제 API

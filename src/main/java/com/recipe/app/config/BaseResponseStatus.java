@@ -65,7 +65,6 @@ public enum BaseResponseStatus {
     EMPTY_TITLE(false, 2050, "제목을 입력해주세요."),
     EMPTY_CONTENT(false, 2051, "내용을 입력해주세요."),
     EMPTY_THUMBNAIL(false, 2052, "썸네일을 입력해주세요."),
-    INVALID_INGREDIENT_IDX(false, 2053, "재료리스트에 존재하지 않는 재료인덱스입니다."),
     EMPTY_INGREDIENT_NAME(false, 2082, "재료 직접입력 - 재료명을 입력하세요."),
     EMPTY_INGREDIENT_ICON(false, 2083, "재료 직접입력 - 재료 아이콘을 입력하세요."),
 
@@ -164,7 +163,6 @@ public enum BaseResponseStatus {
     // [POST] /my-recipes
     FAILED_TO_SAVE_MY_RECIPE(false, 3027, "나만의 레시피 생성 저장에 실패하였습니다."),
     FAILED_TO_SAVE_MY_RECIPE_INGREDIENT(false, 3072, "나만의 레시피 재료 저장에 실패하였습니다."),
-    FAILED_TO_SAVE_MY_RECIPE_DIRECT_INGREDIENT(false, 3073, "나만의 레시피 직접입력 재료 저장에 실패하였습니다."),
 
     // [PATCH] /my-recipes/:myRecipeIdx
     FAILED_TO_PATCH_MY_RECIPE(false, 3028, "나만의 레시피 수정에 실패하였습니다."),
