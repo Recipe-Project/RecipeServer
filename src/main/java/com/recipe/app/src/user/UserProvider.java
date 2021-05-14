@@ -86,7 +86,7 @@ public class UserProvider {
      * @throws BaseException
      */
     public GetUserRes retrieveUser(Integer jwtUserIdx, Integer userIdx) throws BaseException {
-        if(userIdx != jwtUserIdx){
+        if(userIdx != (int)jwtUserIdx){
             throw new BaseException(FORBIDDEN_USER);
         }
         User user = retrieveUserByUserIdx(jwtUserIdx);
@@ -120,19 +120,27 @@ public class UserProvider {
                     return -(o1.getCreatedAt().toString().compareTo(o2.getCreatedAt().toString()));
                 }
             });
-            int totalSize = userRecipes.size();
-            int size=6;
-            if(userRecipes.size()<6){
-                size = userRecipes.size();
+            int totalSize = 0;
+            for(int i=0;i<userRecipes.size();i++){
+                if(userRecipes.get(i).getStatus().equals("ACTIVE")){
+                    totalSize++;
+                }
             }
+            int size=0;
 
             List<MypageMyRecipeList> myRecipeList= new ArrayList<>();
-            for(int i=0;i<size;i++){
-                Integer myRecipeIdx = userRecipes.get(i).getUserRecipeIdx();
-                String myRecipeThumbnail = userRecipes.get(i).getThumbnail();
-                MypageMyRecipeList mypageMyRecipe = new MypageMyRecipeList(myRecipeIdx, myRecipeThumbnail);
+            for(int i=0;i<userRecipes.size();i++){
+                if(size==5){
+                    break;
+                }
+                if(userRecipes.get(i).getStatus().equals("ACTIVE")) {
+                    Integer myRecipeIdx = userRecipes.get(i).getUserRecipeIdx();
+                    String myRecipeThumbnail = userRecipes.get(i).getThumbnail();
+                    MypageMyRecipeList mypageMyRecipe = new MypageMyRecipeList(myRecipeIdx, myRecipeThumbnail);
 
-                myRecipeList.add(mypageMyRecipe);
+                    myRecipeList.add(mypageMyRecipe);
+                    size++;
+                }
             }
 
             return new GetUserRes(userIdx, profilePhoto, userName, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt, totalSize, myRecipeList);

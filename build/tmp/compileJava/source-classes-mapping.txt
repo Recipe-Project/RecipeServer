@@ -180,18 +180,18 @@ com/recipe/app/src/recipeProcess/RecipeProcessService.java
  com.recipe.app.src.recipeProcess.RecipeProcessService
 com/recipe/app/src/fridge/models/IngredientList.java
  com.recipe.app.src.fridge.models.IngredientList
-com/recipe/app/src/fridgeBasket/FridgeBasketProvider.java
- com.recipe.app.src.fridgeBasket.FridgeBasketProvider
+com/recipe/app/src/fridgeBasket/FridgeBasketRepository.java
+ com.recipe.app.src.fridgeBasket.FridgeBasketRepository
 com/recipe/app/src/ingredient/models/Ingredient.java
  com.recipe.app.src.ingredient.models.Ingredient
 com/recipe/app/src/receipt/ReceiptRepository.java
  com.recipe.app.src.receipt.ReceiptRepository
-com/recipe/app/src/userRecipeIngredient/UserRecipeIngredientProvider.java
- com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider
+com/recipe/app/src/fridge/models/ShelfLifeUser.java
+ com.recipe.app.src.fridge.models.ShelfLifeUser
 com/recipe/app/src/scrapBlog/models/ScrapBlog.java
  com.recipe.app.src.scrapBlog.models.ScrapBlog
-com/recipe/app/src/userRecipe/models/PostMyRecipeRes.java
- com.recipe.app.src.userRecipe.models.PostMyRecipeRes
+com/recipe/app/src/fridge/models/DeleteFridgesIngredientReq.java
+ com.recipe.app.src.fridge.models.DeleteFridgesIngredientReq
 com/recipe/app/src/fridge/models/PatchFcmTokenReq.java
  com.recipe.app.src.fridge.models.PatchFcmTokenReq
 com/recipe/app/src/fridge/models/GetFridgesRes.java
@@ -205,146 +205,146 @@ com/recipe/app/src/fridge/models/FcmMessage.java
  com.recipe.app.src.fridge.models.FcmMessage$Notification$NotificationBuilder
 com/recipe/app/src/fridge/models/Fridges.java
  com.recipe.app.src.fridge.models.Fridges
-com/recipe/app/src/userRecipe/UserRecipeController.java
- com.recipe.app.src.userRecipe.UserRecipeController
-com/recipe/app/config/BaseException.java
- com.recipe.app.config.BaseException
-com/recipe/app/src/ingredient/IngredientService.java
- com.recipe.app.src.ingredient.IngredientService
+com/recipe/app/src/scrapPublic/models/ScrapPublic.java
+ com.recipe.app.src.scrapPublic.models.ScrapPublic
+com/recipe/app/src/userRecipe/UserRecipeRepository.java
+ com.recipe.app.src.userRecipe.UserRecipeRepository
+com/recipe/app/src/userRecipe/models/UserRecipe.java
+ com.recipe.app.src.userRecipe.models.UserRecipe
 com/recipe/app/src/ingredient/models/GetIngredientsRes.java
  com.recipe.app.src.ingredient.models.GetIngredientsRes
 com/recipe/app/src/receipt/models/Receipt.java
  com.recipe.app.src.receipt.models.Receipt
 com/recipe/app/src/scrapYoutube/ScrapYoutubeRepository.java
  com.recipe.app.src.scrapYoutube.ScrapYoutubeRepository
-com/recipe/app/src/recipeKeyword/RecipeKeywordService.java
- com.recipe.app.src.recipeKeyword.RecipeKeywordService
+com/recipe/app/src/scrapPublic/ScrapPublicRepository.java
+ com.recipe.app.src.scrapPublic.ScrapPublicRepository
 com/recipe/app/src/viewBlog/models/ViewBlog.java
  com.recipe.app.src.viewBlog.models.ViewBlog
-com/recipe/app/src/scrapBlog/ScrapBlogService.java
- com.recipe.app.src.scrapBlog.ScrapBlogService
+com/recipe/app/src/scrapYoutube/models/ScrapYoutube.java
+ com.recipe.app.src.scrapYoutube.models.ScrapYoutube
 com/recipe/app/src/user/UserRepository.java
  com.recipe.app.src.user.UserRepository
 com/recipe/app/src/ingredient/IngredientRepository.java
  com.recipe.app.src.ingredient.IngredientRepository
-com/recipe/app/src/scrapYoutube/ScrapYoutubeService.java
- com.recipe.app.src.scrapYoutube.ScrapYoutubeService
-com/recipe/app/src/fridge/FridgeController.java
- com.recipe.app.src.fridge.FridgeController
-com/recipe/app/src/viewBlog/ViewBlogController.java
- com.recipe.app.src.viewBlog.ViewBlogController
+com/recipe/app/src/fridgeBasket/models/FridgeBasket.java
+ com.recipe.app.src.fridgeBasket.models.FridgeBasket
+com/recipe/app/src/fridge/FridgeRepository.java
+ com.recipe.app.src.fridge.FridgeRepository
+com/recipe/app/src/buy/models/Buy.java
+ com.recipe.app.src.buy.models.Buy
 com/recipe/app/src/ingredient/models/Ingredients.java
  com.recipe.app.src.ingredient.models.Ingredients
-com/recipe/app/src/ingredient/IngredientController.java
- com.recipe.app.src.ingredient.IngredientController
+com/recipe/app/src/userRecipe/models/MyRecipeIngredient.java
+ com.recipe.app.src.userRecipe.models.MyRecipeIngredient
 com/recipe/app/src/scrapBlog/ScrapBlogRepository.java
  com.recipe.app.src.scrapBlog.ScrapBlogRepository
+com/recipe/app/src/viewPublic/models/ViewPublic.java
+ com.recipe.app.src.viewPublic.models.ViewPublic
+com/recipe/app/src/userRecipeIngredient/models/UserRecipeIngredient.java
+ com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient
+com/recipe/app/src/fridge/FirebaseCloudMessageService.java
+ com.recipe.app.src.fridge.FirebaseCloudMessageService
+com/recipe/app/src/user/models/User.java
+ com.recipe.app.src.user.models.User
+com/recipe/app/src/fridge/models/Fridge.java
+ com.recipe.app.src.fridge.models.Fridge
+com/recipe/app/src/viewYoutube/models/ViewYoutube.java
+ com.recipe.app.src.viewYoutube.models.ViewYoutube
+com/recipe/app/config/BaseResponseStatus.java
+ com.recipe.app.config.BaseResponseStatus
+com/recipe/app/src/userRecipe/models/PatchMyRecipeRes.java
+ com.recipe.app.src.userRecipe.models.PatchMyRecipeRes
+com/recipe/app/config/BaseException.java
+ com.recipe.app.config.BaseException
+com/recipe/app/src/userRecipe/models/PostMyRecipeReq.java
+ com.recipe.app.src.userRecipe.models.PostMyRecipeReq
+com/recipe/app/src/ingredientCategory/IngredientCategoryProvider.java
+ com.recipe.app.src.ingredientCategory.IngredientCategoryProvider
+com/recipe/app/src/userRecipe/models/PatchMyRecipeReq.java
+ com.recipe.app.src.userRecipe.models.PatchMyRecipeReq
+com/recipe/app/src/userRecipeIngredient/UserRecipeIngredientProvider.java
+ com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider
+com/recipe/app/src/userRecipe/models/PostMyRecipeRes.java
+ com.recipe.app.src.userRecipe.models.PostMyRecipeRes
+com/recipe/app/config/BaseResponse.java
+ com.recipe.app.config.BaseResponse
+com/recipe/app/utils/JwtService.java
+ com.recipe.app.utils.JwtService
+com/recipe/app/src/receipt/ReceiptProvider.java
+ com.recipe.app.src.receipt.ReceiptProvider
+com/recipe/app/src/fridgeBasket/FridgeBasketProvider.java
+ com.recipe.app.src.fridgeBasket.FridgeBasketProvider
+com/recipe/app/src/userRecipe/UserRecipeService.java
+ com.recipe.app.src.userRecipe.UserRecipeService
+com/recipe/app/src/scrapPublic/ScrapPublicService.java
+ com.recipe.app.src.scrapPublic.ScrapPublicService
+com/recipe/app/src/receipt/ReceiptService.java
+ com.recipe.app.src.receipt.ReceiptService
+com/recipe/app/src/userRecipe/UserRecipeController.java
+ com.recipe.app.src.userRecipe.UserRecipeController
+com/recipe/app/src/ingredient/IngredientService.java
+ com.recipe.app.src.ingredient.IngredientService
+com/recipe/app/src/recipeInfo/RecipeInfoService.java
+ com.recipe.app.src.recipeInfo.RecipeInfoService
+com/recipe/app/src/recipeKeyword/RecipeKeywordService.java
+ com.recipe.app.src.recipeKeyword.RecipeKeywordService
+com/recipe/app/src/scrapBlog/ScrapBlogProvider.java
+ com.recipe.app.src.scrapBlog.ScrapBlogProvider
+com/recipe/app/src/scrapBlog/ScrapBlogService.java
+ com.recipe.app.src.scrapBlog.ScrapBlogService
+com/recipe/app/src/user/UserProvider.java
+ com.recipe.app.src.user.UserProvider
+ com.recipe.app.src.user.UserProvider$1
+com/recipe/app/src/fridge/FridgeService.java
+ com.recipe.app.src.fridge.FridgeService
+com/recipe/app/src/scrapYoutube/ScrapYoutubeProvider.java
+ com.recipe.app.src.scrapYoutube.ScrapYoutubeProvider
+com/recipe/app/src/scrapYoutube/ScrapYoutubeService.java
+ com.recipe.app.src.scrapYoutube.ScrapYoutubeService
+com/recipe/app/src/user/UserService.java
+ com.recipe.app.src.user.UserService
+com/recipe/app/src/viewBlog/ViewBlogController.java
+ com.recipe.app.src.viewBlog.ViewBlogController
+com/recipe/app/src/fridgeBasket/FridgeBasketService.java
+ com.recipe.app.src.fridgeBasket.FridgeBasketService
+com/recipe/app/src/scrapPublic/ScrapPublicProvider.java
+ com.recipe.app.src.scrapPublic.ScrapPublicProvider
 com/recipe/app/src/recipeKeyword/RecipeKeywordController.java
  com.recipe.app.src.recipeKeyword.RecipeKeywordController
 com/recipe/app/src/viewYoutube/ViewYoutubeService.java
  com.recipe.app.src.viewYoutube.ViewYoutubeService
 com/recipe/app/src/recipeKeyword/RecipeKeywordProvider.java
  com.recipe.app.src.recipeKeyword.RecipeKeywordProvider
-com/recipe/app/src/user/models/User.java
- com.recipe.app.src.user.models.User
+com/recipe/app/src/scrapBlog/ScrapBlogController.java
+ com.recipe.app.src.scrapBlog.ScrapBlogController
+com/recipe/app/src/fridge/FridgeProvider.java
+ com.recipe.app.src.fridge.FridgeProvider
 com/recipe/app/src/fridgeBasket/FridgeBasketController.java
  com.recipe.app.src.fridgeBasket.FridgeBasketController
 com/recipe/app/src/scrapYoutube/ScrapYoutubeController.java
  com.recipe.app.src.scrapYoutube.ScrapYoutubeController
+com/recipe/app/src/user/UserController.java
+ com.recipe.app.src.user.UserController
 com/recipe/app/src/viewYoutube/ViewYoutubeController.java
  com.recipe.app.src.viewYoutube.ViewYoutubeController
-com/recipe/app/src/userRecipe/models/PatchMyRecipeReq.java
- com.recipe.app.src.userRecipe.models.PatchMyRecipeReq
-com/recipe/app/src/userRecipe/UserRecipeProvider.java
- com.recipe.app.src.userRecipe.UserRecipeProvider
-com/recipe/app/src/fridge/models/DeleteFridgesIngredientReq.java
- com.recipe.app.src.fridge.models.DeleteFridgesIngredientReq
-com/recipe/app/src/userRecipe/models/MyRecipeIngredient.java
- com.recipe.app.src.userRecipe.models.MyRecipeIngredient
-com/recipe/app/src/fridgeBasket/models/FridgeBasket.java
- com.recipe.app.src.fridgeBasket.models.FridgeBasket
-com/recipe/app/src/receipt/ReceiptController.java
- com.recipe.app.src.receipt.ReceiptController
-com/recipe/app/src/receipt/ReceiptProvider.java
- com.recipe.app.src.receipt.ReceiptProvider
-com/recipe/app/src/userRecipe/models/PatchMyRecipeRes.java
- com.recipe.app.src.userRecipe.models.PatchMyRecipeRes
-com/recipe/app/src/userRecipe/UserRecipeService.java
- com.recipe.app.src.userRecipe.UserRecipeService
-com/recipe/app/src/ingredientCategory/IngredientCategoryProvider.java
- com.recipe.app.src.ingredientCategory.IngredientCategoryProvider
-com/recipe/app/src/ingredient/IngredientProvider.java
- com.recipe.app.src.ingredient.IngredientProvider
-com/recipe/app/src/viewYoutube/models/ViewYoutube.java
- com.recipe.app.src.viewYoutube.models.ViewYoutube
-com/recipe/app/src/fridge/models/Fridge.java
- com.recipe.app.src.fridge.models.Fridge
-com/recipe/app/config/BaseResponse.java
- com.recipe.app.config.BaseResponse
-com/recipe/app/src/userRecipe/models/UserRecipe.java
- com.recipe.app.src.userRecipe.models.UserRecipe
-com/recipe/app/src/receipt/ReceiptService.java
- com.recipe.app.src.receipt.ReceiptService
-com/recipe/app/src/fridge/FirebaseCloudMessageService.java
- com.recipe.app.src.fridge.FirebaseCloudMessageService
-com/recipe/app/src/fridgeBasket/FridgeBasketRepository.java
- com.recipe.app.src.fridgeBasket.FridgeBasketRepository
-com/recipe/app/src/userRecipeIngredient/models/UserRecipeIngredient.java
- com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient
-com/recipe/app/src/scrapBlog/ScrapBlogProvider.java
- com.recipe.app.src.scrapBlog.ScrapBlogProvider
-com/recipe/app/src/fridge/models/ShelfLifeUser.java
- com.recipe.app.src.fridge.models.ShelfLifeUser
-com/recipe/app/src/userRecipe/models/PostMyRecipeReq.java
- com.recipe.app.src.userRecipe.models.PostMyRecipeReq
-com/recipe/app/src/buy/models/Buy.java
- com.recipe.app.src.buy.models.Buy
-com/recipe/app/src/user/UserProvider.java
- com.recipe.app.src.user.UserProvider
- com.recipe.app.src.user.UserProvider$1
-com/recipe/app/src/viewBlog/ViewBlogService.java
- com.recipe.app.src.viewBlog.ViewBlogService
-com/recipe/app/src/scrapYoutube/ScrapYoutubeProvider.java
- com.recipe.app.src.scrapYoutube.ScrapYoutubeProvider
-com/recipe/app/src/fridge/FridgeRepository.java
- com.recipe.app.src.fridge.FridgeRepository
-com/recipe/app/src/fridgeBasket/FridgeBasketService.java
- com.recipe.app.src.fridgeBasket.FridgeBasketService
-com/recipe/app/src/scrapYoutube/models/ScrapYoutube.java
- com.recipe.app.src.scrapYoutube.models.ScrapYoutube
-com/recipe/app/utils/JwtService.java
- com.recipe.app.utils.JwtService
-com/recipe/app/src/viewPublic/models/ViewPublic.java
- com.recipe.app.src.viewPublic.models.ViewPublic
-com/recipe/app/src/scrapPublic/ScrapPublicRepository.java
- com.recipe.app.src.scrapPublic.ScrapPublicRepository
-com/recipe/app/src/scrapBlog/ScrapBlogController.java
- com.recipe.app.src.scrapBlog.ScrapBlogController
-com/recipe/app/config/BaseResponseStatus.java
- com.recipe.app.config.BaseResponseStatus
-com/recipe/app/src/userRecipe/UserRecipeRepository.java
- com.recipe.app.src.userRecipe.UserRecipeRepository
-com/recipe/app/src/fridge/FridgeProvider.java
- com.recipe.app.src.fridge.FridgeProvider
-com/recipe/app/src/scrapPublic/models/ScrapPublic.java
- com.recipe.app.src.scrapPublic.models.ScrapPublic
-com/recipe/app/src/recipeInfo/RecipeInfoService.java
- com.recipe.app.src.recipeInfo.RecipeInfoService
+com/recipe/app/src/ingredient/IngredientController.java
+ com.recipe.app.src.ingredient.IngredientController
 com/recipe/app/src/scrapPublic/ScrapPublicController.java
  com.recipe.app.src.scrapPublic.ScrapPublicController
-com/recipe/app/src/scrapPublic/ScrapPublicProvider.java
- com.recipe.app.src.scrapPublic.ScrapPublicProvider
-com/recipe/app/src/scrapPublic/ScrapPublicService.java
- com.recipe.app.src.scrapPublic.ScrapPublicService
-com/recipe/app/src/fridge/FridgeService.java
- com.recipe.app.src.fridge.FridgeService
+com/recipe/app/src/viewBlog/ViewBlogService.java
+ com.recipe.app.src.viewBlog.ViewBlogService
+com/recipe/app/src/userRecipe/UserRecipeProvider.java
+ com.recipe.app.src.userRecipe.UserRecipeProvider
 com/recipe/app/src/recipeInfo/RecipeInfoProvider.java
  com.recipe.app.src.recipeInfo.RecipeInfoProvider
  com.recipe.app.src.recipeInfo.RecipeInfoProvider$1
  com.recipe.app.src.recipeInfo.RecipeInfoProvider$2
+com/recipe/app/src/ingredient/IngredientProvider.java
+ com.recipe.app.src.ingredient.IngredientProvider
+com/recipe/app/src/receipt/ReceiptController.java
+ com.recipe.app.src.receipt.ReceiptController
 com/recipe/app/src/recipeInfo/RecipeInfoController.java
  com.recipe.app.src.recipeInfo.RecipeInfoController
-com/recipe/app/src/user/UserController.java
- com.recipe.app.src.user.UserController
-com/recipe/app/src/user/UserService.java
- com.recipe.app.src.user.UserService
+com/recipe/app/src/fridge/FridgeController.java
+ com.recipe.app.src.fridge.FridgeController

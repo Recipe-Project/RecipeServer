@@ -141,13 +141,7 @@ public class UserService {
             throw new BaseException(FAILED_TO_PARSE);
         }
 
-        User user = null;
-        try {
-            //이미 존재하는 회원이 있는지 조회
-            user = userRepository.findBySocialId(socialId);
-        } catch (Exception ignored) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        User user = userProvider.retrieveUserInfoBySocialId(socialId);
 
         // 이미 존재하는 회원이 없다면 유저 정보 저장
         if (user == null) {
@@ -157,17 +151,6 @@ public class UserService {
                 user = userRepository.save(user);
             } catch (Exception exception) {
                 throw new BaseException(DATABASE_ERROR);
-            }
-        }
-        else{
-            if(!user.getStatus().equals("ACTIVE")) {
-                user.setStatus("ACTIVE");
-
-                try {
-                    user = userRepository.save(user);
-                } catch (Exception exception) {
-                    throw new BaseException(DATABASE_ERROR);
-                }
             }
         }
 
@@ -278,33 +261,16 @@ public class UserService {
             throw new BaseException(FAILED_TO_PARSE);
         }
 
-        User user = null;
-        try {
-            //이미 존재하는 회원이 있는지 조회
-            user = userRepository.findBySocialId(socialId);
-        } catch (Exception ignored) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        User user = userProvider.retrieveUserInfoBySocialId(socialId);
 
         // 이미 존재하는 회원이 없다면 유저 정보 저장
         if (user == null) {
-            user = new User(socialId, profilePhoto, userName, email, phoneNumber,fcmToken);
+            user = new User(socialId, profilePhoto, userName, email, phoneNumber, fcmToken);
 
             try {
                 user = userRepository.save(user);
             } catch (Exception exception) {
                 throw new BaseException(DATABASE_ERROR);
-            }
-        }
-        else{
-            if(!user.getStatus().equals("ACTIVE")) {
-                user.setStatus("ACTIVE");
-
-                try {
-                    user = userRepository.save(user);
-                } catch (Exception exception) {
-                    throw new BaseException(DATABASE_ERROR);
-                }
             }
         }
 
@@ -432,7 +398,7 @@ public class UserService {
      */
     public void deleteUser(Integer jwtUserIdx, Integer userIdx) throws BaseException {
         //jwt 확인
-        if(userIdx != jwtUserIdx){
+        if(userIdx != (int)jwtUserIdx){
             throw new BaseException(FORBIDDEN_USER);
         }
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
