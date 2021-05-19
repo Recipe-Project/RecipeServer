@@ -53,7 +53,7 @@ public class FirebaseCloudMessageService {
                 .validate_only(false)
                 .build();
 
-        System.out.println("fcmMessage"+fcmMessage.getMessage().getNotification().getTitle());
+        System.out.println("fcmMessage: "+fcmMessage.getMessage().getNotification().getTitle());
         return objectMapper.writeValueAsString(fcmMessage);
 
 

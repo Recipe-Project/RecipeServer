@@ -14,6 +14,7 @@ import com.recipe.app.src.recipeIngredient.RecipeIngredientRepository;
 import com.recipe.app.src.recipeIngredient.models.RecipeIngredient;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
 import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.UserRepository;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,10 +39,11 @@ public class FridgeProvider {
     private final ScrapPublicRepository scrapPublicRepository;
     private final RecipeInfoProvider recipeInfoProvider;
     private final FridgeBasketRepository fridgeBasketRepository;
+    private final UserRepository userRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeProvider(UserProvider userProvider, FridgeRepository fridgeRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientCategoryRepository ingredientCategoryRepository, RecipeInfoRepository recipeInfoRepository, RecipeIngredientRepository recipeIngredientRepository, ScrapPublicRepository scrapPublicRepository, RecipeInfoProvider recipeInfoProvider, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
+    public FridgeProvider(UserProvider userProvider, FridgeRepository fridgeRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientCategoryRepository ingredientCategoryRepository, RecipeInfoRepository recipeInfoRepository, RecipeIngredientRepository recipeIngredientRepository, ScrapPublicRepository scrapPublicRepository, RecipeInfoProvider recipeInfoProvider, FridgeBasketRepository fridgeBasketRepository, UserRepository userRepository, JwtService jwtService) {
         this.userProvider = userProvider;
         this.fridgeRepository = fridgeRepository;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
@@ -51,6 +53,7 @@ public class FridgeProvider {
         this.scrapPublicRepository = scrapPublicRepository;
         this.recipeInfoProvider = recipeInfoProvider;
         this.fridgeBasketRepository = fridgeBasketRepository;
+        this.userRepository = userRepository;
         this.jwtService = jwtService;
     }
 
@@ -299,37 +302,42 @@ public class FridgeProvider {
         try {
             fridgeList = fridgeRepository.findByStatus("ACTIVE");
 
-            for (int i=0;i<fridgeList.size();i++){
-                Date tmpDate = fridgeList.get(i).getExpiredAt();
+            for (int i=0;i<fridgeList.size();i++) {
+                Integer userIdx = fridgeList.get(i).getUser().getUserIdx();
+                Boolean existUserIdx = userRepository.existsByUserIdxAndStatus(userIdx,"ACTIVE");
+                if (existUserIdx){
 
-                if (tmpDate== null){
-                    continue;
+                    Date tmpDate = fridgeList.get(i).getExpiredAt();
+
+                    if (tmpDate== null){
+                        continue;
+                    }
+                    DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
+                    String expiredAt = sdFormat.format(tmpDate);
+                    Date tempDate = new Date();
+                    String nowDate = sdFormat.format(tempDate);
+                    SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
+                    long diffDay = 0;
+                    try{
+                        Date startDate = sdf.parse(nowDate);
+                        Date endDate = sdf.parse(expiredAt);
+                        diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
+                    }catch(ParseException e){
+                        e.printStackTrace();
+                    }
+
+
+                    if(diffDay>2 && diffDay<=3){
+
+                        String ingredientName = fridgeList.get(i).getIngredientName();
+                        User user = userProvider.retrieveUserByUserIdx(userIdx);
+                        String deviceToken = user.getDeviceToken();
+                        ShelfLifeUser shelfLifeUser = new ShelfLifeUser(deviceToken,ingredientName);
+                        shelfLifeUsers.add(shelfLifeUser);
+                    }
                 }
-                DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
-                String expiredAt = sdFormat.format(tmpDate);
-                Date tempDate = new Date();
-                String nowDate = sdFormat.format(tempDate);
-                SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
-                long diffDay = 0;
-                try{
-                    Date startDate = sdf.parse(nowDate);
-                    Date endDate = sdf.parse(expiredAt);
-                    diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
-                }catch(ParseException e){
-                    e.printStackTrace();
-                }
 
-               if(diffDay>2 && diffDay<=3){
-
-//                   Integer userIdx = fridgeList.get(i).getUser().getUserIdx(); //테스트
-                   String deviceToken = fridgeList.get(i).getUser().getDeviceToken();
-                   String ingredientName = fridgeList.get(i).getIngredientName();
-
-                   ShelfLifeUser shelfLifeUser = new ShelfLifeUser(deviceToken,ingredientName);
-                   shelfLifeUsers.add(shelfLifeUser);
-               }
             }
-
 
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_SHELF_LIFE_USER_LIST);
@@ -338,5 +346,7 @@ public class FridgeProvider {
 
         return shelfLifeUsers;
     }
+
+
 
 }

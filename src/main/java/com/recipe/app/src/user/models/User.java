@@ -1,6 +1,7 @@
 package com.recipe.app.src.user.models;
 
 import com.recipe.app.config.BaseEntity;
+import com.recipe.app.src.fridge.models.Fridge;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.receipt.models.Receipt;
 import com.recipe.app.src.scrapBlog.models.ScrapBlog;
@@ -79,6 +80,8 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<ViewPublic> viewPublics = new ArrayList<>();
 
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
+    private List<Fridge> fridges = new ArrayList<>();
 
     public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber, String deviceToken){
         this.socialId = socialId;

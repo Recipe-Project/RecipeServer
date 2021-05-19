@@ -12,4 +12,6 @@ public interface UserRepository extends CrudRepository<User, Integer> {
     List<User> findBySocialIdAndStatus(String socialId, String status);
 
     User findByUserIdxAndStatus(Integer userIdx, String active);
+
+    Boolean existsByUserIdxAndStatus(Integer userIdx, String active);
 }
