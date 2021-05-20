@@ -296,11 +296,11 @@ public class FridgeController {
      * [POST] /notification
      * @return BaseResponse<Void>
      */
-//     @Scheduled(cron = "*/10 * * * * *") //10초마다
-    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시
+     @Scheduled(cron = "*/30 * * * * *") //10초마다
+//    @Scheduled(cron = "0 0 13 * * *") //cron = 0 0 12 * * * 매일 12시
     @PostMapping("/notification")
     public  BaseResponse<Void> postNotification() throws BaseException ,IOException{
-
+         System.out.println("fcm start! 13:00 pm");
         try {
             // 유통기한 리스트 조회한다.
             List<ShelfLifeUser> shelfLifeUsers =  fridgeProvider.retreiveShelfLifeUserList();
