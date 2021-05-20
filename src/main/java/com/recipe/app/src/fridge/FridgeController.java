@@ -10,7 +10,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
@@ -270,29 +273,26 @@ public class FridgeController {
     }
 
 
-//    /**
-//     * 푸시알림 API - test
-//     * [POST] /fcm-test
-//     * @return BaseResponse<Void>
-//     */
-//    @Scheduled(cron = "0 0/1 * * * *") //1분마다
-////    @Scheduled(fixedDelay = 10000) //10초마다
-//    @PostMapping("/fcm-test")
-//    public  BaseResponse<Void> posFcmTest() throws BaseException, IOException {
-////        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-////        String targetToken = request.getHeader("FCM-TOKEN");
-//        String targetToken = "";
-//        String title = "title-test";
-//        String body = "body-test";
-//
-//        firebaseCloudMessageService.sendMessageTo(targetToken,title,body);
-//
-//        return new BaseResponse<>(SUCCESS);
-//
-//    }
+    /**
+     * 푸시알림 API - test
+     * [POST] /fcm-test
+     * @return BaseResponse<Void>
+     */
+    @PostMapping("/fcm-test")
+    public  BaseResponse<Void> posFcmTest() throws BaseException, IOException {
+        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
+        String targetToken = request.getHeader("FCM-TOKEN");
+        String title = "title-test";
+        String body = "body-test";
+
+        firebaseCloudMessageService.sendMessageTo(targetToken,title,body);
+
+        return new BaseResponse<>(SUCCESS);
+
+    }
 
     // 테스트
-    @Scheduled(cron = "0 55 22 * * *") // 10시 55분
+    @Scheduled(cron = "0 58 23 * * *") // 10시 55분
 //    @Scheduled(cron = "0 0/1 * * * *") //1분마다
     public void cronTest() {
         System.out.println("current date : " + new Date());
@@ -306,7 +306,7 @@ public class FridgeController {
 //    @Scheduled(cron = "0 0/1 * * * *") //1분마다
 //    @Scheduled(cron = "0 0 13 * * *") //cron = 0 0 12 * * * 매일 12시
 //    @Scheduled(cron = "*/20 * * * * *") //20초마다
-    @Scheduled(cron = "0 55 22 * * *") // 10시 55분
+    @Scheduled(cron = "0 58 23 * * *") // 10시 55분
     @PostMapping("/notification")
     public  BaseResponse<Void> postNotification() throws BaseException ,IOException{
          System.out.println("*******************fcm start!****************");
