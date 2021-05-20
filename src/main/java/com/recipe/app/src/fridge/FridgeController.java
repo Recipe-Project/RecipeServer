@@ -292,12 +292,15 @@ public class FridgeController {
     }
 
     // 테스트
-    @Scheduled(cron = "0 58 23 * * *") // 10시 55분
-//    @Scheduled(cron = "0 0/1 * * * *") //1분마다
-    public void cronTest() {
-        System.out.println("current date : " + new Date());
+    @Scheduled(cron = "0 20 0 * * *") // 10시 55분
+    public void cronTest1() {
+        System.out.println("current date1 : " + new Date());
     }
-
+    // 테스트
+    @Scheduled(cron = "0 0/1 * * * *") //1분마다
+    public void cronTest2() {
+        System.out.println("current date2 : " + new Date());
+    }
     /**
      * 푸시알림 API
      * [POST] /notification
@@ -306,7 +309,7 @@ public class FridgeController {
 //    @Scheduled(cron = "0 0/1 * * * *") //1분마다
 //    @Scheduled(cron = "0 0 13 * * *") //cron = 0 0 12 * * * 매일 12시
 //    @Scheduled(cron = "*/20 * * * * *") //20초마다
-    @Scheduled(cron = "0 58 23 * * *") // 10시 55분
+    @Scheduled(cron = "0 25 0 * * *") // 10시 55분
     @PostMapping("/notification")
     public  BaseResponse<Void> postNotification() throws BaseException ,IOException{
          System.out.println("*******************fcm start!****************");
