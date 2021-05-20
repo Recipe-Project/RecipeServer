@@ -16,7 +16,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
@@ -291,23 +290,14 @@ public class FridgeController {
 
     }
 
-    // 테스트
-    @Scheduled(cron = "0 30 2 * * *") // 2시 30분
-    public void cronTest1() {
-        System.out.println("current date1 : " + new Date());
-    }
-    // 테스트
-    @Scheduled(cron = "0 0/1 * * * *") //1분마다
-    public void cronTest2() {
-        System.out.println("current date2 : " + new Date());
-    }
+
     /**
      * 푸시알림 API
      * [POST] /notification
      * @return BaseResponse<Void>
      */
-//    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시
-    @Scheduled(cron = "0 30 2 * * *") // 2시 30분
+    // @Scheduled(cron = "0 30 2 * * *") // 2시 30분 test
+    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시
     @PostMapping("/notification")
     public  BaseResponse<Void> postNotification() throws BaseException ,IOException{
          System.out.println("*******************fcm start!****************");
