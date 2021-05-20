@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
@@ -290,6 +291,11 @@ public class FridgeController {
 //
 //    }
 
+    // 테스트
+    @Scheduled(cron = "0 30 22 * * *") // 10시 20분
+    public void cronTest() {
+        System.out.println("cron: 0 30 22 * * * " + new Date());
+    }
 
     /**
      * 푸시알림 API
@@ -298,7 +304,8 @@ public class FridgeController {
      */
 //    @Scheduled(cron = "0 0/1 * * * *") //1분마다
 //    @Scheduled(cron = "0 0 13 * * *") //cron = 0 0 12 * * * 매일 12시
-    @Scheduled(cron = "*/20 * * * * *") //20초마다
+//    @Scheduled(cron = "*/20 * * * * *") //20초마다
+    @Scheduled(cron = "0 30 22 * * *") // 10시 30분
     @PostMapping("/notification")
     public  BaseResponse<Void> postNotification() throws BaseException ,IOException{
          System.out.println("*******************fcm start!****************");
