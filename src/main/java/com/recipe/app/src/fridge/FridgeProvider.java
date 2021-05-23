@@ -196,7 +196,7 @@ public class FridgeProvider {
      * @return List<GetFridgesRecipeRes>
      * @throws BaseException
      */
-    public List<GetFridgesRecipeRes> retreiveFridgesRecipe(int userIdx) throws BaseException {
+    public List<GetFridgesRecipeRes> retreiveFridgesRecipe(int userIdx, Integer start, Integer display) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
         // 냉장고 재료랑 레시피 재료랑 동일한 재료 개수 많은 순
@@ -272,7 +272,9 @@ public class FridgeProvider {
         //내림차순
         Collections.sort(keySetList, (o1, o2) -> (map.get(o2).compareTo(map.get(o1))));
         List<GetFridgesRecipeRes> getFridgesRecipeResList = new ArrayList<>();
-        for (Integer recipeId : keySetList) {
+        for(int i=start;i<start+display;i++){
+        //for (Integer recipeId : keySetList) {
+            Integer recipeId = keySetList.get(i);
             System.out.println(String.format("Key : %s, Value : %s", recipeId, map.get(recipeId)));
             RecipeInfo recipeInfo = recipeInfoRepository.findByRecipeIdAndStatus(recipeId, "ACTIVE");
             RecipeInfo ri = recipeInfoProvider.retrieveRecipeByRecipeId(recipeId);

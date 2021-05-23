@@ -127,6 +127,10 @@ public enum BaseResponseStatus {
     // [PATCH] /fcm/token
     EMPTY_FCM_TOKEN(false, 2081, "FCM 토큰을 입력하세요."),
 
+    // recipes
+    RECIPES_EMPTY_RECIPE_IDX(false, 2082, "공공 레시피 인덱스 값을 확인해주세요."),
+
+
     // 2088부터 가능
     /**
      * 3000 : Response 오류

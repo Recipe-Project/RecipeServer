@@ -232,13 +232,13 @@ public class FridgeController {
      */
     @ResponseBody
     @GetMapping("/fridges/recipe")
-    public BaseResponse<List<GetFridgesRecipeRes>> getFridgesRecipe()  {
+    public BaseResponse<List<GetFridgesRecipeRes>> getFridgesRecipe(@RequestParam(value = "start") Integer start, @RequestParam(value = "display") Integer display)  {
 
         try {
             Integer userIdx = jwtService.getUserId();
 
 
-            List<GetFridgesRecipeRes> getFridgesRecipeRes = fridgeProvider.retreiveFridgesRecipe(userIdx);
+            List<GetFridgesRecipeRes> getFridgesRecipeRes = fridgeProvider.retreiveFridgesRecipe(userIdx, start, display);
 
             return new BaseResponse<>(getFridgesRecipeRes);
         } catch (BaseException exception) {

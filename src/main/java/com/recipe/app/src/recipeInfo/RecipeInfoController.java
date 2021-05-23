@@ -13,6 +13,9 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.recipe.app.config.BaseResponseStatus.RECIPES_EMPTY_RECIPE_IDX;
+import static com.recipe.app.config.BaseResponseStatus.USERS_EMPTY_USER_ID;
+
 
 @RestController
 @RequestMapping("/recipes")
@@ -56,6 +59,10 @@ public class RecipeInfoController {
 
     @GetMapping("/{recipeIdx}")
     public BaseResponse<GetRecipeInfoRes> getRecipeInfo(@PathVariable Integer recipeIdx) {
+        if(recipeIdx==null || recipeIdx<=0){
+            return new BaseResponse<>(RECIPES_EMPTY_RECIPE_IDX);
+        }
+
 
         try {
             Integer jwtUserIdx = jwtService.getUserId();
