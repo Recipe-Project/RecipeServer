@@ -328,8 +328,10 @@ com/recipe/app/src/scrapPublic/ScrapPublicService.java
  com.recipe.app.src.scrapPublic.ScrapPublicService
 com/recipe/app/src/scrapBlog/ScrapBlogController.java
  com.recipe.app.src.scrapBlog.ScrapBlogController
-com/recipe/app/src/fridge/FridgeProvider.java
- com.recipe.app.src.fridge.FridgeProvider
+com/recipe/app/src/recipeInfo/RecipeInfoProvider.java
+ com.recipe.app.src.recipeInfo.RecipeInfoProvider
+ com.recipe.app.src.recipeInfo.RecipeInfoProvider$1
+ com.recipe.app.src.recipeInfo.RecipeInfoProvider$2
 com/recipe/app/src/recipeInfo/RecipeInfoService.java
  com.recipe.app.src.recipeInfo.RecipeInfoService
 com/recipe/app/src/scrapPublic/ScrapPublicController.java
@@ -338,13 +340,11 @@ com/recipe/app/src/scrapBlog/ScrapBlogProvider.java
  com.recipe.app.src.scrapBlog.ScrapBlogProvider
 com/recipe/app/src/scrapBlog/ScrapBlogService.java
  com.recipe.app.src.scrapBlog.ScrapBlogService
-com/recipe/app/src/fridge/FridgeService.java
- com.recipe.app.src.fridge.FridgeService
-com/recipe/app/src/recipeInfo/RecipeInfoProvider.java
- com.recipe.app.src.recipeInfo.RecipeInfoProvider
- com.recipe.app.src.recipeInfo.RecipeInfoProvider$1
- com.recipe.app.src.recipeInfo.RecipeInfoProvider$2
 com/recipe/app/src/recipeInfo/RecipeInfoController.java
  com.recipe.app.src.recipeInfo.RecipeInfoController
+com/recipe/app/src/fridge/FridgeService.java
+ com.recipe.app.src.fridge.FridgeService
 com/recipe/app/src/fridge/FridgeController.java
  com.recipe.app.src.fridge.FridgeController
+com/recipe/app/src/fridge/FridgeProvider.java
+ com.recipe.app.src.fridge.FridgeProvider

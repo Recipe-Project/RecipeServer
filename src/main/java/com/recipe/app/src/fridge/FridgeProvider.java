@@ -200,7 +200,6 @@ public class FridgeProvider {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
         // 냉장고 재료랑 레시피 재료랑 동일한 재료 개수 많은 순
-
         // 1.유저인덱스로 냉장고 재료를 조회한다.
         List<Fridge> fridgeList;
         try {
@@ -272,7 +271,7 @@ public class FridgeProvider {
         //내림차순
         Collections.sort(keySetList, (o1, o2) -> (map.get(o2).compareTo(map.get(o1))));
         List<GetFridgesRecipeRes> getFridgesRecipeResList = new ArrayList<>();
-        for(int i=start;i<start+display;i++){
+        for(int i=start;i<start+display&&i<keySetList.size();i++){
         //for (Integer recipeId : keySetList) {
             Integer recipeId = keySetList.get(i);
             System.out.println(String.format("Key : %s, Value : %s", recipeId, map.get(recipeId)));
