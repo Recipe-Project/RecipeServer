@@ -296,8 +296,8 @@ com/recipe/app/src/scrapYoutube/ScrapYoutubeProvider.java
  com.recipe.app.src.scrapYoutube.ScrapYoutubeProvider
 com/recipe/app/src/scrapYoutube/ScrapYoutubeService.java
  com.recipe.app.src.scrapYoutube.ScrapYoutubeService
-com/recipe/app/src/user/UserService.java
- com.recipe.app.src.user.UserService
+com/recipe/app/src/fridge/FridgeController.java
+ com.recipe.app.src.fridge.FridgeController
 com/recipe/app/src/viewBlog/ViewBlogController.java
  com.recipe.app.src.viewBlog.ViewBlogController
 com/recipe/app/src/fridgeBasket/FridgeBasketService.java
@@ -318,8 +318,8 @@ com/recipe/app/src/ingredient/IngredientProvider.java
  com.recipe.app.src.ingredient.IngredientProvider
 com/recipe/app/config/BaseResponseStatus.java
  com.recipe.app.config.BaseResponseStatus
-com/recipe/app/src/user/UserController.java
- com.recipe.app.src.user.UserController
+com/recipe/app/src/fridge/FridgeProvider.java
+ com.recipe.app.src.fridge.FridgeProvider
 com/recipe/app/src/scrapPublic/ScrapPublicProvider.java
  com.recipe.app.src.scrapPublic.ScrapPublicProvider
 com/recipe/app/src/scrapBlog/ScrapBlogRepository.java
@@ -344,7 +344,7 @@ com/recipe/app/src/recipeInfo/RecipeInfoController.java
  com.recipe.app.src.recipeInfo.RecipeInfoController
 com/recipe/app/src/fridge/FridgeService.java
  com.recipe.app.src.fridge.FridgeService
-com/recipe/app/src/fridge/FridgeController.java
- com.recipe.app.src.fridge.FridgeController
-com/recipe/app/src/fridge/FridgeProvider.java
- com.recipe.app.src.fridge.FridgeProvider
+com/recipe/app/src/user/UserController.java
+ com.recipe.app.src.user.UserController
+com/recipe/app/src/user/UserService.java
+ com.recipe.app.src.user.UserService

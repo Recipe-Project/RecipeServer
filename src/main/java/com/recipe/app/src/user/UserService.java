@@ -10,6 +10,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -396,16 +397,19 @@ public class UserService {
      * @param userIdx
      * @throws BaseException
      */
+    @Transactional(rollbackFor = Exception.class)
     public void deleteUser(Integer jwtUserIdx, Integer userIdx) throws BaseException {
         //jwt 확인
         if(userIdx != (int)jwtUserIdx){
             throw new BaseException(FORBIDDEN_USER);
         }
+
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
-        user.setStatus("INACTIVE");
+        //user.setStatus("INACTIVE");
         try {
-            user = userRepository.save(user);
+            userRepository.delete(user);
+            //user = userRepository.save(user);
         } catch (Exception ignored) {
             throw new BaseException(DATABASE_ERROR);
         }
