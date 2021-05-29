@@ -10,6 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.Date;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
 @EqualsAndHashCode(callSuper = false)
@@ -43,6 +44,12 @@ public class FridgeBasket extends BaseEntity {
 
     @Column(name="count")
     private Integer count=1;
+
+    @Column(name="storageMethod", nullable = false,length = 4)
+    private String storageMethod="냉장";
+
+    @Column(name = "expiredAt")
+    private Date expiredAt;
 
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";

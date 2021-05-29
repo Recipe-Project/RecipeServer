@@ -12,6 +12,9 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -120,8 +123,15 @@ public class FridgeBasketProvider {
             String ingredientIcon = fridgeBasket.getIngredientIcon();
             Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategory().getIngredientCategoryIdx();
             Integer ingredientCnt = fridgeBasket.getCount();
+            String storageMethod = fridgeBasket.getStorageMethod();
+            Date tmpDate = fridgeBasket.getExpiredAt();
+            String expiredAt=null;
+            if (tmpDate != null){
+                DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
+                expiredAt = sdFormat.format(tmpDate) + "까지";
+            }
 
-            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon,ingredientCategoryIdx, ingredientCnt);
+            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon,ingredientCategoryIdx, ingredientCnt, storageMethod, expiredAt);
 
         }).collect(Collectors.toList());
     }

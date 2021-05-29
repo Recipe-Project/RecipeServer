@@ -130,6 +130,8 @@ public enum BaseResponseStatus {
     // recipes
     RECIPES_EMPTY_RECIPE_IDX(false, 2082, "공공 레시피 인덱스 값을 확인해주세요."),
 
+    // [PATCH] /fridge/basket
+    PATCH_FRIDGES_BASKET_EMPTY_FRIDGES_BASKET_LIST(false, 2083, "수정할 냉장고 바구니 리스트를 입력하세요."),
 
     // 2088부터 가능
     /**

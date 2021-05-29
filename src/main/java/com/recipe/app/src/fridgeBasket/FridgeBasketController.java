@@ -161,6 +161,28 @@ public class FridgeBasketController {
         }
     }
 
+    /**
+     * 냉장고 바구니 수정 사항 저장 API
+     * [PATCH] /fridges/basket
+     * @RequestBody parameters
+     * @return BaseResponse<Void>
+     */
+    @ResponseBody
+    @PatchMapping("/basket")
+    public BaseResponse<Void> patchFridgesBasket(@RequestBody PatchFridgesBasketReq parameters) {
+        try {
+            Integer userIdx = jwtService.getUserId();
+            List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
+            if (fridgeBasketList == null || fridgeBasketList.isEmpty()) {
+                return new BaseResponse<>(PATCH_FRIDGES_BASKET_EMPTY_FRIDGES_BASKET_LIST);
+            }
 
+            fridgeBasketService.updateFridgesBasket(parameters,userIdx);
+
+            return new BaseResponse<>(SUCCESS);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 
 }

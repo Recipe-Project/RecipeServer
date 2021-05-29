@@ -13,4 +13,6 @@ public class IngredientList {
     private final String ingredientIcon;
     private final Integer ingredientCategoryIdx;
     private final Integer ingredientCnt;
+    private final String storageMethod;
+    private final String expiredAt;
 }

@@ -1,10 +1,7 @@
 package com.recipe.app.src.fridgeBasket;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
-import com.recipe.app.src.fridgeBasket.models.PostFridgesBasketReq;
-import com.recipe.app.src.fridgeBasket.models.PostFridgesDirectBasketReq;
-import com.recipe.app.src.fridgeBasket.models.PostFridgesDirectBasketRes;
+import com.recipe.app.src.fridgeBasket.models.*;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.ingredient.IngredientRepository;
 import com.recipe.app.src.ingredient.models.Ingredient;
@@ -16,6 +13,9 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
@@ -139,4 +139,54 @@ public class FridgeBasketService {
 
     }
 
+
+    /**
+     * 냉장고 바구니 수정 사항 저장 API
+     * @param patchFridgesBasketReq,userIdx
+     * @return void
+     * @throws BaseException
+     */
+    public void updateFridgesBasket(PatchFridgesBasketReq patchFridgesBasketReq, int userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        List<FridgeBasketList> fridgeBasketList = patchFridgesBasketReq.getFridgeBasketList();
+
+        for (FridgeBasketList fridgeBasket : fridgeBasketList) {
+            String ingredientName = fridgeBasket.getIngredientName();
+            Integer ingredientCnt = fridgeBasket.getIngredientCnt();
+            String storageMethod = fridgeBasket.getStorageMethod();
+            String expiredAtTmp = fridgeBasket.getExpiredAt();
+            Date expiredAt;
+            if (expiredAtTmp == null || expiredAtTmp.equals("")){
+                expiredAt=null;
+            }
+            else{
+                try {
+                    DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
+                    expiredAt = sdFormat.parse(expiredAtTmp);
+                }catch(Exception e){
+                    throw new BaseException(DATE_PARSE_ERROR);
+                }
+            }
+
+            FridgeBasket existIngredient=null;
+            try {
+                existIngredient = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredientName, "ACTIVE");
+            } catch (Exception ignored) {
+                throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
+            }
+
+            if(existIngredient!=null){
+                existIngredient.setCount(ingredientCnt);
+                existIngredient.setStorageMethod(storageMethod);
+                existIngredient.setExpiredAt(expiredAt);
+                try {
+                    fridgeBasketRepository.save(existIngredient);
+                }catch(Exception e){
+                    throw new BaseException(DATABASE_ERROR);
+                }
+            }
+        }
+
+
+    }
 }
