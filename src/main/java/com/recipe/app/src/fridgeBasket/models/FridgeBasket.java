@@ -41,6 +41,8 @@ public class FridgeBasket extends BaseEntity {
     @JoinColumn(name = "ingredientCategoryIdx", nullable = false)
     private IngredientCategory ingredientCategory;
 
+    @Column(name="count")
+    private Integer count=1;
 
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
@@ -52,5 +54,4 @@ public class FridgeBasket extends BaseEntity {
         this.ingredientIcon = ingredientIcon;
         this.ingredientCategory = ingredientCategory;
     }
-
 }

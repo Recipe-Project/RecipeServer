@@ -141,18 +141,18 @@ public class FridgeController {
     @DeleteMapping("/fridges/ingredient")
     public BaseResponse<Void> deleteFridgesIngredient(@RequestBody DeleteFridgesIngredientReq parameters) throws BaseException {
 
-        String ingrdientName = parameters.getIngredientName();
+        List<String> ingrdientNames = parameters.getIngredientName();
 
-        if (ingrdientName == null || ingrdientName.equals("")) {
+        if (ingrdientNames == null) {
             return new BaseResponse<>(EMPTY_INGREDIENT);
         }
         Integer userIdx = jwtService.getUserId();
-        Boolean existIngredient = fridgeProvider.existIngredient(ingrdientName,userIdx);
-        if (!existIngredient){
-            return new BaseResponse<>(NOT_FOUND_INGREDIENT);
+        for(String ingrdientName : ingrdientNames) {
+            Boolean existIngredient = fridgeProvider.existIngredient(ingrdientName, userIdx);
+            if (!existIngredient) {
+                return new BaseResponse<>(NOT_FOUND_INGREDIENT);
+            }
         }
-
-
 
         try {
 

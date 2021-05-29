@@ -119,8 +119,9 @@ public class FridgeBasketProvider {
             String ingredientName = fridgeBasket.getIngredientName();
             String ingredientIcon = fridgeBasket.getIngredientIcon();
             Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategory().getIngredientCategoryIdx();
+            Integer ingredientCnt = fridgeBasket.getCount();
 
-            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon,ingredientCategoryIdx);
+            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon,ingredientCategoryIdx, ingredientCnt);
 
         }).collect(Collectors.toList());
     }

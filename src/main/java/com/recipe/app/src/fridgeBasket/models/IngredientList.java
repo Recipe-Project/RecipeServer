@@ -12,4 +12,5 @@ public class IngredientList {
     private final String ingredientName;
     private final String ingredientIcon;
     private final Integer ingredientCategoryIdx;
+    private final Integer ingredientCnt;
 }

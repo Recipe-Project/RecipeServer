@@ -29,6 +29,7 @@ dependencies {
     // DB
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     runtimeOnly 'mysql:mysql-connector-java'
+    compile 'mysql:mysql-connector-java'
 
     // Web
     implementation 'org.springframework.boot:spring-boot-starter-web'

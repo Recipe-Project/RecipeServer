@@ -31,7 +31,6 @@ public class FridgeBasketService {
 
     @Autowired
     public FridgeBasketService(UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientProvider ingredientProvider, IngredientRepository ingredientRepository, JwtService jwtService){
-
         this.userProvider = userProvider;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
@@ -60,9 +59,22 @@ public class FridgeBasketService {
                 String ingredientIcon = ingredient.getIcon();
                 Integer ingredientCategoryIdx = ingredient.getIngredientCategory().getIngredientCategoryIdx();
                 IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
-                FridgeBasket fridgeBasket = new FridgeBasket(user,ingredient,ingredientName,ingredientIcon,ingredientCategory);
-                fridgeBasketRepository.save(fridgeBasket);
 
+                FridgeBasket existIngredient=null;
+                try {
+                    existIngredient = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredientName, "ACTIVE");
+                } catch (Exception ignored) {
+                    throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
+                }
+                if(existIngredient!=null){
+                    Integer cnt = existIngredient.getCount() +1;
+                    existIngredient.setCount(cnt);
+                    fridgeBasketRepository.save(existIngredient);
+                }
+                else {
+                    FridgeBasket fridgeBasket = new FridgeBasket(user, ingredient, ingredientName, ingredientIcon, ingredientCategory);
+                    fridgeBasketRepository.save(fridgeBasket);
+                }
             }
 
         } catch (Exception exception) {
