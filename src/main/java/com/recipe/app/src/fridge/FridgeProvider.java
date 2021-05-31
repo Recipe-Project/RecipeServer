@@ -193,10 +193,10 @@ public class FridgeProvider {
     /**
      * 냉장고 파먹기 조회 API
      * @param userIdx
-     * @return List<GetFridgesRecipeRes>
+     * @return GetFridgesRecipeRes
      * @throws BaseException
      */
-    public List<GetFridgesRecipeRes> retreiveFridgesRecipe(int userIdx, Integer start, Integer display) throws BaseException {
+    public GetFridgesRecipeRes retreiveFridgesRecipe(int userIdx, Integer start, Integer display) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
         // 냉장고 재료랑 레시피 재료랑 동일한 재료 개수 많은 순
@@ -270,7 +270,7 @@ public class FridgeProvider {
         List<Integer> keySetList = new ArrayList<>(map.keySet());
         //내림차순
         Collections.sort(keySetList, (o1, o2) -> (map.get(o2).compareTo(map.get(o1))));
-        List<GetFridgesRecipeRes> getFridgesRecipeResList = new ArrayList<>();
+        List<RecipeList> recipeList = new ArrayList<>();
         for(int i=start;i<start+display&&i<keySetList.size();i++){
         //for (Integer recipeId : keySetList) {
             Integer recipeId = keySetList.get(i);
@@ -283,12 +283,11 @@ public class FridgeProvider {
             String cookingTime = recipeInfo.getCookingTime();
             long scrapCount = scrapPublicRepository.countByRecipeInfoAndStatus(ri, "ACTIVE");
 
-            GetFridgesRecipeRes getRes = new GetFridgesRecipeRes(recipeId, title, content, thumbnail, cookingTime, scrapCount);
-            getFridgesRecipeResList.add(getRes);
-
+            recipeList.add(new RecipeList(recipeId, title, content, thumbnail, cookingTime, scrapCount));
 
         }
-        return getFridgesRecipeResList;
+
+        return new GetFridgesRecipeRes(keySetList.size(), recipeList);
     }
 
 

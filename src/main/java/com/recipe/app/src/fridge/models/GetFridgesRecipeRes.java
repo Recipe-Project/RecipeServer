@@ -3,15 +3,13 @@ package com.recipe.app.src.fridge.models;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.List;
+
 
 @Getter
 @AllArgsConstructor
 public class GetFridgesRecipeRes {
-    private final Integer recipeId;
-    private final String title;
-    private final String content;
-    private final String thumbnail;
-    private final String cookingTime;
-    private final long scrapCount;
+    private final Integer total;
+    private final List<RecipeList> recipeList;
 
 }
