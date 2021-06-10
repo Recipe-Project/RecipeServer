@@ -1,11 +1,13 @@
 package com.recipe.app.src.scrapYoutube.models;
 
-import com.recipe.app.src.user.models.User;
-import lombok.*;
-import javax.persistence.*;
 import com.recipe.app.config.BaseEntity;
+import com.recipe.app.src.user.models.User;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-import java.util.Date;
+import javax.persistence.*;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
 @EqualsAndHashCode(callSuper = false)
@@ -27,7 +29,7 @@ public class ScrapYoutube extends BaseEntity {
     @Column(name = "youtubeId", nullable = false, length = 45)
     private String youtubeId;
 
-    @Column(name = "title", nullable = false, length = 45)
+    @Column(name = "title", nullable = false, columnDefinition = "TEXT")
     private String title;
 
     @Column(name = "thumbnail", nullable = false)
