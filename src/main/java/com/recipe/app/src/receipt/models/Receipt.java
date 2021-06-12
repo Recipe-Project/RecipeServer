@@ -32,7 +32,7 @@ public class Receipt extends BaseEntity {
     private Date receiptDate;
 
     @Column(name = "status", nullable = false, length = 10)
-    private String status = "ACTIVE";
+    private String status;
 
     @OneToMany(mappedBy = "receipt", cascade = CascadeType.ALL)
     private List<Buy> buys = new ArrayList<>();

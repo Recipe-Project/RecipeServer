@@ -22,9 +22,9 @@ public class IngredientCategory extends BaseEntity {
     @Id // PK를 의미하는 어노테이션
     @Column(name = "ingredientCategoryIdx", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ingredientCategoryIdx;
+    private Integer ingredientCategoryIdx; // Integer -> Long 21억 지나면 터지니까 Long
 
-    @Column(name="name", nullable = false,length = 45)
+    @Column(name = "name", nullable = false, length = 45)
     private String name;
 
     @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
@@ -36,10 +36,10 @@ public class IngredientCategory extends BaseEntity {
     @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
     private List<Fridge> fridge = new ArrayList<>();
 
-    @Column(name="status", nullable=false, length=10)
-    private String status="ACTIVE";
+    @Column(name = "status", nullable = false, length = 10)
+    private String status = "ACTIVE";
 
-    public IngredientCategory(String name){
+    public IngredientCategory(String name) {
         this.name = name;
     }
 

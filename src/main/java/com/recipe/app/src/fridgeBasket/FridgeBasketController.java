@@ -185,4 +185,21 @@ public class FridgeBasketController {
         }
     }
 
+    /**
+     * 냉장고 바구니 개수 조회 API
+     * [GET] /fridges/basket/count
+     * @return BaseResponse<GetFridgesBasketCountRes>
+     */
+    @GetMapping("/basket/count")
+    public BaseResponse<GetFridgesBasketCountRes> getFridgesBasketCount() {
+
+        try {
+            Integer userIdx = jwtService.getUserId();
+            GetFridgesBasketCountRes getFridgesBasketCountRes = fridgeBasketProvider.retreiveFridgeBasketCount(userIdx);
+
+            return new BaseResponse<>(getFridgesBasketCountRes);
+        } catch (BaseException exception) {
+            return new BaseResponse<>(exception.getStatus());
+        }
+    }
 }

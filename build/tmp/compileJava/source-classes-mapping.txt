@@ -2,8 +2,8 @@ com/recipe/app/src/recipeKeyword/models/GetRecipesBestKeywordRes.java
  com.recipe.app.src.recipeKeyword.models.GetRecipesBestKeywordRes
 com/recipe/app/src/recipeProcess/RecipeProcessProvider.java
  com.recipe.app.src.recipeProcess.RecipeProcessProvider
-com/recipe/app/src/fridgeBasket/FridgeBasketProvider.java
- com.recipe.app.src.fridgeBasket.FridgeBasketProvider
+com/recipe/app/src/scrapPublic/models/PostScrapPublicReq.java
+ com.recipe.app.src.scrapPublic.models.PostScrapPublicReq
 com/recipe/app/src/ingredientCategory/IngredientCategoryController.java
  com.recipe.app.src.ingredientCategory.IngredientCategoryController
 com/recipe/app/src/receipt/ReceiptRepository.java
@@ -34,8 +34,8 @@ com/recipe/app/src/receipt/models/GetBuyList.java
  com.recipe.app.src.receipt.models.GetBuyList
 com/recipe/app/src/receipt/models/PostReceiptIngredientRes.java
  com.recipe.app.src.receipt.models.PostReceiptIngredientRes
-com/recipe/app/src/ingredient/IngredientController.java
- com.recipe.app.src.ingredient.IngredientController
+com/recipe/app/src/scrapYoutube/ScrapYoutubeService.java
+ com.recipe.app.src.scrapYoutube.ScrapYoutubeService
 com/recipe/app/src/user/UserService.java
  com.recipe.app.src.user.UserService
 com/recipe/app/src/userRecipePhoto/UserRecipePhotoService.java
@@ -201,8 +201,8 @@ com/recipe/app/src/recipeProcess/RecipeProcessService.java
  com.recipe.app.src.recipeProcess.RecipeProcessService
 com/recipe/app/src/viewPublic/ViewPublicRepository.java
  com.recipe.app.src.viewPublic.ViewPublicRepository
-com/recipe/app/src/ingredient/IngredientProvider.java
- com.recipe.app.src.ingredient.IngredientProvider
+com/recipe/app/src/scrapYoutube/ScrapYoutubeRepository.java
+ com.recipe.app.src.scrapYoutube.ScrapYoutubeRepository
 com/recipe/app/src/viewBlog/models/ViewBlog.java
  com.recipe.app.src.viewBlog.models.ViewBlog
 com/recipe/app/src/user/models/MypageMyRecipeList.java
@@ -241,10 +241,10 @@ com/recipe/app/src/fridgeBasket/models/FridgeBasketList.java
  com.recipe.app.src.fridgeBasket.models.FridgeBasketList
 com/recipe/app/src/user/models/User.java
  com.recipe.app.src.user.models.User
-com/recipe/app/src/fridgeBasket/FridgeBasketController.java
- com.recipe.app.src.fridgeBasket.FridgeBasketController
 com/recipe/app/src/ingredient/models/GetIngredientsRes.java
  com.recipe.app.src.ingredient.models.GetIngredientsRes
+com/recipe/app/src/scrapYoutube/ScrapYoutubeController.java
+ com.recipe.app.src.scrapYoutube.ScrapYoutubeController
 com/recipe/app/src/viewPublic/ViewPublicController.java
  com.recipe.app.src.viewPublic.ViewPublicController
 com/recipe/app/src/fridge/models/PatchFridgesIngredientRes.java
@@ -303,10 +303,11 @@ com/recipe/app/config/Constant.java
  com.recipe.app.config.Constant
 com/recipe/app/src/scrapBlog/ScrapBlogProvider.java
  com.recipe.app.src.scrapBlog.ScrapBlogProvider
-com/recipe/app/src/viewBlog/ViewBlogService.java
- com.recipe.app.src.viewBlog.ViewBlogService
-com/recipe/app/src/userRecipe/models/GetMyRecipesRes.java
- com.recipe.app.src.userRecipe.models.GetMyRecipesRes
+com/recipe/app/src/user/UserProvider.java
+ com.recipe.app.src.user.UserProvider
+ com.recipe.app.src.user.UserProvider$1
+com/recipe/app/src/scrapYoutube/ScrapYoutubeProvider.java
+ com.recipe.app.src.scrapYoutube.ScrapYoutubeProvider
 com/recipe/app/src/buy/BuyRepository.java
  com.recipe.app.src.buy.BuyRepository
 com/recipe/app/src/receipt/models/GetReceiptRes.java
@@ -319,8 +320,8 @@ com/recipe/app/src/recipeIngredient/RecipeIngredientService.java
  com.recipe.app.src.recipeIngredient.RecipeIngredientService
 com/recipe/app/src/recipeInfo/RecipeInfoRepository.java
  com.recipe.app.src.recipeInfo.RecipeInfoRepository
-com/recipe/app/src/scrapPublic/models/PostScrapPublicReq.java
- com.recipe.app.src.scrapPublic.models.PostScrapPublicReq
+com/recipe/app/src/scrapYoutube/models/ScrapYoutube.java
+ com.recipe.app.src.scrapYoutube.models.ScrapYoutube
 com/recipe/app/src/recipeInfo/models/GetRecipeBlogsRes.java
  com.recipe.app.src.recipeInfo.models.GetRecipeBlogsRes
 com/recipe/app/src/recipeIngredient/models/RecipeIngredient.java
@@ -341,16 +342,17 @@ com/recipe/app/src/scrapPublic/models/ScrapPublicList.java
  com.recipe.app.src.scrapPublic.models.ScrapPublicList
 com/recipe/app/src/userRecipe/UserRecipeRepository.java
  com.recipe.app.src.userRecipe.UserRecipeRepository
-com/recipe/app/src/scrapYoutube/ScrapYoutubeController.java
- com.recipe.app.src.scrapYoutube.ScrapYoutubeController
-com/recipe/app/src/scrapYoutube/models/ScrapYoutube.java
- com.recipe.app.src.scrapYoutube.models.ScrapYoutube
-com/recipe/app/src/scrapYoutube/ScrapYoutubeRepository.java
- com.recipe.app.src.scrapYoutube.ScrapYoutubeRepository
-com/recipe/app/src/user/UserProvider.java
- com.recipe.app.src.user.UserProvider
- com.recipe.app.src.user.UserProvider$1
-com/recipe/app/src/scrapYoutube/ScrapYoutubeProvider.java
- com.recipe.app.src.scrapYoutube.ScrapYoutubeProvider
-com/recipe/app/src/scrapYoutube/ScrapYoutubeService.java
- com.recipe.app.src.scrapYoutube.ScrapYoutubeService
+com/recipe/app/src/ingredient/IngredientController.java
+ com.recipe.app.src.ingredient.IngredientController
+com/recipe/app/src/userRecipe/models/GetMyRecipesRes.java
+ com.recipe.app.src.userRecipe.models.GetMyRecipesRes
+com/recipe/app/src/viewBlog/ViewBlogService.java
+ com.recipe.app.src.viewBlog.ViewBlogService
+com/recipe/app/src/ingredient/IngredientProvider.java
+ com.recipe.app.src.ingredient.IngredientProvider
+com/recipe/app/src/fridgeBasket/FridgeBasketController.java
+ com.recipe.app.src.fridgeBasket.FridgeBasketController
+com/recipe/app/src/fridgeBasket/FridgeBasketProvider.java
+ com.recipe.app.src.fridgeBasket.FridgeBasketProvider
+com/recipe/app/src/fridgeBasket/models/GetFridgesBasketCountRes.java
+ com.recipe.app.src.fridgeBasket.models.GetFridgesBasketCountRes

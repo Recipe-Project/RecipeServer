@@ -2,6 +2,7 @@ package com.recipe.app.src.fridgeBasket;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
+import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketCountRes;
 import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
 import com.recipe.app.src.fridgeBasket.models.IngredientList;
 import com.recipe.app.src.ingredient.IngredientProvider;
@@ -96,6 +97,24 @@ public class FridgeBasketProvider {
         return new GetFridgesBasketRes(ingredientCount,ingredientList);
     }
 
+    /**
+     *냉장고 바구니 개수 조회 API
+     * @param userIdx
+     * @return GetFridgesBasketCountRes
+     * @throws BaseException
+     */
+    public GetFridgesBasketCountRes retreiveFridgeBasketCount(int userIdx) throws BaseException {
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+
+        Long ingredientCount;
+        try {
+            ingredientCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_COUNT_FRIDGE_BASKET_BY_USER);
+        }
+
+        return new GetFridgesBasketCountRes(ingredientCount);
+    }
 
     /**
      * 유저 인덱스로 냉장고 바구니 조회

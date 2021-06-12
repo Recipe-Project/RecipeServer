@@ -31,7 +31,7 @@ public class ReceiptService {
     private final ReceiptRepository receiptRepository;
 
     @Autowired
-    public ReceiptService(BuyRepository buyRepository, IngredientRepository ingredientRepository, FridgeRepository fridgeRepository, UserProvider userProvider, ReceiptProvider receiptProvider, ReceiptRepository receiptRepository){
+    public ReceiptService(BuyRepository buyRepository, IngredientRepository ingredientRepository, FridgeRepository fridgeRepository, UserProvider userProvider, ReceiptProvider receiptProvider, ReceiptRepository receiptRepository) {
         this.buyRepository = buyRepository;
         this.ingredientRepository = ingredientRepository;
         this.fridgeRepository = fridgeRepository;
@@ -42,14 +42,15 @@ public class ReceiptService {
 
     /**
      * 영수증 삭제 API
+     *
      * @param jwtUserIdx, receiptIdx
      * @throws BaseException
      */
-    @Transactional(rollbackFor = Exception.class)
+    @Transactional
     public void deleteReceipt(Integer jwtUserIdx, Integer receiptIdx) throws BaseException {
-        Receipt receipt = receiptProvider.retrieveReceiptByReceiptIdx(receiptIdx);
+        Receipt receipt = receiptProvider.retrieveReceiptByReceiptIdx(receiptIdx); // reivew: retrieveReceiptById
 
-        if(receipt.getUser().getUserIdx()!=jwtUserIdx)
+        if (receipt.getUser().getUserIdx() != jwtUserIdx)
             throw new BaseException(FORBIDDEN_ACCESS);
 
         receipt.setStatus("INACTIVE");
@@ -60,19 +61,18 @@ public class ReceiptService {
         }
 
         List<Buy> buys = receipt.getBuys();
-        for(int i=0;i<buys.size();i++){
-            buys.get(i).setStatus("INACTIVE");
-
-            try {
-                buyRepository.save(buys.get(i));
-            } catch (Exception exception) {
-                throw new BaseException(DATABASE_ERROR);
-            }
+        int size = buys.size();
+        for (int i = 0; i < size; i++) {
+            Buy buy = buys.get(i);
+            buy.setStatus("INACTIVE");
+            buyRepository.save(buy);
+            throw new BaseException(DATABASE_ERROR);
         }
     }
 
     /**
      * 영수증 수정
+     *
      * @param patchReceiptReq
      * @return void
      * @throws BaseException
@@ -81,7 +81,7 @@ public class ReceiptService {
     public void updateReceipt(int jwtUserIdx, int receiptIdx, PatchReceiptReq patchReceiptReq) throws BaseException {
         Receipt receipt = receiptProvider.retrieveReceiptByReceiptIdx(receiptIdx);
         //jwt 확인
-        if(receipt.getUser().getUserIdx() != jwtUserIdx){
+        if (receipt.getUser().getUserIdx() != jwtUserIdx) {
             throw new BaseException(FORBIDDEN_USER);
         }
 
@@ -91,8 +91,8 @@ public class ReceiptService {
         datetime.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
         Date date;
         try {
-            date = datetime.parse(receiptDate);
-        }catch (Exception e){
+            date = datetime.parse(receiptDate); // 컨트롤러에서 하면 좋지않을까?
+        } catch (Exception e) {
             throw new BaseException(DATE_PARSE_ERROR);
         }
         receipt.setReceiptDate(date);
@@ -103,16 +103,12 @@ public class ReceiptService {
         }
 
         List<PatchBuyList> patchBuyList = patchReceiptReq.getPatchBuyList();
-        for(int i=0;i< patchBuyList.size();i++){
+        for (int i = 0; i < patchBuyList.size(); i++) {
             PatchBuyList patchBuy = patchBuyList.get(i);
-            Buy buy;
-            try {
-                buy = buyRepository.findById(patchBuy.getBuyIdx()).orElse(null);
-            } catch (Exception exception) {
-                throw new BaseException(DATABASE_ERROR);
-            }
+            Buy buy = buyRepository.findById(patchBuy.getBuyIdx())
+                    .orElse(null);
 
-            if(buy==null || buy.getReceipt().getReceiptIdx()!=receiptIdx){
+            if (buy == null || buy.getReceipt().getReceiptIdx() != receiptIdx) {
                 throw new BaseException(NOT_FOUND_BUY);
             }
             buy.setBuyName(patchBuy.getBuyName());
@@ -125,7 +121,7 @@ public class ReceiptService {
         }
 
         List<DeleteBuyList> deleteBuyList = patchReceiptReq.getDeleteBuyList();
-        for(int i=0;i< deleteBuyList.size();i++){
+        for (int i = 0; i < deleteBuyList.size(); i++) {
             DeleteBuyList deleteBuy = deleteBuyList.get(i);
             Buy buy;
             try {
@@ -134,7 +130,7 @@ public class ReceiptService {
                 throw new BaseException(DATABASE_ERROR);
             }
 
-            if(buy==null || buy.getReceipt().getReceiptIdx()!=receiptIdx){
+            if (buy == null || buy.getReceipt().getReceiptIdx() != receiptIdx) {
                 throw new BaseException(NOT_FOUND_BUY);
             }
 
@@ -149,6 +145,7 @@ public class ReceiptService {
 
     /**
      * 영수증 입력
+     *
      * @param postReceiptReq
      * @return void
      * @throws BaseException
@@ -165,7 +162,7 @@ public class ReceiptService {
         Date date;
         try {
             date = datetime.parse(receiptDate);
-        }catch (Exception e){
+        } catch (Exception e) {
             throw new BaseException(DATE_PARSE_ERROR);
         }
 
@@ -178,7 +175,7 @@ public class ReceiptService {
         }
 
         List<PostBuyList> postBuyList = postReceiptReq.getBuyList();
-        for(int i = 0; i< postBuyList.size(); i++){
+        for (int i = 0; i < postBuyList.size(); i++) {
             PostBuyList buys = postBuyList.get(i);
             String buyName = buys.getBuyName();
 
