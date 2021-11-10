@@ -102,7 +102,6 @@ public class UserService {
             JSONParser jsonParser = new JSONParser();
             jsonObject = (JSONObject) jsonParser.parse(body);
             resultcode = jsonObject.get("resultcode").toString();
-            System.out.println(resultcode);
         }
         catch (Exception e){
             throw new BaseException(FAILED_TO_PARSE);
@@ -111,7 +110,6 @@ public class UserService {
         String response;
         if(resultcode.equals("00")){
             response = jsonObject.get("response").toString();
-            System.out.println(response);
         }
         else{
             throw new BaseException(FORBIDDEN_ACCESS);
@@ -223,7 +221,6 @@ public class UserService {
         if (body.length() == 0) {
             throw new BaseException(FAILED_TO_READ_RESPONSE);
         }
-        System.out.println(body);
 
         String socialId;
         String response;

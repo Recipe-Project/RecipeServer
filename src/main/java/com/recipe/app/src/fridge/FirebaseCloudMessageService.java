@@ -34,7 +34,6 @@ public class FirebaseCloudMessageService {
                 .build();
         Response response = client.newCall(request)
                 .execute();
-        System.out.println("response body"+response.body().string());
     }
 
     // fcm 메시지를 만들고 이를 objectmapper를 이용해 string으로 변환하여 반환한다.
@@ -52,15 +51,10 @@ public class FirebaseCloudMessageService {
                 )
                 .validate_only(false)
                 .build();
-
-        System.out.println("fcmMessage: "+fcmMessage.getMessage().getNotification().getTitle());
         return objectMapper.writeValueAsString(fcmMessage);
-
-
     }
 
     private String getAccessToken() throws IOException {
-
         String firebaseConfigPath = "recipeapp-key.json";
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())

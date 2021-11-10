@@ -274,7 +274,6 @@ public class FridgeProvider {
         for(int i=start;i<start+display&&i<keySetList.size();i++){
         //for (Integer recipeId : keySetList) {
             Integer recipeId = keySetList.get(i);
-            System.out.println(String.format("Key : %s, Value : %s", recipeId, map.get(recipeId)));
             RecipeInfo recipeInfo = recipeInfoRepository.findByRecipeIdAndStatus(recipeId, "ACTIVE");
             RecipeInfo ri = recipeInfoProvider.retrieveRecipeByRecipeId(recipeId);
             String title = recipeInfo.getRecipeNmKo();

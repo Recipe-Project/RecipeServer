@@ -159,8 +159,6 @@ public class RecipeInfoProvider {
         String thumbnail = recipeInfo.getImgUrl();
         String cookingTime = recipeInfo.getCookingTime();
         String level = recipeInfo.getLevelNm();
-        System.out.println(recipeInfo.getRecipeId());
-
         List<Ingredient> ingredientList = ingredientRepository.findByStatus("ACTIVE");
         List<Fridge> fridges = fridgeRepository.findByUserAndStatus(user, "ACTIVE");
         List<RecipeIngredient> recipeIngredients = recipeInfo.getRecipeIngredients();
@@ -201,13 +199,9 @@ public class RecipeInfoProvider {
             Integer recipeIngredientIdx = ingredient.getIdx();
             String recipeIngredientName = ingredient.getIrdntNm();
             String recipeIngredientCpcty = ingredient.getIrdntCpcty();
-
-            System.out.println("***");
             String recipeIngredientIcon = null;
             for(int j=0;j<ingredientList.size();j++){
-                //System.out.println(ingredientList.get(j).getName());
                 if(recipeIngredientName.contains(ingredientList.get(j).getName())){
-                    //System.out.println(recipeIngredientName +","+ingredientList.get(j).getName());
                     recipeIngredientIcon = ingredientList.get(j).getIcon();
                 }
             }
@@ -419,7 +413,6 @@ public class RecipeInfoProvider {
 
             String inFridgeYN = "N";
             for(int j=0;j<fridges.size();j++){
-                System.out.println(fridges.get(j).getIngredientName());
                 if(recipeIngredientName.contains(fridges.get(j).getIngredientName())&&recipeIngredientIcon.equals(fridges.get(j).getIngredientIcon())){
                     inFridgeYN="Y";
                     break;
@@ -524,8 +517,6 @@ public class RecipeInfoProvider {
         if (body.length() == 0) {
             throw new BaseException(FAILED_TO_READ_RESPONSE);
         }
-        System.out.println(body);
-
 
         Integer total;
         JSONArray arr;
@@ -534,7 +525,6 @@ public class RecipeInfoProvider {
             jsonObject = (JSONObject) jsonParser.parse(body);
             arr = (JSONArray) jsonObject.get("items");
             total = Integer.parseInt(jsonObject.get("total").toString());
-            System.out.println(total);
         }
         catch (Exception e){
             throw new BaseException(FAILED_TO_PARSE);
@@ -569,7 +559,6 @@ public class RecipeInfoProvider {
             SimpleDateFormat datetime2 = new SimpleDateFormat("yyyy.M.d", Locale.KOREA);
             datetime2.setTimeZone(TimeZone.getTimeZone("Asia/Seoul"));
             String postdate = datetime2.format(date);
-            //System.out.println(blogUrl);
 
             if(blogUrl.contains("naver")) {
                 try {
@@ -577,7 +566,6 @@ public class RecipeInfoProvider {
                     Document doc = Jsoup.parse(url, 5000);
 
                     String src = doc.getElementById("mainFrame").toString().replace("&amp;", "&");
-                    //System.out.println(src);
 
                     int s = src.indexOf("src=") + 5;
                     int e = src.indexOf("&from=");
@@ -615,8 +603,6 @@ public class RecipeInfoProvider {
                     String result = null;
                     for (Element image : imageLinks) {
                         String temp = image.attr("src");
-                        System.out.println(temp);
-
                         if (!temp.contains("admin")) {
                             result = temp;
                             break;
