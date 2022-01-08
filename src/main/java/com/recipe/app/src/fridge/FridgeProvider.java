@@ -82,7 +82,7 @@ public class FridgeProvider {
         }
 
         List<Fridges> fridges = new ArrayList<>();
-        for (int i=0;i<ingredientCategories.size()-1;i++){
+        for (int i=0;i<ingredientCategories.size();i++){
             int ingredientCategoryIdx = ingredientCategories.get(i).getIngredientCategoryIdx();
             String ingredientCategoryName = ingredientCategories.get(i).getName();
 

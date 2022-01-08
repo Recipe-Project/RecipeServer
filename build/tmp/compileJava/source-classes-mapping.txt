@@ -2,8 +2,8 @@ com/recipe/app/src/recipeKeyword/models/GetRecipesBestKeywordRes.java
  com.recipe.app.src.recipeKeyword.models.GetRecipesBestKeywordRes
 com/recipe/app/src/recipeProcess/RecipeProcessProvider.java
  com.recipe.app.src.recipeProcess.RecipeProcessProvider
-com/recipe/app/src/scrapPublic/models/PostScrapPublicReq.java
- com.recipe.app.src.scrapPublic.models.PostScrapPublicReq
+com/recipe/app/src/fridgeBasket/FridgeBasketProvider.java
+ com.recipe.app.src.fridgeBasket.FridgeBasketProvider
 com/recipe/app/src/ingredientCategory/IngredientCategoryController.java
  com.recipe.app.src.ingredientCategory.IngredientCategoryController
 com/recipe/app/src/receipt/ReceiptRepository.java
@@ -114,8 +114,8 @@ com/recipe/app/src/userRecipe/models/PostMyRecipeReq.java
  com.recipe.app.src.userRecipe.models.PostMyRecipeReq
 com/recipe/app/src/buy/models/Buy.java
  com.recipe.app.src.buy.models.Buy
-com/recipe/app/src/fridge/FridgeService.java
- com.recipe.app.src.fridge.FridgeService
+com/recipe/app/src/ingredient/models/GetIngredientsRes.java
+ com.recipe.app.src.ingredient.models.GetIngredientsRes
 com/recipe/app/src/receipt/models/PatchBuyList.java
  com.recipe.app.src.receipt.models.PatchBuyList
 com/recipe/app/src/fridge/models/GetFridgesRecipeRes.java
@@ -124,6 +124,8 @@ com/recipe/app/src/fridgeBasket/FridgeBasketService.java
  com.recipe.app.src.fridgeBasket.FridgeBasketService
 com/recipe/app/src/fridge/models/PostFridgesReq.java
  com.recipe.app.src.fridge.models.PostFridgesReq
+com/recipe/app/src/fridgeBasket/models/GetFridgesBasketCountRes.java
+ com.recipe.app.src.fridgeBasket.models.GetFridgesBasketCountRes
 com/recipe/app/src/viewBlog/models/PostViewBlogReq.java
  com.recipe.app.src.viewBlog.models.PostViewBlogReq
 com/recipe/app/src/userRecipe/models/GetMyRecipeRes.java
@@ -134,8 +136,8 @@ com/recipe/app/src/user/models/PatchUserRes.java
  com.recipe.app.src.user.models.PatchUserRes
 com/recipe/app/config/BaseResponseStatus.java
  com.recipe.app.config.BaseResponseStatus
-com/recipe/app/src/fridge/FridgeProvider.java
- com.recipe.app.src.fridge.FridgeProvider
+com/recipe/app/src/ingredient/IngredientProvider.java
+ com.recipe.app.src.ingredient.IngredientProvider
 com/recipe/app/AppApplication.java
  com.recipe.app.AppApplication
 com/recipe/app/src/fridge/models/FridgeRecipeList.java
@@ -156,8 +158,8 @@ com/recipe/app/src/userRecipeIngredient/UserRecipeIngredientService.java
  com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientService
 com/recipe/app/src/recipeKeyword/models/RecipeKeyword.java
  com.recipe.app.src.recipeKeyword.models.RecipeKeyword
-com/recipe/app/src/fridge/FridgeController.java
- com.recipe.app.src.fridge.FridgeController
+com/recipe/app/src/scrapPublic/models/PostScrapPublicReq.java
+ com.recipe.app.src.scrapPublic.models.PostScrapPublicReq
 com/recipe/app/src/userRecipePhoto/models/UserRecipePhoto.java
  com.recipe.app.src.userRecipePhoto.models.UserRecipePhoto
 com/recipe/app/src/fridge/models/IngredientList.java
@@ -241,8 +243,8 @@ com/recipe/app/src/fridgeBasket/models/FridgeBasketList.java
  com.recipe.app.src.fridgeBasket.models.FridgeBasketList
 com/recipe/app/src/user/models/User.java
  com.recipe.app.src.user.models.User
-com/recipe/app/src/ingredient/models/GetIngredientsRes.java
- com.recipe.app.src.ingredient.models.GetIngredientsRes
+com/recipe/app/src/fridgeBasket/FridgeBasketController.java
+ com.recipe.app.src.fridgeBasket.FridgeBasketController
 com/recipe/app/src/scrapYoutube/ScrapYoutubeController.java
  com.recipe.app.src.scrapYoutube.ScrapYoutubeController
 com/recipe/app/src/viewPublic/ViewPublicController.java
@@ -348,11 +350,9 @@ com/recipe/app/src/userRecipe/models/GetMyRecipesRes.java
  com.recipe.app.src.userRecipe.models.GetMyRecipesRes
 com/recipe/app/src/viewBlog/ViewBlogService.java
  com.recipe.app.src.viewBlog.ViewBlogService
-com/recipe/app/src/ingredient/IngredientProvider.java
- com.recipe.app.src.ingredient.IngredientProvider
-com/recipe/app/src/fridgeBasket/FridgeBasketController.java
- com.recipe.app.src.fridgeBasket.FridgeBasketController
-com/recipe/app/src/fridgeBasket/FridgeBasketProvider.java
- com.recipe.app.src.fridgeBasket.FridgeBasketProvider
-com/recipe/app/src/fridgeBasket/models/GetFridgesBasketCountRes.java
- com.recipe.app.src.fridgeBasket.models.GetFridgesBasketCountRes
+com/recipe/app/src/fridge/FridgeService.java
+ com.recipe.app.src.fridge.FridgeService
+com/recipe/app/src/fridge/FridgeController.java
+ com.recipe.app.src.fridge.FridgeController
+com/recipe/app/src/fridge/FridgeProvider.java
+ com.recipe.app.src.fridge.FridgeProvider
