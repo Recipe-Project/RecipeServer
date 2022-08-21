@@ -1,2 +1,0 @@
-com/recipe/app/AppApplicationTests.java
- com.recipe.app.AppApplicationTests
