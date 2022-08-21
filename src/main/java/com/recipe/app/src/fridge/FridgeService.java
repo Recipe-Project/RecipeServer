@@ -240,6 +240,7 @@ public class FridgeService {
 
         try{
             userinfo.setDeviceToken(fcmToken);
+            userRepository.save(userinfo);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_PATCH_FCM_TOKEN);
         }
