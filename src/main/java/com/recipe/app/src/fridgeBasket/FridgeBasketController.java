@@ -97,16 +97,14 @@ public class FridgeBasketController {
      */
     @GetMapping("/basket")
     public BaseResponse<GetFridgesBasketRes> getFridgesBasket() {
-
         try {
             Integer userIdx = jwtService.getUserId();
             GetFridgesBasketRes getFridgesBasketRes = fridgeBasketProvider.retreiveFridgeBasket(userIdx);
-
-
             return new BaseResponse<>(getFridgesBasketRes);
-
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
+        } catch (Exception exception) {
+            return new BaseResponse<>(FAILED_TO_COUNT_FRIDGE_BASKET_BY_USER);
         }
     }
 

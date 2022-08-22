@@ -9,5 +9,5 @@ import java.util.List;
 @AllArgsConstructor
 public class GetFridgesBasketRes {
     private final Long ingredientCount;
-    private final List ingredientList;
+    private final List<IngredientList> ingredientList;
 }
