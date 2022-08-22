@@ -10,5 +10,5 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Getter
 public class PostFridgesBasketReq {
-    private List ingredientList;
+    private List<Integer> ingredientList;
 }

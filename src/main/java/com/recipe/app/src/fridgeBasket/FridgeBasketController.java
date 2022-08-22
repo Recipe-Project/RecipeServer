@@ -53,16 +53,6 @@ public class FridgeBasketController {
                 return new BaseResponse<>(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
             }
 
-            /*
-            for(Integer ingredientIdx : ingredientList){
-                Boolean existIngredientName = fridgeBasketProvider.existIngredient(userIdx,ingredientIdx);
-                Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
-                String ingredientName = ingredient.getName();
-                if(existIngredientName){
-                    return new BaseResponse<>(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME,ingredientName);
-                }
-            }
-             */
             fridgeBasketService.createFridgesBasket(parameters,userIdx);
 
             return new BaseResponse<>(SUCCESS);
