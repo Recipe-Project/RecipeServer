@@ -63,15 +63,13 @@ public class FridgeBasketProvider {
      * @return FridgeBasket
      * @throws BaseException
      */
-    public FridgeBasket retreiveFridgeBasketByName(String name,int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+    public FridgeBasket retreiveFridgeBasketByName(String name, User user) throws BaseException {
         FridgeBasket fridgeBasket;
         try {
-            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user,name,"ACTIVE");
+            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, name,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
         }
-
         return fridgeBasket;
     }
 

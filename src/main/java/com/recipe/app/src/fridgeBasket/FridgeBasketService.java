@@ -9,7 +9,6 @@ import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -30,16 +29,16 @@ public class FridgeBasketService {
     private final IngredientCategoryProvider ingredientCategoryProvider;
     private final IngredientProvider ingredientProvider;
     private final IngredientRepository ingredientRepository;
-    private final JwtService jwtService;
+    private final FridgeBasketProvider fridgeBasketProvider;
 
     @Autowired
-    public FridgeBasketService(UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientProvider ingredientProvider, IngredientRepository ingredientRepository, JwtService jwtService){
+    public FridgeBasketService(UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientProvider ingredientProvider, IngredientRepository ingredientRepository, FridgeBasketProvider fridgeBasketProvider){
         this.userProvider = userProvider;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
         this.ingredientProvider = ingredientProvider;
         this.ingredientRepository = ingredientRepository;
-        this.jwtService = jwtService;
+        this.fridgeBasketProvider = fridgeBasketProvider;
     }
 
 
@@ -51,31 +50,27 @@ public class FridgeBasketService {
      * @throws BaseException
      */
     public void createFridgesBasket(PostFridgesBasketReq postFridgesBasketReq, int userIdx) throws BaseException {
-        try {
-            User user = userProvider.retrieveUserByUserIdx(userIdx);
-            List<Integer> ingredientIdxList = postFridgesBasketReq.getIngredientList();
-            List<Ingredient> ingredientList = ingredientRepository.findAllByIngredientIdxIn(ingredientIdxList);
-            Map<String, FridgeBasket> existIngredientMap = fridgeBasketRepository.findAllByUserAndStatusAndIngredientIn(user, "ACTIVE", ingredientList)
-                    .stream().collect(Collectors.toMap(FridgeBasket::getIngredientName, v -> v));;
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        List<Integer> ingredientIdxList = postFridgesBasketReq.getIngredientList();
+        List<Ingredient> ingredientList = ingredientRepository.findAllByIngredientIdxIn(ingredientIdxList);
+        Map<String, FridgeBasket> existIngredientMap = fridgeBasketRepository.findAllByUserAndStatusAndIngredientIn(user, "ACTIVE", ingredientList)
+                .stream().collect(Collectors.toMap(FridgeBasket::getIngredientName, v -> v));
 
-            List<FridgeBasket> fridgeBaskets = new ArrayList<>();
-            for (Ingredient ingredient : ingredientList) {
-                String ingredientName = ingredient.getName();
-                String ingredientIcon = ingredient.getIcon();
-                IngredientCategory ingredientCategory = ingredient.getIngredientCategory();
-                if (existIngredientMap.containsKey(ingredientName)) {
-                    FridgeBasket fridgeBasket = existIngredientMap.get(ingredientName);
-                    fridgeBasket.setCount(fridgeBasket.getCount() + 1);
-                    fridgeBaskets.add(fridgeBasket);
-                } else {
-                    FridgeBasket fridgeBasket = new FridgeBasket(user, ingredient, ingredientName, ingredientIcon, ingredientCategory);
-                    fridgeBaskets.add(fridgeBasket);
-                }
+        List<FridgeBasket> fridgeBaskets = new ArrayList<>();
+        for (Ingredient ingredient : ingredientList) {
+            String ingredientName = ingredient.getName();
+            String ingredientIcon = ingredient.getIcon();
+            IngredientCategory ingredientCategory = ingredient.getIngredientCategory();
+            if (existIngredientMap.containsKey(ingredientName)) {
+                FridgeBasket fridgeBasket = existIngredientMap.get(ingredientName);
+                fridgeBasket.setCount(fridgeBasket.getCount() + 1);
+                fridgeBaskets.add(fridgeBasket);
+            } else {
+                FridgeBasket fridgeBasket = new FridgeBasket(user, ingredient, ingredientName, ingredientIcon, ingredientCategory);
+                fridgeBaskets.add(fridgeBasket);
             }
-            fridgeBasketRepository.saveAll(fridgeBaskets);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_FRIDGES_BASKET);
         }
+        fridgeBasketRepository.saveAll(fridgeBaskets);
     }
 
     /**
@@ -85,21 +80,25 @@ public class FridgeBasketService {
      * @throws BaseException
      */
     public PostFridgesDirectBasketRes createFridgesDirectBasket(PostFridgesDirectBasketReq postFridgesDirectBasketReq, int userIdx) throws BaseException {
-        try {
-            User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        String ingredientName = postFridgesDirectBasketReq.getIngredientName();
+        String ingredientIcon = postFridgesDirectBasketReq.getIngredientIcon();
+        Integer ingredientCategoryIdx = postFridgesDirectBasketReq.getIngredientCategoryIdx();
 
-            String ingredientName = postFridgesDirectBasketReq.getIngredientName();
-            String ingredientIcon = postFridgesDirectBasketReq.getIngredientIcon();
-            Integer ingredientCategoryIdx = postFridgesDirectBasketReq.getIngredientCategoryIdx();
+        // name 이 이미 바구니에 있다면
+        FridgeBasket existFridgeBasket = fridgeBasketProvider.retreiveFridgeBasketByName(ingredientName, user);
+        if (existFridgeBasket != null)
+            throw new BaseException(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME);
+        // name 이 재료리스트에 있다면
+        Ingredient existIngredient = ingredientProvider.retreiveIngredientByName(ingredientName);
+        if (existIngredient != null)
+            throw new BaseException(POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS);
 
-            IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
-            FridgeBasket fridgeBasket = new FridgeBasket(user,null, ingredientName, ingredientIcon, ingredientCategory);
-            fridgeBasketRepository.save(fridgeBasket);
+        IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
+        FridgeBasket fridgeBasket = new FridgeBasket(user,null, ingredientName, ingredientIcon, ingredientCategory);
+        fridgeBasketRepository.save(fridgeBasket);
 
-            return new PostFridgesDirectBasketRes(ingredientName,ingredientIcon,ingredientCategoryIdx);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_FRIDGES_DIRECT_BASKET);
-        }
+        return new PostFridgesDirectBasketRes(ingredientName,ingredientIcon,ingredientCategoryIdx);
     }
 
 
