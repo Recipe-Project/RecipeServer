@@ -85,23 +85,21 @@ public class FridgeBasketService {
      * @throws BaseException
      */
     public PostFridgesDirectBasketRes createFridgesDirectBasket(PostFridgesDirectBasketReq postFridgesDirectBasketReq, int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
-        String ingredientName = postFridgesDirectBasketReq.getIngredientName();
-
-        String ingredientIcon = postFridgesDirectBasketReq.getIngredientIcon();
-        Integer ingredientCategoryIdx = postFridgesDirectBasketReq.getIngredientCategoryIdx();
-
-        IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
         try {
-            FridgeBasket fridgeBasket = new FridgeBasket(user,null,ingredientName,ingredientIcon,ingredientCategory);
-            fridgeBasket = fridgeBasketRepository.save(fridgeBasket);
+            User user = userProvider.retrieveUserByUserIdx(userIdx);
 
+            String ingredientName = postFridgesDirectBasketReq.getIngredientName();
+            String ingredientIcon = postFridgesDirectBasketReq.getIngredientIcon();
+            Integer ingredientCategoryIdx = postFridgesDirectBasketReq.getIngredientCategoryIdx();
+
+            IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
+            FridgeBasket fridgeBasket = new FridgeBasket(user,null, ingredientName, ingredientIcon, ingredientCategory);
+            fridgeBasketRepository.save(fridgeBasket);
+
+            return new PostFridgesDirectBasketRes(ingredientName,ingredientIcon,ingredientCategoryIdx);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_FRIDGES_DIRECT_BASKET);
         }
-
-
-        return new PostFridgesDirectBasketRes(ingredientName,ingredientIcon,ingredientCategoryIdx);
     }
 
 
