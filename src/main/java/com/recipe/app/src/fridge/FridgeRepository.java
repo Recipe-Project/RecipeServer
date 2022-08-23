@@ -12,10 +12,15 @@ import java.util.List;
 @Repository
 public interface FridgeRepository extends CrudRepository<Fridge, Integer> {
     List<Fridge> findByUserAndStatus(User user, String status);
-    List<Fridge>  findByUserAndIngredientCategoryAndStatus(User user, IngredientCategory ingredientCategory, String status);
+
+    List<Fridge> findByUserAndIngredientCategoryAndStatus(User user, IngredientCategory ingredientCategory, String status);
+
     Fridge findByUserAndIngredientNameAndStatus(User user, String ingredientName, String status);
 
     List<Fridge> findByStatus(String active);
 
     Boolean existsByUserAndIngredientNameAndStatus(User user, String ingredientName, String active);
+
+    void deleteAllByUserAndStatusAndIngredientNameIn(User user, String status, List<String> ingredientName);
+
 }

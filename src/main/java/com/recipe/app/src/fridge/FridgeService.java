@@ -32,7 +32,7 @@ public class FridgeService {
     private final UserRepository userRepository;
     private final JwtService jwtService;
 
-    private static final String FIREBASE_API_URL="https://fcm.googleapis.com/fcm/send";
+    private static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
 
     @Autowired
     public FridgeService(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeRepository fridgeRepository, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, UserRepository userRepository, JwtService jwtService) {
@@ -47,6 +47,7 @@ public class FridgeService {
 
     /**
      * 냉장고 채우기  API
+     *
      * @param postFridgesReq,userIdx
      * @return List<PostFridgesRes>
      * @throws BaseException
@@ -70,10 +71,9 @@ public class FridgeService {
                 String expiredAtTmp = fridgeBasketList.get(i).getExpiredAt();
 
                 Date expiredAt;
-                if (expiredAtTmp == null || expiredAtTmp.equals("")){
-                    expiredAt=null;
-                }
-                else{
+                if (expiredAtTmp == null || expiredAtTmp.equals("")) {
+                    expiredAt = null;
+                } else {
                     DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
                     expiredAt = sdFormat.parse(expiredAtTmp);
                 }
@@ -81,7 +81,7 @@ public class FridgeService {
                 String storageMethod = fridgeBasketList.get(i).getStorageMethod();
                 Integer count = fridgeBasketList.get(i).getCount();
 
-                Fridge fridge = new Fridge(user,ingredientName,ingredientIcon,ingredientCategory,storageMethod,expiredAt,count);
+                Fridge fridge = new Fridge(user, ingredientName, ingredientIcon, ingredientCategory, storageMethod, expiredAt, count);
                 fridge = fridgeRepository.save(fridge);
 
             }
@@ -93,17 +93,16 @@ public class FridgeService {
 
         // 냉장고 바구니 삭제
         List<FridgeBasket> fbList;
-        try{
+        try {
             fbList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
         }
 
 
-
-        try{
+        try {
             // 재료 삭제
-            for (int i=0;i<fbList.size();i++){
+            for (int i = 0; i < fbList.size(); i++) {
                 fbList.get(i).setStatus("INACTIVE");
             }
             fridgeBasketRepository.saveAll(fbList);
@@ -122,7 +121,7 @@ public class FridgeService {
             Integer count = fridgeBasketList.get(i).getCount();
 
 
-            PostFridgesRes postFridgesRes = new PostFridgesRes(ingredientName,ingredientIcon,ingredientCategoryIdx,expiredAt,storageMethod,count);
+            PostFridgesRes postFridgesRes = new PostFridgesRes(ingredientName, ingredientIcon, ingredientCategoryIdx, expiredAt, storageMethod, count);
             postFridgesResList.add(postFridgesRes);
 
         }
@@ -132,6 +131,7 @@ public class FridgeService {
 
     /**
      * 냉장고 재료 삭제 API
+     *
      * @param userIdx,parameters
      * @throws BaseException
      */
@@ -141,27 +141,17 @@ public class FridgeService {
 
         List<String> ingredientNames = parameters.getIngredientName();
 
-        for(String ingredientName : ingredientNames) {
-            Fridge fridge;
-            try {
-                fridge = fridgeRepository.findByUserAndIngredientNameAndStatus(user, ingredientName, "ACTIVE");
-            } catch (Exception ignored) {
-                throw new BaseException(FAILED_TO_GET_FRIDGE);
-            }
-
-            try {
-                fridge.setStatus("INACTIVE");
-                fridgeRepository.save(fridge);
-            } catch (Exception exception) {
-                throw new BaseException(FAILED_TO_DELETE_FRIDGE);
-            }
-
+        try {
+            fridgeRepository.deleteAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNames);
+        } catch (Exception e) {
+            throw new BaseException(FAILED_TO_DELETE_FRIDGE);
         }
 
     }
 
     /**
      * 냉장고 재료 수정 API
+     *
      * @param patchFridgesIngredientReq,userIdx
      * @return void
      * @throws BaseException
@@ -181,10 +171,9 @@ public class FridgeService {
                 String expiredAtTmp = patchFridgeList.get(i).getExpiredAt();
 
                 Date expiredAt;
-                if (expiredAtTmp == null || expiredAtTmp.equals("")){
-                    expiredAt=null;
-                }
-                else{
+                if (expiredAtTmp == null || expiredAtTmp.equals("")) {
+                    expiredAt = null;
+                } else {
                     DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
                     expiredAt = sdFormat.parse(expiredAtTmp);
                 }
@@ -195,7 +184,7 @@ public class FridgeService {
 
                 Fridge fridge;
                 try {
-                    fridge = fridgeRepository.findByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
+                    fridge = fridgeRepository.findByUserAndIngredientNameAndStatus(user, ingredientName, "ACTIVE");
                 } catch (Exception ignored) {
                     throw new BaseException(FAILED_TO_GET_FRIDGE);
                 }
@@ -220,7 +209,6 @@ public class FridgeService {
     }
 
 
-
     /**
      * fcm 토큰 수정 API
      * @param patchFcmTokenReq,userIdx
@@ -231,14 +219,14 @@ public class FridgeService {
     public void updateFcmToken(PatchFcmTokenReq patchFcmTokenReq, Integer userIdx) throws BaseException {
         String fcmToken = patchFcmTokenReq.getFcmToken();
 
-        User userinfo ;
-        try{
-            userinfo = userRepository.findByUserIdxAndStatus(userIdx,"ACTIVE");
+        User userinfo;
+        try {
+            userinfo = userRepository.findByUserIdxAndStatus(userIdx, "ACTIVE");
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_GET_USER);
         }
 
-        try{
+        try {
             userinfo.setDeviceToken(fcmToken);
             userRepository.save(userinfo);
         } catch (Exception exception) {
