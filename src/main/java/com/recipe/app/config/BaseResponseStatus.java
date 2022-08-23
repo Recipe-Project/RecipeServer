@@ -259,9 +259,14 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_FRIDGE_BASKET(false, 3065, "냉장고 바구니 조회에 실패했습니다."),
     FAILED_TO_DELETE_FRIDGE_BASKET(false, 3066, "냉장고 바구니 삭제에 실패했습니다."),
 
+    // [PATCH] /fridge/basket
+    FAILED_TO_PATCH_FRIDGE_BASKET_INGREDIENTS(false, 3067, "냉장고 바구니 재료 수정에 실패했습니다."),
+
     // [PATCH] /fcm/token
     FAILED_TO_PATCH_FCM_TOKEN(false, 3072, "fcm 토큰 수정에 실패했습니다."),
     // 코드번호 3074부터 사용
+
+
     /**
      * 4000 : Database, Server 오류
      */

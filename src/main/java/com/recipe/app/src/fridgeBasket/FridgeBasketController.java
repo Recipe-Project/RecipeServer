@@ -10,6 +10,7 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.text.ParseException;
 import java.util.List;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
@@ -156,6 +157,10 @@ public class FridgeBasketController {
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
+        } catch (ParseException exception) {
+            return new BaseResponse<>(DATE_PARSE_ERROR);
+        } catch (Exception exception) {
+            return new BaseResponse<>(FAILED_TO_PATCH_FRIDGE_BASKET_INGREDIENTS);
         }
     }
 
