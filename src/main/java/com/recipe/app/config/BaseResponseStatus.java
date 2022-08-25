@@ -266,7 +266,8 @@ public enum BaseResponseStatus {
     FAILED_TO_PATCH_FCM_TOKEN(false, 3072, "fcm 토큰 수정에 실패했습니다."),
     // 코드번호 3074부터 사용
 
-
+    // [GET] /app/version
+    FAILED_TO_GET_APP_VERSION(false, 3073, "앱 버전 조회에 실패했습니다."),
     /**
      * 4000 : Database, Server 오류
      */
