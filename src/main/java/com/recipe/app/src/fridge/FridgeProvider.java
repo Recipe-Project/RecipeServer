@@ -196,53 +196,23 @@ public class FridgeProvider {
      * @throws BaseException
      */
     public List<ShelfLifeUser> retreiveShelfLifeUserList() throws BaseException {
+        SimpleDateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
+        String today = sdFormat.format(new Date());
+
         List<Fridge> fridgeList;
-        List<ShelfLifeUser> shelfLifeUsers = new ArrayList<>();
         try {
-            fridgeList = fridgeRepository.findByStatus("ACTIVE");
-
-            for (int i=0;i<fridgeList.size();i++) {
-                Integer userIdx = fridgeList.get(i).getUser().getUserIdx();
-                Boolean existUserIdx = userRepository.existsByUserIdxAndStatus(userIdx,"ACTIVE");
-                if (existUserIdx){
-
-                    Date tmpDate = fridgeList.get(i).getExpiredAt();
-
-                    if (tmpDate== null){
-                        continue;
-                    }
-                    DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
-                    String expiredAt = sdFormat.format(tmpDate);
-                    Date tempDate = new Date();
-                    String nowDate = sdFormat.format(tempDate);
-                    SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
-                    long diffDay = 0;
-                    try{
-                        Date startDate = sdf.parse(nowDate);
-                        Date endDate = sdf.parse(expiredAt);
-                        diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
-                    }catch(ParseException e){
-                        e.printStackTrace();
-                    }
-
-
-                    if(diffDay>2 && diffDay<=3){
-
-                        String ingredientName = fridgeList.get(i).getIngredientName();
-                        User user = userProvider.retrieveUserByUserIdx(userIdx);
-                        String deviceToken = user.getDeviceToken();
-                        ShelfLifeUser shelfLifeUser = new ShelfLifeUser(deviceToken,ingredientName);
-                        shelfLifeUsers.add(shelfLifeUser);
-                    }
-                }
-
-            }
-
+            fridgeList = fridgeRepository.findAllByStatusAnd3DaysBeforeExpiredAt("ACTIVE", today);
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_SHELF_LIFE_USER_LIST);
         }
 
-
+        List<ShelfLifeUser> shelfLifeUsers = new ArrayList<>();
+        for(Fridge fridge : fridgeList) {
+            String deviceToken = fridge.getUser().getDeviceToken();
+            String ingredientName = fridge.getIngredientName();
+            ShelfLifeUser shelfLifeUser = new ShelfLifeUser(deviceToken, ingredientName);
+            shelfLifeUsers.add(shelfLifeUser);
+        }
         return shelfLifeUsers;
     }
 

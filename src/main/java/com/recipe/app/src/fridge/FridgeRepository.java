@@ -3,6 +3,7 @@ package com.recipe.app.src.fridge;
 import com.recipe.app.src.fridge.models.Fridge;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.models.User;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,4 +24,6 @@ public interface FridgeRepository extends CrudRepository<Fridge, Integer> {
 
     void deleteAllByUserAndStatusAndIngredientNameIn(User user, String status, List<String> ingredientName);
 
+    @Query(nativeQuery = true, value = "SELECT f.* FROM Fridge f WHERE status=:status AND  DATEDIFF(f.expiredAt, :today) = 3")
+    List<Fridge> findAllByStatusAnd3DaysBeforeExpiredAt(String status, String today);
 }
