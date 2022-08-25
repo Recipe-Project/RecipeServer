@@ -173,20 +173,18 @@ public class FridgeProvider {
 
     /**
      * 재료명 존재여부
-     * @param ingredientName,userIdx
-     * @return Boolean
+     * @param ingredientNameList,userIdx
+     * @return List<Fridge>
      * @throws BaseException
      */
-    public Boolean existIngredient(String ingredientName,int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
-        Boolean existIngredient;
+    public List<Fridge> getExistIngredients(List<String> ingredientNameList, User user) throws BaseException {
+        List<Fridge> existIngredients;
         try {
-            existIngredient = fridgeRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
+            existIngredients = fridgeRepository.findAllByUserAndStatusAndIngredientNameIn(user,"ACTIVE", ingredientNameList);
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_INGREDIENT_NAME);
         }
-
-        return existIngredient;
+        return existIngredients;
     }
 
 

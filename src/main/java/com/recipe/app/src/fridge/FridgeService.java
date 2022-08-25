@@ -16,9 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
 
@@ -28,21 +27,17 @@ public class FridgeService {
     private final FridgeProvider fridgeProvider;
     private final FridgeRepository fridgeRepository;
     private final FridgeBasketRepository fridgeBasketRepository;
-    private final IngredientCategoryProvider ingredientCategoryProvider;
     private final UserRepository userRepository;
-    private final JwtService jwtService;
 
     private static final String FIREBASE_API_URL="https://fcm.googleapis.com/fcm/send";
 
     @Autowired
-    public FridgeService(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeRepository fridgeRepository, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, UserRepository userRepository, JwtService jwtService) {
+    public FridgeService(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeRepository fridgeRepository, FridgeBasketRepository fridgeBasketRepository, UserRepository userRepository) {
         this.userProvider = userProvider;
         this.fridgeProvider = fridgeProvider;
         this.fridgeRepository = fridgeRepository;
         this.fridgeBasketRepository = fridgeBasketRepository;
-        this.ingredientCategoryProvider = ingredientCategoryProvider;
         this.userRepository = userRepository;
-        this.jwtService = jwtService;
     }
 
     /**
@@ -55,79 +50,57 @@ public class FridgeService {
     public List<PostFridgesRes> createFridges(PostFridgesReq postFridgesReq, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         List<FridgeBasketList> fridgeBasketList = postFridgesReq.getFridgeBasketList();
+        List<String> ingredientNameList = fridgeBasketList.stream().map(FridgeBasketList::getIngredientName).collect(Collectors.toList());
+        List<FridgeBasket> fbList;
+        try{
+            fbList = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNameList);
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
+        }
+        if(fbList.size() != fridgeBasketList.size())
+            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
+        List<Fridge> existIngredients = fridgeProvider.getExistIngredients(ingredientNameList, user);
+        if (existIngredients.size() > 0) {
+            throw new BaseException(POST_FRIDGES_EXIST_INGREDIENT_NAME, existIngredients.get(0).getIngredientName());
+        }
 
-
+        // 냉장고 저장
+        List<Fridge> fridges = new ArrayList<>();
         try {
-            for (int i = 0; i < fridgeBasketList.size(); i++) {
-                String ingredientName = fridgeBasketList.get(i).getIngredientName();
-
-                String ingredientIcon = fridgeBasketList.get(i).getIngredientIcon();
-
-                Integer ingredientCategoryIdx = fridgeBasketList.get(i).getIngredientCategoryIdx();
-
-                IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
-
-                String expiredAtTmp = fridgeBasketList.get(i).getExpiredAt();
-
-                Date expiredAt;
-                if (expiredAtTmp == null || expiredAtTmp.equals("")){
-                    expiredAt=null;
-                }
-                else{
-                    DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
-                    expiredAt = sdFormat.parse(expiredAtTmp);
-                }
-
-                String storageMethod = fridgeBasketList.get(i).getStorageMethod();
-                Integer count = fridgeBasketList.get(i).getCount();
-
-                Fridge fridge = new Fridge(user,ingredientName,ingredientIcon,ingredientCategory,storageMethod,expiredAt,count);
-                fridge = fridgeRepository.save(fridge);
-
+            for (FridgeBasket fridgeBasket: fbList) {
+                String ingredientName = fridgeBasket.getIngredientName();
+                String ingredientIcon = fridgeBasket.getIngredientIcon();
+                IngredientCategory ingredientCategory = fridgeBasket.getIngredientCategory();
+                Date expiredAt = fridgeBasket.getExpiredAt();
+                String storageMethod = fridgeBasket.getStorageMethod();
+                Integer count = fridgeBasket.getCount();
+                fridges.add(new Fridge(user, ingredientName, ingredientIcon, ingredientCategory, storageMethod, expiredAt, count));
             }
-
+            fridgeRepository.saveAll(fridges);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_FRIDGES);
         }
 
-
         // 냉장고 바구니 삭제
-        List<FridgeBasket> fbList;
         try{
-            fbList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
-        }
-
-
-
-        try{
-            // 재료 삭제
-            for (int i=0;i<fbList.size();i++){
-                fbList.get(i).setStatus("INACTIVE");
-            }
-            fridgeBasketRepository.saveAll(fbList);
+            fridgeBasketRepository.deleteAll(fbList);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_FRIDGE_BASKET);
         }
 
         List<PostFridgesRes> postFridgesResList = new ArrayList<>();
 
-        for (int i = 0; i < fridgeBasketList.size(); i++) {
-            String ingredientName = fridgeBasketList.get(i).getIngredientName();
-            String ingredientIcon = fridgeBasketList.get(i).getIngredientIcon();
-            Integer ingredientCategoryIdx = fridgeBasketList.get(i).getIngredientCategoryIdx();
-            String expiredAt = fridgeBasketList.get(i).getExpiredAt();
-            String storageMethod = fridgeBasketList.get(i).getStorageMethod();
-            Integer count = fridgeBasketList.get(i).getCount();
-
-
-            PostFridgesRes postFridgesRes = new PostFridgesRes(ingredientName,ingredientIcon,ingredientCategoryIdx,expiredAt,storageMethod,count);
+        for (FridgeBasketList fridgeBasket : fridgeBasketList) {
+            String ingredientName = fridgeBasket.getIngredientName();
+            String ingredientIcon = fridgeBasket.getIngredientIcon();
+            Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategoryIdx();
+            String expiredAt = fridgeBasket.getExpiredAt();
+            String storageMethod = fridgeBasket.getStorageMethod();
+            Integer count = fridgeBasket.getCount();
+            PostFridgesRes postFridgesRes = new PostFridgesRes(ingredientName, ingredientIcon, ingredientCategoryIdx, expiredAt, storageMethod, count);
             postFridgesResList.add(postFridgesRes);
-
         }
         return postFridgesResList;
-
     }
 
     /**

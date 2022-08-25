@@ -52,7 +52,6 @@ public class FridgeController {
     @PostMapping("/fridges")
     public BaseResponse<List<PostFridgesRes>> postFridges(@RequestBody PostFridgesReq parameters) {
         try {
-
             List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
             Integer userIdx = jwtService.getUserId();
 
@@ -60,54 +59,42 @@ public class FridgeController {
                 return new BaseResponse<>(POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST);
             }
 
+            for (FridgeBasketList fridgeBasket : fridgeBasketList) {
+                String ingredientName = fridgeBasket.getIngredientName();
+                String ingredientIcon = fridgeBasket.getIngredientIcon();
+                Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategoryIdx();
+                String expiredAt = fridgeBasket.getExpiredAt();
+                String storageMethod = fridgeBasket.getStorageMethod();
+                Integer count = fridgeBasket.getCount();
 
-            for (int i = 0; i < fridgeBasketList.size(); i++) {
-                String ingredientName = fridgeBasketList.get(i).getIngredientName();
-                String ingredientIcon = fridgeBasketList.get(i).getIngredientIcon();
-                Integer ingredientCategoryIdx = fridgeBasketList.get(i).getIngredientCategoryIdx();
-                String expiredAt = fridgeBasketList.get(i).getExpiredAt();
-                String storageMethod = fridgeBasketList.get(i).getStorageMethod();
-                Integer count = fridgeBasketList.get(i).getCount();
-
-                if (ingredientName == null || ingredientName.length()==0 ) {
+                if (ingredientName == null || ingredientName.length()==0) {
                     return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_NAME);
                 }
-                if (ingredientIcon == null || ingredientIcon.length()==0 ) {
+                if (ingredientIcon == null || ingredientIcon.length()==0) {
                     return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_ICON);
                 }
-                //int만 입력하도록?
-                if (ingredientCategoryIdx == null || ingredientCategoryIdx<=0 ) {
+                if (ingredientCategoryIdx == null || ingredientCategoryIdx<=0) {
                     return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
                 }
-                if (storageMethod == null || storageMethod.length()==0 ) {
+                if (storageMethod == null || storageMethod.length()==0) {
                     return new BaseResponse<>(EMPTY_STORAGE_METHOD);
                 }
-                if (count == null || count<=0  ) {
+                if (count == null || count<=0) {
                     return new BaseResponse<>(EMPTY_INGREDIENT_COUNT);
                 }
                 if (expiredAt !=null && expiredAt.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
                     return new BaseResponse<>(INVALID_DATE);
                 }
-                Boolean existIngredientName = fridgeProvider.existIngredient(ingredientName,userIdx);
-                if (existIngredientName) {
-                    return new BaseResponse<>(POST_FRIDGES_EXIST_INGREDIENT_NAME,ingredientName);
-                }
-                ArrayList storageMethods = new ArrayList();
-                storageMethods.add("냉장");
-                storageMethods.add("냉동");
-                storageMethods.add("실온");
-
-                if (!storageMethods.contains(storageMethod)){
+                if (!storageMethod.equals("냉장") && !storageMethod.equals("냉동") && !storageMethod.equals("실온")){
                     return new BaseResponse<>(INVALID_STORAGE_METHOD);
                 }
-
             }
 
-            List<PostFridgesRes> postFridgesBasketRes = fridgeService.createFridges(parameters,userIdx);
+            List<PostFridgesRes> postFridgesBasketRes = fridgeService.createFridges(parameters, userIdx);
 
             return new BaseResponse<>(postFridgesBasketRes);
         } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
+            return new BaseResponse<>(exception.getStatus(), exception.getIngredientName());
         }
     }
 
