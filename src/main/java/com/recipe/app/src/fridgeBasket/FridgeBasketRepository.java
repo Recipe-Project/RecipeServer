@@ -10,10 +10,9 @@ import java.util.List;
 
 @Repository
 public interface FridgeBasketRepository extends CrudRepository<FridgeBasket, Integer> {
-    FridgeBasket findByIngredientNameAndStatus(String name, String status);
+    FridgeBasket findByUserAndIngredientNameAndStatus(User user, String name, String status);
     Long countByUserAndStatus(User user, String status);
     List<FridgeBasket> findByUserAndStatus(User user, String status);
-
     Boolean existsByUserAndIngredientNameAndStatus(User user, String ingredientName, String active);
 
     List<FridgeBasket> findAllByUserAndStatusAndIngredientIn(User user, String status, List<Ingredient> ingredientList);

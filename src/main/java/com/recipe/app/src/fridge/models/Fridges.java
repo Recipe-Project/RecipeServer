@@ -11,6 +11,6 @@ import java.util.List;
 public class Fridges {
     private final Integer ingredientCategoryIdx;
     private final String ingredientCategoryName;
-    private final List ingredientList;
+    private final List<IngredientList> ingredientList;
 
 }

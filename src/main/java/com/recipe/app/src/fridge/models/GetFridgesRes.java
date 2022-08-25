@@ -10,6 +10,6 @@ import java.util.List;
 @AllArgsConstructor
 public class GetFridgesRes {
     private final long fridgeBasketCount;
-    private final List fridges;
+    private final List<Fridges> fridges;
 
 }

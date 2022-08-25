@@ -72,8 +72,6 @@ public class FridgeProvider {
             throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET_COUNT);
         }
 
-
-
         List<IngredientCategory> ingredientCategories;
         try {
             ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
@@ -82,35 +80,27 @@ public class FridgeProvider {
         }
 
         List<Fridges> fridges = new ArrayList<>();
-        for (int i=0;i<ingredientCategories.size();i++){
-            int ingredientCategoryIdx = ingredientCategories.get(i).getIngredientCategoryIdx();
-            String ingredientCategoryName = ingredientCategories.get(i).getName();
+        for (IngredientCategory ingredientCategory : ingredientCategories){
+            int ingredientCategoryIdx = ingredientCategory.getIngredientCategoryIdx();
+            String ingredientCategoryName = ingredientCategory.getName();
 
-            List<IngredientList> ingredientList = retreiveFridgeList(ingredientCategoryIdx,userIdx);
+            List<IngredientList> ingredientList = retreiveFridgeList(ingredientCategory, user);
 
             Fridges fridge = new Fridges(ingredientCategoryIdx, ingredientCategoryName, ingredientList);
             fridges.add(fridge);
-
         }
-
-
-
         return new GetFridgesRes(fridgeBasketCount,fridges);
-
     }
 
 
     /**
      * 카테고리에 해당하는 냉장고 재료 리스트 추출
      *
-     * @param ingredientCategoryIdx,userIdx
+     * @param ingredientCategory,userIdx
      * @return List<IngredientList>
      * @throws BaseException
      */
-    public List<IngredientList> retreiveFridgeList(Integer ingredientCategoryIdx, int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
-        IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
-
+    public List<IngredientList> retreiveFridgeList(IngredientCategory ingredientCategory, User user) throws BaseException {
         List<Fridge> fridgeList;
         try {
             fridgeList = fridgeRepository.findByUserAndIngredientCategoryAndStatus(user,ingredientCategory,"ACTIVE");
@@ -124,28 +114,21 @@ public class FridgeProvider {
             String storageMethod = fl.getStorageMethod();
             Integer count =fl.getCount();
 
-            Date tmpDate = fl.getExpiredAt();
-            String expiredAt;
-            String expiredAtResult;
-            Integer freshness;
-            if (tmpDate == null || tmpDate.equals("")){
-                expiredAt=null;
-                expiredAtResult=null;
-                freshness=555;
+            Date expiredDate = fl.getExpiredAt();
+            String expiredAt = null;
+            Integer freshness = null;
+            if(expiredDate == null) {
+                freshness = 555;
             }
-            else{
-                DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
-                expiredAt = sdFormat.format(tmpDate);
-                expiredAtResult = sdFormat.format(tmpDate)+"까지";
-                Date tempDate = new Date();
-                String nowDate = sdFormat.format(tempDate);
+            else {
                 SimpleDateFormat sdf = new SimpleDateFormat("yy.MM.dd");
+                expiredAt = sdf.format(expiredDate) + "까지";
+
                 long diffDay = 0;
                 try{
-                    Date startDate = sdf.parse(nowDate);
-                    Date endDate = sdf.parse(expiredAt);
+                    Date nowDate = sdf.parse(sdf.format(new Date()));
                     //두날짜 사이의 시간 차이(ms)를 하루 동안의 ms(24시*60분*60초*1000밀리초) 로 나눈다.
-                    diffDay = (endDate.getTime() - startDate.getTime()) / (24*60*60*1000);
+                    diffDay = (expiredDate.getTime() - nowDate.getTime()) / (24*60*60*1000);
                 }catch(ParseException e){
                     e.printStackTrace();
                 }
@@ -162,10 +145,8 @@ public class FridgeProvider {
                 else{
                     freshness=3;
                 }
-
             }
-
-            return new IngredientList(ingredientName,ingredientIcon,expiredAtResult,storageMethod,count,freshness);
+            return new IngredientList(ingredientName, ingredientIcon, expiredAt, storageMethod, count, freshness);
         }).collect(Collectors.toList());
 
     }

@@ -51,6 +51,7 @@ public class FridgeService {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         List<FridgeBasketList> fridgeBasketList = postFridgesReq.getFridgeBasketList();
         List<String> ingredientNameList = fridgeBasketList.stream().map(FridgeBasketList::getIngredientName).collect(Collectors.toList());
+
         List<FridgeBasket> fbList;
         try{
             fbList = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNameList);
@@ -59,10 +60,10 @@ public class FridgeService {
         }
         if(fbList.size() != fridgeBasketList.size())
             throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
+
         List<Fridge> existIngredients = fridgeProvider.getExistIngredients(ingredientNameList, user);
-        if (existIngredients.size() > 0) {
+        if (existIngredients.size() > 0)
             throw new BaseException(POST_FRIDGES_EXIST_INGREDIENT_NAME, existIngredients.get(0).getIngredientName());
-        }
 
         // 냉장고 저장
         List<Fridge> fridges = new ArrayList<>();
@@ -89,7 +90,6 @@ public class FridgeService {
         }
 
         List<PostFridgesRes> postFridgesResList = new ArrayList<>();
-
         for (FridgeBasketList fridgeBasket : fridgeBasketList) {
             String ingredientName = fridgeBasket.getIngredientName();
             String ingredientIcon = fridgeBasket.getIngredientIcon();

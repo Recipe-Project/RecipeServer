@@ -105,15 +105,11 @@ public class FridgeController {
      */
     @GetMapping("/fridges")
     public BaseResponse<GetFridgesRes> getFridges() {
-
         try {
             Integer userIdx = jwtService.getUserId();
-
             GetFridgesRes getFridgesRes = fridgeProvider.retreiveFridges(userIdx);
 
-
             return new BaseResponse<>(getFridgesRes);
-
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
         }
