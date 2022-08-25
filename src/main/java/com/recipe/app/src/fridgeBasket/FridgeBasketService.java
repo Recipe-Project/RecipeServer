@@ -132,10 +132,9 @@ public class FridgeBasketService {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         List<FridgeBasketList> fridgeBasketList = patchFridgesBasketReq.getFridgeBasketList();
         List<String> ingredientNameList = fridgeBasketList.stream().map(FridgeBasketList::getIngredientName).collect(Collectors.toList());
-        Map<String, FridgeBasket> existIngredientMap = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNameList)
-                .stream().collect(Collectors.toMap(FridgeBasket::getIngredientName, v -> v));
+        List<FridgeBasket> existIngredients = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNameList);
+        Map<String, FridgeBasket> existIngredientMap = existIngredients.stream().collect(Collectors.toMap(FridgeBasket::getIngredientName, v -> v));
 
-        List<FridgeBasket> fridgeBaskets = new ArrayList<>();
         for (FridgeBasketList fridgeBasket : fridgeBasketList) {
             String ingredientName = fridgeBasket.getIngredientName();
             Integer ingredientCnt = fridgeBasket.getIngredientCnt();
@@ -150,8 +149,7 @@ public class FridgeBasketService {
             existIngredient.setCount(ingredientCnt);
             existIngredient.setStorageMethod(storageMethod);
             existIngredient.setExpiredAt(expiredAt);
-            fridgeBaskets.add(existIngredient);
         }
-        fridgeBasketRepository.saveAll(fridgeBaskets);
+        fridgeBasketRepository.saveAll(existIngredients);
     }
 }
