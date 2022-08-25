@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -133,55 +134,36 @@ public class FridgeService {
      * @throws BaseException
      */
     @Transactional
-    public void updateFridgeIngredient(PatchFridgesIngredientReq patchFridgesIngredientReq, Integer userIdx) throws BaseException {
+    public void updateFridgeIngredient(PatchFridgesIngredientReq patchFridgesIngredientReq, Integer userIdx) throws BaseException, ParseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-
         List<PatchFridgeList> patchFridgeList = patchFridgesIngredientReq.getPatchFridgeList();
+        List<String> ingredientNames = patchFridgeList.stream().map(PatchFridgeList::getIngredientName).collect(Collectors.toList());
+        List<Fridge> existIngredients = fridgeProvider.getExistIngredients(ingredientNames, user);
+        if (existIngredients.size() != ingredientNames.size())
+            throw new BaseException(NOT_FOUND_INGREDIENT);
+        Map<String, Fridge> existIngredientMap = existIngredients.stream().collect(Collectors.toMap(Fridge::getIngredientName, v -> v));
 
-        try {
-            for (int i = 0; i < patchFridgeList.size(); i++) {
+        for (PatchFridgeList patchFridge : patchFridgeList) {
+            String ingredientName = patchFridge.getIngredientName();
+            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
+            Date expiredAt = (patchFridge.getExpiredAt() == null || "".equals(patchFridge.getExpiredAt())) ? null : sdFormat.parse(patchFridge.getExpiredAt());
+            String storageMethod = patchFridge.getStorageMethod();
+            Integer count = patchFridge.getCount();
 
-                String ingredientName = patchFridgeList.get(i).getIngredientName();
+            if (!existIngredientMap.containsKey(ingredientName))
+                throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BY_NAME);
 
-
-                String expiredAtTmp = patchFridgeList.get(i).getExpiredAt();
-
-                Date expiredAt;
-                if (expiredAtTmp == null || expiredAtTmp.equals("")) {
-                    expiredAt = null;
-                } else {
-                    DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
-                    expiredAt = sdFormat.parse(expiredAtTmp);
-                }
-
-
-                String storageMethod = patchFridgeList.get(i).getStorageMethod();
-                Integer count = patchFridgeList.get(i).getCount();
-
-                Fridge fridge;
-                try {
-                    fridge = fridgeRepository.findByUserAndIngredientNameAndStatus(user, ingredientName, "ACTIVE");
-                } catch (Exception ignored) {
-                    throw new BaseException(FAILED_TO_GET_FRIDGE);
-                }
-
-
-                try {
-                    fridge.setExpiredAt(expiredAt);
-                    fridge.setStorageMethod(storageMethod);
-                    fridge.setCount(count);
-                    fridgeRepository.save(fridge);
-
-                } catch (Exception ignored) {
-                    throw new BaseException(FAILED_TO_SAVE_FRIDGE);
-                }
-
-            }
-
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_PATCH_FRIDGES_INGREDIENT);
+            Fridge existIngredient = existIngredientMap.get(ingredientName);
+            existIngredient.setCount(count);
+            existIngredient.setStorageMethod(storageMethod);
+            existIngredient.setExpiredAt(expiredAt);
         }
 
+        try {
+            fridgeRepository.saveAll(existIngredients);
+        } catch (Exception ignored) {
+            throw new BaseException(FAILED_TO_SAVE_FRIDGE);
+        }
     }
 
 

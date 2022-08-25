@@ -147,22 +147,18 @@ public class FridgeController {
     @ResponseBody
     @PatchMapping("/fridges/ingredient")
     public BaseResponse<Void> patchFridgesIngredient(@RequestBody PatchFridgesIngredientReq parameters) throws BaseException {
-
         try {
             Integer userIdx = jwtService.getUserId();
-
             List<PatchFridgeList> patchFridgeList = parameters.getPatchFridgeList();
-
             if (patchFridgeList==null || patchFridgeList.isEmpty()) {
                 return new BaseResponse<>(EMPTY_PATCH_FRIDGE_LIST);
             }
 
-
-            for (int i = 0; i < patchFridgeList.size(); i++) {
-                String ingredientName = patchFridgeList.get(i).getIngredientName();
-                String expiredAt = patchFridgeList.get(i).getExpiredAt();
-                String storageMethod = patchFridgeList.get(i).getStorageMethod();
-                Integer count = patchFridgeList.get(i).getCount();
+            for (PatchFridgeList patchFridge : patchFridgeList) {
+                String ingredientName = patchFridge.getIngredientName();
+                String expiredAt = patchFridge.getExpiredAt();
+                String storageMethod = patchFridge.getStorageMethod();
+                Integer count = patchFridge.getCount();
 
                 if (ingredientName == null || ingredientName.length()==0 ) {
                     return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_NAME);
@@ -173,21 +169,12 @@ public class FridgeController {
                 if (count == null || count<=0  ) {
                     return new BaseResponse<>(EMPTY_INGREDIENT_COUNT);
                 }
-                if (expiredAt !=null && ingredientName.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
+                if (expiredAt !=null && expiredAt.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
                     return new BaseResponse<>(INVALID_DATE);
                 }
-                Boolean existIngredientName = fridgeProvider.existIngredient(ingredientName, userIdx);
-                if (!existIngredientName) {
-                    return new BaseResponse<>(NOT_FOUND_INGREDIENT);
-                }
-                ArrayList storageMethods = new ArrayList();
-                storageMethods.add("냉장");
-                storageMethods.add("냉동");
-                storageMethods.add("실온");
-                if (!storageMethods.contains(storageMethod)){
+                if (!storageMethod.equals("냉장") && !storageMethod.equals("냉동") && !storageMethod.equals("실온")){
                     return new BaseResponse<>(INVALID_STORAGE_METHOD);
                 }
-
             }
 
             fridgeService.updateFridgeIngredient(parameters,userIdx);
@@ -195,6 +182,8 @@ public class FridgeController {
             return new BaseResponse<>(SUCCESS);
         } catch (BaseException exception) {
             return new BaseResponse<>(exception.getStatus());
+        } catch (Exception exception) {
+            throw new BaseException(FAILED_TO_PATCH_FRIDGES_INGREDIENT);
         }
     }
 
