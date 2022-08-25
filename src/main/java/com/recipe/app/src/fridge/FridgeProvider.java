@@ -1,23 +1,17 @@
 package com.recipe.app.src.fridge;
 
-
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
-import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
-import com.recipe.app.src.recipeInfo.RecipeInfoProvider;
 import com.recipe.app.src.recipeInfo.RecipeInfoRepository;
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
-import com.recipe.app.src.recipeIngredient.RecipeIngredientRepository;
-import com.recipe.app.src.recipeIngredient.models.RecipeIngredient;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicInfo;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.UserRepository;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -33,29 +27,21 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 public class FridgeProvider {
     private final UserProvider userProvider;
     private final FridgeRepository fridgeRepository;
-    private final IngredientCategoryProvider ingredientCategoryProvider;
     private final IngredientCategoryRepository ingredientCategoryRepository;
     private final RecipeInfoRepository recipeInfoRepository;
-    private final RecipeIngredientRepository recipeIngredientRepository;
     private final ScrapPublicRepository scrapPublicRepository;
-    private final RecipeInfoProvider recipeInfoProvider;
     private final FridgeBasketRepository fridgeBasketRepository;
     private final UserRepository userRepository;
-    private final JwtService jwtService;
 
     @Autowired
-    public FridgeProvider(UserProvider userProvider, FridgeRepository fridgeRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientCategoryRepository ingredientCategoryRepository, RecipeInfoRepository recipeInfoRepository, RecipeIngredientRepository recipeIngredientRepository, ScrapPublicRepository scrapPublicRepository, RecipeInfoProvider recipeInfoProvider, FridgeBasketRepository fridgeBasketRepository, UserRepository userRepository, JwtService jwtService) {
+    public FridgeProvider(UserProvider userProvider, FridgeRepository fridgeRepository, IngredientCategoryRepository ingredientCategoryRepository, RecipeInfoRepository recipeInfoRepository, ScrapPublicRepository scrapPublicRepository, FridgeBasketRepository fridgeBasketRepository, UserRepository userRepository) {
         this.userProvider = userProvider;
         this.fridgeRepository = fridgeRepository;
-        this.ingredientCategoryProvider = ingredientCategoryProvider;
         this.ingredientCategoryRepository = ingredientCategoryRepository;
         this.recipeInfoRepository = recipeInfoRepository;
-        this.recipeIngredientRepository = recipeIngredientRepository;
         this.scrapPublicRepository = scrapPublicRepository;
-        this.recipeInfoProvider = recipeInfoProvider;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.userRepository = userRepository;
-        this.jwtService = jwtService;
     }
 
     /**
@@ -177,8 +163,6 @@ public class FridgeProvider {
      * @throws BaseException
      */
     public GetFridgesRecipeRes retreiveFridgesRecipe(int userIdx, Integer start, Integer display) throws BaseException {
-        long beforeTime = System.currentTimeMillis();
-
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
         List<RecipeInfo> recipeInfo;
@@ -202,11 +186,6 @@ public class FridgeProvider {
             long scrapCount = scrapPublicInfo == null ? 0 : scrapPublicInfo.getScrapCount();
             recipeList.add(new RecipeList(recipeId, title, content, thumbnail, cookingTime, scrapCount));
         }
-
-        long afterTime = System.currentTimeMillis();
-        long secDiffTime = afterTime - beforeTime; //두 시간에 차 계산
-        System.out.println("시간차이(m) : "+secDiffTime);
-
         return new GetFridgesRecipeRes(recipeInfo.size(), recipeList);
     }
 

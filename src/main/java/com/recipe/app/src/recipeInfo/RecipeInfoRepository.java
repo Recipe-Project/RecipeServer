@@ -1,8 +1,5 @@
 package com.recipe.app.src.recipeInfo;
 
-
-
-import com.recipe.app.src.fridge.models.RecipeList;
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.user.models.User;
 import org.springframework.data.jpa.repository.Query;
@@ -10,7 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-
 
 @Repository
 public interface RecipeInfoRepository extends CrudRepository<RecipeInfo, Integer> {

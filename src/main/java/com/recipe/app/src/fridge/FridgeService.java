@@ -1,7 +1,6 @@
 package com.recipe.app.src.fridge;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
@@ -13,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
