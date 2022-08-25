@@ -13,6 +13,7 @@ import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.recipeIngredient.RecipeIngredientRepository;
 import com.recipe.app.src.recipeIngredient.models.RecipeIngredient;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
+import com.recipe.app.src.scrapPublic.models.ScrapPublicInfo;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.UserRepository;
 import com.recipe.app.src.user.models.User;
@@ -176,96 +177,37 @@ public class FridgeProvider {
      * @throws BaseException
      */
     public GetFridgesRecipeRes retreiveFridgesRecipe(int userIdx, Integer start, Integer display) throws BaseException {
+        long beforeTime = System.currentTimeMillis();
+
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-        // 냉장고 재료랑 레시피 재료랑 동일한 재료 개수 많은 순
-        // 1.유저인덱스로 냉장고 재료를 조회한다.
-        List<Fridge> fridgeList;
+        List<RecipeInfo> recipeInfo;
         try {
-            fridgeList = fridgeRepository.findByUserAndStatus(user, "ACTIVE");
-
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_FRIDGE_LIST);
-        }
-
-        // 2.모든 레시피를 조회한다.
-        List<RecipeInfo> recipeInfoList;
-        try {
-            recipeInfoList = recipeInfoRepository.findByStatus("ACTIVE");
-
+            recipeInfo = recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(user, "ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_RECIPE_INFO_LIST);
         }
+        List<Integer> recipeIdList = recipeInfo.stream().map(RecipeInfo::getRecipeId).collect(Collectors.toList());
+        Map<Integer, ScrapPublicInfo> scrapCountMap = scrapPublicRepository.findScrapCountStatusAndRecipeInfoIn("ACTIVE", recipeIdList)
+                .stream().collect(Collectors.toMap(ScrapPublicInfo::getRecipeId, v -> v));;
 
-        // 각각의 레시피 재료와 일치하는 냉장고 재료의 개수를 저장하기 위해 hashmap을 선언한다.
-        HashMap<Integer, Integer> map = new HashMap<>();
-        try {
-
-            // 3. 전체 레시피 목록으로 반복문을 실행한다.
-            for (RecipeInfo recipeInfo : recipeInfoList) {
-                Integer recipeId = recipeInfo.getRecipeId();
-
-                // 3-1. 레시피 하나에 해당하는 레시피 재료들을 가져온다.
-                List<RecipeIngredient> recipeIngredientList;
-                try {
-                    recipeIngredientList = recipeIngredientRepository.findByRecipeInfoAndStatus(recipeInfo, "ACTIVE");
-
-                } catch (Exception ignored) {
-                    throw new BaseException(FAILED_TO_GET_RECIPE_INGREDIENTS_LIST);
-                }
-
-
-                //재료들을 arrayList에 저장
-                List<String> recipeIngredients = new ArrayList<>();
-                for (RecipeIngredient recipeIngredient : recipeIngredientList){
-                    recipeIngredients.add(recipeIngredient.getIrdntNm());
-
-                }
-
-                // 3-2. 냉장고 재료 목록으로 반복문을 실행한다.
-                int count = 0;
-                for (Fridge fridge : fridgeList) {
-                    String fridgeIngredientName = fridge.getIngredientName();
-
-                    // 레시피 재료리스트에 냉장고 재료가 포함된다면 count +1
-                    if (recipeIngredients.contains(fridgeIngredientName)) {
-                        count++;
-                    }
-                }
-
-                // 3-3. count가 0이 아닐때 (레시피인덱스, count) (1,5),(2,3)를 map에 추가
-                if(count!=0){
-                    map.put(recipeId, count);
-                }
-
-            }
-
-        } catch (Exception ignored) {
-            throw new BaseException(NO_INGREDIENT_THAT_MATCH_THE_RECIPE);
-        }
-
-
-        // 4.count 많은 수 대로 정렬한다.
-        List<Integer> keySetList = new ArrayList<>(map.keySet());
-        //내림차순
-        Collections.sort(keySetList, (o1, o2) -> (map.get(o2).compareTo(map.get(o1))));
         List<RecipeList> recipeList = new ArrayList<>();
-        for(int i=start;i<start+display&&i<keySetList.size();i++){
-        //for (Integer recipeId : keySetList) {
-            Integer recipeId = keySetList.get(i);
-            RecipeInfo recipeInfo = recipeInfoRepository.findByRecipeIdAndStatus(recipeId, "ACTIVE");
-            RecipeInfo ri = recipeInfoProvider.retrieveRecipeByRecipeId(recipeId);
-            String title = recipeInfo.getRecipeNmKo();
-            String content = recipeInfo.getSumry();
-            String thumbnail = recipeInfo.getImgUrl();
-            String cookingTime = recipeInfo.getCookingTime();
-            long scrapCount = scrapPublicRepository.countByRecipeInfoAndStatus(ri, "ACTIVE");
-
+        for(int i = start; i < start + display && i < recipeInfo.size(); i++) {
+            Integer recipeId = recipeInfo.get(i).getRecipeId();
+            String title = recipeInfo.get(i).getRecipeNmKo();
+            String content = recipeInfo.get(i).getSumry();
+            String thumbnail = recipeInfo.get(i).getImgUrl();
+            String cookingTime = recipeInfo.get(i).getCookingTime();
+            ScrapPublicInfo scrapPublicInfo = scrapCountMap.get(recipeId);
+            long scrapCount = scrapPublicInfo == null ? 0 : scrapPublicInfo.getScrapCount();
             recipeList.add(new RecipeList(recipeId, title, content, thumbnail, cookingTime, scrapCount));
-
         }
 
-        return new GetFridgesRecipeRes(keySetList.size(), recipeList);
+        long afterTime = System.currentTimeMillis();
+        long secDiffTime = afterTime - beforeTime; //두 시간에 차 계산
+        System.out.println("시간차이(m) : "+secDiffTime);
+
+        return new GetFridgesRecipeRes(recipeInfo.size(), recipeList);
     }
 
 

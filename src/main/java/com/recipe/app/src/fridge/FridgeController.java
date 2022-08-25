@@ -196,10 +196,8 @@ public class FridgeController {
     @ResponseBody
     @GetMapping("/fridges/recipe")
     public BaseResponse<GetFridgesRecipeRes> getFridgesRecipe(@RequestParam(value = "start") Integer start, @RequestParam(value = "display") Integer display)  {
-
         try {
             Integer userIdx = jwtService.getUserId();
-
 
             GetFridgesRecipeRes getFridgesRecipeRes = fridgeProvider.retreiveFridgesRecipe(userIdx, start, display);
 
