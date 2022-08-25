@@ -109,23 +109,16 @@ public class FridgeBasketService {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         FridgeBasket fridgeBasket;
         try {
-            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user,ingredient,"ACTIVE");
+            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredient,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
         }
 
-
-
         try {
-            fridgeBasket.setStatus("INACTIVE");
-            fridgeBasketRepository.save(fridgeBasket);
-
+            fridgeBasketRepository.delete(fridgeBasket);
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_DELETE_FRIDGE_BASKET);
         }
-
-
-
     }
 
 
