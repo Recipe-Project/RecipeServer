@@ -9,4 +9,9 @@ import lombok.Setter;
 @AllArgsConstructor
 public class BaseException extends Exception {
     private BaseResponseStatus status;
+    private String ingredientName;
+
+    public BaseException(BaseResponseStatus status) {
+        this.status = status;
+    }
 }

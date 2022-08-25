@@ -262,6 +262,8 @@ public enum BaseResponseStatus {
     // [PATCH] /fridge/basket
     FAILED_TO_PATCH_FRIDGE_BASKET_INGREDIENTS(false, 3067, "냉장고 바구니 재료 수정에 실패했습니다."),
 
+    FAILED_TO_RETREIVE_FRIDGE_BY_NAME(false, 3068, "재료명으로 냉장고 조회에 실패했습니다."),
+
     // [PATCH] /fcm/token
     FAILED_TO_PATCH_FCM_TOKEN(false, 3072, "fcm 토큰 수정에 실패했습니다."),
     // 코드번호 3074부터 사용
