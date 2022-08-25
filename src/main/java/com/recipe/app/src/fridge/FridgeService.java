@@ -114,7 +114,7 @@ public class FridgeService {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         List<String> ingredientNames = parameters.getIngredientName();
         List<Fridge> existIngredients = fridgeProvider.getExistIngredients(ingredientNames, user);
-        if (existIngredients.size() == 0)
+        if (existIngredients.size() != ingredientNames.size())
             throw new BaseException(NOT_FOUND_INGREDIENT);
 
         try {

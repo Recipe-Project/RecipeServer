@@ -126,7 +126,7 @@ public class FridgeController {
         try {
             Integer userIdx = jwtService.getUserId();
             List<String> ingrdientNames = parameters.getIngredientName();
-            if (ingrdientNames == null) {
+            if (ingrdientNames == null || ingrdientNames.isEmpty()) {
                 return new BaseResponse<>(EMPTY_INGREDIENT);
             }
 
