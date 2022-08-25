@@ -112,18 +112,13 @@ public class FridgeService {
     @Transactional
     public void deleteFridgeIngredient(Integer userIdx, DeleteFridgesIngredientReq parameters) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-
-        for(String ingrdientName : ingrdientNames) {
-            Boolean existIngredient = fridgeProvider.existIngredient(ingrdientName, userIdx);
-            if (!existIngredient) {
-                return new BaseResponse<>(NOT_FOUND_INGREDIENT);
-            }
-        }
-
         List<String> ingredientNames = parameters.getIngredientName();
+        List<Fridge> existIngredients = fridgeProvider.getExistIngredients(ingredientNames, user);
+        if (existIngredients.size() == 0)
+            throw new BaseException(NOT_FOUND_INGREDIENT);
 
         try {
-            fridgeRepository.deleteAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNames);
+            fridgeRepository.deleteAll(existIngredients);
         } catch (Exception e) {
             throw new BaseException(FAILED_TO_DELETE_FRIDGE);
         }
