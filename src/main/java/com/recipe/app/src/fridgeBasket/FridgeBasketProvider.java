@@ -63,15 +63,13 @@ public class FridgeBasketProvider {
      * @return FridgeBasket
      * @throws BaseException
      */
-    public FridgeBasket retreiveFridgeBasketByName(String name,int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+    public FridgeBasket retreiveFridgeBasketByName(String name, User user) throws BaseException {
         FridgeBasket fridgeBasket;
         try {
-            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user,name,"ACTIVE");
+            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, name,"ACTIVE");
         } catch (Exception ignored) {
             throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
         }
-
         return fridgeBasket;
     }
 
@@ -84,17 +82,44 @@ public class FridgeBasketProvider {
     public GetFridgesBasketRes retreiveFridgeBasket(int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-        Long ingredientCount;
+        Long ingredientCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
+        List<IngredientList> ingredientList = retrieveIngredientList(user);;
+
+        return new GetFridgesBasketRes(ingredientCount, ingredientList);
+    }
+
+    /**
+     * 유저 인덱스로 냉장고 바구니 조회
+     * @param user
+     * @return List<IngredientList>
+     * @throws BaseException
+     */
+    public List<IngredientList> retrieveIngredientList(User user) throws BaseException {
+        List<FridgeBasket> fridgeBasketList;
         try {
-            ingredientCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
+            fridgeBasketList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
         } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_COUNT_FRIDGE_BASKET_BY_USER);
+            throw new BaseException(FAILED_TO_RETREIVE_INGREDIENT_LIST_BY_USER);
         }
 
-        List ingredientList = retrieveIngredientList(userIdx);;
-
-
-        return new GetFridgesBasketRes(ingredientCount,ingredientList);
+        return fridgeBasketList.stream().map(fridgeBasket -> {
+            Integer ingredientIdx=null;
+            if(fridgeBasket.getIngredient()!=null){
+                ingredientIdx = fridgeBasket.getIngredient().getIngredientIdx();
+            }
+            String ingredientName = fridgeBasket.getIngredientName();
+            String ingredientIcon = fridgeBasket.getIngredientIcon();
+            Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategory().getIngredientCategoryIdx();
+            Integer ingredientCnt = fridgeBasket.getCount();
+            String storageMethod = fridgeBasket.getStorageMethod();
+            Date tmpDate = fridgeBasket.getExpiredAt();
+            String expiredAt=null;
+            if (tmpDate != null){
+                DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
+                expiredAt = sdFormat.format(tmpDate) + "까지";
+            }
+            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon,ingredientCategoryIdx, ingredientCnt, storageMethod, expiredAt);
+        }).collect(Collectors.toList());
     }
 
     /**
@@ -114,45 +139,6 @@ public class FridgeBasketProvider {
         }
 
         return new GetFridgesBasketCountRes(ingredientCount);
-    }
-
-    /**
-     * 유저 인덱스로 냉장고 바구니 조회
-     * @param userIdx
-     * @return List<IngredientList>
-     * @throws BaseException
-     */
-    public List<IngredientList> retrieveIngredientList(int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
-
-        List<FridgeBasket> fridgeBasketList;
-        try {
-            fridgeBasketList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_RETREIVE_INGREDIENT_LIST_BY_USER);
-        }
-
-        return fridgeBasketList.stream().map(fridgeBasket -> {
-            Integer ingredientIdx=null;
-            if(fridgeBasket.getIngredient()!=null){
-                ingredientIdx = fridgeBasket.getIngredient().getIngredientIdx();
-            }
-
-            String ingredientName = fridgeBasket.getIngredientName();
-            String ingredientIcon = fridgeBasket.getIngredientIcon();
-            Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategory().getIngredientCategoryIdx();
-            Integer ingredientCnt = fridgeBasket.getCount();
-            String storageMethod = fridgeBasket.getStorageMethod();
-            Date tmpDate = fridgeBasket.getExpiredAt();
-            String expiredAt=null;
-            if (tmpDate != null){
-                DateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
-                expiredAt = sdFormat.format(tmpDate) + "까지";
-            }
-
-            return new IngredientList(ingredientIdx,ingredientName,ingredientIcon,ingredientCategoryIdx, ingredientCnt, storageMethod, expiredAt);
-
-        }).collect(Collectors.toList());
     }
 
 }

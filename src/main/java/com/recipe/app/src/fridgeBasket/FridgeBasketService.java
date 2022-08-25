@@ -9,14 +9,14 @@ import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
 
@@ -27,16 +27,16 @@ public class FridgeBasketService {
     private final IngredientCategoryProvider ingredientCategoryProvider;
     private final IngredientProvider ingredientProvider;
     private final IngredientRepository ingredientRepository;
-    private final JwtService jwtService;
+    private final FridgeBasketProvider fridgeBasketProvider;
 
     @Autowired
-    public FridgeBasketService(UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientProvider ingredientProvider, IngredientRepository ingredientRepository, JwtService jwtService){
+    public FridgeBasketService(UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientProvider ingredientProvider, IngredientRepository ingredientRepository, FridgeBasketProvider fridgeBasketProvider){
         this.userProvider = userProvider;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
         this.ingredientProvider = ingredientProvider;
         this.ingredientRepository = ingredientRepository;
-        this.jwtService = jwtService;
+        this.fridgeBasketProvider = fridgeBasketProvider;
     }
 
 
@@ -49,39 +49,26 @@ public class FridgeBasketService {
      */
     public void createFridgesBasket(PostFridgesBasketReq postFridgesBasketReq, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        List<Integer> ingredientList = postFridgesBasketReq.getIngredientList();
+        List<Integer> ingredientIdxList = postFridgesBasketReq.getIngredientList();
+        List<Ingredient> ingredientList = ingredientRepository.findAllByIngredientIdxIn(ingredientIdxList);
+        Map<String, FridgeBasket> existIngredientMap = fridgeBasketRepository.findAllByUserAndStatusAndIngredientIn(user, "ACTIVE", ingredientList)
+                .stream().collect(Collectors.toMap(FridgeBasket::getIngredientName, v -> v));
 
-        try {
-            for (int i = 0; i < ingredientList.size(); i++) {
-                Integer ingredientIdx = ingredientList.get(i);
-                Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
-                String ingredientName = ingredient.getName();
-                String ingredientIcon = ingredient.getIcon();
-                Integer ingredientCategoryIdx = ingredient.getIngredientCategory().getIngredientCategoryIdx();
-                IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
-
-                FridgeBasket existIngredient=null;
-                try {
-                    existIngredient = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredientName, "ACTIVE");
-                } catch (Exception ignored) {
-                    throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
-                }
-                if(existIngredient!=null){
-                    Integer cnt = existIngredient.getCount() +1;
-                    existIngredient.setCount(cnt);
-                    fridgeBasketRepository.save(existIngredient);
-                }
-                else {
-                    FridgeBasket fridgeBasket = new FridgeBasket(user, ingredient, ingredientName, ingredientIcon, ingredientCategory);
-                    fridgeBasketRepository.save(fridgeBasket);
-                }
+        List<FridgeBasket> fridgeBaskets = new ArrayList<>();
+        for (Ingredient ingredient : ingredientList) {
+            String ingredientName = ingredient.getName();
+            String ingredientIcon = ingredient.getIcon();
+            IngredientCategory ingredientCategory = ingredient.getIngredientCategory();
+            if (existIngredientMap.containsKey(ingredientName)) {
+                FridgeBasket fridgeBasket = existIngredientMap.get(ingredientName);
+                fridgeBasket.setCount(fridgeBasket.getCount() + 1);
+                fridgeBaskets.add(fridgeBasket);
+            } else {
+                FridgeBasket fridgeBasket = new FridgeBasket(user, ingredient, ingredientName, ingredientIcon, ingredientCategory);
+                fridgeBaskets.add(fridgeBasket);
             }
-
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_FRIDGES_BASKET);
         }
-
-
+        fridgeBasketRepository.saveAll(fridgeBaskets);
     }
 
     /**
@@ -93,19 +80,21 @@ public class FridgeBasketService {
     public PostFridgesDirectBasketRes createFridgesDirectBasket(PostFridgesDirectBasketReq postFridgesDirectBasketReq, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         String ingredientName = postFridgesDirectBasketReq.getIngredientName();
-
         String ingredientIcon = postFridgesDirectBasketReq.getIngredientIcon();
         Integer ingredientCategoryIdx = postFridgesDirectBasketReq.getIngredientCategoryIdx();
 
+        // name 이 이미 바구니에 있다면
+        FridgeBasket existFridgeBasket = fridgeBasketProvider.retreiveFridgeBasketByName(ingredientName, user);
+        if (existFridgeBasket != null)
+            throw new BaseException(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME);
+        // name 이 재료리스트에 있다면
+        Ingredient existIngredient = ingredientProvider.retreiveIngredientByName(ingredientName);
+        if (existIngredient != null)
+            throw new BaseException(POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS);
+
         IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
-        try {
-            FridgeBasket fridgeBasket = new FridgeBasket(user,null,ingredientName,ingredientIcon,ingredientCategory);
-            fridgeBasket = fridgeBasketRepository.save(fridgeBasket);
-
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_FRIDGES_DIRECT_BASKET);
-        }
-
+        FridgeBasket fridgeBasket = new FridgeBasket(user,null, ingredientName, ingredientIcon, ingredientCategory);
+        fridgeBasketRepository.save(fridgeBasket);
 
         return new PostFridgesDirectBasketRes(ingredientName,ingredientIcon,ingredientCategoryIdx);
     }
@@ -146,47 +135,30 @@ public class FridgeBasketService {
      * @return void
      * @throws BaseException
      */
-    public void updateFridgesBasket(PatchFridgesBasketReq patchFridgesBasketReq, int userIdx) throws BaseException {
+    public void updateFridgesBasket(PatchFridgesBasketReq patchFridgesBasketReq, int userIdx) throws BaseException, ParseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         List<FridgeBasketList> fridgeBasketList = patchFridgesBasketReq.getFridgeBasketList();
+        List<String> ingredientNameList = fridgeBasketList.stream().map(FridgeBasketList::getIngredientName).collect(Collectors.toList());
+        Map<String, FridgeBasket> existIngredientMap = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNameList)
+                .stream().collect(Collectors.toMap(FridgeBasket::getIngredientName, v -> v));
 
+        List<FridgeBasket> fridgeBaskets = new ArrayList<>();
         for (FridgeBasketList fridgeBasket : fridgeBasketList) {
             String ingredientName = fridgeBasket.getIngredientName();
             Integer ingredientCnt = fridgeBasket.getIngredientCnt();
             String storageMethod = fridgeBasket.getStorageMethod();
-            String expiredAtTmp = fridgeBasket.getExpiredAt();
-            Date expiredAt;
-            if (expiredAtTmp == null || expiredAtTmp.equals("")){
-                expiredAt=null;
-            }
-            else{
-                try {
-                    DateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
-                    expiredAt = sdFormat.parse(expiredAtTmp);
-                }catch(Exception e){
-                    throw new BaseException(DATE_PARSE_ERROR);
-                }
-            }
+            SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd", Locale.KOREA);
+            Date expiredAt = (fridgeBasket.getExpiredAt() == null || "".equals(fridgeBasket.getExpiredAt())) ? null : sdFormat.parse(fridgeBasket.getExpiredAt());
 
-            FridgeBasket existIngredient=null;
-            try {
-                existIngredient = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredientName, "ACTIVE");
-            } catch (Exception ignored) {
+            if (!existIngredientMap.containsKey(ingredientName))
                 throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
-            }
 
-            if(existIngredient!=null){
-                existIngredient.setCount(ingredientCnt);
-                existIngredient.setStorageMethod(storageMethod);
-                existIngredient.setExpiredAt(expiredAt);
-                try {
-                    fridgeBasketRepository.save(existIngredient);
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
-            }
+            FridgeBasket existIngredient = existIngredientMap.get(ingredientName);
+            existIngredient.setCount(ingredientCnt);
+            existIngredient.setStorageMethod(storageMethod);
+            existIngredient.setExpiredAt(expiredAt);
+            fridgeBaskets.add(existIngredient);
         }
-
-
+        fridgeBasketRepository.saveAll(fridgeBaskets);
     }
 }
