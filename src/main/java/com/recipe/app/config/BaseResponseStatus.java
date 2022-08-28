@@ -270,6 +270,11 @@ public enum BaseResponseStatus {
 
     // [GET] /app/version
     FAILED_TO_GET_APP_VERSION(false, 3073, "앱 버전 조회에 실패했습니다."),
+
+    // [GET] /notice
+    FAILED_TO_GET_NOTICE(false, 3074, "공지 조회에 실패했습니다."),
+    NOT_FOUND_NOTICE(false, 3075, "공지가 존재하지 않습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
