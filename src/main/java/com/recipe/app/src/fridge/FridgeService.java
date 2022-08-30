@@ -49,6 +49,7 @@ public class FridgeService {
     public List<PostFridgesRes> createFridges(PostFridgesReq postFridgesReq, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         List<FridgeBasketList> fridgeBasketList = postFridgesReq.getFridgeBasketList();
+        Map<String, FridgeBasketList> fridgeBasketListMap = fridgeBasketList.stream().collect(Collectors.toMap(FridgeBasketList::getIngredientName, v -> v));
         List<String> ingredientNameList = fridgeBasketList.stream().map(FridgeBasketList::getIngredientName).collect(Collectors.toList());
 
         List<FridgeBasket> fbList;
@@ -69,11 +70,13 @@ public class FridgeService {
         try {
             for (FridgeBasket fridgeBasket: fbList) {
                 String ingredientName = fridgeBasket.getIngredientName();
-                String ingredientIcon = fridgeBasket.getIngredientIcon();
                 IngredientCategory ingredientCategory = fridgeBasket.getIngredientCategory();
-                Date expiredAt = fridgeBasket.getExpiredAt();
-                String storageMethod = fridgeBasket.getStorageMethod();
-                Integer count = fridgeBasket.getCount();
+                String ingredientIcon = fridgeBasket.getIngredientIcon();
+                FridgeBasketList fbMapValue = fridgeBasketListMap.get(ingredientName);
+                SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy.MM.dd");
+                Date expiredAt = (fbMapValue.getExpiredAt() == null || "".equals(fbMapValue.getExpiredAt())) ? null : sdFormat.parse(fbMapValue.getExpiredAt());
+                String storageMethod = fbMapValue.getStorageMethod();
+                Integer count = fbMapValue.getCount();
                 fridges.add(new Fridge(user, ingredientName, ingredientIcon, ingredientCategory, storageMethod, expiredAt, count));
             }
             fridgeRepository.saveAll(fridges);
