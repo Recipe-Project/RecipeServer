@@ -41,6 +41,7 @@ public class BaseResponse<T> {
     // 냉장고 채우기 API - 존재하는 재료가 있을 때 그 재료를 validation message에 추가
     public BaseResponse(BaseResponseStatus status,String ingredientName) {
         this.isSuccess = status.isSuccess();
+        this.message = status.getMessage();
         if (status == POST_FRIDGES_EXIST_INGREDIENT_NAME){
             this.message = status.getMessage()+"냉장고에 이미 있는 재료("+ingredientName+")입니다.";
         }
@@ -50,7 +51,6 @@ public class BaseResponse<T> {
         else if(status == POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS){
             this.message =status.getMessage()+"기본으로 제공되는 재료("+ingredientName+")입니다. 재료에서 선택해주세요.";
         }
-
         this.code = status.getCode();
     }
 }
