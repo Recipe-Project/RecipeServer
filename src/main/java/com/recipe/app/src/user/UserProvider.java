@@ -85,8 +85,8 @@ public class UserProvider {
      * @return GetUserRes
      * @throws BaseException
      */
-    public GetUserRes retrieveUser(Integer jwtUserIdx, Integer userIdx) throws BaseException {
-        if(userIdx != (int)jwtUserIdx){
+    public GetUserRes retrieveUser(int jwtUserIdx, Integer userIdx) throws BaseException {
+        if(userIdx != jwtUserIdx){
             throw new BaseException(FORBIDDEN_USER);
         }
         User user = retrieveUserByUserIdx(jwtUserIdx);
@@ -130,7 +130,7 @@ public class UserProvider {
 
             List<MypageMyRecipeList> myRecipeList= new ArrayList<>();
             for(int i=0;i<userRecipes.size();i++){
-                if(size==5){
+                if(size==6){
                     break;
                 }
                 if(userRecipes.get(i).getStatus().equals("ACTIVE")) {

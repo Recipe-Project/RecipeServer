@@ -134,18 +134,11 @@ public class UserController {
     @ResponseBody
     @GetMapping("/{userIdx}")
     public BaseResponse<GetUserRes> getUser(@PathVariable Integer userIdx) {
-        if(userIdx==null || userIdx<=0){
-            return new BaseResponse<>(USERS_EMPTY_USER_ID);
-        }
-
-        int jwtUserIdx;
         try {
-            jwtUserIdx = jwtService.getUserId();
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-
-        try {
+            if(userIdx==null || userIdx<=0){
+                return new BaseResponse<>(USERS_EMPTY_USER_ID);
+            }
+            int jwtUserIdx = jwtService.getUserId();
             GetUserRes getUserRes = userProvider.retrieveUser(jwtUserIdx, userIdx);
             return new BaseResponse<>(getUserRes);
         } catch (BaseException exception) {
