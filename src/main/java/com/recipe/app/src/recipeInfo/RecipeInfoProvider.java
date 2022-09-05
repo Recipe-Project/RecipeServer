@@ -413,7 +413,7 @@ public class RecipeInfoProvider {
 
             String inFridgeYN = "N";
             for(int j=0;j<fridges.size();j++){
-                if(recipeIngredientName.contains(fridges.get(j).getIngredientName())&&recipeIngredientIcon.equals(fridges.get(j).getIngredientIcon())){
+                if(recipeIngredientName.contains(fridges.get(j).getIngredientName()) && recipeIngredientIcon!=null &&recipeIngredientIcon.equals(fridges.get(j).getIngredientIcon())){
                     inFridgeYN="Y";
                     break;
                 }
