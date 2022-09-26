@@ -565,31 +565,18 @@ public class RecipeInfoProvider {
                     URL url = new URL(blogUrl);
                     Document doc = Jsoup.parse(url, 5000);
 
-                    String src = doc.getElementById("mainFrame").toString().replace("&amp;", "&");
+                    Elements iframes = doc.select("iframe#mainFrame");
+                    String src = iframes.attr("src");
 
-                    int s = src.indexOf("src=") + 5;
-                    int e = src.indexOf("&from=");
-                    src = src.substring(s, e);
-                    src = "http://blog.naver.com" + src;
-                    s = src.indexOf("logNo=") + 6;
-                    String logNo = src.substring(s);
+                    String url2 = "http://blog.naver.com"+ src;
+                    Document doc2 = Jsoup.connect(url2).get();
 
-                    doc = Jsoup.connect(src).get();
+                    String[] blog_logNo = src.split("&");
+                    String[] logNo_split = blog_logNo[1].split("=");
+                    String logNo = logNo_split[1];
 
-
-                    // 본문에서 img태그를 모두 파싱한 후 "_photoImage" class 속성을 포함한 이미지의 URL을 파싱
-                    Elements imageLinks = doc.getElementById("post-view" + logNo).getElementsByTag("img");
-                    String result = null;
-                    for (Element image : imageLinks) {
-                        String temp = image.attr("src");
-                        if (temp.contains("postfiles")) {
-                            result = temp;
-                            result = result.replace("w80_blur", "w966");
-                            break;
-                        }
-                    }
-
-                    thumbnail = result;
+                    // 블로그 썸네일 가져오기
+                    thumbnail = doc2.select("meta[property=og:image]").get(0).attr("content");
 
                 } catch (Exception e) {
                     throw new BaseException(FAILED_TO_CRAWLING);
