@@ -33,6 +33,6 @@ public class DialogProvider {
         }
         if(dialog == null)
             throw new BaseException(NOT_FOUND_NOTICE);
-        return new GetDialogRes(dialog.getTitle(), dialog.getContent(), dialog.getLink());
+        return new GetDialogRes(dialog.getIdx(), dialog.getTitle(), dialog.getContent(), dialog.getLink());
     }
 }
