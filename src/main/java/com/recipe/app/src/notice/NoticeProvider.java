@@ -33,6 +33,6 @@ public class NoticeProvider {
         }
         if(notice == null)
             throw new BaseException(NOT_FOUND_NOTICE);
-        return new GetNoticeRes(notice.getTitle(), notice.getContent());
+        return new GetNoticeRes(notice.getIdx(), notice.getTitle(), notice.getContent());
     }
 }
