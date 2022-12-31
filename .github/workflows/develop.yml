@@ -42,7 +42,11 @@ jobs:
       env:
         RECIPEAPP_KEY_FILE: ${{ secrets.RECIPEAPP_KEY }}
       run: echo $RECIPEAPP_KEY_FILE | base64 --decode > src/main/resources/recipeapp-key.json
-        
+
+    # secret 파일 디렉토리 생성
+    - name: Create secret directory
+      run: mkdir src/main/java/com/recipe/app/config/secret
+
     # Secret.java 파일 복사
     - name: Copy Secret.java
       env:
