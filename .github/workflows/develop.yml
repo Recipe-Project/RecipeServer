@@ -82,8 +82,8 @@ jobs:
     # 쉘스크립트 deploy 폴더로 복사
     - name: Copy shell
       run: |
-        cp ./script/start.sh ./deploy/start.sh
-        cp ./script/stop.sh ./deploy/stop.sh
+        cp ./scripts/start.sh ./deploy/start.sh
+        cp ./scripts/stop.sh ./deploy/stop.sh
 
     # 압축파일 형태로 전달
     - name: Make zip file
