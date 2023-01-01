@@ -12,10 +12,10 @@ TIME_NOW=$(date +%c)
 # build 파일 복사
 echo "$TIME_NOW > $JAR_FILE 파일 복사" >> $DEPLOY_LOG
 cp $PROJECT_ROOT/deploy/*.jar $JAR_FILE
+cp $PROJECT_ROOT/keystore.p12 /keystore.p12
 
 # 실행권한 추가
 chmod +x $JAR_FILE
-chmod +x "$PROJECT_ROOT/keystore.p12"
 
 # jar 파일 실행
 echo "$TIME_NOW > $JAR_FILE 파일 실행" >> $DEPLOY_LOG
