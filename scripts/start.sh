@@ -15,7 +15,7 @@ cp $PROJECT_ROOT/deploy/*.jar $JAR_FILE
 
 # 실행권한 추가
 chmod +x $JAR_FILE
-chmod +x keystore.p12
+chmod +x "$PROJECT_ROOT/keystore.p12"
 
 # jar 파일 실행
 echo "$TIME_NOW > $JAR_FILE 파일 실행" >> $DEPLOY_LOG
