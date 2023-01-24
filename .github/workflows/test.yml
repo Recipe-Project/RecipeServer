@@ -17,6 +17,16 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
+      # secret 파일 디렉토리 생성
+      - name: Create secret directory
+        run: mkdir src/main/java/com/recipe/app/config/secret
+
+      # Secret.java 파일 복사
+      - name: Copy Secret.java
+        env:
+          SECRET_JAVA_FILE: ${{ secrets.SECRET_JAVA }}
+        run: echo $SECRET_JAVA_FILE | base64 --decode > src/main/java/com/recipe/app/config/secret/Secret.java
+
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
