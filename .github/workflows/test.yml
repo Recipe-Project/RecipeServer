@@ -17,6 +17,18 @@ jobs:
           java-version: '11'
           distribution: 'temurin'
 
+      # application.yml 파일 복사
+      - name: Copy application.yml
+        env:
+          APPLICATION_YML_FILE: ${{ secrets.APPLICATION_YML }}
+        run: echo $APPLICATION_YML_FILE | base64 --decode > src/main/resources/application.yml
+
+      # recipeapp-key.json 파일 복사
+      - name: Copy recipeapp-key.json
+        env:
+          RECIPEAPP_KEY_FILE: ${{ secrets.RECIPEAPP_KEY }}
+        run: echo $RECIPEAPP_KEY_FILE | base64 --decode > src/main/resources/recipeapp-key.json
+
       # secret 파일 디렉토리 생성
       - name: Create secret directory
         run: mkdir src/main/java/com/recipe/app/config/secret
