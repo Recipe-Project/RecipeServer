@@ -1,7 +1,7 @@
 package com.recipe.app.src.notice;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.notice.models.GetNoticeRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;

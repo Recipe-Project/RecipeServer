@@ -1,7 +1,7 @@
 package com.recipe.app.src.fridgeBasket;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridgeBasket.models.*;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.user.UserProvider;
@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.util.List;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @RestController
 @RequestMapping("/fridges")

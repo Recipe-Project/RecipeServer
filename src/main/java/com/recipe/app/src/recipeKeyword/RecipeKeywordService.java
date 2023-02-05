@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipeKeyword;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.recipeKeyword.models.RecipeKeyword;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
@@ -8,7 +8,7 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.recipe.app.config.BaseResponseStatus.FAILED_TO_POST_RECIPE_KEYWORD;
+import static com.recipe.app.common.response.BaseResponseStatus.FAILED_TO_POST_RECIPE_KEYWORD;
 @Service
 public class RecipeKeywordService {
     private final UserProvider userProvider;

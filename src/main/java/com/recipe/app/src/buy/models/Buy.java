@@ -1,14 +1,9 @@
 package com.recipe.app.src.buy.models;
 
 import com.recipe.app.src.receipt.models.Receipt;
-import com.recipe.app.src.user.models.User;
 import lombok.*;
 import javax.persistence.*;
-import com.recipe.app.config.BaseEntity;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import com.recipe.app.common.entity.BaseEntity;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
 @EqualsAndHashCode(callSuper = false)

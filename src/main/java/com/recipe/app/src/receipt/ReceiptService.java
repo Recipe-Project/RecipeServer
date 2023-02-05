@@ -1,14 +1,10 @@
 package com.recipe.app.src.receipt;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.buy.BuyRepository;
 import com.recipe.app.src.buy.models.Buy;
 import com.recipe.app.src.fridge.FridgeRepository;
-import com.recipe.app.src.fridge.models.Fridge;
 import com.recipe.app.src.ingredient.IngredientRepository;
-import com.recipe.app.src.ingredient.models.Ingredient;
-import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
-import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.receipt.models.*;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.*;
@@ -19,7 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class ReceiptService {

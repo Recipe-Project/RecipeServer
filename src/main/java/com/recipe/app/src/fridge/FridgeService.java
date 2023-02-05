@@ -1,6 +1,6 @@
 package com.recipe.app.src.fridge;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
@@ -17,7 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class FridgeService {

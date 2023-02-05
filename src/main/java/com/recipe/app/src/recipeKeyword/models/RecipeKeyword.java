@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipeKeyword.models;
 
-import com.recipe.app.config.BaseEntity;
+import com.recipe.app.common.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

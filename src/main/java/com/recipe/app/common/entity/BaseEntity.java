@@ -1,4 +1,4 @@
-package com.recipe.app.config;
+package com.recipe.app.common.entity;
 
 import lombok.Getter;
 import org.springframework.data.annotation.CreatedDate;

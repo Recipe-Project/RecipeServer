@@ -1,15 +1,16 @@
-package com.recipe.app.config;
+package com.recipe.app.common.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
+import com.recipe.app.common.response.BaseResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import static com.recipe.app.config.BaseResponseStatus.POST_FRIDGES_EXIST_INGREDIENT_NAME;
-import static com.recipe.app.config.BaseResponseStatus.POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME;
-import static com.recipe.app.config.BaseResponseStatus.POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS;
-import static com.recipe.app.config.BaseResponseStatus.SUCCESS;
+import static com.recipe.app.common.response.BaseResponseStatus.POST_FRIDGES_EXIST_INGREDIENT_NAME;
+import static com.recipe.app.common.response.BaseResponseStatus.POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME;
+import static com.recipe.app.common.response.BaseResponseStatus.POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS;
+import static com.recipe.app.common.response.BaseResponseStatus.SUCCESS;
 
 @Getter
 @AllArgsConstructor

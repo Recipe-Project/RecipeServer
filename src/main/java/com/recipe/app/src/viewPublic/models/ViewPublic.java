@@ -1,6 +1,6 @@
 package com.recipe.app.src.viewPublic.models;
 
-import com.recipe.app.config.BaseEntity;
+import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.user.models.User;
 import lombok.AccessLevel;

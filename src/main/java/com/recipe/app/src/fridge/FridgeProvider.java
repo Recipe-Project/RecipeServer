@@ -1,6 +1,6 @@
 package com.recipe.app.src.fridge;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
@@ -15,13 +15,12 @@ import com.recipe.app.src.user.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class FridgeProvider {

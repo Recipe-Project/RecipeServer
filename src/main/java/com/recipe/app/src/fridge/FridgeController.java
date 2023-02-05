@@ -1,8 +1,8 @@
 package com.recipe.app.src.fridge;
 
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.utils.JwtService;
@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Slf4j
 @RestController

@@ -1,7 +1,7 @@
 package com.recipe.app.src.scrapYoutube;
 
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.scrapYoutube.models.GetScrapYoutubesRes;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutubeList;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @Service

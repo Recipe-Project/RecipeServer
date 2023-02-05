@@ -1,5 +1,6 @@
-package com.recipe.app.config;
+package com.recipe.app.common.exception;
 
+import com.recipe.app.common.response.BaseResponseStatus;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -7,7 +8,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @AllArgsConstructor
-public class BaseException extends Exception {
+public class BaseException extends RuntimeException {
     private BaseResponseStatus status;
     private String ingredientName;
 

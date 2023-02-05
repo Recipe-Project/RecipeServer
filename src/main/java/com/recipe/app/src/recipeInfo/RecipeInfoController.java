@@ -2,8 +2,8 @@ package com.recipe.app.src.recipeInfo;
 
 
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.recipeInfo.models.GetRecipeBlogsRes;
 import com.recipe.app.src.recipeInfo.models.GetRecipeInfoRes;
 import com.recipe.app.src.recipeInfo.models.GetRecipeInfosRes;
@@ -13,8 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.recipe.app.config.BaseResponseStatus.RECIPES_EMPTY_RECIPE_IDX;
-import static com.recipe.app.config.BaseResponseStatus.USERS_EMPTY_USER_ID;
+import static com.recipe.app.common.response.BaseResponseStatus.RECIPES_EMPTY_RECIPE_IDX;
 
 
 @RestController

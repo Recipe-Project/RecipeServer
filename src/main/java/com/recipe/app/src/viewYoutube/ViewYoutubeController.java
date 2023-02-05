@@ -1,14 +1,14 @@
 package com.recipe.app.src.viewYoutube;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeReq;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeRes;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static com.recipe.app.config.BaseResponseStatus.EMPTY_YOUTUBEIDX;
+import static com.recipe.app.common.response.BaseResponseStatus.EMPTY_YOUTUBEIDX;
 
 
 @RestController

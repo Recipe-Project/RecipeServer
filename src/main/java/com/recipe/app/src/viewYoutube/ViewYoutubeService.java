@@ -1,6 +1,6 @@
 package com.recipe.app.src.viewYoutube;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeReq;
@@ -10,7 +10,7 @@ import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.recipe.app.config.BaseResponseStatus.FAILED_TO_POST_VIEWS_YOUTUBE;
+import static com.recipe.app.common.response.BaseResponseStatus.FAILED_TO_POST_VIEWS_YOUTUBE;
 
 
 @Service

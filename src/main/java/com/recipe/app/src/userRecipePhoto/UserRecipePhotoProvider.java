@@ -1,15 +1,8 @@
 package com.recipe.app.src.userRecipePhoto;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.src.userRecipePhoto.models.*;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
 public class UserRecipePhotoProvider {

@@ -1,17 +1,12 @@
 package com.recipe.app.src.notice.models;
 
-import com.recipe.app.config.BaseEntity;
-import com.recipe.app.src.fridge.models.Fridge;
-import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
-import com.recipe.app.src.ingredient.models.Ingredient;
+import com.recipe.app.common.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
 @EqualsAndHashCode(callSuper = false)

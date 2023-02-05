@@ -1,6 +1,6 @@
 package com.recipe.app.src.user;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.user.models.PatchUserReq;
 import com.recipe.app.src.user.models.PatchUserRes;
 import com.recipe.app.src.user.models.PostUserRes;
@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class UserService {

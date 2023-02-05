@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipeKeyword;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.recipeKeyword.models.GetRecipesBestKeywordRes;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.utils.JwtService;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.FAILE_TO_GET_BEST_KEYWORD;
+import static com.recipe.app.common.response.BaseResponseStatus.FAILE_TO_GET_BEST_KEYWORD;
 
 
 @Service

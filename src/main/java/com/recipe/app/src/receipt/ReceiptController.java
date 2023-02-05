@@ -1,21 +1,13 @@
 package com.recipe.app.src.receipt;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.receipt.models.*;
-import com.recipe.app.src.user.models.GetUserRes;
-import com.recipe.app.src.user.models.PatchUserReq;
-import com.recipe.app.src.user.models.PatchUserRes;
-import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.web.context.request.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 import java.util.List;
 

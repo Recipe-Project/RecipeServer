@@ -4,7 +4,7 @@ import com.recipe.app.src.buy.models.Buy;
 import com.recipe.app.src.user.models.User;
 import lombok.*;
 import javax.persistence.*;
-import com.recipe.app.config.BaseEntity;
+import com.recipe.app.common.entity.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.Date;

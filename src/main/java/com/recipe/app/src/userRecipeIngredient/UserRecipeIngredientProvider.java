@@ -1,6 +1,6 @@
 package com.recipe.app.src.userRecipeIngredient;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.userRecipe.models.MyRecipeIngredient;
 import com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient;
 import com.recipe.app.utils.JwtService;
@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.recipe.app.config.BaseResponseStatus.FAILED_TO_GET_MY_RECIPE_INGREDIENTS;
+import static com.recipe.app.common.response.BaseResponseStatus.FAILED_TO_GET_MY_RECIPE_INGREDIENTS;
 
 @Service
 public class UserRecipeIngredientProvider {

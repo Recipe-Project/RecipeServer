@@ -1,4 +1,4 @@
-package com.recipe.app.config;
+package com.recipe.app.common.response;
 
 import lombok.Getter;
 
