@@ -8,7 +8,7 @@ import com.recipe.app.src.scrapYoutube.models.GetScrapYoutubesRes;
 import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeReq;
 import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeRes;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

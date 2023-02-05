@@ -5,7 +5,7 @@ import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.scrapPublic.models.PostScrapPublicRes;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.recipe.app.common.exception.BaseException;

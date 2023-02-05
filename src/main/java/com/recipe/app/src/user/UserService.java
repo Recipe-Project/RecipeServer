@@ -5,7 +5,7 @@ import com.recipe.app.src.user.models.PatchUserReq;
 import com.recipe.app.src.user.models.PatchUserRes;
 import com.recipe.app.src.user.models.PostUserRes;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;

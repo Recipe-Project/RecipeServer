@@ -14,7 +14,7 @@ import com.recipe.app.src.scrapBlog.ScrapBlogRepository;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;

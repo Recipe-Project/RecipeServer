@@ -1,4 +1,4 @@
-package com.recipe.app.utils;
+package com.recipe.app.common.utils;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.config.secret.Secret;

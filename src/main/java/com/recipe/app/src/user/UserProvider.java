@@ -4,7 +4,7 @@ import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.user.models.*;
 import com.recipe.app.src.userRecipe.UserRecipeRepository;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

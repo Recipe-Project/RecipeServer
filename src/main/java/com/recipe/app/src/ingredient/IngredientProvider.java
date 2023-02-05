@@ -11,7 +11,7 @@ import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

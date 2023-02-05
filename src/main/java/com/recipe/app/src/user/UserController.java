@@ -6,7 +6,7 @@ import com.recipe.app.src.user.models.GetUserRes;
 import com.recipe.app.src.user.models.PatchUserReq;
 import com.recipe.app.src.user.models.PatchUserRes;
 import com.recipe.app.src.user.models.PostUserRes;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;

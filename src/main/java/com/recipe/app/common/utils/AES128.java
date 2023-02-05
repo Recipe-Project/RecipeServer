@@ -1,4 +1,4 @@
-package com.recipe.app.utils;
+package com.recipe.app.common.utils;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;

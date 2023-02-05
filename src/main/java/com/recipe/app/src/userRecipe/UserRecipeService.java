@@ -8,7 +8,7 @@ import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientRepository;
 import com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoRepository;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

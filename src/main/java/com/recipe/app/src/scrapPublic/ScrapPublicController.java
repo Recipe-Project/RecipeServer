@@ -3,7 +3,7 @@ package com.recipe.app.src.scrapPublic;
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.scrapPublic.models.*;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 

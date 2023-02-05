@@ -6,7 +6,7 @@ import com.recipe.app.src.user.models.User;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoProvider;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;

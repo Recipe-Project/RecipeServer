@@ -6,7 +6,7 @@ import com.recipe.app.src.user.models.User;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeReq;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeRes;
 import com.recipe.app.src.viewYoutube.models.ViewYoutube;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
