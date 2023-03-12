@@ -36,12 +36,7 @@ public class ScrapBlogProvider {
     public List<GetScrapBlogsRes> retrieveScrapBlogs(Integer jwtUserIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
-        List<ScrapBlog> scrapBlogList;
-        try{
-            scrapBlogList = scrapBlogRepository.findByUserAndStatusOrderByCreatedAtDesc(user, "ACTIVE");
-        }catch(Exception e){
-            throw new BaseException(DATABASE_ERROR);
-        }
+        List<ScrapBlog> scrapBlogList = scrapBlogRepository.findByUserAndStatusOrderByCreatedAtDesc(user, "ACTIVE");
 
         List<GetScrapBlogsRes> getScrapBlogsResList = new ArrayList<>();
         for(int i=0;i<scrapBlogList.size();i++) {
@@ -57,12 +52,7 @@ public class ScrapBlogProvider {
             String date = datetime.format(postDate);
             String thumbnail = scrapBlog.getThumbnail();
 
-            Integer userScrapCnt = 0;
-            try{
-                userScrapCnt = scrapBlogRepository.countByBlogUrlAndStatus(blogUrl, "ACTIVE");
-            }catch(Exception e){
-                throw new BaseException(DATABASE_ERROR);
-            }
+            Integer userScrapCnt = scrapBlogRepository.countByBlogUrlAndStatus(blogUrl, "ACTIVE");
 
             getScrapBlogsResList.add(new GetScrapBlogsRes(scrapBlogIdx, title, blogUrl, description, bloggerName, date, thumbnail,userScrapCnt));
         }

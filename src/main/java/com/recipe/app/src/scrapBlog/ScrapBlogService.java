@@ -56,12 +56,7 @@ public class ScrapBlogService {
 
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
-        ScrapBlog scrapBlog = null;
-        try {
-            scrapBlog = scrapBlogRepository.findByUserAndBlogUrlAndStatus(user, blogUrl, "ACTIVE");
-        }catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
-        }
+        ScrapBlog scrapBlog = scrapBlogRepository.findByUserAndBlogUrlAndStatus(user, blogUrl, "ACTIVE");
 
         if (scrapBlog == null) {
             scrapBlog = new ScrapBlog(user, title, thumbnail, blogUrl, description, bloggerName, date);
@@ -74,11 +69,6 @@ public class ScrapBlogService {
                 scrapBlog.setStatus("ACTIVE");
             }
         }
-
-        try {
-            scrapBlog = scrapBlogRepository.save(scrapBlog);
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        scrapBlogRepository.save(scrapBlog);
     }
 }

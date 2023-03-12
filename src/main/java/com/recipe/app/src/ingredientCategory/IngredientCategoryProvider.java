@@ -26,13 +26,7 @@ public class IngredientCategoryProvider {
      * @throws BaseException
      */
     public IngredientCategory retrieveIngredientCategoryByIngredientCategoryIdx(Integer ingredientCategoryIdx) throws BaseException {
-        IngredientCategory ingredientCategory;
-
-        try {
-            ingredientCategory = ingredientCategoryRepository.findById(ingredientCategoryIdx).orElse(null);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
-        }
+        IngredientCategory ingredientCategory = ingredientCategoryRepository.findById(ingredientCategoryIdx).orElse(null);
 
         if (ingredientCategory == null || !ingredientCategory.getStatus().equals("ACTIVE")) {
             throw new BaseException(NOT_FOUND_INGREDIENT_CATEGORY);

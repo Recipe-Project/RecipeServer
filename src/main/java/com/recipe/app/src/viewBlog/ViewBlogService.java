@@ -33,12 +33,6 @@ public class ViewBlogService {
 
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
-        ViewBlog viewBlog = new ViewBlog(user, blogUrl);
-
-        try {
-            viewBlog = viewBlogRepository.save(viewBlog);
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        viewBlogRepository.save(new ViewBlog(user, blogUrl));
     }
 }

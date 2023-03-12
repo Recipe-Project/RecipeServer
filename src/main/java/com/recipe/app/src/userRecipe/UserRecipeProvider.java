@@ -44,12 +44,7 @@ public class UserRecipeProvider {
     public List<GetMyRecipesRes> retrieveMyRecipesList(Integer userIdx) throws BaseException {
 
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        List<UserRecipe> userRecipeList;
-        try {
-            userRecipeList = userRecipeRepository.findByUserAndStatus(user, "ACTIVE", Sort.by("createdAt").descending());
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_MY_RECIPES);
-        }
+        List<UserRecipe> userRecipeList = userRecipeRepository.findByUserAndStatus(user, "ACTIVE", Sort.by("createdAt").descending());
 
         return userRecipeList.stream().map(userRecipe -> {
             int userRecipeIdx = userRecipe.getUserRecipeIdx();
@@ -76,12 +71,7 @@ public class UserRecipeProvider {
     @Transactional
     public GetMyRecipeRes retrieveMyRecipe(Integer userIdx, Integer myRecipeIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        UserRecipe userRecipe;
-        try {
-            userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user, myRecipeIdx,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_MY_RECIPE);
-        }
+        UserRecipe userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user, myRecipeIdx,"ACTIVE");
 
         String thumbnail = userRecipe.getThumbnail();
         String title = userRecipe.getTitle();
@@ -99,15 +89,7 @@ public class UserRecipeProvider {
      * @throws BaseException
      */
     public Boolean existMyRecipe(Integer myRecipeIdx) throws BaseException {
-        Boolean existMyRecipe;
-        try {
-            existMyRecipe = userRecipeRepository.existsByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_MY_RECIPE);
-        }
-
-
-        return existMyRecipe;
+        return userRecipeRepository.existsByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
     }
 
 }

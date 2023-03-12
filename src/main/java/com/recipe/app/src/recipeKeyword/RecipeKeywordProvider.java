@@ -10,9 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.common.response.BaseResponseStatus.FAILE_TO_GET_BEST_KEYWORD;
-
-
 @Service
 public class RecipeKeywordProvider {
     private final UserProvider userProvider;
@@ -32,22 +29,13 @@ public class RecipeKeywordProvider {
      * @throws BaseException
      */
     public List<GetRecipesBestKeywordRes> retrieveRecipesBestKeyword() throws BaseException {
-        GetRecipesBestKeywordRes getRecipesBestKeywordRes;
-
-        List<Object[]> bestKeywordList;
-        try {
-            bestKeywordList = recipeKeywordRepository.findByBestKeywordTop10();
-        } catch (Exception ignored) {
-            throw new BaseException(FAILE_TO_GET_BEST_KEYWORD);
-        }
+        List<Object[]> bestKeywordList = recipeKeywordRepository.findByBestKeywordTop10();
 
         return bestKeywordList.stream().map(keyword -> {
             String bestKeyword = String.valueOf(keyword[0].toString());
 
             return new GetRecipesBestKeywordRes(bestKeyword);
         }).collect(Collectors.toList());
-
-
     }
 
 }

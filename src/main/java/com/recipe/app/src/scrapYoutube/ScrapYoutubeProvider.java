@@ -42,17 +42,10 @@ public class ScrapYoutubeProvider {
      */
     public GetScrapYoutubesRes retrieveScrapYoutubeList(Integer userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        List<ScrapYoutubeList> scrapYoutubeList = null;
+        List<ScrapYoutubeList> scrapYoutubeList = retrieveScrapYoutubesSortedByCreatedDate(userIdx);
+        Long scrapYoutubeCount = scrapYoutubeRepository.countByUserAndStatus(user,"ACTIVE");
 
-        try {
-
-            scrapYoutubeList= retrieveScrapYoutubesSortedByCreatedDate(userIdx);
-            Long scrapYoutubeCount = scrapYoutubeRepository.countByUserAndStatus(user,"ACTIVE");
-
-            return new GetScrapYoutubesRes(scrapYoutubeCount,scrapYoutubeList);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_SCRAP_YOUTUBE);
-        }
+        return new GetScrapYoutubesRes(scrapYoutubeCount,scrapYoutubeList);
     }
     /**
      * 유튜브 스크랩 조회 - 최신날짜순
@@ -61,15 +54,8 @@ public class ScrapYoutubeProvider {
      * @throws BaseException
      */
     public List<ScrapYoutubeList> retrieveScrapYoutubesSortedByCreatedDate(Integer userIdx) throws BaseException {
-
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        List<ScrapYoutube> scrapYoutubeList;
-
-        try {
-            scrapYoutubeList = scrapYoutubeRepository.findByUserAndStatus(user, "ACTIVE",Sort.by("createdAt").descending());
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_SCRAP_YOUTUBE);
-        }
+        List<ScrapYoutube> scrapYoutubeList = scrapYoutubeRepository.findByUserAndStatus(user, "ACTIVE",Sort.by("createdAt").descending());
 
         return scrapYoutubeList.stream().map(scrapYoutube -> {
             String youtubeId = scrapYoutube.getYoutubeId();
@@ -96,17 +82,9 @@ public class ScrapYoutubeProvider {
      * @throws BaseException
      */
     public ScrapYoutube retrieveScrapYoutube(String youtubeId, Integer userIdx) throws BaseException {
-        ScrapYoutube scrapYoutube;
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        try {
-            scrapYoutube = scrapYoutubeRepository.findByYoutubeIdAndUserAndStatus(youtubeId,user,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_SCRAP_YOUTUBE);
-        }
 
-
-
-        return scrapYoutube;
+        return scrapYoutubeRepository.findByYoutubeIdAndUserAndStatus(youtubeId,user,"ACTIVE");
     }
 
 //    /**

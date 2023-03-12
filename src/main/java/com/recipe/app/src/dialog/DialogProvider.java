@@ -6,7 +6,6 @@ import com.recipe.app.src.dialog.models.Dialog;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.recipe.app.common.response.BaseResponseStatus.FAILED_TO_GET_NOTICE;
 import static com.recipe.app.common.response.BaseResponseStatus.NOT_FOUND_NOTICE;
 
 @Service
@@ -25,14 +24,11 @@ public class DialogProvider {
      * @throws BaseException
      */
     public GetDialogRes retrieveDialog() throws BaseException {
-        Dialog dialog;
-        try {
-            dialog = dialogRepository.findFirstByActiveYn("Y");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_NOTICE);
-        }
+        Dialog dialog = dialogRepository.findFirstByActiveYn("Y");
+
         if(dialog == null)
             throw new BaseException(NOT_FOUND_NOTICE);
+
         return new GetDialogRes(dialog.getIdx(), dialog.getTitle(), dialog.getContent(), dialog.getLink());
     }
 }

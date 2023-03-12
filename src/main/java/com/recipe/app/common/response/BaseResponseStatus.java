@@ -105,8 +105,7 @@ public enum BaseResponseStatus {
 
     // [POST] /fridges
     POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST(2073, "냉장고 바구니 리스트를 입력해주세요."),
-    FAILED_TO_POST_FRIDGES(2074, "냉장고에 재료넣기를 실패했습니다."),
-    POST_FRIDGES_EXIST_INGREDIENT_NAME(2075, ""),
+    POST_FRIDGES_EXIST_INGREDIENT_NAME(2075, "냉장고에 이미 있는 재료(%s)입니다."),
     POST_FRIDGES_EMPTY_INGREDIENT_NAME(2084, "재료명을 입력하세요."),
     POST_FRIDGES_EMPTY_INGREDIENT_ICON(2085, "재료 아이콘을 입력하세요."),
     EMPTY_STORAGE_METHOD(2086, "재료 보관방법을 입력하세요."),
@@ -139,9 +138,6 @@ public enum BaseResponseStatus {
     /**
      * 3000 : Response 오류
      */
-    // Common
-    RESPONSE_ERROR(3000, "값을 불러오는데 실패하였습니다."),
-
     // users
     NOT_FOUND_USER(3010, "존재하지 않는 회원입니다."),
     FORBIDDEN_USER(3011, "해당 회원에 접근할 수 없습니다."),
@@ -149,65 +145,19 @@ public enum BaseResponseStatus {
     // [POST] /users
     DUPLICATED_USER(3013, "이미 존재하는 회원입니다."),
 
-    // [POST] /users/naver-login
-    FAILED_TO_NAVER_LOGIN(3015, "네이버 로그인에 실패하였습니다."),
-
-    // [POST] /users/kakao-login
-    FAILED_TO_KAKAO_LOGIN(3016, "카카오 로그인에 실패하였습니다."),
-
-    FAILED_TO_GET_USER(3020, "유저 상세 정보 조회에 실패하였습니다."),
-    FAILED_TO_PATCH_USER(3021, "유저 정보 수정에 실패하였습니다."),
-
-
-    // [GET] /my-recipes
-    FAILED_TO_GET_MY_RECIPES(3022, "나만의 레시피 전체 조회에 실패하였습니다."),
-
-
     // [GET] /my-recipes/:myRecipeIdx
-    FAILED_TO_GET_MY_RECIPE_INGREDIENTS(3024, "나만의 레시피 재료 조회에 실패하였습니다."),
-    FAILED_TO_GET_MY_RECIPE(3025, "나만의 레시피 상세 조회에 실패하였습니다."),
     NO_FOUND_MY_RECIPE(3026, "존재하지 않는 나만의 레시피입니다."),
 
-    // [POST] /my-recipes
-    FAILED_TO_SAVE_MY_RECIPE(3027, "나만의 레시피 생성 저장에 실패하였습니다."),
-    FAILED_TO_SAVE_MY_RECIPE_INGREDIENT(3072, "나만의 레시피 재료 저장에 실패하였습니다."),
-
-    // [PATCH] /my-recipes/:myRecipeIdx
-    FAILED_TO_PATCH_MY_RECIPE(3028, "나만의 레시피 수정에 실패하였습니다."),
-
-    // [DELETE] /my-recipes/:myRecipeIdx
-    FAILED_TO_DELETE_MY_RECIPE(3029, "나만의 레시피 삭제에 실패하였습니다."),
-    FAILED_TO_DELETE_MY_RECIPE_INGREDIENT(3068, "나만의 레시피 재료 삭제에 실패하였습니다."),
-
-    // [POST] /scraps/youtube
-    FAILED_TO_POST_SCRAP_YOUTUBE(3030, "유튜브 스크랩하기에 실패하였습니다."),
-    FAILED_TO_POST_DELETE_SCRAP_YOUTUBE(3032, "유튜브 스크랩 취소를 실패하였습니다."),
-    // [GET] /scraps/youtube
-    FAILED_TO_GET_SCRAP_YOUTUBE(3031, "유튜브 스크랩 조회에 실패하였습니다."),
-
-
     // [POST] /scraps/recipe
-    FAILED_TO_POST_CREATE_SCRAP_PUBLIC(3033, "공공 레시피 스크랩 추가에 실패하였습니다."),
-    FAILED_TO_POST_DELETE_SCRAP_PUBLIC(3034, "공공 레시피 스크랩 삭제에 실패하였습니다."),
-    FAILE_TO_GET_RECIPE_INFO(3035, "공공레시피 정보 조회에 실패하였습니다."),
     NOT_FOUND_RECIPE_INFO(3036, "공공레시피 정보를 찾지 못하였습니다."),
-    // [GET] /scraps/recipe
-    FAILED_TO_GET_SCRAP_PUBLIC(3037, "공공 레시피 스크랩 조회에 실패하였습니다."),
 
     // [GET] /ingredients
-    FAILED_TO_GET_INGREDIENT_CATEGORY(3038, "재료 카테고리 조회에 실패하였습니다."),
     NOT_FOUND_INGREDIENT_CATEGORY(3039, "재료 카테고리인덱스를 찾을 수 없습니다."),
-    FAILED_TO_GET_INGREDIENT_LIST(3040, "재료 리스트 조회에 실패하였습니다."),
-    FAILED_TO_GET_FRIDGE_BASKET_COUNT(3070, "냉장고 바구니 개수 조회에 실패하였습니다."),
 
     // [POST] /fridges/direct-basket
     FAILED_TO_POST_FRIDGES_DIRECT_BASKET(3041, "재료 직접 입력으로 냉장고 바구니 담기에 실패하였습니다."),
     FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME(3042, "재료명으로 냉장고 바구니 조회에 실패하였습니다."),
     FAILED_TO_RETREIVE_INGREDIENT_BY_NAME(3043, "재료명으로 재료 조회에 실패하였습니다."),
-
-    // [GET] /fridges/basket
-    FAILED_TO_RETREIVE_INGREDIENT_LIST_BY_USER(3044, "재료명으로 재료 조회에 실패하였습니다."),
-    FAILED_TO_COUNT_FRIDGE_BASKET_BY_USER(3045, "유저로 바구니 속 개수 세기에 실패하였습니다."),
 
     // [POST] /fridges/basket
     FAILED_TO_POST_FRIDGES_BASKET(3046, "재료 선택으로 냉장고 바구니 담기에 실패했습니다."),
@@ -224,42 +174,24 @@ public enum BaseResponseStatus {
     NOT_FOUND_RECEIPT(3048, "존재하지 않는 영수증입니다."),
     NOT_FOUND_BUY(3049, "존재하지 않는 구매 품목입니다."),
 
-    //[POST] /views/youtube
-    FAILED_TO_POST_VIEWS_YOUTUBE(3050, "유튜브 조회로그를 저장에 실패습니다."),
-
     // [DELETE] /fridges/ingredient
-    FAILED_TO_GET_INGREDIENT_NAME(3051, "재료명 조회에 실패했습니다."),
     FAILED_TO_GET_FRIDGE(3052, "냉장고 조회에 실패했습니다."),
-    FAILED_TO_DELETE_FRIDGE(3053, "냉장고 재료 삭제에 실패했습니다."),
 
 
     // [PATCH] /fridge/ingredient
-    FAILED_TO_SAVE_FRIDGE(3054, "냉장고 재료 수정 저장에 실패했습니다."),
     FAILED_TO_PATCH_FRIDGES_INGREDIENT(3055, "냉장고 재료 수정에 실패했습니다."),
-
-    // [POST] /recipes?keyword=
-    FAILED_TO_POST_RECIPE_KEYWORD(3056, "레시피 검색어 저장에 실패했습니다."),
-
-    // notification
-    FAILED_TO_GET_SHELF_LIFE_USER_LIST(3057, "유통기한 지난 재료를 가진 유저리스트 조회에 실패했습니다."),
 
     // [GET] /fridges/recipe
     NO_INGREDIENT_THAT_MATCH_THE_RECIPE(3058, "레시피와 일치하는 재료가 없습니다."),
     FAILED_TO_GET_FRIDGE_LIST(3059, "냉장고 재료 조회에 실패했습니다."),
-    FAILED_TO_GET_RECIPE_INFO_LIST(3060, "레시피 조회에 실패했습니다."),
     FAILED_TO_GET_RECIPE_INGREDIENTS_LIST(3061, "레시피 재료 조회에 실패했습니다."),
 
     // [POST] /fridges/notification
     EMPTY_USER_LIST(3062, "유저리스트가 비었습니다."),
     PUSH_NOTIFICATION_ERROR(3063, "푸시알림에 실패했습니다."),
 
-    // [GET] /recipes/best-keyword
-    FAILE_TO_GET_BEST_KEYWORD(3064, "인기검색어 조회에 실패했습니다."),
-
-
     // [DELETE] /fridges/basket?ingredient=
     FAILED_TO_GET_FRIDGE_BASKET(3065, "냉장고 바구니 조회에 실패했습니다."),
-    FAILED_TO_DELETE_FRIDGE_BASKET(3066, "냉장고 바구니 삭제에 실패했습니다."),
 
     // [PATCH] /fridge/basket
     FAILED_TO_PATCH_FRIDGE_BASKET_INGREDIENTS(3067, "냉장고 바구니 재료 수정에 실패했습니다."),
@@ -267,20 +199,13 @@ public enum BaseResponseStatus {
     FAILED_TO_RETREIVE_FRIDGE_BY_NAME(3068, "재료명으로 냉장고 조회에 실패했습니다."),
 
     // [PATCH] /fcm/token
-    FAILED_TO_PATCH_FCM_TOKEN(3072, "fcm 토큰 수정에 실패했습니다."),
-    // 코드번호 3074부터 사용
 
-    // [GET] /app/version
-    FAILED_TO_GET_APP_VERSION(3073, "앱 버전 조회에 실패했습니다."),
-
-    // [GET] /notice
-    FAILED_TO_GET_NOTICE(3074, "공지 조회에 실패했습니다."),
     NOT_FOUND_NOTICE(3075, "공지가 존재하지 않습니다."),
 
     /**
      * 4000 : Database, Server 오류
      */
-    DATABASE_ERROR(4000, "데이터베이스 연결에 실패하였습니다."),
+    DATABASE_ERROR(4000, "데이터베이스 조회에 실패하였습니다."),
     SERVER_ERROR(4001, "서버와의 연결에 실패하였습니다."),
     DATE_PARSE_ERROR(4002, "Date형 변환에 실패하였습니다."),
 

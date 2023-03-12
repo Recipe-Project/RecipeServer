@@ -8,7 +8,6 @@ import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.recipe.app.common.response.BaseResponseStatus.FAILED_TO_POST_RECIPE_KEYWORD;
 @Service
 public class RecipeKeywordService {
     private final UserProvider userProvider;
@@ -31,17 +30,7 @@ public class RecipeKeywordService {
      */
     public void createRecipeKeyword(int userIdx, String keyword) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-
-
-        try {
-            RecipeKeyword keywordYoutube = new RecipeKeyword(keyword);
-            keywordYoutube = recipeKeywordRepository.save(keywordYoutube);
-
-
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_RECIPE_KEYWORD);
-        }
-
+        recipeKeywordRepository.save(new RecipeKeyword(keyword));
     }
 
 

@@ -42,13 +42,8 @@ public class ScrapPublicService {
     public PostScrapPublicRes createScrapRecipe(int recipeId, int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         RecipeInfo recipeInfo = recipeInfoProvider.retrieveRecipeByRecipeId(recipeId);
+        scrapPublicRepository.save(new ScrapPublic(user, recipeInfo));
 
-        ScrapPublic scrapPublic = new ScrapPublic(user, recipeInfo);
-        try {
-            scrapPublic = scrapPublicRepository.save(scrapPublic);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_CREATE_SCRAP_PUBLIC);
-        }
         return new PostScrapPublicRes(recipeId, userIdx);
 
     }
@@ -60,15 +55,9 @@ public class ScrapPublicService {
      * @throws BaseException
      */
     public PostScrapPublicRes deleteScrapRecipe(int recipeId, int userIdx) throws BaseException {
-
-
         ScrapPublic scrapPublic = scrapPublicProvider.retrieveScrapRecipe(recipeId, userIdx);
         scrapPublic.setStatus("INACTIVE");
-        try {
-            scrapPublicRepository.save(scrapPublic);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_POST_DELETE_SCRAP_PUBLIC);
-        }
+        scrapPublicRepository.save(scrapPublic);
         return new PostScrapPublicRes(recipeId, userIdx);
     }
 }

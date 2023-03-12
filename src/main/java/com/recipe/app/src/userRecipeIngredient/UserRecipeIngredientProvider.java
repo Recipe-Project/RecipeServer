@@ -10,8 +10,6 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.recipe.app.common.response.BaseResponseStatus.FAILED_TO_GET_MY_RECIPE_INGREDIENTS;
-
 @Service
 public class UserRecipeIngredientProvider {
     private final UserRecipeIngredientRepository userRecipeIngredientRepository;
@@ -31,12 +29,7 @@ public class UserRecipeIngredientProvider {
      * @throws BaseException
      */
     public List<MyRecipeIngredient> retrieveUserRecipeIngredient(Integer myRecipeIdx) throws BaseException {
-        List<UserRecipeIngredient> userRecipeIngredientList;
-        try {
-            userRecipeIngredientList = userRecipeIngredientRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_MY_RECIPE_INGREDIENTS);
-        }
+        List<UserRecipeIngredient> userRecipeIngredientList = userRecipeIngredientRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
 
         List<MyRecipeIngredient> myRecipeIngredientList = new ArrayList<>();
 
@@ -46,7 +39,6 @@ public class UserRecipeIngredientProvider {
 
             MyRecipeIngredient myRecipeIngredient = new MyRecipeIngredient(ingredientName,ingredientIcon);
             myRecipeIngredientList.add(myRecipeIngredient);
-
         }
 
         return myRecipeIngredientList;

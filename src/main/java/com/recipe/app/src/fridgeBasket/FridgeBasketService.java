@@ -106,18 +106,8 @@ public class FridgeBasketService {
      */
     public void deleteFridgeBasket(Integer userIdx, String ingredient) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        FridgeBasket fridgeBasket;
-        try {
-            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredient,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
-        }
-
-        try {
-            fridgeBasketRepository.delete(fridgeBasket);
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_DELETE_FRIDGE_BASKET);
-        }
+        FridgeBasket fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredient,"ACTIVE");
+        fridgeBasketRepository.delete(fridgeBasket);
     }
 
 

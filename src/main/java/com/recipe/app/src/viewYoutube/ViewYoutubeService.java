@@ -10,9 +10,6 @@ import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.recipe.app.common.response.BaseResponseStatus.FAILED_TO_POST_VIEWS_YOUTUBE;
-
-
 @Service
 public class ViewYoutubeService {
     private final UserProvider userProvider;
@@ -36,15 +33,7 @@ public class ViewYoutubeService {
         Integer youtubeIdx = postViewsYoutubeReq.getYoutubeIdx();
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-
-        try {
-            ViewYoutube viewYoutube = new ViewYoutube(user, youtubeIdx);
-            viewYoutube = viewYoutubeRepository.save(viewYoutube);
-
-
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_VIEWS_YOUTUBE);
-        }
+        viewYoutubeRepository.save(new ViewYoutube(user, youtubeIdx));
 
         return new PostViewsYoutubeRes(userIdx,youtubeIdx);
     }
