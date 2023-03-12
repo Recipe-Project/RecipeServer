@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipeInfo;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridge.FridgeRepository;
 import com.recipe.app.src.fridge.models.Fridge;
 import com.recipe.app.src.ingredient.IngredientRepository;
