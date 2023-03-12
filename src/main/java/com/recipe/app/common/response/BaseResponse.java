@@ -1,44 +1,67 @@
 package com.recipe.app.common.response;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
-import com.recipe.app.common.response.BaseResponseStatus;
-import lombok.AllArgsConstructor;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 
-import static com.recipe.app.common.response.BaseResponseStatus.POST_FRIDGES_EXIST_INGREDIENT_NAME;
-import static com.recipe.app.common.response.BaseResponseStatus.POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME;
-import static com.recipe.app.common.response.BaseResponseStatus.POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS;
 import static com.recipe.app.common.response.BaseResponseStatus.SUCCESS;
 
 @Getter
-@AllArgsConstructor
-@JsonPropertyOrder({"isSuccess", "code", "message", "result"})
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class BaseResponse<T> {
-    @JsonProperty("isSuccess")
-    private final Boolean isSuccess;
-//    private final String message;
+    private boolean success;
     private String message;
-    private final int code;
-    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private int code;
     private T result;
 
-    // 요청에 성공한 경우
-    public BaseResponse(T result) {
-        this.isSuccess = SUCCESS.isSuccess();
-        this.message = SUCCESS.getMessage();
-        this.code = SUCCESS.getCode();
+    public static <T> BaseResponse<T> success(T result) {
+        return new BaseResponse<>(true, SUCCESS, result);
+    }
+
+    public static BaseResponse<?> error(BaseResponseStatus status) {
+        return new BaseResponse<>(false, status, null);
+    }
+
+    public BaseResponse(boolean success, BaseResponseStatus status, T result) {
+        this(success, status.getMessage(), status.getCode(), result);
+    }
+
+    public BaseResponse(boolean success, String message, int code, T result) {
+        this.success = success;
+        this.message = message;
+        this.code = code;
         this.result = result;
     }
 
-    // 요청에 실패한 경우
-    public BaseResponse(BaseResponseStatus status) {
-        this.isSuccess = status.isSuccess();
-        this.message = status.getMessage();
-        this.code = status.getCode();
+    public boolean isSuccess() {
+        return success;
     }
 
+    public String getMessage() {
+        return message;
+    }
+
+    public int getCode() {
+        return code;
+    }
+
+    public T getResult() {
+        return result;
+    }
+
+    @Override
+    public String toString() {
+        return new ToStringBuilder(this, ToStringStyle.SHORT_PREFIX_STYLE)
+                .append("isSuccess", success)
+                .append("message", message)
+                .append("code", code)
+                .append("result", result)
+                .toString();
+    }
+
+    /*
     // 냉장고 채우기 API - 존재하는 재료가 있을 때 그 재료를 validation message에 추가
     public BaseResponse(BaseResponseStatus status,String ingredientName) {
         this.isSuccess = status.isSuccess();
@@ -54,4 +77,6 @@ public class BaseResponse<T> {
         }
         this.code = status.getCode();
     }
+
+     */
 }
