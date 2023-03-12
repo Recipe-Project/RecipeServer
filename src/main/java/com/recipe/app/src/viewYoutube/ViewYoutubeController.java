@@ -8,6 +8,7 @@ import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import static com.recipe.app.common.response.BaseResponse.success;
 import static com.recipe.app.common.response.BaseResponseStatus.EMPTY_YOUTUBEIDX;
 
 
@@ -33,18 +34,12 @@ public class ViewYoutubeController {
     @PostMapping("")
     public BaseResponse<PostViewsYoutubeRes> postViewsYoutube(@RequestBody PostViewsYoutubeReq parameters) {
         if (parameters.getYoutubeIdx() == null && parameters.getYoutubeIdx() !=null) {
-            return new BaseResponse<>(EMPTY_YOUTUBEIDX);
+            throw new BaseException(EMPTY_YOUTUBEIDX);
         }
 
-        try {
-            Integer userIdx = jwtService.getUserId();
-            PostViewsYoutubeRes postViewsYoutubeRes = viewYoutubeService.createViewYoutube(parameters,userIdx);
-            return new BaseResponse<>(postViewsYoutubeRes);
-
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-
+        Integer userIdx = jwtService.getUserId();
+        PostViewsYoutubeRes postViewsYoutubeRes = viewYoutubeService.createViewYoutube(parameters,userIdx);
+        return success(postViewsYoutubeRes);
     }
 
 }

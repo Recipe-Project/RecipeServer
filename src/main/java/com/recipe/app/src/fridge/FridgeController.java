@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.List;
 
+import static com.recipe.app.common.response.BaseResponse.success;
 import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Slf4j
@@ -50,51 +51,47 @@ public class FridgeController {
     @ResponseBody
     @PostMapping("/fridges")
     public BaseResponse<List<PostFridgesRes>> postFridges(@RequestBody PostFridgesReq parameters) {
-        try {
-            List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
-            Integer userIdx = jwtService.getUserId();
+        List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
+        Integer userIdx = jwtService.getUserId();
 
-            if (fridgeBasketList==null || fridgeBasketList.isEmpty()) {
-                return new BaseResponse<>(POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST);
-            }
-
-            for (FridgeBasketList fridgeBasket : fridgeBasketList) {
-                String ingredientName = fridgeBasket.getIngredientName();
-                String ingredientIcon = fridgeBasket.getIngredientIcon();
-                Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategoryIdx();
-                String expiredAt = fridgeBasket.getExpiredAt();
-                String storageMethod = fridgeBasket.getStorageMethod();
-                Integer count = fridgeBasket.getCount();
-
-                if (ingredientName == null || ingredientName.length()==0) {
-                    return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_NAME);
-                }
-                if (ingredientIcon == null || ingredientIcon.length()==0) {
-                    return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_ICON);
-                }
-                if (ingredientCategoryIdx == null || ingredientCategoryIdx<=0) {
-                    return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
-                }
-                if (storageMethod == null || storageMethod.length()==0) {
-                    return new BaseResponse<>(EMPTY_STORAGE_METHOD);
-                }
-                if (count == null || count<=0) {
-                    return new BaseResponse<>(EMPTY_INGREDIENT_COUNT);
-                }
-                if (expiredAt !=null && expiredAt.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
-                    return new BaseResponse<>(INVALID_DATE);
-                }
-                if (!storageMethod.equals("냉장") && !storageMethod.equals("냉동") && !storageMethod.equals("실온")){
-                    return new BaseResponse<>(INVALID_STORAGE_METHOD);
-                }
-            }
-
-            List<PostFridgesRes> postFridgesBasketRes = fridgeService.createFridges(parameters, userIdx);
-
-            return new BaseResponse<>(postFridgesBasketRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus(), exception.getIngredientName());
+        if (fridgeBasketList==null || fridgeBasketList.isEmpty()) {
+            throw new BaseException(POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST);
         }
+
+        for (FridgeBasketList fridgeBasket : fridgeBasketList) {
+            String ingredientName = fridgeBasket.getIngredientName();
+            String ingredientIcon = fridgeBasket.getIngredientIcon();
+            Integer ingredientCategoryIdx = fridgeBasket.getIngredientCategoryIdx();
+            String expiredAt = fridgeBasket.getExpiredAt();
+            String storageMethod = fridgeBasket.getStorageMethod();
+            Integer count = fridgeBasket.getCount();
+
+            if (ingredientName == null || ingredientName.length()==0) {
+                throw new BaseException(POST_FRIDGES_EMPTY_INGREDIENT_NAME);
+            }
+            if (ingredientIcon == null || ingredientIcon.length()==0) {
+                throw new BaseException(POST_FRIDGES_EMPTY_INGREDIENT_ICON);
+            }
+            if (ingredientCategoryIdx == null || ingredientCategoryIdx<=0) {
+                throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
+            }
+            if (storageMethod == null || storageMethod.length()==0) {
+                throw new BaseException(EMPTY_STORAGE_METHOD);
+            }
+            if (count == null || count<=0) {
+                throw new BaseException(EMPTY_INGREDIENT_COUNT);
+            }
+            if (expiredAt !=null && expiredAt.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
+                throw new BaseException(INVALID_DATE);
+            }
+            if (!storageMethod.equals("냉장") && !storageMethod.equals("냉동") && !storageMethod.equals("실온")){
+                throw new BaseException(INVALID_STORAGE_METHOD);
+            }
+        }
+
+        List<PostFridgesRes> postFridgesBasketRes = fridgeService.createFridges(parameters, userIdx);
+
+        return success(postFridgesBasketRes);
     }
 
     /**
@@ -104,14 +101,10 @@ public class FridgeController {
      */
     @GetMapping("/fridges")
     public BaseResponse<GetFridgesRes> getFridges() {
-        try {
-            Integer userIdx = jwtService.getUserId();
-            GetFridgesRes getFridgesRes = fridgeProvider.retreiveFridges(userIdx);
+        Integer userIdx = jwtService.getUserId();
+        GetFridgesRes getFridgesRes = fridgeProvider.retreiveFridges(userIdx);
 
-            return new BaseResponse<>(getFridgesRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(getFridgesRes);
     }
 
     /**
@@ -122,19 +115,14 @@ public class FridgeController {
      */
     @DeleteMapping("/fridges/ingredient")
     public BaseResponse<Void> deleteFridgesIngredient(@RequestBody DeleteFridgesIngredientReq parameters) throws BaseException {
-        try {
-            Integer userIdx = jwtService.getUserId();
-            List<String> ingrdientNames = parameters.getIngredientName();
-            if (ingrdientNames == null || ingrdientNames.isEmpty()) {
-                return new BaseResponse<>(EMPTY_INGREDIENT);
-            }
-
-            fridgeService.deleteFridgeIngredient(userIdx, parameters);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
+        Integer userIdx = jwtService.getUserId();
+        List<String> ingrdientNames = parameters.getIngredientName();
+        if (ingrdientNames == null || ingrdientNames.isEmpty()) {
+            throw new BaseException(EMPTY_INGREDIENT);
         }
 
+        fridgeService.deleteFridgeIngredient(userIdx, parameters);
+        return success();
     }
 
     /**
@@ -146,44 +134,38 @@ public class FridgeController {
     @ResponseBody
     @PatchMapping("/fridges/ingredient")
     public BaseResponse<Void> patchFridgesIngredient(@RequestBody PatchFridgesIngredientReq parameters) throws BaseException {
-        try {
-            Integer userIdx = jwtService.getUserId();
-            List<PatchFridgeList> patchFridgeList = parameters.getPatchFridgeList();
-            if (patchFridgeList==null || patchFridgeList.isEmpty()) {
-                return new BaseResponse<>(EMPTY_PATCH_FRIDGE_LIST);
-            }
-
-            for (PatchFridgeList patchFridge : patchFridgeList) {
-                String ingredientName = patchFridge.getIngredientName();
-                String expiredAt = patchFridge.getExpiredAt();
-                String storageMethod = patchFridge.getStorageMethod();
-                Integer count = patchFridge.getCount();
-
-                if (ingredientName == null || ingredientName.length()==0 ) {
-                    return new BaseResponse<>(POST_FRIDGES_EMPTY_INGREDIENT_NAME);
-                }
-                if (storageMethod == null || storageMethod.length()==0 ) {
-                    return new BaseResponse<>(EMPTY_STORAGE_METHOD);
-                }
-                if (count == null || count<=0  ) {
-                    return new BaseResponse<>(EMPTY_INGREDIENT_COUNT);
-                }
-                if (expiredAt !=null && expiredAt.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
-                    return new BaseResponse<>(INVALID_DATE);
-                }
-                if (!storageMethod.equals("냉장") && !storageMethod.equals("냉동") && !storageMethod.equals("실온")){
-                    return new BaseResponse<>(INVALID_STORAGE_METHOD);
-                }
-            }
-
-            fridgeService.updateFridgeIngredient(parameters,userIdx);
-
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_PATCH_FRIDGES_INGREDIENT);
+        Integer userIdx = jwtService.getUserId();
+        List<PatchFridgeList> patchFridgeList = parameters.getPatchFridgeList();
+        if (patchFridgeList==null || patchFridgeList.isEmpty()) {
+            throw new BaseException(EMPTY_PATCH_FRIDGE_LIST);
         }
+
+        for (PatchFridgeList patchFridge : patchFridgeList) {
+            String ingredientName = patchFridge.getIngredientName();
+            String expiredAt = patchFridge.getExpiredAt();
+            String storageMethod = patchFridge.getStorageMethod();
+            Integer count = patchFridge.getCount();
+
+            if (ingredientName == null || ingredientName.length()==0 ) {
+                throw new BaseException(POST_FRIDGES_EMPTY_INGREDIENT_NAME);
+            }
+            if (storageMethod == null || storageMethod.length()==0 ) {
+                throw new BaseException(EMPTY_STORAGE_METHOD);
+            }
+            if (count == null || count<=0  ) {
+                throw new BaseException(EMPTY_INGREDIENT_COUNT);
+            }
+            if (expiredAt !=null && expiredAt.length()!=0 && !expiredAt.matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
+                throw new BaseException(INVALID_DATE);
+            }
+            if (!storageMethod.equals("냉장") && !storageMethod.equals("냉동") && !storageMethod.equals("실온")){
+                throw new BaseException(INVALID_STORAGE_METHOD);
+            }
+        }
+
+        fridgeService.updateFridgeIngredient(parameters,userIdx);
+
+        return success();
     }
 
 

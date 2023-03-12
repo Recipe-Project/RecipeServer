@@ -16,6 +16,10 @@ public class BaseResponse<T> {
     private int code;
     private T result;
 
+    public static <T> BaseResponse<T> success() {
+        return new BaseResponse<>(true, SUCCESS, null);
+    }
+
     public static <T> BaseResponse<T> success(T result) {
         return new BaseResponse<>(true, SUCCESS, result);
     }

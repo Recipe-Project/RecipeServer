@@ -7,6 +7,7 @@ import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import static com.recipe.app.common.response.BaseResponse.*;
 import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
@@ -32,16 +33,11 @@ public class ViewBlogController {
     @PostMapping("")
     public BaseResponse<Void> postViewBlog(@RequestBody PostViewBlogReq parameters) {
         if (parameters.getBlogUrl() == null || parameters.getBlogUrl().length()==0) {
-            return new BaseResponse<>(POST_VIEW_BLOG_EMPTY_BLOGURL);
+            throw new BaseException(POST_VIEW_BLOG_EMPTY_BLOGURL);
         }
 
-        try {
-            Integer jwtUserIdx = jwtService.getUserId();
-            viewBlogService.createViewBlog(jwtUserIdx, parameters);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-
+        Integer jwtUserIdx = jwtService.getUserId();
+        viewBlogService.createViewBlog(jwtUserIdx, parameters);
+        return success();
     }
 }

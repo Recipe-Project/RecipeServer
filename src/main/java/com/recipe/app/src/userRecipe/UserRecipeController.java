@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.recipe.app.common.response.BaseResponse.*;
 import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
@@ -36,15 +37,10 @@ public class UserRecipeController {
      */
     @GetMapping("")
     public BaseResponse<List<GetMyRecipesRes>> getMyRecipes() {
-        try {
-            Integer userIdx = jwtService.getUserId();
-            List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx);
+        Integer userIdx = jwtService.getUserId();
+        List<GetMyRecipesRes> GetMyRecipesResList = userRecipeProvider.retrieveMyRecipesList(userIdx);
 
-            return new BaseResponse<>(GetMyRecipesResList);
-
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(GetMyRecipesResList);
     }
 
 
@@ -58,16 +54,12 @@ public class UserRecipeController {
     public BaseResponse<GetMyRecipeRes> getMyRecipe(@PathVariable Integer myRecipeIdx) throws BaseException {
         Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
         if (!existMyRecipe){
-            return new BaseResponse<>(NO_FOUND_MY_RECIPE);
+            throw new BaseException(NO_FOUND_MY_RECIPE);
         }
 
-        try {
-            Integer userIdx = jwtService.getUserId();
-            GetMyRecipeRes getMyRecipeRes = userRecipeProvider.retrieveMyRecipe(userIdx,myRecipeIdx);
-            return new BaseResponse<>(getMyRecipeRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        Integer userIdx = jwtService.getUserId();
+        GetMyRecipeRes getMyRecipeRes = userRecipeProvider.retrieveMyRecipe(userIdx,myRecipeIdx);
+        return success(getMyRecipeRes);
     }
 
     /**
@@ -79,39 +71,30 @@ public class UserRecipeController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<PostMyRecipeRes> postMyRecipe(@RequestBody PostMyRecipeReq parameters) {
-        try {
-            Integer userIdx = jwtService.getUserId();
+        Integer userIdx = jwtService.getUserId();
 
-            if (parameters.getTitle() == null || parameters.getTitle().length()==0 ) {
-                return new BaseResponse<>(EMPTY_TITLE);
-            }
-            if (parameters.getContent() == null || parameters.getContent().length()==0 ) {
-                return new BaseResponse<>(EMPTY_CONTENT);
-            }
-
-
-
-            List<MyRecipeIngredient> ingredientList = parameters.getIngredientList();
-            if (ingredientList!=null) {
-                for(int i=0;i<ingredientList.size();i++){
-                    if(ingredientList.get(i).getIngredientName()==null || ingredientList.get(i).getIngredientName().length()==0 ){
-                        return new BaseResponse<>(EMPTY_INGREDIENT_NAME);
-                    }
-                    if(ingredientList.get(i).getIngredientIcon()==null || ingredientList.get(i).getIngredientIcon().length()==0 ){
-                        return new BaseResponse<>(EMPTY_INGREDIENT_ICON);
-                    }
-
-                }
-            }
-
-
-            PostMyRecipeRes postMyRecipeRes = userRecipeService.createMyRecipe(parameters,userIdx);
-            return new BaseResponse<>(postMyRecipeRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
+        if (parameters.getTitle() == null || parameters.getTitle().length()==0 ) {
+            throw new BaseException(EMPTY_TITLE);
+        }
+        if (parameters.getContent() == null || parameters.getContent().length()==0 ) {
+            throw new BaseException(EMPTY_CONTENT);
         }
 
+        List<MyRecipeIngredient> ingredientList = parameters.getIngredientList();
+        if (ingredientList!=null) {
+            for(int i=0;i<ingredientList.size();i++){
+                if(ingredientList.get(i).getIngredientName()==null || ingredientList.get(i).getIngredientName().length()==0 ){
+                    throw new BaseException(EMPTY_INGREDIENT_NAME);
+                }
+                if(ingredientList.get(i).getIngredientIcon()==null || ingredientList.get(i).getIngredientIcon().length()==0 ){
+                    throw new BaseException(EMPTY_INGREDIENT_ICON);
+                }
 
+            }
+        }
+
+        PostMyRecipeRes postMyRecipeRes = userRecipeService.createMyRecipe(parameters,userIdx);
+        return success(postMyRecipeRes);
     }
     /**
      * 나만의 레시피 수정 API
@@ -123,50 +106,42 @@ public class UserRecipeController {
     @ResponseBody
     @PatchMapping("{myRecipeIdx}")
     public BaseResponse<PatchMyRecipeRes> patchMyRecipe(@PathVariable Integer myRecipeIdx, @RequestBody PatchMyRecipeReq parameters) throws BaseException {
+        Integer userIdx = jwtService.getUserId();
 
-
-        try {
-
-            Integer userIdx = jwtService.getUserId();
-
-
-            Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
-            if (!existMyRecipe){
-                return new BaseResponse<>(NO_FOUND_MY_RECIPE);
-            }
-
-
-            if (myRecipeIdx == null || myRecipeIdx <= 0) {
-                return new BaseResponse<>(EMPTY_MY_RECIPEIDX);
-            }
-
-
-            if (parameters.getTitle() == null || parameters.getTitle().length()==0 ) {
-                return new BaseResponse<>(EMPTY_TITLE);
-            }
-            if (parameters.getContent() == null || parameters.getContent().length()==0 ) {
-                return new BaseResponse<>(EMPTY_CONTENT);
-            }
-
-
-            List<MyRecipeIngredient> ingredientList = parameters.getIngredientList();
-            if (ingredientList !=null) {
-                for(int i=0;i<ingredientList.size();i++){
-                    if(ingredientList.get(i).getIngredientName()==null || ingredientList.get(i).getIngredientName().length()==0 ){
-                        return new BaseResponse<>(EMPTY_INGREDIENT_NAME);
-                    }
-                    if(ingredientList.get(i).getIngredientIcon()==null || ingredientList.get(i).getIngredientIcon().length()==0 ){
-                        return new BaseResponse<>(EMPTY_INGREDIENT_ICON);
-                    }
-
-                }
-            }
-
-            PatchMyRecipeRes patchMyRecipeRes = userRecipeService.updateMyRecipe(parameters,userIdx,myRecipeIdx);
-            return new BaseResponse<>(patchMyRecipeRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
+        Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
+        if (!existMyRecipe){
+            throw new BaseException(NO_FOUND_MY_RECIPE);
         }
+
+
+        if (myRecipeIdx == null || myRecipeIdx <= 0) {
+            throw new BaseException(EMPTY_MY_RECIPEIDX);
+        }
+
+
+        if (parameters.getTitle() == null || parameters.getTitle().length()==0 ) {
+            throw new BaseException(EMPTY_TITLE);
+        }
+        if (parameters.getContent() == null || parameters.getContent().length()==0 ) {
+            throw new BaseException(EMPTY_CONTENT);
+        }
+
+
+        List<MyRecipeIngredient> ingredientList = parameters.getIngredientList();
+        if (ingredientList !=null) {
+            for(int i=0;i<ingredientList.size();i++){
+                if(ingredientList.get(i).getIngredientName()==null || ingredientList.get(i).getIngredientName().length()==0 ){
+                    throw new BaseException(EMPTY_INGREDIENT_NAME);
+                }
+                if(ingredientList.get(i).getIngredientIcon()==null || ingredientList.get(i).getIngredientIcon().length()==0 ){
+                    throw new BaseException(EMPTY_INGREDIENT_ICON);
+                }
+
+            }
+        }
+
+        PatchMyRecipeRes patchMyRecipeRes = userRecipeService.updateMyRecipe(parameters,userIdx,myRecipeIdx);
+        return success(patchMyRecipeRes);
     }
 
     /**
@@ -179,21 +154,16 @@ public class UserRecipeController {
     public BaseResponse<Void> deleteMyRecipe(@PathVariable Integer myRecipeIdx) throws BaseException {
         Boolean existMyRecipe = userRecipeProvider.existMyRecipe(myRecipeIdx);
         if (!existMyRecipe){
-            return new BaseResponse<>(NO_FOUND_MY_RECIPE);
+            throw new BaseException(NO_FOUND_MY_RECIPE);
         }
 
         if (myRecipeIdx == null || myRecipeIdx <= 0) {
-            return new BaseResponse<>(EMPTY_MY_RECIPEIDX);
+            throw new BaseException(EMPTY_MY_RECIPEIDX);
         }
 
-        try {
-            Integer userIdx = jwtService.getUserId();
-            userRecipeService.deleteUserRecipe(userIdx,myRecipeIdx);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-
+        Integer userIdx = jwtService.getUserId();
+        userRecipeService.deleteUserRecipe(userIdx,myRecipeIdx);
+        return success();
     }
 
 }

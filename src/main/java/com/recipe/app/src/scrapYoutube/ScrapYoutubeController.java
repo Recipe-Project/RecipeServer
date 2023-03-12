@@ -12,6 +12,7 @@ import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import static com.recipe.app.common.response.BaseResponse.success;
 import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
@@ -37,40 +38,37 @@ public class ScrapYoutubeController {
      */
     @PostMapping("")
     public BaseResponse<PostScrapYoutubeRes> postScrapsYoutube(@RequestBody PostScrapYoutubeReq parameters) {
-
-        try {
             Integer userIdx = jwtService.getUserId();
 
-
             if (parameters.getTitle() == null || parameters.getTitle().length()==0) {
-                return new BaseResponse<>(EMPTY_TITLE);
+                throw new BaseException(EMPTY_TITLE);
             }
             if (parameters.getThumbnail() == null || parameters.getThumbnail().length()==0) {
-                return new BaseResponse<>(EMPTY_THUMBNAIL);
+                throw new BaseException(EMPTY_THUMBNAIL);
             }
             if (parameters.getYoutubeUrl() == null || parameters.getYoutubeUrl().length()==0) {
-                return new BaseResponse<>(EMPTY_YOUTUBEURL);
+                throw new BaseException(EMPTY_YOUTUBEURL);
             }
             if (parameters.getPostDate() == null || parameters.getPostDate().length()==0) {
-                return new BaseResponse<>(EMPTY_POST_DATE);
+                throw new BaseException(EMPTY_POST_DATE);
             }
             if (parameters.getChannelName() == null || parameters.getChannelName().length()==0) {
-                return new BaseResponse<>(EMPTY_CHANNEL_NAME);
+                throw new BaseException(EMPTY_CHANNEL_NAME);
             }
             if (parameters.getYoutubeId() == null || parameters.getYoutubeId().length()==0) {
-                return new BaseResponse<>(EMPTY_YOUTUBEIDX);
+                throw new BaseException(EMPTY_YOUTUBEIDX);
             }
             if (parameters.getPlayTime() == null || parameters.getPlayTime().length()==0) {
-                return new BaseResponse<>(EMPTY_PLAY_TIME);
+                throw new BaseException(EMPTY_PLAY_TIME);
             }
             if(!parameters.getThumbnail().matches("([^\\s]+(\\.(?i)(jpg|png|gif|pdf))$)")){
-                return new BaseResponse<>(INVALID_THUMBNAIL);
+                throw new BaseException(INVALID_THUMBNAIL);
             }
             if (!parameters.getYoutubeUrl().matches("^(https?|ftp|file)://[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]")) {
-                return new BaseResponse<>(INVALID_YOUTUBE_URL);
+                throw new BaseException(INVALID_YOUTUBE_URL);
             }
             if (!parameters.getPostDate().matches("^\\d{4}\\.(0[1-9]|1[012])\\.(0[1-9]|[12][0-9]|3[01])$")) {
-                return new BaseResponse<>(INVALID_DATE);
+                throw new BaseException(INVALID_DATE);
             }
 //            if (!parameters.getPlayTime().matches("^([0-5]?[0-9]:[0-5][0-9]):[0-5][0-9]$")|!parameters.getPlayTime().matches("^([1-2]?[0-9]:[0-5][0-9]):[0-5][0-9]:[0-5][0-9]$")) { // 1~23
 //                return new BaseResponse<>(INVALID_PLAY_TIME);
@@ -85,18 +83,13 @@ public class ScrapYoutubeController {
             PostScrapYoutubeRes postScrapYoutubeRes;
             if (scrapYoutube != null) {
                 postScrapYoutubeRes = scrapYoutubeService.deleteScrapYoutube(parameters.getYoutubeId(),userIdx);
-                return new BaseResponse<>(postScrapYoutubeRes);
+                return success(postScrapYoutubeRes);
             }
             else{
                 // 새로 만들지
                 postScrapYoutubeRes = scrapYoutubeService.createScrapYoutube(parameters,userIdx);
-                return new BaseResponse<>(postScrapYoutubeRes);
+                return success(postScrapYoutubeRes);
             }
-
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-
     }
 
 
@@ -108,18 +101,11 @@ public class ScrapYoutubeController {
      */
     @GetMapping("")
     public BaseResponse<GetScrapYoutubesRes> getScrapsYoutube() {
+        Integer userIdx = jwtService.getUserId();
 
-        GetScrapYoutubesRes getScrapYoutubesRes = null;
-        try {
-            Integer userIdx = jwtService.getUserId();
+        GetScrapYoutubesRes getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubeList(userIdx);
 
-            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubeList(userIdx);
-
-            return new BaseResponse<>(getScrapYoutubesRes);
-
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(getScrapYoutubesRes);
     }
 //
 //    /**

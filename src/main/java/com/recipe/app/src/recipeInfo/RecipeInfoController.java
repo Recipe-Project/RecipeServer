@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.recipe.app.common.response.BaseResponse.success;
 import static com.recipe.app.common.response.BaseResponseStatus.RECIPES_EMPTY_RECIPE_IDX;
 
 
@@ -38,15 +39,10 @@ public class RecipeInfoController {
 
     @GetMapping("")
     public BaseResponse<List<GetRecipeInfosRes>> getRecipeInfos(@RequestParam(value="keyword") String keyword) {
+        Integer jwtUserIdx = jwtService.getUserId();
+        List<GetRecipeInfosRes> GetRecipeInfoList = recipeInfoProvider.retrieveRecipeInfos(jwtUserIdx, keyword);
 
-        try {
-            Integer jwtUserIdx = jwtService.getUserId();
-            List<GetRecipeInfosRes> GetRecipeInfoList = recipeInfoProvider.retrieveRecipeInfos(jwtUserIdx, keyword);
-
-            return new BaseResponse<>(GetRecipeInfoList);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(GetRecipeInfoList);
     }
 
 
@@ -59,18 +55,13 @@ public class RecipeInfoController {
     @GetMapping("/{recipeIdx}")
     public BaseResponse<GetRecipeInfoRes> getRecipeInfo(@PathVariable Integer recipeIdx) {
         if(recipeIdx==null || recipeIdx<=0){
-            return new BaseResponse<>(RECIPES_EMPTY_RECIPE_IDX);
+            throw new BaseException(RECIPES_EMPTY_RECIPE_IDX);
         }
 
+        Integer jwtUserIdx = jwtService.getUserId();
+        GetRecipeInfoRes getRecipeInfo = recipeInfoProvider.retrieveRecipeInfo(jwtUserIdx, recipeIdx);
 
-        try {
-            Integer jwtUserIdx = jwtService.getUserId();
-            GetRecipeInfoRes getRecipeInfo = recipeInfoProvider.retrieveRecipeInfo(jwtUserIdx, recipeIdx);
-
-            return new BaseResponse<>(getRecipeInfo);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(getRecipeInfo);
     }
 
 
@@ -81,15 +72,10 @@ public class RecipeInfoController {
      */
     @GetMapping("/blog")
     public BaseResponse<GetRecipeBlogsRes> getRecipeBlogs(@RequestParam(value="keyword") String keyword, @RequestParam(value="display") Integer display, @RequestParam(value="start") Integer start) {
+        int jwtUserIdx = jwtService.getUserId();
+        GetRecipeBlogsRes getRecipeBlog = recipeInfoProvider.retrieveRecipeBlogs(jwtUserIdx, keyword, display, start);
 
-        try {
-            int jwtUserIdx = jwtService.getUserId();
-            GetRecipeBlogsRes getRecipeBlog = recipeInfoProvider.retrieveRecipeBlogs(jwtUserIdx, keyword, display, start);
-
-            return new BaseResponse<>(getRecipeBlog);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(getRecipeBlog);
     }
 
 

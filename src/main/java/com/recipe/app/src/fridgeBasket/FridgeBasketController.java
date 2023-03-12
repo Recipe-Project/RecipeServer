@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import java.text.ParseException;
 import java.util.List;
 
+import static com.recipe.app.common.response.BaseResponse.success;
 import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @RestController
@@ -39,21 +40,15 @@ public class FridgeBasketController {
     @ResponseBody
     @PostMapping("/basket")
     public BaseResponse<Void> postFridgesBasket(@RequestBody PostFridgesBasketReq parameters) {
-        try {
-            Integer userIdx = jwtService.getUserId();
-            List<Integer> ingredientList = parameters.getIngredientList();
-            if (ingredientList == null || ingredientList.isEmpty()) {
-                return new BaseResponse<>(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
-            }
-
-            fridgeBasketService.createFridgesBasket(parameters,userIdx);
-
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        } catch (Exception exception) {
-            return new BaseResponse<>(FAILED_TO_POST_FRIDGES_BASKET);
+        Integer userIdx = jwtService.getUserId();
+        List<Integer> ingredientList = parameters.getIngredientList();
+        if (ingredientList == null || ingredientList.isEmpty()) {
+            throw new BaseException(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
         }
+
+        fridgeBasketService.createFridgesBasket(parameters,userIdx);
+
+        return success();
     }
 
     /**
@@ -65,28 +60,22 @@ public class FridgeBasketController {
     @ResponseBody
     @PostMapping("/direct-basket")
     public BaseResponse<PostFridgesDirectBasketRes> postFridgesDirectBasket(@RequestBody PostFridgesDirectBasketReq parameters) {
-        try {
-            Integer userIdx = jwtService.getUserId();
+        Integer userIdx = jwtService.getUserId();
 
-            if (parameters.getIngredientName() == null || parameters.getIngredientName().length()==0) {
-                return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_NAME);
-            }
-
-            if (parameters.getIngredientIcon() == null || parameters.getIngredientIcon().length()==0) {
-                return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_ICON);
-            }
-            if (parameters.getIngredientCategoryIdx() == null || parameters.getIngredientCategoryIdx() <= 0) {
-                return new BaseResponse<>(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
-            }
-
-            PostFridgesDirectBasketRes postFridgesBasketRes = fridgeBasketService.createFridgesDirectBasket(parameters,userIdx);
-
-            return new BaseResponse<>(postFridgesBasketRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus(), parameters.getIngredientName());
-        } catch (Exception exception) {
-            return new BaseResponse<>(FAILED_TO_POST_FRIDGES_DIRECT_BASKET);
+        if (parameters.getIngredientName() == null || parameters.getIngredientName().length()==0) {
+            throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_NAME);
         }
+
+        if (parameters.getIngredientIcon() == null || parameters.getIngredientIcon().length()==0) {
+            throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_ICON);
+        }
+        if (parameters.getIngredientCategoryIdx() == null || parameters.getIngredientCategoryIdx() <= 0) {
+            throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
+        }
+
+        PostFridgesDirectBasketRes postFridgesBasketRes = fridgeBasketService.createFridgesDirectBasket(parameters,userIdx);
+
+        return success(postFridgesBasketRes);
     }
 
 
@@ -97,15 +86,9 @@ public class FridgeBasketController {
      */
     @GetMapping("/basket")
     public BaseResponse<GetFridgesBasketRes> getFridgesBasket() {
-        try {
-            Integer userIdx = jwtService.getUserId();
-            GetFridgesBasketRes getFridgesBasketRes = fridgeBasketProvider.retreiveFridgeBasket(userIdx);
-            return new BaseResponse<>(getFridgesBasketRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        } catch (Exception exception) {
-            return new BaseResponse<>(FAILED_TO_COUNT_FRIDGE_BASKET_BY_USER);
-        }
+        Integer userIdx = jwtService.getUserId();
+        GetFridgesBasketRes getFridgesBasketRes = fridgeBasketProvider.retreiveFridgeBasket(userIdx);
+        return success(getFridgesBasketRes);
     }
 
     /**
@@ -116,18 +99,14 @@ public class FridgeBasketController {
      */
     @DeleteMapping("/basket")
     public BaseResponse<Void> deleteFridgesBasket(@RequestParam(value="ingredient") String ingredient) {
-        try {
-            Integer userIdx = jwtService.getUserId();
-            if (ingredient == null || ingredient.equals("")){
-                return new BaseResponse<>(EMPTY_INGREDIENT);
-            }
-
-            fridgeBasketService.deleteFridgeBasket(userIdx, ingredient);
-
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
+        Integer userIdx = jwtService.getUserId();
+        if (ingredient == null || ingredient.equals("")){
+            throw new BaseException(EMPTY_INGREDIENT);
         }
+
+        fridgeBasketService.deleteFridgeBasket(userIdx, ingredient);
+
+        return success();
     }
 
     /**
@@ -138,24 +117,16 @@ public class FridgeBasketController {
      */
     @ResponseBody
     @PatchMapping("/basket")
-    public BaseResponse<Void> patchFridgesBasket(@RequestBody PatchFridgesBasketReq parameters) {
-        try {
+    public BaseResponse<Void> patchFridgesBasket(@RequestBody PatchFridgesBasketReq parameters) throws ParseException {
             Integer userIdx = jwtService.getUserId();
             List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
             if (fridgeBasketList == null || fridgeBasketList.isEmpty()) {
-                return new BaseResponse<>(PATCH_FRIDGES_BASKET_EMPTY_FRIDGES_BASKET_LIST);
+                throw new BaseException(PATCH_FRIDGES_BASKET_EMPTY_FRIDGES_BASKET_LIST);
             }
 
             fridgeBasketService.updateFridgesBasket(parameters,userIdx);
 
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        } catch (ParseException exception) {
-            return new BaseResponse<>(DATE_PARSE_ERROR);
-        } catch (Exception exception) {
-            return new BaseResponse<>(FAILED_TO_PATCH_FRIDGE_BASKET_INGREDIENTS);
-        }
+            return success();
     }
 
     /**
@@ -165,14 +136,9 @@ public class FridgeBasketController {
      */
     @GetMapping("/basket/count")
     public BaseResponse<GetFridgesBasketCountRes> getFridgesBasketCount() {
+        Integer userIdx = jwtService.getUserId();
+        GetFridgesBasketCountRes getFridgesBasketCountRes = fridgeBasketProvider.retreiveFridgeBasketCount(userIdx);
 
-        try {
-            Integer userIdx = jwtService.getUserId();
-            GetFridgesBasketCountRes getFridgesBasketCountRes = fridgeBasketProvider.retreiveFridgeBasketCount(userIdx);
-
-            return new BaseResponse<>(getFridgesBasketCountRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(getFridgesBasketCountRes);
     }
 }

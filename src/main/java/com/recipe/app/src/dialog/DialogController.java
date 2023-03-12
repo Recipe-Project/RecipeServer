@@ -8,6 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import static com.recipe.app.common.response.BaseResponse.success;
+
 @RestController
 @RequestMapping("/dialog")
 public class DialogController {
@@ -25,11 +27,7 @@ public class DialogController {
      */
     @GetMapping("")
     public BaseResponse<GetDialogRes> getDialog() {
-        try {
-            GetDialogRes getDialogRes = dialogProvider.retrieveDialog();
-            return new BaseResponse<>(getDialogRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        GetDialogRes getDialogRes = dialogProvider.retrieveDialog();
+        return success(getDialogRes);
     }
 }
