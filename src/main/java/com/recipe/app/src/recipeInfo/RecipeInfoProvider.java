@@ -468,7 +468,7 @@ public class RecipeInfoProvider {
         }catch(Exception e){
             throw new BaseException(FAILED_TO_URL_ENCODER);
         }
-        String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&query="+text+"&display=25&start=1";
+        String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&query="+text+"&display="+display+"&start="+start;
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("X-Naver-Client-Id", NAVER_CLIENT_ID);
