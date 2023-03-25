@@ -632,7 +632,7 @@ public class RecipeInfoProvider {
             throw new BaseException(DATABASE_ERROR);
         }
 
-        return new GetRecipeBlogsRes(total, blogList);
+        return new GetRecipeBlogsRes(50, blogList);
 
     }
 }
