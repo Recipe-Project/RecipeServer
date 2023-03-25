@@ -469,7 +469,7 @@ public class RecipeInfoProvider {
             throw new BaseException(FAILED_TO_URL_ENCODER);
         }
 
-        if(start > 5) {
+        if(start > 50) {
             return new GetRecipeBlogsRes(50, new ArrayList<>());
         }
 
