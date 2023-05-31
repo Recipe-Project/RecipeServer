@@ -1,12 +1,14 @@
 package com.recipe.app.src.appVersion;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.appVersion.models.GetAppVersionRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.recipe.app.common.response.BaseResponse.success;
 
 
 @RestController
@@ -27,12 +29,7 @@ public class AppVersionController {
      */
     @GetMapping("/app/version")
     public BaseResponse<GetAppVersionRes> getAppVersion() throws BaseException {
-
-        try {
-            GetAppVersionRes getAppVersionRes = appVersionProvider.retrieveAppVersion();
-            return new BaseResponse<>(getAppVersionRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        GetAppVersionRes getAppVersionRes = appVersionProvider.retrieveAppVersion();
+        return success(getAppVersionRes);
     }
 }

@@ -1,12 +1,12 @@
 package com.recipe.app.src.ingredientCategory;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class IngredientCategoryProvider {
@@ -26,13 +26,7 @@ public class IngredientCategoryProvider {
      * @throws BaseException
      */
     public IngredientCategory retrieveIngredientCategoryByIngredientCategoryIdx(Integer ingredientCategoryIdx) throws BaseException {
-        IngredientCategory ingredientCategory;
-
-        try {
-            ingredientCategory = ingredientCategoryRepository.findById(ingredientCategoryIdx).orElse(null);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
-        }
+        IngredientCategory ingredientCategory = ingredientCategoryRepository.findById(ingredientCategoryIdx).orElse(null);
 
         if (ingredientCategory == null || !ingredientCategory.getStatus().equals("ACTIVE")) {
             throw new BaseException(NOT_FOUND_INGREDIENT_CATEGORY);

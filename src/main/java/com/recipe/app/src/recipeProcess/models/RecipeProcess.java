@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipeProcess.models;
 
-import com.recipe.app.config.BaseEntity;
+import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import lombok.AccessLevel;
 import lombok.Data;

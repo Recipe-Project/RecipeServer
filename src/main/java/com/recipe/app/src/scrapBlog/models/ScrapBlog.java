@@ -3,11 +3,9 @@ package com.recipe.app.src.scrapBlog.models;
 import com.recipe.app.src.user.models.User;
 import lombok.*;
 import javax.persistence.*;
-import com.recipe.app.config.BaseEntity;
+import com.recipe.app.common.entity.BaseEntity;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
 @EqualsAndHashCode(callSuper = false)

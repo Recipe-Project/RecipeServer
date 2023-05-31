@@ -1,20 +1,16 @@
 package com.recipe.app.src.scrapBlog;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.scrapBlog.models.*;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Lazy;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
-import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponse.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @RestController
@@ -41,32 +37,27 @@ public class ScrapBlogController {
     @PostMapping("")
     public BaseResponse<Void> postScrapBlog(@RequestBody PostScrapBlogReq parameters) {
         if (parameters.getTitle() == null || parameters.getTitle().length()==0) {
-            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_TITLE);
+            throw new BaseException(POST_SCRAP_BLOG_EMPTY_TITLE);
         }
         if (parameters.getThumbnail() == null || parameters.getThumbnail().length()==0) {
-            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_THUMBNAIL);
+            throw new BaseException(POST_SCRAP_BLOG_EMPTY_THUMBNAIL);
         }
         if (parameters.getBlogUrl() == null || parameters.getBlogUrl().length()==0) {
-            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_BLOGURL);
+            throw new BaseException(POST_SCRAP_BLOG_EMPTY_BLOGURL);
         }
         if (parameters.getDescription() == null || parameters.getDescription().length()==0) {
-            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_DESCRIPTION);
+            throw new BaseException(POST_SCRAP_BLOG_EMPTY_DESCRIPTION);
         }
         if (parameters.getBloggerName() == null || parameters.getBloggerName().length()==0) {
-            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_BLOGGER_NAME);
+            throw new BaseException(POST_SCRAP_BLOG_EMPTY_BLOGGER_NAME);
         }
         if (parameters.getPostDate() == null || parameters.getPostDate().length()==0) {
-            return new BaseResponse<>(POST_SCRAP_BLOG_EMPTY_POST_DATE);
+            throw new BaseException(POST_SCRAP_BLOG_EMPTY_POST_DATE);
         }
 
-        try {
-            Integer jwtUserIdx = jwtService.getUserId();
-            scrapBlogService.createOrDeleteScrapBlog(jwtUserIdx, parameters);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-
+        Integer jwtUserIdx = jwtService.getUserId();
+        scrapBlogService.createOrDeleteScrapBlog(jwtUserIdx, parameters);
+        return success();
     }
 
 
@@ -80,13 +71,8 @@ public class ScrapBlogController {
     @ResponseBody
     @GetMapping("")
     public BaseResponse<List<GetScrapBlogsRes>> getScrapBlogs() {
-
-        try {
-            Integer jwtUserIdx = jwtService.getUserId();
-            List<GetScrapBlogsRes> getScrapBlogsResList = scrapBlogProvider.retrieveScrapBlogs(jwtUserIdx);
-            return new BaseResponse<>(getScrapBlogsResList);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        Integer jwtUserIdx = jwtService.getUserId();
+        List<GetScrapBlogsRes> getScrapBlogsResList = scrapBlogProvider.retrieveScrapBlogs(jwtUserIdx);
+        return success(getScrapBlogsResList);
     }
 }

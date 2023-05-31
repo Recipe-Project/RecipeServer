@@ -1,17 +1,14 @@
 package com.recipe.app.src.viewYoutube;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeReq;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeRes;
 import com.recipe.app.src.viewYoutube.models.ViewYoutube;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import static com.recipe.app.config.BaseResponseStatus.FAILED_TO_POST_VIEWS_YOUTUBE;
-
 
 @Service
 public class ViewYoutubeService {
@@ -36,15 +33,7 @@ public class ViewYoutubeService {
         Integer youtubeIdx = postViewsYoutubeReq.getYoutubeIdx();
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-
-        try {
-            ViewYoutube viewYoutube = new ViewYoutube(user, youtubeIdx);
-            viewYoutube = viewYoutubeRepository.save(viewYoutube);
-
-
-        } catch (Exception exception) {
-            throw new BaseException(FAILED_TO_POST_VIEWS_YOUTUBE);
-        }
+        viewYoutubeRepository.save(new ViewYoutube(user, youtubeIdx));
 
         return new PostViewsYoutubeRes(userIdx,youtubeIdx);
     }

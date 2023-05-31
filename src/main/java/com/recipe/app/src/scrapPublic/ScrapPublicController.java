@@ -1,12 +1,13 @@
 package com.recipe.app.src.scrapPublic;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.scrapPublic.models.*;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import static com.recipe.app.common.response.BaseResponse.*;
 
 
 @RestController
@@ -32,28 +33,21 @@ public class ScrapPublicController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<PostScrapPublicRes> postScrapRecipe(@RequestBody PostScrapPublicReq parameters) throws BaseException {
+        Integer userIdx = jwtService.getUserId();
 
-        try {
-            Integer userIdx = jwtService.getUserId();
-
-            // 이미 발급 받은건지
-            ScrapPublic scrapPublic = null;
-            scrapPublic = scrapPublicProvider.retrieveScrapRecipe(parameters.getRecipeId(), userIdx);
+        // 이미 발급 받은건지
+        ScrapPublic scrapPublic = null;
+        scrapPublic = scrapPublicProvider.retrieveScrapRecipe(parameters.getRecipeId(), userIdx);
 
 
-                PostScrapPublicRes postScrapPublicRes;
-                if (scrapPublic != null) {
-                postScrapPublicRes =  scrapPublicService.deleteScrapRecipe(parameters.getRecipeId(),userIdx);
-            }
-            else{
-                postScrapPublicRes = scrapPublicService.createScrapRecipe(parameters.getRecipeId(),userIdx);
-            }
-            return new BaseResponse<>(postScrapPublicRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
+            PostScrapPublicRes postScrapPublicRes;
+            if (scrapPublic != null) {
+            postScrapPublicRes =  scrapPublicService.deleteScrapRecipe(parameters.getRecipeId(),userIdx);
         }
-
-
+        else{
+            postScrapPublicRes = scrapPublicService.createScrapRecipe(parameters.getRecipeId(),userIdx);
+        }
+        return success(postScrapPublicRes);
     }
     /**
      * 레시피 스크랩 조회 API
@@ -63,18 +57,11 @@ public class ScrapPublicController {
     @ResponseBody
     @GetMapping("")
     public BaseResponse <GetScrapPublicsRes> getScrapRecipes() throws BaseException {
+        Integer userIdx = jwtService.getUserId();
 
+        GetScrapPublicsRes getScrapPublicsRes = scrapPublicProvider.retrieveScrapRecipes(userIdx);
 
-        try {
-            Integer userIdx = jwtService.getUserId();
-
-            GetScrapPublicsRes getScrapPublicsRes = scrapPublicProvider.retrieveScrapRecipes(userIdx);
-
-
-            return new BaseResponse<>(getScrapPublicsRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(getScrapPublicsRes);
     }
 //    /**
 //     * 레시피 스크랩 조회 API

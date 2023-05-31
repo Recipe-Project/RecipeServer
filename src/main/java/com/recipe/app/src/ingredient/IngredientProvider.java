@@ -1,6 +1,6 @@
 package com.recipe.app.src.ingredient;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.ingredient.models.GetIngredientsRes;
 import com.recipe.app.src.ingredient.models.Ingredient;
@@ -11,7 +11,7 @@ import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @Service
@@ -53,20 +53,9 @@ public class IngredientProvider {
     @Transactional
     public GetIngredientsRes retrieveKeywordIngredientsList(String keyword,Integer userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        long fridgeBasketCount;
-        try {
-            fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET_COUNT);
-        }
+        long fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
 
-        List<IngredientCategory> ingredientCategories;
-
-        try {
-            ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
-        }
+        List<IngredientCategory> ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
 
         List<Ingredients> ingredients = new ArrayList<>();
         for (int i=0;i<ingredientCategories.size()-1;i++){
@@ -92,21 +81,9 @@ public class IngredientProvider {
     @Transactional
     public GetIngredientsRes retrieveIngredientsList(Integer userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        long fridgeBasketCount;
-        try {
-            fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET_COUNT);
-        }
+        long fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
 
-        List<IngredientCategory> ingredientCategories;
-
-        try {
-            // 카테고리 리스트 뽑기
-            ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
-        }
+        List<IngredientCategory> ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
 
         List<Ingredients> ingredients = new ArrayList<>();
         for (int i=0;i<ingredientCategories.size()-1;i++){
@@ -131,12 +108,7 @@ public class IngredientProvider {
     public List<IngredientList> retrieveIngredients(Integer ingredientCategoryIdx) throws BaseException {
         IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
 
-        List<Ingredient> ingredients;
-        try {
-            ingredients = ingredientRepository.findByIngredientCategoryAndStatus(ingredientCategory,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_LIST);
-        }
+        List<Ingredient> ingredients = ingredientRepository.findByIngredientCategoryAndStatus(ingredientCategory,"ACTIVE");
 
         // 카테고리에 해당하는 재료 리스트 생성
         return ingredients.stream().map(ing -> {
@@ -159,14 +131,7 @@ public class IngredientProvider {
      */
     public List<IngredientList> retrieveKeywordIngredients(Integer ingredientCategoryIdx,String keyword) throws BaseException {
         IngredientCategory ingredientCategory = ingredientCategoryProvider.retrieveIngredientCategoryByIngredientCategoryIdx(ingredientCategoryIdx);
-        List<Ingredient> ingredients;
-
-
-        try {
-            ingredients = ingredientRepository.findByNameContainingAndIngredientCategoryAndStatus(keyword,ingredientCategory,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_LIST);
-        }
+        List<Ingredient> ingredients = ingredientRepository.findByNameContainingAndIngredientCategoryAndStatus(keyword,ingredientCategory,"ACTIVE");
 
         return ingredients.stream().map(ing -> {
 
@@ -206,13 +171,7 @@ public class IngredientProvider {
      * @throws BaseException
      */
     public Ingredient retrieveIngredientByIngredientIdx(Integer ingredientIdx) throws BaseException {
-        Ingredient ingredient;
-
-        try {
-            ingredient = ingredientRepository.findById(ingredientIdx).orElse(null);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT);
-        }
+        Ingredient ingredient = ingredientRepository.findById(ingredientIdx).orElse(null);
 
         if (ingredient == null || !ingredient.getStatus().equals("ACTIVE")) {
             throw new BaseException(NOT_FOUND_INGREDIENT);
@@ -229,14 +188,6 @@ public class IngredientProvider {
      * @throws BaseException
      */
     public Boolean existIngredient(Integer ingredientIdx) throws BaseException {
-        Boolean existIngredient;
-
-        try {
-            existIngredient = ingredientRepository.existsByIngredientIdxAndStatus(ingredientIdx,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT);
-        }
-
-        return existIngredient;
+        return ingredientRepository.existsByIngredientIdxAndStatus(ingredientIdx,"ACTIVE");
     }
 }

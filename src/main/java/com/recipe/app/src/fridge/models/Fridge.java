@@ -1,7 +1,6 @@
 package com.recipe.app.src.fridge.models;
 
-import com.recipe.app.config.BaseEntity;
-import com.recipe.app.src.ingredient.models.Ingredient;
+import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.models.User;
 import lombok.AccessLevel;

@@ -1,22 +1,14 @@
 package com.recipe.app.src.viewBlog;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.viewBlog.models.*;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
-import java.util.TimeZone;
-
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @Service
@@ -41,12 +33,6 @@ public class ViewBlogService {
 
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
-        ViewBlog viewBlog = new ViewBlog(user, blogUrl);
-
-        try {
-            viewBlog = viewBlogRepository.save(viewBlog);
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        viewBlogRepository.save(new ViewBlog(user, blogUrl));
     }
 }

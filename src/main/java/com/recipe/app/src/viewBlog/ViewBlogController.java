@@ -1,17 +1,14 @@
 package com.recipe.app.src.viewBlog;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.viewBlog.models.*;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
-
-import javax.servlet.http.HttpServletRequest;
-
-import org.springframework.web.context.request.*;
+import static com.recipe.app.common.response.BaseResponse.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @RestController
@@ -36,16 +33,11 @@ public class ViewBlogController {
     @PostMapping("")
     public BaseResponse<Void> postViewBlog(@RequestBody PostViewBlogReq parameters) {
         if (parameters.getBlogUrl() == null || parameters.getBlogUrl().length()==0) {
-            return new BaseResponse<>(POST_VIEW_BLOG_EMPTY_BLOGURL);
+            throw new BaseException(POST_VIEW_BLOG_EMPTY_BLOGURL);
         }
 
-        try {
-            Integer jwtUserIdx = jwtService.getUserId();
-            viewBlogService.createViewBlog(jwtUserIdx, parameters);
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
-
+        Integer jwtUserIdx = jwtService.getUserId();
+        viewBlogService.createViewBlog(jwtUserIdx, parameters);
+        return success();
     }
 }

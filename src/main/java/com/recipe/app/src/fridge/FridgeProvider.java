@@ -1,6 +1,6 @@
 package com.recipe.app.src.fridge;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
@@ -15,13 +15,12 @@ import com.recipe.app.src.user.models.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class FridgeProvider {
@@ -52,19 +51,8 @@ public class FridgeProvider {
      */
     public GetFridgesRes retreiveFridges(int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        long fridgeBasketCount;
-        try {
-            fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET_COUNT);
-        }
-
-        List<IngredientCategory> ingredientCategories;
-        try {
-            ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_CATEGORY);
-        }
+        long fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
+        List<IngredientCategory> ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
 
         List<Fridges> fridges = new ArrayList<>();
         for (IngredientCategory ingredientCategory : ingredientCategories){
@@ -88,12 +76,7 @@ public class FridgeProvider {
      * @throws BaseException
      */
     public List<IngredientList> retreiveFridgeList(IngredientCategory ingredientCategory, User user) throws BaseException {
-        List<Fridge> fridgeList;
-        try {
-            fridgeList = fridgeRepository.findByUserAndIngredientCategoryAndStatus(user,ingredientCategory,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_LIST);
-        }
+        List<Fridge> fridgeList = fridgeRepository.findByUserAndIngredientCategoryAndStatus(user,ingredientCategory,"ACTIVE");
 
         return fridgeList.stream().map(fl -> {
             String ingredientName = fl.getIngredientName();
@@ -146,13 +129,7 @@ public class FridgeProvider {
      * @throws BaseException
      */
     public List<Fridge> getExistIngredients(List<String> ingredientNameList, User user) throws BaseException {
-        List<Fridge> existIngredients;
-        try {
-            existIngredients = fridgeRepository.findAllByUserAndStatusAndIngredientNameIn(user,"ACTIVE", ingredientNameList);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_INGREDIENT_NAME);
-        }
-        return existIngredients;
+        return fridgeRepository.findAllByUserAndStatusAndIngredientNameIn(user,"ACTIVE", ingredientNameList);
     }
 
 
@@ -165,12 +142,8 @@ public class FridgeProvider {
     public GetFridgesRecipeRes retreiveFridgesRecipe(int userIdx, Integer start, Integer display) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-        List<RecipeInfo> recipeInfo;
-        try {
-            recipeInfo = recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(user, "ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_RECIPE_INFO_LIST);
-        }
+        List<RecipeInfo> recipeInfo = recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(user, "ACTIVE");
+
         List<Integer> recipeIdList = recipeInfo.stream().map(RecipeInfo::getRecipeId).collect(Collectors.toList());
         Map<Integer, ScrapPublicInfo> scrapCountMap = scrapPublicRepository.findScrapCountStatusAndRecipeInfoIn("ACTIVE", recipeIdList)
                 .stream().collect(Collectors.toMap(ScrapPublicInfo::getRecipeId, v -> v));;
@@ -199,12 +172,7 @@ public class FridgeProvider {
         SimpleDateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
         String today = sdFormat.format(new Date());
 
-        List<Fridge> fridgeList;
-        try {
-            fridgeList = fridgeRepository.findAllByStatusAnd3DaysBeforeExpiredAt("ACTIVE", today);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_SHELF_LIFE_USER_LIST);
-        }
+        List<Fridge> fridgeList = fridgeRepository.findAllByStatusAnd3DaysBeforeExpiredAt("ACTIVE", today);
 
         List<ShelfLifeUser> shelfLifeUsers = new ArrayList<>();
         for(Fridge fridge : fridgeList) {
@@ -215,7 +183,4 @@ public class FridgeProvider {
         }
         return shelfLifeUsers;
     }
-
-
-
 }

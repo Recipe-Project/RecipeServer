@@ -1,15 +1,16 @@
 package com.recipe.app.src.recipeKeyword;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.recipeKeyword.models.GetRecipesBestKeywordRes;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.recipe.app.config.BaseResponseStatus.SUCCESS;
+import static com.recipe.app.common.response.BaseResponse.success;
+import static com.recipe.app.common.response.BaseResponseStatus.SUCCESS;
 
 
 @RestController
@@ -34,16 +35,11 @@ public class RecipeKeywordController {
      */
     @PostMapping("")
     public BaseResponse<Void> postRecipesKeyword(@RequestParam(value="keyword") String keyword) {
+        int jwtUserIdx = jwtService.getUserId();
 
-        try {
-            int jwtUserIdx = jwtService.getUserId();
+        recipeKeywordService.createRecipeKeyword(jwtUserIdx, keyword);
 
-            recipeKeywordService.createRecipeKeyword(jwtUserIdx, keyword);
-
-            return new BaseResponse<>(SUCCESS);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success();
     }
 
     /**
@@ -53,16 +49,11 @@ public class RecipeKeywordController {
      */
     @GetMapping("/best-keyword")
     public BaseResponse<List<GetRecipesBestKeywordRes>> getRecipesBestKeyword() {
+        int jwtUserIdx = jwtService.getUserId();
 
-        try {
-            int jwtUserIdx = jwtService.getUserId();
+        List<GetRecipesBestKeywordRes> getRecipesBestKeywordRes = recipeKeywordProvider.retrieveRecipesBestKeyword();
 
-            List<GetRecipesBestKeywordRes> getRecipesBestKeywordRes = recipeKeywordProvider.retrieveRecipesBestKeyword();
-
-            return new BaseResponse<>(getRecipesBestKeywordRes);
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
-        }
+        return success(getRecipesBestKeywordRes);
     }
 
 

@@ -1,18 +1,16 @@
 package com.recipe.app.src.user;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.secret.Secret;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.user.models.*;
 import com.recipe.app.src.userRecipe.UserRecipeRepository;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.text.SimpleDateFormat;
 import java.util.*;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class UserProvider {
@@ -36,12 +34,7 @@ public class UserProvider {
      */
     public User retrieveUserByUserIdx(Integer userIdx) throws BaseException {
         // 1. DB에서 User 조회
-        User user;
-        try {
-            user = userRepository.findById(userIdx).orElse(null);
-        } catch (Exception ignored) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        User user = userRepository.findById(userIdx).orElse(null);
 
         // 2. 존재하는 회원인지 확인
         if (user == null || !user.getStatus().equals("ACTIVE")) {
@@ -59,12 +52,7 @@ public class UserProvider {
      */
     public User retrieveUserInfoBySocialId(String userID) throws BaseException {
         // 1. userId 이용해서 UserInfo DB 접근
-        List<User> existsUserInfoList;
-        try {
-            existsUserInfoList = userRepository.findBySocialIdAndStatus(userID, "ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        List<User> existsUserInfoList = userRepository.findBySocialIdAndStatus(userID, "ACTIVE");
 
         // 2. 존재하는 UserInfo가 있는지 확인
         User userInfo;
@@ -72,7 +60,6 @@ public class UserProvider {
             userInfo = existsUserInfoList.get(0);
         } else {
             userInfo = null;
-
         }
 
         // 3. UserInfo를 return
@@ -91,61 +78,57 @@ public class UserProvider {
         }
         User user = retrieveUserByUserIdx(jwtUserIdx);
 
-        try {
-            String profilePhoto = user.getProfilePhoto();
-            String userName = user.getUserName();
-            Integer youtubeScrapCnt=0;
-            for(int i=0;i<user.getScrapYoutubes().size();i++){
-                if(user.getScrapYoutubes().get(i).getStatus().equals("ACTIVE")){
-                    youtubeScrapCnt++;
-                }
+        String profilePhoto = user.getProfilePhoto();
+        String userName = user.getUserName();
+        Integer youtubeScrapCnt=0;
+        for(int i=0;i<user.getScrapYoutubes().size();i++){
+            if(user.getScrapYoutubes().get(i).getStatus().equals("ACTIVE")){
+                youtubeScrapCnt++;
             }
-            Integer blogScrapCnt = 0;
-            for(int i=0;i<user.getScrapBlogs().size();i++){
-                if(user.getScrapBlogs().get(i).getStatus().equals("ACTIVE")){
-                    blogScrapCnt++;
-                }
-            }
-            Integer recipeScrapCnt = 0;
-            for(int i=0;i<user.getScrapPublics().size();i++){
-                if(user.getScrapPublics().get(i).getStatus().equals("ACTIVE")){
-                    recipeScrapCnt++;
-                }
-            }
-
-            List<UserRecipe> userRecipes = user.getUserRecipes();
-            Collections.sort(userRecipes, new Comparator<UserRecipe>() {
-                @Override
-                public int compare(UserRecipe o1, UserRecipe o2) {
-                    return -(o1.getCreatedAt().toString().compareTo(o2.getCreatedAt().toString()));
-                }
-            });
-            int totalSize = 0;
-            for(int i=0;i<userRecipes.size();i++){
-                if(userRecipes.get(i).getStatus().equals("ACTIVE")){
-                    totalSize++;
-                }
-            }
-            int size=0;
-
-            List<MypageMyRecipeList> myRecipeList= new ArrayList<>();
-            for(int i=0;i<userRecipes.size();i++){
-                if(size==6){
-                    break;
-                }
-                if(userRecipes.get(i).getStatus().equals("ACTIVE")) {
-                    Integer myRecipeIdx = userRecipes.get(i).getUserRecipeIdx();
-                    String myRecipeThumbnail = userRecipes.get(i).getThumbnail();
-                    MypageMyRecipeList mypageMyRecipe = new MypageMyRecipeList(myRecipeIdx, myRecipeThumbnail);
-
-                    myRecipeList.add(mypageMyRecipe);
-                    size++;
-                }
-            }
-
-            return new GetUserRes(userIdx, profilePhoto, userName, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt, totalSize, myRecipeList);
-        }catch(Exception e){
-            throw new BaseException(FAILED_TO_GET_USER);
         }
+        Integer blogScrapCnt = 0;
+        for(int i=0;i<user.getScrapBlogs().size();i++){
+            if(user.getScrapBlogs().get(i).getStatus().equals("ACTIVE")){
+                blogScrapCnt++;
+            }
+        }
+        Integer recipeScrapCnt = 0;
+        for(int i=0;i<user.getScrapPublics().size();i++){
+            if(user.getScrapPublics().get(i).getStatus().equals("ACTIVE")){
+                recipeScrapCnt++;
+            }
+        }
+
+        List<UserRecipe> userRecipes = user.getUserRecipes();
+        Collections.sort(userRecipes, new Comparator<UserRecipe>() {
+            @Override
+            public int compare(UserRecipe o1, UserRecipe o2) {
+                return -(o1.getCreatedAt().toString().compareTo(o2.getCreatedAt().toString()));
+            }
+        });
+        int totalSize = 0;
+        for(int i=0;i<userRecipes.size();i++){
+            if(userRecipes.get(i).getStatus().equals("ACTIVE")){
+                totalSize++;
+            }
+        }
+        int size=0;
+
+        List<MypageMyRecipeList> myRecipeList= new ArrayList<>();
+        for(int i=0;i<userRecipes.size();i++){
+            if(size==6){
+                break;
+            }
+            if(userRecipes.get(i).getStatus().equals("ACTIVE")) {
+                Integer myRecipeIdx = userRecipes.get(i).getUserRecipeIdx();
+                String myRecipeThumbnail = userRecipes.get(i).getThumbnail();
+                MypageMyRecipeList mypageMyRecipe = new MypageMyRecipeList(myRecipeIdx, myRecipeThumbnail);
+
+                myRecipeList.add(mypageMyRecipe);
+                size++;
+            }
+        }
+
+        return new GetUserRes(userIdx, profilePhoto, userName, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt, totalSize, myRecipeList);
     }
 }

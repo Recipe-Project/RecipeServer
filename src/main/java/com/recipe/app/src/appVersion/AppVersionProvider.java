@@ -1,13 +1,11 @@
 package com.recipe.app.src.appVersion;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.appVersion.models.AppVersion;
 import com.recipe.app.src.appVersion.models.GetAppVersionRes;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import static com.recipe.app.config.BaseResponseStatus.FAILED_TO_GET_APP_VERSION;
 
 @Service
 public class AppVersionProvider {
@@ -27,12 +25,7 @@ public class AppVersionProvider {
      */
     @Transactional
     public GetAppVersionRes retrieveAppVersion() throws BaseException {
-        AppVersion appVersion;
-        try {
-            appVersion = appVersionRepositiory.findByIdx(1);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_APP_VERSION);
-        }
+        AppVersion appVersion = appVersionRepositiory.findByIdx(1);
 
         return new GetAppVersionRes(appVersion.getVersion());
     }

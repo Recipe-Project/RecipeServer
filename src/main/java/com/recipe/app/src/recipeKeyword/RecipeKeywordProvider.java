@@ -1,17 +1,14 @@
 package com.recipe.app.src.recipeKeyword;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.recipeKeyword.models.GetRecipesBestKeywordRes;
 import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.recipe.app.config.BaseResponseStatus.FAILE_TO_GET_BEST_KEYWORD;
-
 
 @Service
 public class RecipeKeywordProvider {
@@ -32,22 +29,13 @@ public class RecipeKeywordProvider {
      * @throws BaseException
      */
     public List<GetRecipesBestKeywordRes> retrieveRecipesBestKeyword() throws BaseException {
-        GetRecipesBestKeywordRes getRecipesBestKeywordRes;
-
-        List<Object[]> bestKeywordList;
-        try {
-            bestKeywordList = recipeKeywordRepository.findByBestKeywordTop10();
-        } catch (Exception ignored) {
-            throw new BaseException(FAILE_TO_GET_BEST_KEYWORD);
-        }
+        List<Object[]> bestKeywordList = recipeKeywordRepository.findByBestKeywordTop10();
 
         return bestKeywordList.stream().map(keyword -> {
             String bestKeyword = String.valueOf(keyword[0].toString());
 
             return new GetRecipesBestKeywordRes(bestKeyword);
         }).collect(Collectors.toList());
-
-
     }
 
 }

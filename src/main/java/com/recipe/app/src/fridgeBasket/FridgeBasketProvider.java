@@ -1,6 +1,6 @@
 package com.recipe.app.src.fridgeBasket;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketCountRes;
 import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
@@ -9,7 +9,7 @@ import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class FridgeBasketProvider {
@@ -47,14 +47,7 @@ public class FridgeBasketProvider {
         Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
         String ingredientName = ingredient.getName();
 
-        Boolean existIngredient;
-        try {
-            existIngredient = fridgeBasketRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
-        }
-
-        return existIngredient;
+        return fridgeBasketRepository.existsByUserAndIngredientNameAndStatus(user,ingredientName,"ACTIVE");
     }
 
     /**
@@ -64,13 +57,7 @@ public class FridgeBasketProvider {
      * @throws BaseException
      */
     public FridgeBasket retreiveFridgeBasketByName(String name, User user) throws BaseException {
-        FridgeBasket fridgeBasket;
-        try {
-            fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, name,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_RETREIVE_FRIDGE_BASKET_BY_NAME);
-        }
-        return fridgeBasket;
+        return fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, name,"ACTIVE");
     }
 
     /**
@@ -95,12 +82,7 @@ public class FridgeBasketProvider {
      * @throws BaseException
      */
     public List<IngredientList> retrieveIngredientList(User user) throws BaseException {
-        List<FridgeBasket> fridgeBasketList;
-        try {
-            fridgeBasketList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_RETREIVE_INGREDIENT_LIST_BY_USER);
-        }
+        List<FridgeBasket> fridgeBasketList = fridgeBasketRepository.findByUserAndStatus(user, "ACTIVE");
 
         return fridgeBasketList.stream().map(fridgeBasket -> {
             Integer ingredientIdx=null;
@@ -131,12 +113,7 @@ public class FridgeBasketProvider {
     public GetFridgesBasketCountRes retreiveFridgeBasketCount(int userIdx) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-        Long ingredientCount;
-        try {
-            ingredientCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_COUNT_FRIDGE_BASKET_BY_USER);
-        }
+        Long ingredientCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
 
         return new GetFridgesBasketCountRes(ingredientCount);
     }

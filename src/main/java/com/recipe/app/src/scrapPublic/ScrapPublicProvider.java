@@ -7,10 +7,10 @@ import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicList;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.viewPublic.ViewPublicRepository;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.user.models.User;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @Service
@@ -48,15 +48,7 @@ public class ScrapPublicProvider {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
         RecipeInfo recipeInfo = recipeInfoProvider.retrieveRecipeByRecipeId(recipeId);
 
-        ScrapPublic scrapPublic;
-        try {
-            scrapPublic = scrapPublicRepository.findByUserAndRecipeInfoAndStatus(user,recipeInfo,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_SCRAP_PUBLIC);
-        }
-
-
-        return scrapPublic;
+        return scrapPublicRepository.findByUserAndRecipeInfoAndStatus(user,recipeInfo,"ACTIVE");
     }
     /**
      * 스크랩 레시피 조회 API
@@ -65,22 +57,13 @@ public class ScrapPublicProvider {
      * @throws BaseException
      */
     public GetScrapPublicsRes retrieveScrapRecipes(Integer userIdx) throws BaseException {
-
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-        List<ScrapPublicList> scrapPublicList = null;
+        List<ScrapPublicList> scrapPublicList= retrieveScrapRecipesSortedByCreatedDate(userIdx);
 
-        try {
+        Long scrapCount = scrapPublicRepository.countByUserAndStatus(user,"ACTIVE");
 
-            scrapPublicList= retrieveScrapRecipesSortedByCreatedDate(userIdx);
-
-
-            Long scrapCount = scrapPublicRepository.countByUserAndStatus(user,"ACTIVE");
-
-            return new GetScrapPublicsRes(scrapCount,scrapPublicList);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_SCRAP_PUBLIC);
-        }
+        return new GetScrapPublicsRes(scrapCount,scrapPublicList);
     }
 
     /**
@@ -92,13 +75,7 @@ public class ScrapPublicProvider {
     public List<ScrapPublicList> retrieveScrapRecipesSortedByCreatedDate(Integer userIdx) throws BaseException {
 
         User user = userProvider.retrieveUserByUserIdx(userIdx);
-        List<ScrapPublic> scrapPublicList;
-
-        try {
-            scrapPublicList = scrapPublicRepository.findByUserAndStatus(user, "ACTIVE",Sort.by("createdAt").descending());
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_SCRAP_PUBLIC);
-        }
+        List<ScrapPublic> scrapPublicList = scrapPublicRepository.findByUserAndStatus(user, "ACTIVE",Sort.by("createdAt").descending());
 
         return scrapPublicList.stream().map(scrapPublic -> {
             RecipeInfo recipeInfo = scrapPublic.getRecipeInfo();

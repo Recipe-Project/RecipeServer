@@ -1,15 +1,16 @@
 package com.recipe.app.src.ingredient;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.ingredient.models.GetIngredientsRes;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.lang.Nullable;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import static com.recipe.app.common.response.BaseResponse.success;
 
 
 @RestController
@@ -35,24 +36,18 @@ public class IngredientController {
      */
     @GetMapping("")
     public BaseResponse<GetIngredientsRes> getIngredients(@RequestParam(value = "keyword") @Nullable String keyword) {
+        Integer userIdx = jwtService.getUserId();
 
-        try {
-            Integer userIdx = jwtService.getUserId();
-
-            GetIngredientsRes getIngredientsRes;
-            if (keyword != null && keyword.length() != 0){
-                getIngredientsRes = ingredientProvider.retrieveKeywordIngredientsList(keyword,userIdx);
-            }
-            else{
-                getIngredientsRes = ingredientProvider.retrieveIngredientsList(userIdx);
-            }
-
-
-            return new BaseResponse<>(getIngredientsRes);
-
-        } catch (BaseException exception) {
-            return new BaseResponse<>(exception.getStatus());
+        GetIngredientsRes getIngredientsRes;
+        if (keyword != null && keyword.length() != 0){
+            getIngredientsRes = ingredientProvider.retrieveKeywordIngredientsList(keyword,userIdx);
         }
+        else{
+            getIngredientsRes = ingredientProvider.retrieveIngredientsList(userIdx);
+        }
+
+
+        return success(getIngredientsRes);
     }
 
 }

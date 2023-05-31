@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipeInfo;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridge.FridgeRepository;
 import com.recipe.app.src.fridge.models.Fridge;
 import com.recipe.app.src.ingredient.IngredientRepository;
@@ -14,18 +14,15 @@ import com.recipe.app.src.scrapBlog.ScrapBlogRepository;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -37,12 +34,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 import static com.recipe.app.config.secret.Secret.NAVER_CLIENT_ID;
 import static com.recipe.app.config.secret.Secret.NAVER_CLINET_SECRET;
-import static com.sun.el.util.MessageFactory.get;
 
 @Service
 public class RecipeInfoProvider {
@@ -75,12 +70,7 @@ public class RecipeInfoProvider {
      * @throws BaseException
      */
     public RecipeInfo retrieveRecipeByRecipeId(Integer recipeId) throws BaseException {
-        RecipeInfo recipeInfo;
-        try {
-            recipeInfo = recipeInfoRepository.findById(recipeId).orElse(null);
-        } catch (Exception ignored) {
-            throw new BaseException(FAILE_TO_GET_RECIPE_INFO);
-        }
+        RecipeInfo recipeInfo = recipeInfoRepository.findById(recipeId).orElse(null);
 
         if (recipeInfo == null || !recipeInfo.getStatus().equals("ACTIVE")) {
             throw new BaseException(NOT_FOUND_RECIPE_INFO);
@@ -98,12 +88,7 @@ public class RecipeInfoProvider {
 
     public List<GetRecipeInfosRes> retrieveRecipeInfos(Integer jwtUserIdx, String keyword) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
-        List<RecipeInfo> recipeInfoList;
-        try {
-            recipeInfoList= recipeInfoRepository.searchRecipeInfos(keyword, "ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        List<RecipeInfo> recipeInfoList= recipeInfoRepository.searchRecipeInfos(keyword, "ACTIVE");
 
         List<GetRecipeInfosRes> getRecipeInfosResList = new ArrayList<>();
         for(int i=0;i<recipeInfoList.size();i++){
@@ -119,23 +104,13 @@ public class RecipeInfoProvider {
                 }
             }
 
-            Integer userScrapCnt = 0;
-            try{
-                userScrapCnt = Math.toIntExact(scrapPublicRepository.countByRecipeInfoAndStatus(recipeInfo, "ACTIVE"));
-            }catch (Exception e){
-                throw new BaseException(DATABASE_ERROR);
-            }
+            Integer userScrapCnt = Math.toIntExact(scrapPublicRepository.countByRecipeInfoAndStatus(recipeInfo, "ACTIVE"));
 
             getRecipeInfosResList.add(new GetRecipeInfosRes(recipeId, title, description, thumbnail, userScrapYN, userScrapCnt));
 
         }
 
-        RecipeKeyword recipeKeyword = new RecipeKeyword(keyword);
-        try{
-            recipeKeyword = recipeKeywordRepository.save(recipeKeyword);
-        }catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
-        }
+        recipeKeywordRepository.save(new RecipeKeyword(keyword));
 
         return getRecipeInfosResList;
 
@@ -207,202 +182,121 @@ public class RecipeInfoProvider {
             }
 
             if(recipeIngredientName.contains("대하")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("새우", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("새우", "ACTIVE");
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("달걀")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("계란", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("계란", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("쇠고기")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("소고기", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("소고기", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("후춧가루")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("후추", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("후추", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("다진마늘")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("간마늘", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("간마늘", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.equals("어린잎채소")||recipeIngredientName.equals("무순")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("새싹채소", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("새싹채소", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.equals("조갯살")||recipeIngredientName.contains("바지락")||recipeIngredientName.contains("전복")||recipeIngredientName.contains("굴")||recipeIngredientName.contains("가리비")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("조개", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("조개", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("케첩")||recipeIngredientName.contains("케찹")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("케찹", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("케찹", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("돼지")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("돼지고기", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("돼지고기", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientIcon==null&&recipeIngredientName.contains("닭")&&!recipeIngredientName.equals("닭발")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("닭고기", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("닭고기", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("연어")||recipeIngredientName.contains("북어")||recipeIngredientName.contains("대구")||recipeIngredientName.contains("동태")||recipeIngredientName.contains("광어")||recipeIngredientName.contains("코다리")||recipeIngredientName.contains("아귀")||recipeIngredientName.contains("아구")||recipeIngredientName.contains("조기")) {
-                Ingredient igr;
-                try {
-                    igr = ingredientRepository.findByNameAndStatus("생선", "ACTIVE");
-                } catch (Exception e) {
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("생선", "ACTIVE");
+
                 if (igr != null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.equals("소면")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("국수", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("국수", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.equals("김칫잎")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("김치", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("김치", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.equals("인절미")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("떡", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("떡", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.equals("고추가루")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("고춧가루", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("고춧가루", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.equals("올리브오일")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("올리브유", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("올리브유", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("양송이")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("버섯", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("버섯", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("스파게티")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("파스타", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("파스타", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("맛살")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("게", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("게", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
             else if(recipeIngredientName.contains("포도씨유")){
-                Ingredient igr;
-                try{
-                    igr = ingredientRepository.findByNameAndStatus("식용유", "ACTIVE");
-                }catch(Exception e){
-                    throw new BaseException(DATABASE_ERROR);
-                }
+                Ingredient igr = ingredientRepository.findByNameAndStatus("식용유", "ACTIVE");
+
                 if(igr!=null)
                     recipeIngredientIcon = igr.getIcon();
             }
@@ -440,12 +334,7 @@ public class RecipeInfoProvider {
             }
         }
 
-        Integer userScrapCnt = 0;
-        try{
-            userScrapCnt = Math.toIntExact(scrapPublicRepository.countByRecipeInfoAndStatus(recipeInfo, "ACTIVE"));
-        }catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
-        }
+        Integer userScrapCnt = Math.toIntExact(scrapPublicRepository.countByRecipeInfoAndStatus(recipeInfo, "ACTIVE"));
 
         return new GetRecipeInfoRes(recipeIdx, recipeName, summary, thumbnail, cookingTime, level, recipeIngredientList, recipeProcessList, userScrapYN, userScrapCnt);
     }
@@ -615,22 +504,12 @@ public class RecipeInfoProvider {
                 }
             }
 
-            Integer userScrapCnt = 0;
-            try{
-                userScrapCnt = Math.toIntExact(scrapBlogRepository.countByBlogUrlAndStatus(blogUrl, "ACTIVE"));
-            }catch (Exception e){
-                throw new BaseException(DATABASE_ERROR);
-            }
+            Integer userScrapCnt = Math.toIntExact(scrapBlogRepository.countByBlogUrlAndStatus(blogUrl, "ACTIVE"));
 
             blogList.add(new BlogList(title, blogUrl, description, bloggerName, postdate, thumbnail, userScrapYN, userScrapCnt));
         }
 
-        RecipeKeyword recipeKeyword = new RecipeKeyword(keyword);
-        try{
-            recipeKeyword = recipeKeywordRepository.save(recipeKeyword);
-        }catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
-        }
+        recipeKeywordRepository.save(new RecipeKeyword(keyword));
 
         return new GetRecipeBlogsRes(50, blogList);
 

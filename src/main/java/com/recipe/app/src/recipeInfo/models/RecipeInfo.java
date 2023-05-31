@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipeInfo.models;
 
-import com.recipe.app.config.BaseEntity;
+import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipeIngredient.models.RecipeIngredient;
 import com.recipe.app.src.recipeProcess.models.RecipeProcess;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;

@@ -1,14 +1,12 @@
 package com.recipe.app.src.scrapBlog;
 
-import com.recipe.app.config.BaseException;
-import com.recipe.app.config.BaseResponse;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.scrapBlog.models.*;
 import com.recipe.app.src.user.UserProvider;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 
 import java.text.SimpleDateFormat;
@@ -16,7 +14,7 @@ import java.util.Date;
 import java.util.Locale;
 import java.util.TimeZone;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @Service
@@ -58,12 +56,7 @@ public class ScrapBlogService {
 
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
-        ScrapBlog scrapBlog = null;
-        try {
-            scrapBlog = scrapBlogRepository.findByUserAndBlogUrlAndStatus(user, blogUrl, "ACTIVE");
-        }catch (Exception e){
-            throw new BaseException(DATABASE_ERROR);
-        }
+        ScrapBlog scrapBlog = scrapBlogRepository.findByUserAndBlogUrlAndStatus(user, blogUrl, "ACTIVE");
 
         if (scrapBlog == null) {
             scrapBlog = new ScrapBlog(user, title, thumbnail, blogUrl, description, bloggerName, date);
@@ -76,11 +69,6 @@ public class ScrapBlogService {
                 scrapBlog.setStatus("ACTIVE");
             }
         }
-
-        try {
-            scrapBlog = scrapBlogRepository.save(scrapBlog);
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        scrapBlogRepository.save(scrapBlog);
     }
 }

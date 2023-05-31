@@ -1,7 +1,7 @@
 package com.recipe.app.src.userRecipeIngredient.models;
 
 
-import com.recipe.app.config.BaseEntity;
+import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import lombok.AccessLevel;
 import lombok.Data;

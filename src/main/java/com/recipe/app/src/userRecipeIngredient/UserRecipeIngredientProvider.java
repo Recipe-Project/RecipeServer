@@ -1,16 +1,14 @@
 package com.recipe.app.src.userRecipeIngredient;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.userRecipe.models.MyRecipeIngredient;
 import com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.recipe.app.config.BaseResponseStatus.FAILED_TO_GET_MY_RECIPE_INGREDIENTS;
 
 @Service
 public class UserRecipeIngredientProvider {
@@ -31,12 +29,7 @@ public class UserRecipeIngredientProvider {
      * @throws BaseException
      */
     public List<MyRecipeIngredient> retrieveUserRecipeIngredient(Integer myRecipeIdx) throws BaseException {
-        List<UserRecipeIngredient> userRecipeIngredientList;
-        try {
-            userRecipeIngredientList = userRecipeIngredientRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
-        } catch (Exception ignored) {
-            throw new BaseException(FAILED_TO_GET_MY_RECIPE_INGREDIENTS);
-        }
+        List<UserRecipeIngredient> userRecipeIngredientList = userRecipeIngredientRepository.findByUserRecipeIdxAndStatus(myRecipeIdx,"ACTIVE");
 
         List<MyRecipeIngredient> myRecipeIngredientList = new ArrayList<>();
 
@@ -46,7 +39,6 @@ public class UserRecipeIngredientProvider {
 
             MyRecipeIngredient myRecipeIngredient = new MyRecipeIngredient(ingredientName,ingredientIcon);
             myRecipeIngredientList.add(myRecipeIngredient);
-
         }
 
         return myRecipeIngredientList;

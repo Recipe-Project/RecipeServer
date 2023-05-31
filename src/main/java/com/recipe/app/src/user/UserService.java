@@ -1,11 +1,11 @@
 package com.recipe.app.src.user;
 
-import com.recipe.app.config.BaseException;
+import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.user.models.PatchUserReq;
 import com.recipe.app.src.user.models.PatchUserRes;
 import com.recipe.app.src.user.models.PostUserRes;
 import com.recipe.app.src.user.models.User;
-import com.recipe.app.utils.JwtService;
+import com.recipe.app.common.utils.JwtService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,7 +22,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.recipe.app.config.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class UserService {
@@ -144,23 +144,13 @@ public class UserService {
 
         // 이미 존재하는 회원이 없다면 유저 정보 저장
         if (user == null) {
-            user = new User(socialId, profilePhoto, userName, email, phoneNumber,fcmToken);
-
-            try {
-                user = userRepository.save(user);
-            } catch (Exception exception) {
-                throw new BaseException(DATABASE_ERROR);
-            }
+            user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber,fcmToken));
         }
 
         // JWT 생성
-        try {
-            Integer userIdx = user.getUserIdx();
-            String jwt = jwtService.createJwt(userIdx);
-            return new PostUserRes(userIdx, jwt);
-        }catch(Exception e){
-            throw new BaseException(FAILED_TO_NAVER_LOGIN);
-        }
+        Integer userIdx = user.getUserIdx();
+        String jwt = jwtService.createJwt(userIdx);
+        return new PostUserRes(userIdx, jwt);
     }
 
     /**
@@ -263,23 +253,13 @@ public class UserService {
 
         // 이미 존재하는 회원이 없다면 유저 정보 저장
         if (user == null) {
-            user = new User(socialId, profilePhoto, userName, email, phoneNumber, fcmToken);
-
-            try {
-                user = userRepository.save(user);
-            } catch (Exception exception) {
-                throw new BaseException(DATABASE_ERROR);
-            }
+            user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber, fcmToken));
         }
 
         // JWT 생성
-        try {
-            Integer userIdx = user.getUserIdx();
-            String jwt = jwtService.createJwt(userIdx);
-            return new PostUserRes(userIdx, jwt);
-        }catch(Exception e){
-            throw new BaseException(FAILED_TO_KAKAO_LOGIN);
-        }
+        Integer userIdx = user.getUserIdx();
+        String jwt = jwtService.createJwt(userIdx);
+        return new PostUserRes(userIdx, jwt);
     }
 
 
@@ -330,11 +310,8 @@ public class UserService {
                 User userInfo = new User(userId, imageUrl, name, email,null,fcmToken);
 
                 // 2. 유저 정보 저장
-                try {
-                    userInfo = userRepository.save(userInfo);
-                } catch (Exception exception) {
-                    throw new BaseException(FAILED_TO_GET_USER);
-                }
+                userInfo = userRepository.save(userInfo);
+
                 // 3. JWT 생성
                 String jwt = jwtService.createJwt(userInfo.getUserIdx());
 
@@ -372,21 +349,13 @@ public class UserService {
 
         //유저 정보 수정
         user.setProfilePhoto(patchUserReq.getProfilePhoto());
-        try {
-            user = userRepository.save(user);
-        } catch (Exception exception) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        user = userRepository.save(user);
 
-        try {
-            String socialId = user.getSocialId();
-            String profilePhoto = user.getProfilePhoto();
-            String userName = user.getUserName();
+        String socialId = user.getSocialId();
+        String profilePhoto = user.getProfilePhoto();
+        String userName = user.getUserName();
 
-            return new PatchUserRes(userIdx, socialId, profilePhoto, userName);
-        }catch(Exception e){
-            throw new BaseException(FAILED_TO_PATCH_USER);
-        }
+        return new PatchUserRes(userIdx, socialId, profilePhoto, userName);
     }
 
     /**
@@ -402,14 +371,7 @@ public class UserService {
         }
 
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
-
-        //user.setStatus("INACTIVE");
-        try {
-            userRepository.delete(user);
-            //user = userRepository.save(user);
-        } catch (Exception ignored) {
-            throw new BaseException(DATABASE_ERROR);
-        }
+        userRepository.delete(user);
     }
 
 }
