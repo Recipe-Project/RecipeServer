@@ -1,8 +1,8 @@
 package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.application.UserProvider;
+import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider;
 import com.recipe.app.src.userRecipePhoto.UserRecipePhotoProvider;
@@ -14,8 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class UserRecipeProvider {

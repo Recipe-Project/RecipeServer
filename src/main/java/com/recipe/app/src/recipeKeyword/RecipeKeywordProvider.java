@@ -2,7 +2,7 @@ package com.recipe.app.src.recipeKeyword;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.recipeKeyword.models.GetRecipesBestKeywordRes;
-import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

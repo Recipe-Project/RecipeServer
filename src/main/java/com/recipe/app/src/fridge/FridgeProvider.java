@@ -9,9 +9,9 @@ import com.recipe.app.src.recipeInfo.RecipeInfoRepository;
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicInfo;
-import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.src.user.UserRepository;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.application.UserProvider;
+import com.recipe.app.src.user.mapper.UserRepository;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,8 +19,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class FridgeProvider {

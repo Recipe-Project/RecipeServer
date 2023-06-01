@@ -2,7 +2,7 @@ package com.recipe.app.src.fridge;
 
 import com.recipe.app.src.fridge.models.Fridge;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

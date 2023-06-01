@@ -3,7 +3,7 @@ package com.recipe.app.src.scrapYoutube;
 
 
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

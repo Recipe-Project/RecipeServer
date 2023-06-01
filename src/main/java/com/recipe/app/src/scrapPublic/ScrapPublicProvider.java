@@ -5,20 +5,18 @@ import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.scrapPublic.models.GetScrapPublicsRes;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicList;
-import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.src.viewPublic.ViewPublicRepository;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @Service

@@ -1,10 +1,7 @@
 package com.recipe.app.src.scrapBlog;
 
 import com.recipe.app.src.scrapBlog.models.ScrapBlog;
-import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
-import com.recipe.app.src.user.models.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;

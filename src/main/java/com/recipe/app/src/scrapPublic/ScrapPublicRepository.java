@@ -3,7 +3,7 @@ package com.recipe.app.src.scrapPublic;
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicInfo;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

@@ -1,11 +1,12 @@
-package com.recipe.app.src.user;
+package com.recipe.app.src.user.application;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.user.models.PatchUserReq;
-import com.recipe.app.src.user.models.PatchUserRes;
-import com.recipe.app.src.user.models.PostUserRes;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.application.dto.PatchUserReq;
+import com.recipe.app.src.user.application.dto.PatchUserRes;
+import com.recipe.app.src.user.application.dto.PostUserRes;
+import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.user.mapper.UserRepository;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.beans.factory.annotation.Autowired;

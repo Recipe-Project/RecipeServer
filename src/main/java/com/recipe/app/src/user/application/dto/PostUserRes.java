@@ -1,4 +1,4 @@
-package com.recipe.app.src.user.models;
+package com.recipe.app.src.user.application.dto;
 
 import lombok.*;
 

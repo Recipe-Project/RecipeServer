@@ -1,6 +1,6 @@
-package com.recipe.app.src.user;
+package com.recipe.app.src.user.mapper;
 
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

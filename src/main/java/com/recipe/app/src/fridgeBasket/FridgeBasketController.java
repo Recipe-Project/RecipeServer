@@ -4,7 +4,7 @@ import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridgeBasket.models.*;
 import com.recipe.app.src.ingredient.IngredientProvider;
-import com.recipe.app.src.user.UserProvider;
+import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

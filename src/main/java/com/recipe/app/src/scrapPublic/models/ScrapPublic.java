@@ -1,7 +1,7 @@
 package com.recipe.app.src.scrapPublic.models;
 
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import lombok.*;
 import javax.persistence.*;
 import com.recipe.app.common.entity.BaseEntity;

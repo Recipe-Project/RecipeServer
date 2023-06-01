@@ -1,11 +1,13 @@
-package com.recipe.app.src.user;
+package com.recipe.app.src.user.api;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
-import com.recipe.app.src.user.models.GetUserRes;
-import com.recipe.app.src.user.models.PatchUserReq;
-import com.recipe.app.src.user.models.PatchUserRes;
-import com.recipe.app.src.user.models.PostUserRes;
+import com.recipe.app.src.user.application.UserProvider;
+import com.recipe.app.src.user.application.UserService;
+import com.recipe.app.src.user.application.dto.GetUserRes;
+import com.recipe.app.src.user.application.dto.PatchUserReq;
+import com.recipe.app.src.user.application.dto.PatchUserRes;
+import com.recipe.app.src.user.application.dto.PostUserRes;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;

@@ -1,7 +1,7 @@
 package com.recipe.app.src.scrapYoutube.models;
 
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

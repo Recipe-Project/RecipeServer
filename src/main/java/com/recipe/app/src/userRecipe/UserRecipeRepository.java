@@ -1,6 +1,6 @@
 package com.recipe.app.src.userRecipe;
 
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.repository.CrudRepository;

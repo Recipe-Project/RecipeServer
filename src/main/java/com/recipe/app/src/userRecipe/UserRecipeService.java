@@ -2,8 +2,8 @@ package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.ingredient.IngredientProvider;
-import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.application.UserProvider;
+import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientRepository;
 import com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient;
@@ -14,8 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-
-import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @Service

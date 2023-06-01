@@ -1,7 +1,10 @@
-package com.recipe.app.src.user;
+package com.recipe.app.src.user.application;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.user.models.*;
+import com.recipe.app.src.user.application.dto.GetUserRes;
+import com.recipe.app.src.user.application.dto.MypageMyRecipeList;
+import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.mapper.UserRepository;
 import com.recipe.app.src.userRecipe.UserRecipeRepository;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
 import com.recipe.app.common.utils.JwtService;

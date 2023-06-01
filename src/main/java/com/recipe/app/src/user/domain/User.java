@@ -1,4 +1,4 @@
-package com.recipe.app.src.user.models;
+package com.recipe.app.src.user.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.fridge.models.Fridge;

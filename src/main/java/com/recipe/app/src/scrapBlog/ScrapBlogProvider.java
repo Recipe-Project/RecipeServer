@@ -2,16 +2,14 @@ package com.recipe.app.src.scrapBlog;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.scrapBlog.models.*;
-import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.application.UserProvider;
+import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
-
-import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 
 @Service

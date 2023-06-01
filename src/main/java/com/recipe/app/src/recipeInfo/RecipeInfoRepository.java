@@ -1,7 +1,7 @@
 package com.recipe.app.src.recipeInfo;
 
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

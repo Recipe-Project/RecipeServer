@@ -7,8 +7,8 @@ import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
 import com.recipe.app.src.fridgeBasket.models.IngredientList;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.ingredient.models.Ingredient;
-import com.recipe.app.src.user.UserProvider;
-import com.recipe.app.src.user.models.User;
+import com.recipe.app.src.user.application.UserProvider;
+import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -18,8 +18,6 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class FridgeBasketProvider {
