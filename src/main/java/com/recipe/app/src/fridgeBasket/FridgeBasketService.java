@@ -7,7 +7,6 @@ import com.recipe.app.src.ingredient.IngredientRepository;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

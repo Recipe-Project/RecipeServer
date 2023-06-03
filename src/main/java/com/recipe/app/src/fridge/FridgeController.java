@@ -4,7 +4,6 @@ package com.recipe.app.src.fridge;
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridge.models.*;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.common.utils.JwtService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;

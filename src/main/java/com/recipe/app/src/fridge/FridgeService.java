@@ -5,7 +5,6 @@ import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.src.user.mapper.UserRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -7,7 +7,6 @@ import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
 import com.recipe.app.src.fridgeBasket.models.IngredientList;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.ingredient.models.Ingredient;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;

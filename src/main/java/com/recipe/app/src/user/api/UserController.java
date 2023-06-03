@@ -2,7 +2,6 @@ package com.recipe.app.src.user.api;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.GetUserRes;
 import com.recipe.app.src.user.application.dto.PatchUserReq;

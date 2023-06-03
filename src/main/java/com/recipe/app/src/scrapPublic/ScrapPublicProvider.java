@@ -5,7 +5,6 @@ import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.scrapPublic.models.GetScrapPublicsRes;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicList;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.src.viewPublic.ViewPublicRepository;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;

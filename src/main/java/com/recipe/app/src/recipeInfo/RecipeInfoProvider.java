@@ -12,7 +12,6 @@ import com.recipe.app.src.recipeKeyword.models.RecipeKeyword;
 import com.recipe.app.src.recipeProcess.models.RecipeProcess;
 import com.recipe.app.src.scrapBlog.ScrapBlogRepository;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.json.simple.JSONArray;

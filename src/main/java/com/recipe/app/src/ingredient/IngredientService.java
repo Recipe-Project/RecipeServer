@@ -3,7 +3,6 @@ package com.recipe.app.src.ingredient;
 import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

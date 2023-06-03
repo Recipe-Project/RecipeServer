@@ -1,7 +1,6 @@
 package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.user.application.UserProvider;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider;
