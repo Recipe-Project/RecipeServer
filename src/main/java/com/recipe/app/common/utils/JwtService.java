@@ -1,70 +1,91 @@
 package com.recipe.app.common.utils;
 
-import com.recipe.app.common.exception.BaseException;
+import com.google.api.client.util.Value;
 import com.recipe.app.config.secret.Secret;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jws;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.recipe.app.src.user.mapper.JwtBlacklistRepository;
+import io.jsonwebtoken.*;
+import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 
-import static com.recipe.app.common.response.BaseResponseStatus.*;
-
 @Service
+@RequiredArgsConstructor
 public class JwtService {
-    /**
-     * JWT 생성
-     * @param userId
-     * @return String
-     */
+
+    @Value("${jwt.secret}")
+    private String secretKey;
+
+    @Value("${jwt.token-header}")
+    private String tokenHeader;
+
+    @Value("${jwt.token-validity-in-ms}")
+    private String tokenValidMillisecond;
+
+    private final UserDetailsService userDetailsService;
+    private final JwtBlacklistRepository jwtBlacklistRepository;
+    private final Logger logger = LoggerFactory.getLogger(JwtService.class);
+
     public String createJwt(int userId) {
         Date now = new Date();
         return Jwts.builder()
                 .claim("userId", userId)
                 .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + tokenValidMillisecond))
                 .signWith(SignatureAlgorithm.HS256, Secret.JWT_SECRET_KEY)
                 .compact();
     }
 
-    /**
-     * Header에서 X-ACCESS-TOKEN 으로 JWT 추출
-     * @return String
-     */
-    public String getJwt() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        return request.getHeader("X-ACCESS-TOKEN");
-    }
+    public String resolveToken(HttpServletRequest request) {
+        String token = request.getHeader(tokenHeader);
 
-    /**
-     * JWT에서 userId 추출
-     * @return int
-     * @throws BaseException
-     */
-    public int getUserId() throws BaseException {
-        // 1. JWT 추출
-        String accessToken = getJwt();
-        if (accessToken == null || accessToken.length() == 0) {
-            throw new BaseException(EMPTY_JWT);
+        if (!StringUtils.hasText(token)) {
+            token = request.getParameter(tokenHeader);
         }
 
-        // 2. JWT parsing
-        Jws<Claims> claims;
+        return StringUtils.hasText(token) ? token : null;
+    }
+
+    public int getUserId(String token) {
+        return Jwts.parser()
+                .setSigningKey(secretKey)
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId", Integer.class);
+    }
+
+    public Authentication getAuthentication(String token) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(String.valueOf(getUserId(token)));
+        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+    }
+
+    public boolean validateToken(String token) {
         try {
-            claims = Jwts.parser()
-                    .setSigningKey(Secret.JWT_SECRET_KEY)
-                    .parseClaimsJws(accessToken);
-        } catch (Exception ignored) {
-            throw new BaseException(INVALID_JWT);
+            logger.debug(this.secretKey);
+            if(jwtBlacklistRepository.findById(token).isPresent())
+                return false;
+            Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(token);
+            return !claims.getBody().getExpiration().before(new Date());
+        } catch (SecurityException | MalformedJwtException | IllegalArgumentException exception) {
+            logger.info("잘못된 Jwt 토큰입니다");
+        } catch (ExpiredJwtException exception) {
+            logger.info("만료된 Jwt 토큰입니다");
+        } catch (UnsupportedJwtException exception) {
+            logger.info("지원하지 않는 Jwt 토큰입니다");
         }
 
-        // 3. userId 추출
-        return claims.getBody().get("userId", Integer.class);
+        return false;
     }
 
-
+    public String getTokenHeader() {
+        return this.tokenHeader;
+    }
 }
