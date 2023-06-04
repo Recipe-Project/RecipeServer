@@ -5,6 +5,7 @@ import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.user.application.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -25,7 +26,7 @@ import static com.recipe.app.common.response.BaseResponseStatus.*;
 //@RequestMapping("/fridges")
 public class FridgeController {
 //    Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final FridgeProvider fridgeProvider;
     private final FridgeService fridgeService;
     private final FridgeRepository fridgeRepository;
@@ -33,8 +34,8 @@ public class FridgeController {
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeController(UserProvider userProvider, FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, FirebaseCloudMessageService firebaseCloudMessageService, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public FridgeController(UserService userService, FridgeProvider fridgeProvider, FridgeService fridgeService, FridgeRepository fridgeRepository, FirebaseCloudMessageService firebaseCloudMessageService, JwtService jwtService) {
+        this.userService = userService;
         this.fridgeProvider = fridgeProvider;
         this.fridgeService = fridgeService;
         this.fridgeRepository = fridgeRepository;

@@ -2,6 +2,7 @@ package com.recipe.app.src.scrapBlog;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.scrapBlog.models.*;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,13 +14,13 @@ import java.util.*;
 
 @Service
 public class ScrapBlogProvider {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final ScrapBlogRepository scrapBlogRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapBlogProvider(UserProvider userProvider, ScrapBlogRepository scrapBlogRepository, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public ScrapBlogProvider(UserService userService, ScrapBlogRepository scrapBlogRepository, JwtService jwtService) {
+        this.userService = userService;
         this.scrapBlogRepository = scrapBlogRepository;
         this.jwtService = jwtService;
     }
@@ -31,7 +32,7 @@ public class ScrapBlogProvider {
      * @throws BaseException
      */
     public List<GetScrapBlogsRes> retrieveScrapBlogs(Integer jwtUserIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+        User user = userService.retrieveUserByUserIdx(jwtUserIdx);
 
         List<ScrapBlog> scrapBlogList = scrapBlogRepository.findByUserAndStatusOrderByCreatedAtDesc(user, "ACTIVE");
 

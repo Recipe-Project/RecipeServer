@@ -1,6 +1,7 @@
 package com.recipe.app.src.viewYoutube;
 
 import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeReq;
 import com.recipe.app.src.viewYoutube.models.PostViewsYoutubeRes;
@@ -11,13 +12,13 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ViewYoutubeService {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final ViewYoutubeRepository viewYoutubeRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public ViewYoutubeService(UserProvider userProvider, ViewYoutubeRepository viewYoutubeRepository, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public ViewYoutubeService(UserService userService, ViewYoutubeRepository viewYoutubeRepository, JwtService jwtService) {
+        this.userService = userService;
         this.viewYoutubeRepository = viewYoutubeRepository;
         this.jwtService = jwtService;
     }
@@ -30,7 +31,7 @@ public class ViewYoutubeService {
      */
     public PostViewsYoutubeRes createViewYoutube(PostViewsYoutubeReq postViewsYoutubeReq, int userIdx) throws BaseException {
         Integer youtubeIdx = postViewsYoutubeReq.getYoutubeIdx();
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         viewYoutubeRepository.save(new ViewYoutube(user, youtubeIdx));
 

@@ -2,6 +2,7 @@ package com.recipe.app.src.scrapBlog;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.scrapBlog.models.*;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,14 +19,14 @@ import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class ScrapBlogService {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final ScrapBlogRepository scrapBlogRepository;
     private final ScrapBlogProvider scrapBlogProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapBlogService(UserProvider userProvider, ScrapBlogRepository scrapBlogRepository, ScrapBlogProvider scrapBlogProvider, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public ScrapBlogService(UserService userService, ScrapBlogRepository scrapBlogRepository, ScrapBlogProvider scrapBlogProvider, JwtService jwtService) {
+        this.userService = userService;
         this.scrapBlogRepository = scrapBlogRepository;
         this.scrapBlogProvider = scrapBlogProvider;
         this.jwtService = jwtService;
@@ -53,7 +54,7 @@ public class ScrapBlogService {
             throw new BaseException(DATE_PARSE_ERROR);
         }
 
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+        User user = userService.retrieveUserByUserIdx(jwtUserIdx);
 
         ScrapBlog scrapBlog = scrapBlogRepository.findByUserAndBlogUrlAndStatus(user, blogUrl, "ACTIVE");
 

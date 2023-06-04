@@ -9,6 +9,7 @@ import com.recipe.app.src.ingredient.models.Ingredients;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,7 +25,7 @@ import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class IngredientProvider {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final IngredientCategoryProvider ingredientCategoryProvider;
     private final IngredientRepository ingredientRepository;
     private final IngredientCategoryRepository ingredientCategoryRepository;
@@ -32,8 +33,8 @@ public class IngredientProvider {
     private final JwtService jwtService;
 
     @Autowired
-    public IngredientProvider(UserProvider userProvider, IngredientCategoryProvider ingredientCategoryProvider, IngredientRepository ingredientRepository, IngredientCategoryRepository ingredientCategoryRepository, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public IngredientProvider(UserService userService, IngredientCategoryProvider ingredientCategoryProvider, IngredientRepository ingredientRepository, IngredientCategoryRepository ingredientCategoryRepository, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
+        this.userService = userService;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
         this.ingredientRepository = ingredientRepository;
         this.ingredientCategoryRepository = ingredientCategoryRepository;
@@ -51,7 +52,7 @@ public class IngredientProvider {
      */
     @Transactional
     public GetIngredientsRes retrieveKeywordIngredientsList(String keyword,Integer userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         long fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
 
         List<IngredientCategory> ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
@@ -79,7 +80,7 @@ public class IngredientProvider {
      */
     @Transactional
     public GetIngredientsRes retrieveIngredientsList(Integer userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         long fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
 
         List<IngredientCategory> ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");

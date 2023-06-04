@@ -1,6 +1,7 @@
 package com.recipe.app.src.viewBlog;
 
 import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.viewBlog.models.*;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,12 +10,12 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ViewBlogService {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final ViewBlogRepository viewBlogRepository;
 
     @Autowired
-    public ViewBlogService(UserProvider userProvider, ViewBlogRepository viewBlogRepository){
-        this.userProvider = userProvider;
+    public ViewBlogService(UserService userService, ViewBlogRepository viewBlogRepository){
+        this.userService = userService;
         this.viewBlogRepository = viewBlogRepository;
     }
 
@@ -27,7 +28,7 @@ public class ViewBlogService {
     public void createViewBlog(Integer jwtUserIdx, PostViewBlogReq postViewBlogReq) throws BaseException {
         String blogUrl = postViewBlogReq.getBlogUrl();
 
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+        User user = userService.retrieveUserByUserIdx(jwtUserIdx);
 
         viewBlogRepository.save(new ViewBlog(user, blogUrl));
     }

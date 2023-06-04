@@ -7,6 +7,7 @@ import com.recipe.app.src.fridgeBasket.models.GetFridgesBasketRes;
 import com.recipe.app.src.fridgeBasket.models.IngredientList;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.src.ingredient.models.Ingredient;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,14 +21,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class FridgeBasketProvider {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final IngredientProvider ingredientProvider;
     private final FridgeBasketRepository fridgeBasketRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeBasketProvider(UserProvider userProvider, IngredientProvider ingredientProvider, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public FridgeBasketProvider(UserService userService, IngredientProvider ingredientProvider, FridgeBasketRepository fridgeBasketRepository, JwtService jwtService) {
+        this.userService = userService;
         this.ingredientProvider = ingredientProvider;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.jwtService = jwtService;
@@ -40,7 +41,7 @@ public class FridgeBasketProvider {
      * @throws BaseException
      */
     public Boolean existIngredient(int userIdx,int ingredientIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         Ingredient ingredient = ingredientProvider.retrieveIngredientByIngredientIdx(ingredientIdx);
         String ingredientName = ingredient.getName();
 
@@ -64,7 +65,7 @@ public class FridgeBasketProvider {
      * @throws BaseException
      */
     public GetFridgesBasketRes retreiveFridgeBasket(int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         Long ingredientCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
         List<IngredientList> ingredientList = retrieveIngredientList(user);;
@@ -108,7 +109,7 @@ public class FridgeBasketProvider {
      * @throws BaseException
      */
     public GetFridgesBasketCountRes retreiveFridgeBasketCount(int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         Long ingredientCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
 

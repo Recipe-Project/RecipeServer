@@ -5,6 +5,7 @@ import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.scrapPublic.models.GetScrapPublicsRes;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicList;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.viewPublic.ViewPublicRepository;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,15 +21,15 @@ import java.util.stream.Collectors;
 
 @Service
 public class ScrapPublicProvider {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final RecipeInfoProvider recipeInfoProvider;
     private final ViewPublicRepository viewPublicRepository;
     private final ScrapPublicRepository scrapPublicRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapPublicProvider(UserProvider userProvider, RecipeInfoProvider recipeInfoProvider, ViewPublicRepository viewPublicRepository, ScrapPublicRepository scrapPublicRepository, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public ScrapPublicProvider(UserService userService, RecipeInfoProvider recipeInfoProvider, ViewPublicRepository viewPublicRepository, ScrapPublicRepository scrapPublicRepository, JwtService jwtService) {
+        this.userService = userService;
         this.recipeInfoProvider = recipeInfoProvider;
         this.viewPublicRepository = viewPublicRepository;
         this.scrapPublicRepository = scrapPublicRepository;
@@ -42,7 +43,7 @@ public class ScrapPublicProvider {
      * @throws BaseException
      */
     public ScrapPublic retrieveScrapRecipe(int recipeId, int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         RecipeInfo recipeInfo = recipeInfoProvider.retrieveRecipeByRecipeId(recipeId);
 
         return scrapPublicRepository.findByUserAndRecipeInfoAndStatus(user,recipeInfo,"ACTIVE");
@@ -54,7 +55,7 @@ public class ScrapPublicProvider {
      * @throws BaseException
      */
     public GetScrapPublicsRes retrieveScrapRecipes(Integer userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         List<ScrapPublicList> scrapPublicList= retrieveScrapRecipesSortedByCreatedDate(userIdx);
 
@@ -71,7 +72,7 @@ public class ScrapPublicProvider {
      */
     public List<ScrapPublicList> retrieveScrapRecipesSortedByCreatedDate(Integer userIdx) throws BaseException {
 
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         List<ScrapPublic> scrapPublicList = scrapPublicRepository.findByUserAndStatus(user, "ACTIVE",Sort.by("createdAt").descending());
 
         return scrapPublicList.stream().map(scrapPublic -> {

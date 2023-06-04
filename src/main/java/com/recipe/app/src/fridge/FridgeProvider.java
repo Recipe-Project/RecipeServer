@@ -9,6 +9,7 @@ import com.recipe.app.src.recipeInfo.RecipeInfoRepository;
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicInfo;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.mapper.UserRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Service
 public class FridgeProvider {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final FridgeRepository fridgeRepository;
     private final IngredientCategoryRepository ingredientCategoryRepository;
     private final RecipeInfoRepository recipeInfoRepository;
@@ -30,8 +31,8 @@ public class FridgeProvider {
     private final UserRepository userRepository;
 
     @Autowired
-    public FridgeProvider(UserProvider userProvider, FridgeRepository fridgeRepository, IngredientCategoryRepository ingredientCategoryRepository, RecipeInfoRepository recipeInfoRepository, ScrapPublicRepository scrapPublicRepository, FridgeBasketRepository fridgeBasketRepository, UserRepository userRepository) {
-        this.userProvider = userProvider;
+    public FridgeProvider(UserService userService, FridgeRepository fridgeRepository, IngredientCategoryRepository ingredientCategoryRepository, RecipeInfoRepository recipeInfoRepository, ScrapPublicRepository scrapPublicRepository, FridgeBasketRepository fridgeBasketRepository, UserRepository userRepository) {
+        this.userService = userService;
         this.fridgeRepository = fridgeRepository;
         this.ingredientCategoryRepository = ingredientCategoryRepository;
         this.recipeInfoRepository = recipeInfoRepository;
@@ -47,7 +48,7 @@ public class FridgeProvider {
      * @throws BaseException
      */
     public GetFridgesRes retreiveFridges(int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         long fridgeBasketCount = fridgeBasketRepository.countByUserAndStatus(user,"ACTIVE");
         List<IngredientCategory> ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
 
@@ -137,7 +138,7 @@ public class FridgeProvider {
      * @throws BaseException
      */
     public GetFridgesRecipeRes retreiveFridgesRecipe(int userIdx, Integer start, Integer display) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         List<RecipeInfo> recipeInfo = recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(user, "ACTIVE");
 

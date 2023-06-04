@@ -5,6 +5,7 @@ import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import com.recipe.app.src.scrapPublic.models.PostScrapPublicRes;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.user.application.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.recipe.app.common.exception.BaseException;
@@ -14,15 +15,15 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ScrapPublicService {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final RecipeInfoProvider recipeInfoProvider;
     private final ScrapPublicRepository scrapPublicRepository;
     private final ScrapPublicProvider scrapPublicProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapPublicService(UserProvider userProvider, RecipeInfoProvider recipeInfoProvider, ScrapPublicRepository scrapPublicRepository, ScrapPublicProvider scrapPublicProvider, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public ScrapPublicService(UserService userService, RecipeInfoProvider recipeInfoProvider, ScrapPublicRepository scrapPublicRepository, ScrapPublicProvider scrapPublicProvider, JwtService jwtService) {
+        this.userService = userService;
         this.recipeInfoProvider = recipeInfoProvider;
         this.scrapPublicRepository = scrapPublicRepository;
         this.scrapPublicProvider = scrapPublicProvider;
@@ -36,7 +37,7 @@ public class ScrapPublicService {
      * @throws BaseException
      */
     public PostScrapPublicRes createScrapRecipe(int recipeId, int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         RecipeInfo recipeInfo = recipeInfoProvider.retrieveRecipeByRecipeId(recipeId);
         scrapPublicRepository.save(new ScrapPublic(user, recipeInfo));
 

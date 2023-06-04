@@ -3,6 +3,7 @@ package com.recipe.app.src.recipeKeyword;
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.recipeKeyword.models.GetRecipesBestKeywordRes;
 import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.user.application.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -11,13 +12,13 @@ import java.util.stream.Collectors;
 
 @Service
 public class RecipeKeywordProvider {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final RecipeKeywordRepository recipeKeywordRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public RecipeKeywordProvider(UserProvider userProvider, RecipeKeywordRepository recipeKeywordRepository, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public RecipeKeywordProvider(UserService userService, RecipeKeywordRepository recipeKeywordRepository, JwtService jwtService) {
+        this.userService = userService;
         this.recipeKeywordRepository = recipeKeywordRepository;
         this.jwtService = jwtService;
     }

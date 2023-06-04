@@ -1,6 +1,7 @@
 package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.common.exception.BaseException;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientProvider;
@@ -16,16 +17,16 @@ import java.util.stream.Collectors;
 
 @Service
 public class UserRecipeProvider {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final UserRecipeRepository userRecipeRepository;
     private final UserRecipePhotoProvider userRecipePhotoProvider;
     private final UserRecipeIngredientProvider userRecipeIngredientProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public UserRecipeProvider(UserProvider userProvider, UserRecipeRepository userRecipeRepository, UserRecipePhotoProvider userRecipePhotoProvider,
+    public UserRecipeProvider(UserService userService, UserRecipeRepository userRecipeRepository, UserRecipePhotoProvider userRecipePhotoProvider,
                               UserRecipeIngredientProvider userRecipeIngredientProvider, JwtService jwtService) {
-        this.userProvider = userProvider;
+        this.userService = userService;
         this.userRecipeRepository = userRecipeRepository;
         this.userRecipePhotoProvider = userRecipePhotoProvider;
         this.userRecipeIngredientProvider = userRecipeIngredientProvider;
@@ -40,7 +41,7 @@ public class UserRecipeProvider {
      */
     public List<GetMyRecipesRes> retrieveMyRecipesList(Integer userIdx) throws BaseException {
 
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         List<UserRecipe> userRecipeList = userRecipeRepository.findByUserAndStatus(user, "ACTIVE", Sort.by("createdAt").descending());
 
         return userRecipeList.stream().map(userRecipe -> {
@@ -67,7 +68,7 @@ public class UserRecipeProvider {
      */
     @Transactional
     public GetMyRecipeRes retrieveMyRecipe(Integer userIdx, Integer myRecipeIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         UserRecipe userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user, myRecipeIdx,"ACTIVE");
 
         String thumbnail = userRecipe.getThumbnail();

@@ -7,6 +7,7 @@ import com.recipe.app.src.ingredient.IngredientRepository;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,7 +21,7 @@ import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 public class FridgeBasketService {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final FridgeBasketRepository fridgeBasketRepository;
     private final IngredientCategoryProvider ingredientCategoryProvider;
     private final IngredientProvider ingredientProvider;
@@ -28,8 +29,8 @@ public class FridgeBasketService {
     private final FridgeBasketProvider fridgeBasketProvider;
 
     @Autowired
-    public FridgeBasketService(UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientProvider ingredientProvider, IngredientRepository ingredientRepository, FridgeBasketProvider fridgeBasketProvider){
-        this.userProvider = userProvider;
+    public FridgeBasketService(UserService userService, FridgeBasketRepository fridgeBasketRepository, IngredientCategoryProvider ingredientCategoryProvider, IngredientProvider ingredientProvider, IngredientRepository ingredientRepository, FridgeBasketProvider fridgeBasketProvider){
+        this.userService = userService;
         this.fridgeBasketRepository = fridgeBasketRepository;
         this.ingredientCategoryProvider = ingredientCategoryProvider;
         this.ingredientProvider = ingredientProvider;
@@ -46,7 +47,7 @@ public class FridgeBasketService {
      * @throws BaseException
      */
     public void createFridgesBasket(PostFridgesBasketReq postFridgesBasketReq, int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         List<Integer> ingredientIdxList = postFridgesBasketReq.getIngredientList();
         List<Ingredient> ingredientList = ingredientRepository.findAllByIngredientIdxIn(ingredientIdxList);
         Map<String, FridgeBasket> existIngredientMap = fridgeBasketRepository.findAllByUserAndStatusAndIngredientIn(user, "ACTIVE", ingredientList)
@@ -76,7 +77,7 @@ public class FridgeBasketService {
      * @throws BaseException
      */
     public PostFridgesDirectBasketRes createFridgesDirectBasket(PostFridgesDirectBasketReq postFridgesDirectBasketReq, int userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         String ingredientName = postFridgesDirectBasketReq.getIngredientName();
         String ingredientIcon = postFridgesDirectBasketReq.getIngredientIcon();
         Integer ingredientCategoryIdx = postFridgesDirectBasketReq.getIngredientCategoryIdx();
@@ -104,7 +105,7 @@ public class FridgeBasketService {
      * @throws BaseException
      */
     public void deleteFridgeBasket(Integer userIdx, String ingredient) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         FridgeBasket fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredient,"ACTIVE");
         fridgeBasketRepository.delete(fridgeBasket);
     }
@@ -117,7 +118,7 @@ public class FridgeBasketService {
      * @throws BaseException
      */
     public void updateFridgesBasket(PatchFridgesBasketReq patchFridgesBasketReq, int userIdx) throws BaseException, ParseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         List<FridgeBasketList> fridgeBasketList = patchFridgesBasketReq.getFridgeBasketList();
         List<String> ingredientNameList = fridgeBasketList.stream().map(FridgeBasketList::getIngredientName).collect(Collectors.toList());
         List<FridgeBasket> existIngredients = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNameList);

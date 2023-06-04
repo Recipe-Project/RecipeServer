@@ -5,6 +5,7 @@ import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.scrapYoutube.models.GetScrapYoutubesRes;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutubeList;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.viewYoutube.ViewYoutubeRepository;
 import com.recipe.app.common.utils.JwtService;
@@ -18,14 +19,14 @@ import java.util.stream.Collectors;
 
 @Service
 public class ScrapYoutubeProvider {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final ScrapYoutubeRepository scrapYoutubeRepository;
     private final ViewYoutubeRepository viewYoutubeRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapYoutubeProvider(UserProvider userProvider, ScrapYoutubeRepository scrapYoutubeRepository, ViewYoutubeRepository viewYoutubeRepository, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public ScrapYoutubeProvider(UserService userService, ScrapYoutubeRepository scrapYoutubeRepository, ViewYoutubeRepository viewYoutubeRepository, JwtService jwtService) {
+        this.userService = userService;
         this.scrapYoutubeRepository = scrapYoutubeRepository;
         this.viewYoutubeRepository = viewYoutubeRepository;
         this.jwtService = jwtService;
@@ -38,7 +39,7 @@ public class ScrapYoutubeProvider {
      * @throws BaseException
      */
     public GetScrapYoutubesRes retrieveScrapYoutubeList(Integer userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         List<ScrapYoutubeList> scrapYoutubeList = retrieveScrapYoutubesSortedByCreatedDate(userIdx);
         Long scrapYoutubeCount = scrapYoutubeRepository.countByUserAndStatus(user,"ACTIVE");
 
@@ -51,7 +52,7 @@ public class ScrapYoutubeProvider {
      * @throws BaseException
      */
     public List<ScrapYoutubeList> retrieveScrapYoutubesSortedByCreatedDate(Integer userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         List<ScrapYoutube> scrapYoutubeList = scrapYoutubeRepository.findByUserAndStatus(user, "ACTIVE",Sort.by("createdAt").descending());
 
         return scrapYoutubeList.stream().map(scrapYoutube -> {
@@ -79,7 +80,7 @@ public class ScrapYoutubeProvider {
      * @throws BaseException
      */
     public ScrapYoutube retrieveScrapYoutube(String youtubeId, Integer userIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         return scrapYoutubeRepository.findByYoutubeIdAndUserAndStatus(youtubeId,user,"ACTIVE");
     }

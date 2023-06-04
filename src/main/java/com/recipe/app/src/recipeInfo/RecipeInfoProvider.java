@@ -12,6 +12,7 @@ import com.recipe.app.src.recipeKeyword.models.RecipeKeyword;
 import com.recipe.app.src.recipeProcess.models.RecipeProcess;
 import com.recipe.app.src.scrapBlog.ScrapBlogRepository;
 import com.recipe.app.src.scrapPublic.ScrapPublicRepository;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.json.simple.JSONArray;
@@ -45,18 +46,18 @@ public class RecipeInfoProvider {
     private final FridgeRepository fridgeRepository;
     private final ScrapBlogRepository scrapBlogRepository;
     private final ScrapPublicRepository scrapPublicRepository;
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final RecipeInfoRepository recipeInfoRepository;
     private final JwtService jwtService;
 
     @Autowired
-    public RecipeInfoProvider(IngredientRepository ingredientRepository, RecipeKeywordRepository recipeKeywordRepository, FridgeRepository fridgeRepository, ScrapBlogRepository scrapBlogRepository, ScrapPublicRepository scrapPublicRepository, UserProvider userProvider, RecipeInfoRepository recipeInfoRepository, JwtService jwtService) {
+    public RecipeInfoProvider(IngredientRepository ingredientRepository, RecipeKeywordRepository recipeKeywordRepository, FridgeRepository fridgeRepository, ScrapBlogRepository scrapBlogRepository, ScrapPublicRepository scrapPublicRepository, UserService userService, RecipeInfoRepository recipeInfoRepository, JwtService jwtService) {
         this.ingredientRepository = ingredientRepository;
         this.recipeKeywordRepository = recipeKeywordRepository;
         this.fridgeRepository = fridgeRepository;
         this.scrapBlogRepository = scrapBlogRepository;
         this.scrapPublicRepository = scrapPublicRepository;
-        this.userProvider = userProvider;
+        this.userService = userService;
         this.recipeInfoRepository = recipeInfoRepository;
         this.jwtService = jwtService;
     }
@@ -86,7 +87,7 @@ public class RecipeInfoProvider {
      */
 
     public List<GetRecipeInfosRes> retrieveRecipeInfos(Integer jwtUserIdx, String keyword) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+        User user = userService.retrieveUserByUserIdx(jwtUserIdx);
         List<RecipeInfo> recipeInfoList= recipeInfoRepository.searchRecipeInfos(keyword, "ACTIVE");
 
         List<GetRecipeInfosRes> getRecipeInfosResList = new ArrayList<>();
@@ -124,7 +125,7 @@ public class RecipeInfoProvider {
      */
 
     public GetRecipeInfoRes retrieveRecipeInfo(Integer jwtUserIdx, Integer recipeIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+        User user = userService.retrieveUserByUserIdx(jwtUserIdx);
 
         RecipeInfo recipeInfo= retrieveRecipeByRecipeId(recipeIdx);
 
@@ -347,7 +348,7 @@ public class RecipeInfoProvider {
      */
 
     public GetRecipeBlogsRes retrieveRecipeBlogs(Integer jwtUserIdx, String keyword, Integer display, Integer start) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+        User user = userService.retrieveUserByUserIdx(jwtUserIdx);
 
         JSONObject jsonObject;
         String text;

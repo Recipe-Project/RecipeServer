@@ -2,6 +2,7 @@ package com.recipe.app.src.scrapYoutube;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.scrapYoutube.models.*;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.common.utils.JwtService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,14 +11,14 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ScrapYoutubeService {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final ScrapYoutubeRepository scrapYoutubeRepository;
     private final ScrapYoutubeProvider scrapYoutubeProvider;
     private final JwtService jwtService;
 
     @Autowired
-    public ScrapYoutubeService(UserProvider userProvider, ScrapYoutubeRepository scrapYoutubeRepository, ScrapYoutubeProvider scrapYoutubeProvider, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public ScrapYoutubeService(UserService userService, ScrapYoutubeRepository scrapYoutubeRepository, ScrapYoutubeProvider scrapYoutubeProvider, JwtService jwtService) {
+        this.userService = userService;
         this.scrapYoutubeRepository = scrapYoutubeRepository;
         this.scrapYoutubeProvider = scrapYoutubeProvider;
         this.jwtService = jwtService;
@@ -37,7 +38,7 @@ public class ScrapYoutubeService {
         String postDate = postScrapYoutubeReq.getPostDate();
         String channelName = postScrapYoutubeReq.getChannelName();
         String playTime = postScrapYoutubeReq.getPlayTime();
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         ScrapYoutube scrapYoutube = new ScrapYoutube(user, youtubeId, title, thumbnail, youtubeUrl, postDate, channelName,playTime);
         scrapYoutubeRepository.save(scrapYoutube);
@@ -63,7 +64,7 @@ public class ScrapYoutubeService {
         String postDate = scrapYoutube.getPostDate();
         String channelName = scrapYoutube.getChannelName();
         String playTime = scrapYoutube.getPlayTime();
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         scrapYoutubeRepository.save(scrapYoutube);
 
         return new PostScrapYoutubeRes(userIdx,youtubeId, title,thumbnail,youtubeUrl,postDate,channelName,playTime);

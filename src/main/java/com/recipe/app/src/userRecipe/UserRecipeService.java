@@ -2,6 +2,7 @@ package com.recipe.app.src.userRecipe;
 
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.ingredient.IngredientProvider;
+import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.userRecipe.models.*;
 import com.recipe.app.src.userRecipeIngredient.UserRecipeIngredientRepository;
@@ -17,7 +18,7 @@ import java.util.List;
 
 @Service
 public class UserRecipeService {
-    private final UserProvider userProvider;
+    private final UserService userService;
     private final UserRecipeRepository userRecipeRepository;
     private final UserRecipePhotoRepository userRecipePhotoRepository;
     private final UserRecipeIngredientRepository userRecipeIngredientRepository;
@@ -26,8 +27,8 @@ public class UserRecipeService {
     private final JwtService jwtService;
 
     @Autowired
-    public UserRecipeService(UserProvider userProvider, UserRecipeRepository userRecipeRepository, UserRecipePhotoRepository userRecipePhotoRepository, UserRecipeIngredientRepository userRecipeIngredientRepository, UserRecipeProvider userRecipeProvider, IngredientProvider ingredientProvider, JwtService jwtService) {
-        this.userProvider = userProvider;
+    public UserRecipeService(UserService userService, UserRecipeRepository userRecipeRepository, UserRecipePhotoRepository userRecipePhotoRepository, UserRecipeIngredientRepository userRecipeIngredientRepository, UserRecipeProvider userRecipeProvider, IngredientProvider ingredientProvider, JwtService jwtService) {
+        this.userService = userService;
         this.userRecipeRepository = userRecipeRepository;
         this.userRecipePhotoRepository = userRecipePhotoRepository;
         this.userRecipeIngredientRepository = userRecipeIngredientRepository;
@@ -52,7 +53,7 @@ public class UserRecipeService {
         List<MyRecipeIngredient> ingredientList = postMyRecipeReq.getIngredientList();
 
         Integer userRecipeIdx;
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         UserRecipe userRecipe = new UserRecipe(user, thumbnail, title, content);
         userRecipe = userRecipeRepository.save(userRecipe);
@@ -77,7 +78,7 @@ public class UserRecipeService {
      */
     @Transactional
     public PatchMyRecipeRes updateMyRecipe(PatchMyRecipeReq patchMyRecipeReq, Integer userIdx, Integer userRecipeIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
 
         String thumbnail = patchMyRecipeReq.getThumbnail();
         String title = patchMyRecipeReq.getTitle();
@@ -120,7 +121,7 @@ public class UserRecipeService {
      */
     @Transactional
     public void deleteUserRecipe(Integer userIdx, Integer myRecipeIdx) throws BaseException {
-        User user = userProvider.retrieveUserByUserIdx(userIdx);
+        User user = userService.retrieveUserByUserIdx(userIdx);
         UserRecipe userRecipe = userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user,myRecipeIdx,"ACTIVE");
 
         userRecipe.setStatus("INACTIVE");
