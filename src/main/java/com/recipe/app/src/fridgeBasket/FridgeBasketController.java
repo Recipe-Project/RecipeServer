@@ -5,7 +5,9 @@ import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridgeBasket.models.*;
 import com.recipe.app.src.ingredient.IngredientProvider;
 import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.text.ParseException;
@@ -22,8 +24,7 @@ public class FridgeBasketController {
     private final JwtService jwtService;
 
     @Autowired
-    public FridgeBasketController(FridgeBasketProvider fridgeBasketProvider, FridgeBasketService fridgeBasketService, UserProvider userProvider, FridgeBasketRepository fridgeBasketRepository, IngredientProvider ingredientProvider, JwtService jwtService) {
-
+    public FridgeBasketController(FridgeBasketProvider fridgeBasketProvider, FridgeBasketService fridgeBasketService, FridgeBasketRepository fridgeBasketRepository, IngredientProvider ingredientProvider, JwtService jwtService) {
         this.fridgeBasketProvider = fridgeBasketProvider;
         this.fridgeBasketService = fridgeBasketService;
         this.jwtService = jwtService;
@@ -38,8 +39,8 @@ public class FridgeBasketController {
      */
     @ResponseBody
     @PostMapping("/basket")
-    public BaseResponse<Void> postFridgesBasket(@RequestBody PostFridgesBasketReq parameters) {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<Void> postFridgesBasket(final Authentication authentication, @RequestBody PostFridgesBasketReq parameters) {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         List<Integer> ingredientList = parameters.getIngredientList();
         if (ingredientList == null || ingredientList.isEmpty()) {
             throw new BaseException(POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST);
@@ -58,8 +59,8 @@ public class FridgeBasketController {
      */
     @ResponseBody
     @PostMapping("/direct-basket")
-    public BaseResponse<PostFridgesDirectBasketRes> postFridgesDirectBasket(@RequestBody PostFridgesDirectBasketReq parameters) {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<PostFridgesDirectBasketRes> postFridgesDirectBasket(final Authentication authentication, @RequestBody PostFridgesDirectBasketReq parameters) {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
 
         if (parameters.getIngredientName() == null || parameters.getIngredientName().length()==0) {
             throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_NAME);
@@ -84,8 +85,8 @@ public class FridgeBasketController {
      * @return BaseResponse<GetFridgesBasketRes>
      */
     @GetMapping("/basket")
-    public BaseResponse<GetFridgesBasketRes> getFridgesBasket() {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<GetFridgesBasketRes> getFridgesBasket(final Authentication authentication) {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         GetFridgesBasketRes getFridgesBasketRes = fridgeBasketProvider.retreiveFridgeBasket(userIdx);
         return success(getFridgesBasketRes);
     }
@@ -97,8 +98,8 @@ public class FridgeBasketController {
      * @return BaseResponse<Void>
      */
     @DeleteMapping("/basket")
-    public BaseResponse<Void> deleteFridgesBasket(@RequestParam(value="ingredient") String ingredient) {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<Void> deleteFridgesBasket(final Authentication authentication, @RequestParam(value="ingredient") String ingredient) {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         if (ingredient == null || ingredient.equals("")){
             throw new BaseException(EMPTY_INGREDIENT);
         }
@@ -116,8 +117,8 @@ public class FridgeBasketController {
      */
     @ResponseBody
     @PatchMapping("/basket")
-    public BaseResponse<Void> patchFridgesBasket(@RequestBody PatchFridgesBasketReq parameters) throws ParseException {
-            Integer userIdx = jwtService.getUserId();
+    public BaseResponse<Void> patchFridgesBasket(final Authentication authentication, @RequestBody PatchFridgesBasketReq parameters) throws ParseException {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
             List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
             if (fridgeBasketList == null || fridgeBasketList.isEmpty()) {
                 throw new BaseException(PATCH_FRIDGES_BASKET_EMPTY_FRIDGES_BASKET_LIST);
@@ -134,8 +135,8 @@ public class FridgeBasketController {
      * @return BaseResponse<GetFridgesBasketCountRes>
      */
     @GetMapping("/basket/count")
-    public BaseResponse<GetFridgesBasketCountRes> getFridgesBasketCount() {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<GetFridgesBasketCountRes> getFridgesBasketCount(final Authentication authentication) {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         GetFridgesBasketCountRes getFridgesBasketCountRes = fridgeBasketProvider.retreiveFridgeBasketCount(userIdx);
 
         return success(getFridgesBasketCountRes);

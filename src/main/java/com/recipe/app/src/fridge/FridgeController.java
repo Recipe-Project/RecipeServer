@@ -6,9 +6,11 @@ import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridge.models.*;
 import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.application.UserService;
+import com.recipe.app.src.user.domain.User;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -51,9 +53,9 @@ public class FridgeController {
      */
     @ResponseBody
     @PostMapping("/fridges")
-    public BaseResponse<List<PostFridgesRes>> postFridges(@RequestBody PostFridgesReq parameters) throws ParseException {
+    public BaseResponse<List<PostFridgesRes>> postFridges(final Authentication authentication, @RequestBody PostFridgesReq parameters) throws ParseException {
         List<FridgeBasketList> fridgeBasketList = parameters.getFridgeBasketList();
-        Integer userIdx = jwtService.getUserId();
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
 
         if (fridgeBasketList==null || fridgeBasketList.isEmpty()) {
             throw new BaseException(POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST);
@@ -101,8 +103,8 @@ public class FridgeController {
      * @return BaseResponse<GetFridgesBasketRes>
      */
     @GetMapping("/fridges")
-    public BaseResponse<GetFridgesRes> getFridges() {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<GetFridgesRes> getFridges(final Authentication authentication) {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         GetFridgesRes getFridgesRes = fridgeProvider.retreiveFridges(userIdx);
 
         return success(getFridgesRes);
@@ -115,8 +117,8 @@ public class FridgeController {
      * @PathVariable myRecipeIdx
      */
     @DeleteMapping("/fridges/ingredient")
-    public BaseResponse<Void> deleteFridgesIngredient(@RequestBody DeleteFridgesIngredientReq parameters) throws BaseException {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<Void> deleteFridgesIngredient(final Authentication authentication, @RequestBody DeleteFridgesIngredientReq parameters) throws BaseException {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         List<String> ingrdientNames = parameters.getIngredientName();
         if (ingrdientNames == null || ingrdientNames.isEmpty()) {
             throw new BaseException(EMPTY_INGREDIENT);
@@ -134,8 +136,8 @@ public class FridgeController {
      */
     @ResponseBody
     @PatchMapping("/fridges/ingredient")
-    public BaseResponse<Void> patchFridgesIngredient(@RequestBody PatchFridgesIngredientReq parameters) throws BaseException, ParseException {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<Void> patchFridgesIngredient(final Authentication authentication, @RequestBody PatchFridgesIngredientReq parameters) throws BaseException, ParseException {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         List<PatchFridgeList> patchFridgeList = parameters.getPatchFridgeList();
         if (patchFridgeList==null || patchFridgeList.isEmpty()) {
             throw new BaseException(EMPTY_PATCH_FRIDGE_LIST);
@@ -177,8 +179,8 @@ public class FridgeController {
      */
     @ResponseBody
     @GetMapping("/fridges/recipe")
-    public BaseResponse<GetFridgesRecipeRes> getFridgesRecipe(@RequestParam(value = "start") Integer start, @RequestParam(value = "display") Integer display)  {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<GetFridgesRecipeRes> getFridgesRecipe(final Authentication authentication, @RequestParam(value = "start") Integer start, @RequestParam(value = "display") Integer display)  {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         GetFridgesRecipeRes getFridgesRecipeRes = fridgeProvider.retreiveFridgesRecipe(userIdx, start, display);
 
         return success(getFridgesRecipeRes);
@@ -191,8 +193,8 @@ public class FridgeController {
      * @return BaseResponse<Void>
      */
     @PatchMapping("/fcm-token")
-    public BaseResponse<Void> patchFcmToken(@RequestBody PatchFcmTokenReq parameters)  {
-        Integer userIdx = jwtService.getUserId();
+    public BaseResponse<Void> patchFcmToken(final Authentication authentication, @RequestBody PatchFcmTokenReq parameters)  {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         String fcmToken = parameters.getFcmToken();
 
         if (fcmToken == null || fcmToken.equals("")){

@@ -41,9 +41,10 @@ public class UserController {
      */
     @ResponseBody
     @PostMapping("/auto-login")
-    public BaseResponse<Void> postAutoLogin() {
-        Integer userIdx = jwtService.getUserId();
-        userProvider.retrieveUserByUserIdx(userIdx);
+    public BaseResponse<Void> postAutoLogin(final Authentication authentication) {
+        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
+        userService.retrieveUserByUserIdx(userIdx);
+
         return success();
     }
 
@@ -119,12 +120,12 @@ public class UserController {
      */
     @ResponseBody
     @GetMapping("/{userIdx}")
-    public BaseResponse<GetUserRes> getUser(@PathVariable Integer userIdx) {
+    public BaseResponse<GetUserRes> getUser(final Authentication authentication, @PathVariable Integer userIdx) {
         if(userIdx==null || userIdx<=0){
             throw new BaseException(USERS_EMPTY_USER_ID);
         }
-        int jwtUserIdx = jwtService.getUserId();
-        GetUserRes getUserRes = userProvider.retrieveUser(jwtUserIdx, userIdx);
+        Integer jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
+        GetUserRes getUserRes = userService.retrieveUser(jwtUserIdx, userIdx);
         return success(getUserRes);
     }
 
@@ -135,12 +136,12 @@ public class UserController {
      */
     @ResponseBody
     @PatchMapping("/{userIdx}")
-    public BaseResponse<PatchUserRes> patchUser(@PathVariable Integer userIdx, @RequestBody PatchUserReq parameters) {
+    public BaseResponse<PatchUserRes> patchUser(final Authentication authentication, @PathVariable Integer userIdx, @RequestBody PatchUserReq parameters) {
         if(userIdx==null || userIdx<=0){
             throw new BaseException(USERS_EMPTY_USER_ID);
         }
 
-        int jwtUserIdx = jwtService.getUserId();
+        Integer jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
 
         PatchUserRes patchUserRes = userService.updateUser(jwtUserIdx, userIdx, parameters);
         return success(patchUserRes);
@@ -152,12 +153,12 @@ public class UserController {
      */
     @ResponseBody
     @DeleteMapping("/{userIdx}")
-    public BaseResponse<Void> deleteUser(@PathVariable Integer userIdx) {
+    public BaseResponse<Void> deleteUser(final Authentication authentication, @PathVariable Integer userIdx) {
         if(userIdx==null || userIdx<=0){
             throw new BaseException(USERS_EMPTY_USER_ID);
         }
 
-        int jwtUserIdx = jwtService.getUserId();
+        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
 
         userService.deleteUser(jwtUserIdx, userIdx);
         return success();
