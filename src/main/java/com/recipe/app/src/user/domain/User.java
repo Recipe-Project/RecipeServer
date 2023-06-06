@@ -10,22 +10,19 @@ import com.recipe.app.src.userRecipe.models.UserRecipe;
 import com.recipe.app.src.viewBlog.models.ViewBlog;
 import com.recipe.app.src.viewPublic.models.ViewPublic;
 import com.recipe.app.src.viewYoutube.models.ViewYoutube;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @EqualsAndHashCode(callSuper = false)
-@Data // from lombok
-@Entity // 필수, Class 를 Database Table화 해주는 것이다
-@Table(name = "UserInfo") // Table 이름을 명시해주지 않으면 class 이름을 Table 이름으로 대체한다.
+@Data
+@Entity
+@Table(name = "UserInfo")
 public class User extends BaseEntity {
-    @Id // PK를 의미하는 어노테이션
+    @Id
     @Column(name = "userIdx", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer userIdx;
@@ -45,12 +42,8 @@ public class User extends BaseEntity {
     @Column(name = "phoneNumber", nullable = false, length = 45)
     private String phoneNumber;
 
-    //추가
     @Column(name = "deviceToken", length = 500)
     private String deviceToken;
-
-    @Column(name="status", nullable=false, length=10)
-    private String status="ACTIVE";
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<UserRecipe> userRecipes = new ArrayList<>();
@@ -85,7 +78,7 @@ public class User extends BaseEntity {
         this.userName = userName;
         this.email = email;
         this.phoneNumber = phoneNumber;
-        this.deviceToken = deviceToken;//추가
+        this.deviceToken = deviceToken;
     }
 
 }
