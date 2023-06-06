@@ -1,44 +1,49 @@
 package com.recipe.app.src.user.api;
 
+import com.google.api.client.util.Value;
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.user.application.UserService;
-import com.recipe.app.src.user.application.dto.GetUserRes;
-import com.recipe.app.src.user.application.dto.PatchUserReq;
-import com.recipe.app.src.user.application.dto.PatchUserRes;
-import com.recipe.app.src.user.application.dto.PostUserRes;
+import com.recipe.app.src.user.application.dto.*;
 import com.recipe.app.common.utils.JwtService;
-import org.springframework.beans.factory.annotation.Autowired;
+import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.exception.EmptyFcmTokenException;
+import com.recipe.app.src.user.exception.EmptyTokenException;
+import lombok.RequiredArgsConstructor;
+import org.json.simple.parser.ParseException;
+import org.springframework.security.core.Authentication;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.io.IOException;
+
 import static com.recipe.app.common.response.BaseResponse.*;
 import static com.recipe.app.common.response.BaseResponseStatus.*;
 
-
-
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-    private final UserProvider userProvider;
+
+    @Value("${recipe-project.header.naver-token}")
+    private String naverToken;
+
+    @Value("${recipe-project.header.kakao-token}")
+    private String kakaoToken;
+
+    @Value("${recipe-project.header.google-token}")
+    private String googleToken;
+
+    @Value("${recipe-project.header.fcm-token}")
+    private String fcmToken;
+
     private final UserService userService;
     private final JwtService jwtService;
 
-    @Autowired
-    public UserController(UserProvider userProvider, UserService userService, JwtService jwtService) {
-        this.userProvider = userProvider;
-        this.userService = userService;
-        this.jwtService = jwtService;
-    }
-
-
-    /**
-     * 자동로그인 API
-     * [POST] /users/auto-login
-     */
     @ResponseBody
     @PostMapping("/auto-login")
     public BaseResponse<Void> postAutoLogin(final Authentication authentication) {
@@ -48,69 +53,64 @@ public class UserController {
         return success();
     }
 
-    /**
-     * 네이버 로그인 API
-     * [POST] /users/naver-login
-     * @return BaseResponse<PostUserRes>
-     */
     @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<PostUserRes> postNaverLogin() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String accessToken = request.getHeader("NAVER-ACCESS-TOKEN");
-        String fcmToken = request.getHeader("FCM-TOKEN");
-        if (accessToken == null || accessToken.length() == 0) {
-            throw new BaseException(EMPTY_TOKEN);
+    public BaseResponse<UserDto.UserProfileResponse> postNaverLogin(HttpServletRequest request) throws IOException, ParseException {
+        String accessToken = request.getHeader(this.naverToken);
+        if (!StringUtils.hasText(accessToken)) {
+            throw new EmptyTokenException();
         }
-        if (fcmToken == null || fcmToken.length() == 0) {
-            throw new BaseException(EMPTY_FCM_TOKEN);
+
+        String fcmToken = request.getHeader(this.fcmToken);
+        if (!StringUtils.hasText(fcmToken)) {
+            throw new EmptyFcmTokenException();
         }
-        PostUserRes postUserRes = userService.naverLogin(accessToken,fcmToken);
-        return success(postUserRes);
+
+        User user = userService.naverLogin(accessToken,fcmToken);
+        String jwt = jwtService.createJwt(user.getUserIdx());
+        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user, jwt);
+
+        return success(data);
     }
 
-
-    /**
-     * 카카오 로그인 API
-     * [POST] /users/kakao-login
-     * @return BaseResponse<PostUserRes>
-     */
     @ResponseBody
     @PostMapping("/kakao-login")
-    public BaseResponse<PostUserRes> postKakaoLogin() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String accessToken = request.getHeader("KAKAO-ACCESS-TOKEN");
-        String fcmToken = request.getHeader("FCM-TOKEN");
-        if (accessToken == null || accessToken.length() == 0) {
-            throw new BaseException(EMPTY_TOKEN);
+    public BaseResponse<UserDto.UserProfileResponse> postKakaoLogin(HttpServletRequest request) throws IOException, ParseException {
+        String accessToken = request.getHeader(this.kakaoToken);
+        if (!StringUtils.hasText(accessToken)) {
+            throw new EmptyTokenException();
         }
-        if (fcmToken == null || fcmToken.length() == 0) {
-            throw new BaseException(EMPTY_FCM_TOKEN);
+
+        String fcmToken = request.getHeader(this.fcmToken);
+        if (!StringUtils.hasText(fcmToken)) {
+            throw new EmptyFcmTokenException();
         }
-        PostUserRes postUserRes = userService.kakaoLogin(accessToken,fcmToken);
-        return success(postUserRes);
+
+        User user = userService.kakaoLogin(accessToken,fcmToken);
+        String jwt = jwtService.createJwt(user.getUserIdx());
+        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user, jwt);
+
+        return success(data);
     }
-    /**
-     * 구글 로그인 API
-     * [POST] /users/google-login
-     * @RequestBody parameters (accesstoken)
-     */
+
     @ResponseBody
     @PostMapping("/google-login")
-    public BaseResponse<PostUserRes> postGoogleLogin() {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String googleIdToken = request.getHeader("GOOGLE-ID-TOKEN");
-        String fcmToken = request.getHeader("FCM-TOKEN");
-
-        if (googleIdToken == null || googleIdToken.length() == 0) {
-            throw new BaseException(EMPTY_TOKEN);
-        }
-        if (fcmToken == null || fcmToken.length() == 0) {
-            throw new BaseException(EMPTY_FCM_TOKEN);
+    public BaseResponse<UserDto.UserProfileResponse> postGoogleLogin(HttpServletRequest request) throws IOException, ParseException {
+        String accessToken = request.getHeader(this.googleToken);
+        if (!StringUtils.hasText(accessToken)) {
+            throw new EmptyTokenException();
         }
 
-        PostUserRes postUserRes = userService.googleLogin(googleIdToken,fcmToken);
-        return success(postUserRes);
+        String fcmToken = request.getHeader(this.fcmToken);
+        if (!StringUtils.hasText(fcmToken)) {
+            throw new EmptyFcmTokenException();
+        }
+
+        User user = userService.googleLogin(accessToken,fcmToken);
+        String jwt = jwtService.createJwt(user.getUserIdx());
+        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user, jwt);
+
+        return success(data);
     }
 
     /**

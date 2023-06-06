@@ -1,15 +1,19 @@
 package com.recipe.app.src.user.application;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.user.application.dto.*;
+import com.recipe.app.src.user.application.dto.GetUserRes;
+import com.recipe.app.src.user.application.dto.MypageMyRecipeList;
+import com.recipe.app.src.user.application.dto.PatchUserReq;
+import com.recipe.app.src.user.application.dto.PatchUserRes;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import com.recipe.app.src.user.exception.NotFoundUserException;
 import com.recipe.app.src.user.mapper.UserRepository;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
+import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,321 +22,162 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
 
-import static com.recipe.app.common.response.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponseStatus.FORBIDDEN_USER;
 
 @Service
+@RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
+
     private final UserRepository userRepository;
-    private final UserProvider userProvider;
-    private final JwtService jwtService;
 
-    @Autowired
-    public UserService(UserRepository userRepository, UserProvider userProvider, JwtService jwtService) {
-        this.userRepository = userRepository;
-        this.userProvider = userProvider;
-        this.jwtService = jwtService;
-    }
-
-
-    /**
-     * 네이버 로그인
-     * @param accessToken,fcmToken
-     * @return PostUserRes
-     * @throws BaseException
-     */
-    public PostUserRes naverLogin(String accessToken,String fcmToken) throws BaseException {
-        JSONObject jsonObject;
-        String resultcode;
-
-        String header = "Bearer " + accessToken; // Bearer 다음에 공백 추가
+    public User naverLogin(String accessToken, String fcmToken) throws IOException, ParseException {
+        String header = "Bearer " + accessToken;
         String apiURL = "https://openapi.naver.com/v1/nid/me";
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("Authorization", header);
 
-        HttpURLConnection con;
-        try {
-            URL url = new URL(apiURL);
-            con = (HttpURLConnection) url.openConnection();
-        } catch (MalformedURLException e) {
-            throw new BaseException(WRONG_URL);
-        } catch (IOException e) {
-            throw new BaseException(FAILED_TO_CONNECT);
+        URL url = new URL(apiURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setRequestMethod("GET");
+        for (Map.Entry<String, String> rqheader : requestHeaders.entrySet()) {
+            con.setRequestProperty(rqheader.getKey(), rqheader.getValue());
         }
 
-        String body;
-        try {
-            con.setRequestMethod("GET");
-            for (Map.Entry<String, String> rqheader : requestHeaders.entrySet()) {
-                con.setRequestProperty(rqheader.getKey(), rqheader.getValue());
-            }
-
-            int responseCode = con.getResponseCode();
-            InputStreamReader streamReader;
-            if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-                streamReader = new InputStreamReader(con.getInputStream());
-            } else { // 에러 발생
-                streamReader = new InputStreamReader(con.getErrorStream());
-            }
-
-            BufferedReader lineReader = new BufferedReader(streamReader);
-            StringBuilder responseBody = new StringBuilder();
-
-            String line;
-            while ((line = lineReader.readLine()) != null) {
-                responseBody.append(line);
-            }
-
-            body = responseBody.toString();
-        } catch (IOException e) {
-            throw new BaseException(FAILED_TO_READ_RESPONSE);
-        } finally {
-            con.disconnect();
+        int responseCode = con.getResponseCode();
+        InputStreamReader streamReader;
+        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+            streamReader = new InputStreamReader(con.getInputStream());
+        } else { // 에러 발생
+            streamReader = new InputStreamReader(con.getErrorStream());
         }
 
-        if (body.length() == 0) {
-            throw new BaseException(FAILED_TO_READ_RESPONSE);
+        BufferedReader lineReader = new BufferedReader(streamReader);
+        StringBuilder responseBody = new StringBuilder();
+
+        String line;
+        while ((line = lineReader.readLine()) != null) {
+            responseBody.append(line);
         }
 
-        try{
-            JSONParser jsonParser = new JSONParser();
-            jsonObject = (JSONObject) jsonParser.parse(body);
-            resultcode = jsonObject.get("resultcode").toString();
-        }
-        catch (Exception e){
-            throw new BaseException(FAILED_TO_PARSE);
-        }
+        String body = responseBody.toString();
+        con.disconnect();
 
-        String response;
-        if(resultcode.equals("00")){
-            response = jsonObject.get("response").toString();
-        }
-        else{
-            throw new BaseException(FORBIDDEN_ACCESS);
-        }
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        String resultcode = jsonObject.get("resultcode").toString();
 
-        String socialId;
-        String profilePhoto=null;
-        String userName;
-        String email=null;
-        String phoneNumber=null;
-        try {
-            JSONParser jsonParser = new JSONParser();
-            JSONObject responObj = (JSONObject) jsonParser.parse(response);
-            socialId = "naver_"+responObj.get("id").toString();
-            /*
-            if(responObj.get("profile_image")!=null) {
-                profilePhoto = responObj.get("profile_image").toString();
-            }*/
-            userName = responObj.get("name").toString();
-            if(responObj.get("email")!=null) {
-                email = responObj.get("email").toString();
-            }
-            if(responObj.get("mobile")!=null) {
-                phoneNumber = responObj.get("mobile").toString();
-            }
-        }
-        catch (Exception e){
-            throw new BaseException(FAILED_TO_PARSE);
-        }
+        if (!resultcode.equals("00"))
+            throw new ForbiddenAccessException();
 
-        User user = userProvider.retrieveUserInfoBySocialId(socialId);
+        String response = jsonObject.get("response").toString();
+        JSONObject responObj = (JSONObject) jsonParser.parse(response);
+        String socialId = "naver_" + responObj.get("id").toString();
+        String profilePhoto = null;
+        String userName = responObj.get("name").toString();
+        String email = responObj.get("email") != null ? responObj.get("email").toString() : null;
+        String phoneNumber = responObj.get("mobile") != null ? responObj.get("mobile").toString() : null;
 
-        // 이미 존재하는 회원이 없다면 유저 정보 저장
+        User user = userRepository.findBySocialId(socialId).orElse(null);
         if (user == null) {
-            user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber,fcmToken));
+            user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber, fcmToken));
         }
 
-        // JWT 생성
-        Integer userIdx = user.getUserIdx();
-        String jwt = jwtService.createJwt(userIdx);
-        return new PostUserRes(userIdx, jwt);
+        return user;
     }
 
-    /**
-     * 카카오 로그인
-     * @param accessToken,fcmToken
-     * @return PostUserRes
-     * @throws BaseException
-     */
-    public PostUserRes kakaoLogin(String accessToken,String fcmToken) throws BaseException {
-        JSONObject jsonObject;
+    public User kakaoLogin(String accessToken, String fcmToken) throws IOException, ParseException {
 
-        String header = "Bearer " + accessToken; // Bearer 다음에 공백 추가
+        String header = "Bearer " + accessToken;
         String apiURL = "https://kapi.kakao.com/v2/user/me";
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("Authorization", header);
 
-        HttpURLConnection con;
-        try {
-            URL url = new URL(apiURL);
-            con = (HttpURLConnection) url.openConnection();
-        } catch (MalformedURLException e) {
-            throw new BaseException(WRONG_URL);
-        } catch (IOException e) {
-            throw new BaseException(FAILED_TO_CONNECT);
+        URL url = new URL(apiURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setRequestMethod("GET");
+        for (Map.Entry<String, String> rqheader : requestHeaders.entrySet()) {
+            con.setRequestProperty(rqheader.getKey(), rqheader.getValue());
         }
 
-        String body;
-        try {
-            con.setRequestMethod("GET");
-            for (Map.Entry<String, String> rqheader : requestHeaders.entrySet()) {
-                con.setRequestProperty(rqheader.getKey(), rqheader.getValue());
-            }
-
-            int responseCode = con.getResponseCode();
-            InputStreamReader streamReader;
-            if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-                streamReader = new InputStreamReader(con.getInputStream());
-            } else { // 에러 발생
-                streamReader = new InputStreamReader(con.getErrorStream());
-            }
-
-            BufferedReader lineReader = new BufferedReader(streamReader);
-            StringBuilder responseBody = new StringBuilder();
-
-            String line;
-            while ((line = lineReader.readLine()) != null) {
-                responseBody.append(line);
-            }
-
-            body = responseBody.toString();
-        } catch (IOException e) {
-            throw new BaseException(FAILED_TO_READ_RESPONSE);
-        } finally {
-            con.disconnect();
+        int responseCode = con.getResponseCode();
+        InputStreamReader streamReader;
+        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+            streamReader = new InputStreamReader(con.getInputStream());
+        } else { // 에러 발생
+            streamReader = new InputStreamReader(con.getErrorStream());
         }
 
-        if (body.length() == 0) {
-            throw new BaseException(FAILED_TO_READ_RESPONSE);
+        BufferedReader lineReader = new BufferedReader(streamReader);
+        StringBuilder responseBody = new StringBuilder();
+
+        String line;
+        while ((line = lineReader.readLine()) != null) {
+            responseBody.append(line);
         }
 
-        String socialId;
-        String response;
-        try{
-            JSONParser jsonParser = new JSONParser();
-            jsonObject = (JSONObject) jsonParser.parse(body);
-            socialId = "kakao_"+jsonObject.get("id").toString();
-            response = jsonObject.get("kakao_account").toString();
-        }
-        catch (Exception e){
-            throw new BaseException(FAILED_TO_PARSE);
-        }
+        String body = responseBody.toString();
 
-        String profilePhoto=null;
-        String userName=null;
-        String email=null;
-        String phoneNumber=null;
-        try {
-            JSONParser jsonParser = new JSONParser();
-            JSONObject responObj = (JSONObject) jsonParser.parse(response);
-            if(responObj.get("email")!=null) {
-                email = responObj.get("email").toString();
-            }
+        con.disconnect();
 
-            String profile = responObj.get("profile").toString();
-            JSONObject profileObj = (JSONObject) jsonParser.parse(profile);
-            userName = profileObj.get("nickname").toString();
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        String socialId = "kakao_" + jsonObject.get("id").toString();
+        String response = jsonObject.get("kakao_account").toString();
 
-            /*
-            if(profileObj.get("profile_image")!=null) {
-                profilePhoto = profileObj.get("profile_image").toString();
-            }*/
+        String profilePhoto = null;
+        String email = null;
+        String phoneNumber = null;
 
-        }
-        catch (Exception e){
-            throw new BaseException(FAILED_TO_PARSE);
+        JSONObject responObj = (JSONObject) jsonParser.parse(response);
+        if (responObj.get("email") != null) {
+            email = responObj.get("email").toString();
         }
 
-        User user = userProvider.retrieveUserInfoBySocialId(socialId);
+        String profile = responObj.get("profile").toString();
+        JSONObject profileObj = (JSONObject) jsonParser.parse(profile);
+        String userName = profileObj.get("nickname").toString();
 
-        // 이미 존재하는 회원이 없다면 유저 정보 저장
+        User user = userRepository.findBySocialId(socialId).orElse(null);
         if (user == null) {
             user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber, fcmToken));
         }
 
-        // JWT 생성
-        Integer userIdx = user.getUserIdx();
-        String jwt = jwtService.createJwt(userIdx);
-        return new PostUserRes(userIdx, jwt);
+        return user;
     }
 
+    public User googleLogin(String idToken, String fcmToken) throws IOException, ParseException {
 
-    /**
-     * 구글 로그인
-     * @param idToken,fcmToken
-     * @return PostUserRes
-     * @throws BaseException
-     */
-    public PostUserRes googleLogin (String idToken,String fcmToken)  throws BaseException {
-        BufferedReader in  = null;
-        InputStream is = null;
-        InputStreamReader isr = null;
         JSONParser jsonParser = new JSONParser();
+        String url = "https://oauth2.googleapis.com/tokeninfo";
+        url += "?id_token=" + idToken;
 
-        String userId = null;
+        URL gUrl = new URL(url);
+        HttpURLConnection con = (HttpURLConnection) gUrl.openConnection();
 
-        try {
+        InputStream is = con.getInputStream();
+        InputStreamReader isr = new InputStreamReader(is, "UTF-8");
+        BufferedReader in = new BufferedReader(isr);
 
-            String url = "https://oauth2.googleapis.com/tokeninfo";
-            url += "?id_token="+idToken;
+        JSONObject jsonObj = (JSONObject) jsonParser.parse(in);
+        String userId = "google_" + jsonObj.get("sub").toString();
+        String name = jsonObj.get("name").toString();
+        String email = jsonObj.get("email").toString();
+        String imageUrl = null;
 
-            HttpURLConnection con;
-            URL gUrl = new URL(url);
-            con = (HttpURLConnection) gUrl.openConnection();
-
-            is = con.getInputStream();
-            isr = new InputStreamReader(is, "UTF-8");
-            in = new BufferedReader(isr);
-
-            String name;
-            String email;
-            String imageUrl=null;
-
-            JSONObject jsonObj = (JSONObject)jsonParser.parse(in);
-
-            userId = "google_" + jsonObj.get("sub").toString();
-            name = jsonObj.get("name").toString();
-            email = jsonObj.get("email").toString();
-            //imageUrl = jsonObj.get("picture").toString();
-
-            User existsUserInfo = null;
-
-            existsUserInfo = userProvider.retrieveUserInfoBySocialId(userId);
-            // 1-1. 존재하는 회원이 없다면 회원가입
-            if (existsUserInfo == null) {
-                // 빈 값은 null 처리
-                User userInfo = new User(userId, imageUrl, name, email,null,fcmToken);
-
-                // 2. 유저 정보 저장
-                userInfo = userRepository.save(userInfo);
-
-                // 3. JWT 생성
-                String jwt = jwtService.createJwt(userInfo.getUserIdx());
-
-                // 4. UserInfoLoginRes로 변환하여 return
-                Integer useridx = userInfo.getUserIdx();
-                return new PostUserRes(useridx, jwt);
-            }
-            // 1-2. 존재하는 회원이 있다면 로그인
-            if (existsUserInfo != null) {
-                // 2. JWT 생성
-                String jwt = jwtService.createJwt(existsUserInfo.getUserIdx());
-
-                // 3. UserInfoLoginRes로 변환하여 return
-                Integer useridx = existsUserInfo.getUserIdx();
-                return new PostUserRes(useridx, jwt);
-            }
-        }catch(Exception e) {
-            System.out.println(e);
+        User user = userRepository.findBySocialId(userId).orElse(null);
+        if (user == null) {
+            user = userRepository.save(new User(userId, imageUrl, name, email, null, fcmToken));
         }
 
-        return null;
+        return user;
     }
     /**
      * 회원 정보 수정
@@ -372,341 +217,6 @@ public class UserService {
 
         User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
         userRepository.delete(user);
-        /**
-         * 네이버 로그인
-         * @param accessToken,fcmToken
-         * @return PostUserRes
-         * @throws BaseException
-         */
-        public PostUserRes naverLogin(String accessToken,String fcmToken) throws BaseException {
-            JSONObject jsonObject;
-            String resultcode;
-
-            String header = "Bearer " + accessToken; // Bearer 다음에 공백 추가
-            String apiURL = "https://openapi.naver.com/v1/nid/me";
-
-            Map<String, String> requestHeaders = new HashMap<>();
-            requestHeaders.put("Authorization", header);
-
-            HttpURLConnection con;
-            try {
-                URL url = new URL(apiURL);
-                con = (HttpURLConnection) url.openConnection();
-            } catch (MalformedURLException e) {
-                throw new BaseException(WRONG_URL);
-            } catch (IOException e) {
-                throw new BaseException(FAILED_TO_CONNECT);
-            }
-
-            String body;
-            try {
-                con.setRequestMethod("GET");
-                for (Map.Entry<String, String> rqheader : requestHeaders.entrySet()) {
-                    con.setRequestProperty(rqheader.getKey(), rqheader.getValue());
-                }
-
-                int responseCode = con.getResponseCode();
-                InputStreamReader streamReader;
-                if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-                    streamReader = new InputStreamReader(con.getInputStream());
-                } else { // 에러 발생
-                    streamReader = new InputStreamReader(con.getErrorStream());
-                }
-
-                BufferedReader lineReader = new BufferedReader(streamReader);
-                StringBuilder responseBody = new StringBuilder();
-
-                String line;
-                while ((line = lineReader.readLine()) != null) {
-                    responseBody.append(line);
-                }
-
-                body = responseBody.toString();
-            } catch (IOException e) {
-                throw new BaseException(FAILED_TO_READ_RESPONSE);
-            } finally {
-                con.disconnect();
-            }
-
-            if (body.length() == 0) {
-                throw new BaseException(FAILED_TO_READ_RESPONSE);
-            }
-
-            try{
-                JSONParser jsonParser = new JSONParser();
-                jsonObject = (JSONObject) jsonParser.parse(body);
-                resultcode = jsonObject.get("resultcode").toString();
-            }
-            catch (Exception e){
-                throw new BaseException(FAILED_TO_PARSE);
-            }
-
-            String response;
-            if(resultcode.equals("00")){
-                response = jsonObject.get("response").toString();
-            }
-            else{
-                throw new BaseException(FORBIDDEN_ACCESS);
-            }
-
-            String socialId;
-            String profilePhoto=null;
-            String userName;
-            String email=null;
-            String phoneNumber=null;
-            try {
-                JSONParser jsonParser = new JSONParser();
-                JSONObject responObj = (JSONObject) jsonParser.parse(response);
-                socialId = "naver_"+responObj.get("id").toString();
-            /*
-            if(responObj.get("profile_image")!=null) {
-                profilePhoto = responObj.get("profile_image").toString();
-            }*/
-                userName = responObj.get("name").toString();
-                if(responObj.get("email")!=null) {
-                    email = responObj.get("email").toString();
-                }
-                if(responObj.get("mobile")!=null) {
-                    phoneNumber = responObj.get("mobile").toString();
-                }
-            }
-            catch (Exception e){
-                throw new BaseException(FAILED_TO_PARSE);
-            }
-
-            User user = userProvider.retrieveUserInfoBySocialId(socialId);
-
-            // 이미 존재하는 회원이 없다면 유저 정보 저장
-            if (user == null) {
-                user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber,fcmToken));
-            }
-
-            // JWT 생성
-            Integer userIdx = user.getUserIdx();
-            String jwt = jwtService.createJwt(userIdx);
-            return new PostUserRes(userIdx, jwt);
-        }
-
-        /**
-         * 카카오 로그인
-         * @param accessToken,fcmToken
-         * @return PostUserRes
-         * @throws BaseException
-         */
-        public PostUserRes kakaoLogin(String accessToken,String fcmToken) throws BaseException {
-            JSONObject jsonObject;
-
-            String header = "Bearer " + accessToken; // Bearer 다음에 공백 추가
-            String apiURL = "https://kapi.kakao.com/v2/user/me";
-
-            Map<String, String> requestHeaders = new HashMap<>();
-            requestHeaders.put("Authorization", header);
-
-            HttpURLConnection con;
-            try {
-                URL url = new URL(apiURL);
-                con = (HttpURLConnection) url.openConnection();
-            } catch (MalformedURLException e) {
-                throw new BaseException(WRONG_URL);
-            } catch (IOException e) {
-                throw new BaseException(FAILED_TO_CONNECT);
-            }
-
-            String body;
-            try {
-                con.setRequestMethod("GET");
-                for (Map.Entry<String, String> rqheader : requestHeaders.entrySet()) {
-                    con.setRequestProperty(rqheader.getKey(), rqheader.getValue());
-                }
-
-                int responseCode = con.getResponseCode();
-                InputStreamReader streamReader;
-                if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-                    streamReader = new InputStreamReader(con.getInputStream());
-                } else { // 에러 발생
-                    streamReader = new InputStreamReader(con.getErrorStream());
-                }
-
-                BufferedReader lineReader = new BufferedReader(streamReader);
-                StringBuilder responseBody = new StringBuilder();
-
-                String line;
-                while ((line = lineReader.readLine()) != null) {
-                    responseBody.append(line);
-                }
-
-                body = responseBody.toString();
-            } catch (IOException e) {
-                throw new BaseException(FAILED_TO_READ_RESPONSE);
-            } finally {
-                con.disconnect();
-            }
-
-            if (body.length() == 0) {
-                throw new BaseException(FAILED_TO_READ_RESPONSE);
-            }
-
-            String socialId;
-            String response;
-            try{
-                JSONParser jsonParser = new JSONParser();
-                jsonObject = (JSONObject) jsonParser.parse(body);
-                socialId = "kakao_"+jsonObject.get("id").toString();
-                response = jsonObject.get("kakao_account").toString();
-            }
-            catch (Exception e){
-                throw new BaseException(FAILED_TO_PARSE);
-            }
-
-            String profilePhoto=null;
-            String userName=null;
-            String email=null;
-            String phoneNumber=null;
-            try {
-                JSONParser jsonParser = new JSONParser();
-                JSONObject responObj = (JSONObject) jsonParser.parse(response);
-                if(responObj.get("email")!=null) {
-                    email = responObj.get("email").toString();
-                }
-
-                String profile = responObj.get("profile").toString();
-                JSONObject profileObj = (JSONObject) jsonParser.parse(profile);
-                userName = profileObj.get("nickname").toString();
-
-            /*
-            if(profileObj.get("profile_image")!=null) {
-                profilePhoto = profileObj.get("profile_image").toString();
-            }*/
-
-            }
-            catch (Exception e){
-                throw new BaseException(FAILED_TO_PARSE);
-            }
-
-            User user = userProvider.retrieveUserInfoBySocialId(socialId);
-
-            // 이미 존재하는 회원이 없다면 유저 정보 저장
-            if (user == null) {
-                user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber, fcmToken));
-            }
-
-            // JWT 생성
-            Integer userIdx = user.getUserIdx();
-            String jwt = jwtService.createJwt(userIdx);
-            return new PostUserRes(userIdx, jwt);
-        }
-
-
-        /**
-         * 구글 로그인
-         * @param idToken,fcmToken
-         * @return PostUserRes
-         * @throws BaseException
-         */
-        public PostUserRes googleLogin (String idToken,String fcmToken)  throws BaseException {
-            BufferedReader in  = null;
-            InputStream is = null;
-            InputStreamReader isr = null;
-            JSONParser jsonParser = new JSONParser();
-
-            String userId = null;
-
-            try {
-
-                String url = "https://oauth2.googleapis.com/tokeninfo";
-                url += "?id_token="+idToken;
-
-                HttpURLConnection con;
-                URL gUrl = new URL(url);
-                con = (HttpURLConnection) gUrl.openConnection();
-
-                is = con.getInputStream();
-                isr = new InputStreamReader(is, "UTF-8");
-                in = new BufferedReader(isr);
-
-                String name;
-                String email;
-                String imageUrl=null;
-
-                JSONObject jsonObj = (JSONObject)jsonParser.parse(in);
-
-                userId = "google_" + jsonObj.get("sub").toString();
-                name = jsonObj.get("name").toString();
-                email = jsonObj.get("email").toString();
-                //imageUrl = jsonObj.get("picture").toString();
-
-                User existsUserInfo = null;
-
-                existsUserInfo = userProvider.retrieveUserInfoBySocialId(userId);
-                // 1-1. 존재하는 회원이 없다면 회원가입
-                if (existsUserInfo == null) {
-                    // 빈 값은 null 처리
-                    User userInfo = new User(userId, imageUrl, name, email,null,fcmToken);
-
-                    // 2. 유저 정보 저장
-                    userInfo = userRepository.save(userInfo);
-
-                    // 3. JWT 생성
-                    String jwt = jwtService.createJwt(userInfo.getUserIdx());
-
-                    // 4. UserInfoLoginRes로 변환하여 return
-                    Integer useridx = userInfo.getUserIdx();
-                    return new PostUserRes(useridx, jwt);
-                }
-                // 1-2. 존재하는 회원이 있다면 로그인
-                if (existsUserInfo != null) {
-                    // 2. JWT 생성
-                    String jwt = jwtService.createJwt(existsUserInfo.getUserIdx());
-
-                    // 3. UserInfoLoginRes로 변환하여 return
-                    Integer useridx = existsUserInfo.getUserIdx();
-                    return new PostUserRes(useridx, jwt);
-                }
-            }catch(Exception e) {
-                System.out.println(e);
-            }
-
-            return null;
-        }
-        /**
-         * 회원 정보 수정
-         * @param patchUserReq
-         * @return PatchUserRes
-         * @throws BaseException
-         */
-        public PatchUserRes updateUser(Integer jwtUserIdx, Integer userIdx, PatchUserReq patchUserReq) throws BaseException {
-            //jwt 확인
-            if(userIdx != jwtUserIdx){
-                throw new BaseException(FORBIDDEN_USER);
-            }
-            User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
-
-            //유저 정보 수정
-            user.setProfilePhoto(patchUserReq.getProfilePhoto());
-            user = userRepository.save(user);
-
-            String socialId = user.getSocialId();
-            String profilePhoto = user.getProfilePhoto();
-            String userName = user.getUserName();
-
-            return new PatchUserRes(userIdx, socialId, profilePhoto, userName);
-        }
-
-        /**
-         * 회원 탈퇴 API
-         * @param userIdx
-         * @throws BaseException
-         */
-        @Transactional(rollbackFor = Exception.class)
-        public void deleteUser(Integer jwtUserIdx, Integer userIdx) throws BaseException {
-            //jwt 확인
-            if(userIdx != (int)jwtUserIdx){
-                throw new BaseException(FORBIDDEN_USER);
-            }
-
-            User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
-            userRepository.delete(user);
-        }
     }
 
 
@@ -787,7 +297,7 @@ public class UserService {
                 totalSize++;
             }
         }
-        int size=0;
+        int size = 0;
 
         List<MypageMyRecipeList> myRecipeList= new ArrayList<>();
         for(int i=0;i<userRecipes.size();i++){
