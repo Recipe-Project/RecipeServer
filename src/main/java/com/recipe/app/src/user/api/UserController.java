@@ -164,5 +164,12 @@ public class UserController {
         return success();
     }
 
+    @ResponseBody
+    @PostMapping("/logout")
+    public BaseResponse<Void> logout(HttpServletRequest request) {
+        String jwt = jwtService.resolveToken(request);
+        userService.registerJwtBlackList(jwt);
 
+        return success();
+    }
 }
