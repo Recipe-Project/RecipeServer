@@ -1,24 +1,23 @@
 package com.recipe.app.src.user.api;
 
-import com.google.api.client.util.Value;
-import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
+import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.*;
 import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.EmptyFcmTokenException;
 import com.recipe.app.src.user.exception.EmptyTokenException;
+import com.recipe.app.src.user.exception.ForbiddenUserException;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-
 import java.io.IOException;
 
 import static com.recipe.app.common.response.BaseResponse.*;
@@ -29,20 +28,23 @@ import static com.recipe.app.common.response.BaseResponseStatus.*;
 @RequestMapping("/users")
 public class UserController {
 
-    @Value("${recipe-project.header.naver-token}")
-    private String naverToken;
-
-    @Value("${recipe-project.header.kakao-token}")
-    private String kakaoToken;
-
-    @Value("${recipe-project.header.google-token}")
-    private String googleToken;
-
-    @Value("${recipe-project.header.fcm-token}")
-    private String fcmToken;
-
     private final UserService userService;
     private final JwtService jwtService;
+
+    @Value("${header.naver-token}")
+    private String naverToken;
+
+    @Value("${header.kakao-token}")
+    private String kakaoToken;
+
+    @Value("${header.google-token}")
+    private String googleToken;
+
+    @Value("${header.fcm-token}")
+    private String fcmToken;
+
+    @Value("${jwt.token-header}")
+    private String jwt;
 
     @ResponseBody
     @PostMapping("/auto-login")
@@ -66,9 +68,11 @@ public class UserController {
             throw new EmptyFcmTokenException();
         }
 
-        User user = userService.naverLogin(accessToken,fcmToken);
+        User user = userService.naverLogin(accessToken, fcmToken);
+        HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserIdx());
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user, jwt);
+        httpHeaders.add(this.jwt, jwt);
+        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
 
         return success(data);
     }
@@ -86,9 +90,11 @@ public class UserController {
             throw new EmptyFcmTokenException();
         }
 
-        User user = userService.kakaoLogin(accessToken,fcmToken);
+        User user = userService.kakaoLogin(accessToken, fcmToken);
+        HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserIdx());
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user, jwt);
+        httpHeaders.add(this.jwt, jwt);
+        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
 
         return success(data);
     }
@@ -106,9 +112,11 @@ public class UserController {
             throw new EmptyFcmTokenException();
         }
 
-        User user = userService.googleLogin(accessToken,fcmToken);
+        User user = userService.googleLogin(accessToken, fcmToken);
+        HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserIdx());
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user, jwt);
+        httpHeaders.add(this.jwt, jwt);
+        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
 
         return success(data);
     }

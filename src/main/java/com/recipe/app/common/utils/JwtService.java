@@ -1,6 +1,6 @@
 package com.recipe.app.common.utils;
 
-import com.google.api.client.util.Value;
+import org.springframework.beans.factory.annotation.Value;
 import com.recipe.app.config.secret.Secret;
 import com.recipe.app.src.user.mapper.JwtBlacklistRepository;
 import io.jsonwebtoken.*;
