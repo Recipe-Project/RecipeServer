@@ -1,10 +1,12 @@
-package com.recipe.app.src.dialog;
+package com.recipe.app.src.common.mapper;
 
-import com.recipe.app.src.dialog.models.Dialog;
+import com.recipe.app.src.common.domain.Dialog;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
+
 @Repository
 public interface DialogRepository extends CrudRepository<Dialog, Integer> {
-    Dialog findFirstByActiveYn(String activeYn);
+    Optional<Dialog> findFirstByActiveYn(String activeYn);
 }
