@@ -61,15 +61,6 @@ public class User extends BaseEntity {
     private List<FridgeBasket> fridgeBasket = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ViewBlog> viewBlogs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ViewYoutube> viewYoutubes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ViewPublic> viewPublics = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Fridge> fridges = new ArrayList<>();
 
     public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber, String deviceToken) {
