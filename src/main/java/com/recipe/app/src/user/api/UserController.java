@@ -3,8 +3,7 @@ package com.recipe.app.src.user.api;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.application.UserService;
-import com.recipe.app.src.user.application.dto.*;
-import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.user.application.dto.UserDto;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.EmptyFcmTokenException;
 import com.recipe.app.src.user.exception.EmptyTokenException;
@@ -20,8 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
-import static com.recipe.app.common.response.BaseResponse.*;
-import static com.recipe.app.common.response.BaseResponseStatus.*;
+import static com.recipe.app.common.response.BaseResponse.success;
 
 @RestController
 @RequiredArgsConstructor
@@ -121,20 +119,21 @@ public class UserController {
         return success(data);
     }
 
-    /**
-     * 마이페이지 조회 API
-     * [GET] /users/:userIdx
-     * @return BaseResponse<GetUserRes>
-     */
     @ResponseBody
     @GetMapping("/{userIdx}")
-    public BaseResponse<GetUserRes> getUser(final Authentication authentication, @PathVariable Integer userIdx) {
-        if(userIdx==null || userIdx<=0){
-            throw new BaseException(USERS_EMPTY_USER_ID);
+    public BaseResponse<UserDto.UserProfileResponse> getUser(final Authentication authentication, @PathVariable Integer userIdx) {
+        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
+        if (!userIdx.equals(jwtUserIdx)) {
+            throw new ForbiddenUserException();
         }
-        Integer jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        GetUserRes getUserRes = userService.retrieveUser(jwtUserIdx, userIdx);
-        return success(getUserRes);
+
+        User user = userService.retrieveUserByUserIdx(userIdx);
+        HttpHeaders httpHeaders = new HttpHeaders();
+        String jwt = jwtService.createJwt(user.getUserIdx());
+        httpHeaders.add(this.jwt, jwt);
+        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+
+        return success(data);
     }
 
     /**
