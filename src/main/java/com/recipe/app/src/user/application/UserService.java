@@ -173,28 +173,15 @@ public class UserService {
 
         return user;
     }
-    /**
-     * 회원 정보 수정
-     * @param patchUserReq
-     * @return PatchUserRes
-     * @throws BaseException
-     */
-    public PatchUserRes updateUser(Integer jwtUserIdx, Integer userIdx, PatchUserReq patchUserReq) throws BaseException {
-        //jwt 확인
-        if(userIdx != jwtUserIdx){
-            throw new BaseException(FORBIDDEN_USER);
-        }
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
 
-        //유저 정보 수정
-        user.setProfilePhoto(patchUserReq.getProfilePhoto());
+    public User updateUser(int userIdx, UserDto.UserProfileRequest request) {
+
+        User user = retrieveUserByUserIdx(userIdx);
+
+        user.changeProfile(request.getProfilePhoto(), request.getUserName());
         user = userRepository.save(user);
 
-        String socialId = user.getSocialId();
-        String profilePhoto = user.getProfilePhoto();
-        String userName = user.getUserName();
-
-        return new PatchUserRes(userIdx, socialId, profilePhoto, userName);
+        return user;
     }
 
     /**

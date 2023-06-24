@@ -136,22 +136,17 @@ public class UserController {
         return success(data);
     }
 
-    /**
-     * 회원 정보 수정 API
-     * [PATCH] /users/:userIdx
-     * @return BaseResponse<PatchUserRes>
-     */
     @ResponseBody
     @PatchMapping("/{userIdx}")
-    public BaseResponse<PatchUserRes> patchUser(final Authentication authentication, @PathVariable Integer userIdx, @RequestBody PatchUserReq parameters) {
-        if(userIdx==null || userIdx<=0){
-            throw new BaseException(USERS_EMPTY_USER_ID);
+    public BaseResponse<UserDto.UserProfileResponse> patchUser(final Authentication authentication, @PathVariable int userIdx, @RequestBody UserDto.UserProfileRequest request) {
+        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
+        if (userIdx != jwtUserIdx) {
+            throw new ForbiddenUserException();
         }
 
-        Integer jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
+        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(userService.updateUser(userIdx, request));
 
-        PatchUserRes patchUserRes = userService.updateUser(jwtUserIdx, userIdx, parameters);
-        return success(patchUserRes);
+        return success(data);
     }
 
     /**

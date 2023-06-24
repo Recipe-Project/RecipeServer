@@ -81,4 +81,9 @@ public class User extends BaseEntity {
         this.deviceToken = deviceToken;
     }
 
+    public void changeProfile(String profilePhoto, String userName) {
+        this.profilePhoto = profilePhoto;
+        this.userName = userName;
+    }
+
 }
