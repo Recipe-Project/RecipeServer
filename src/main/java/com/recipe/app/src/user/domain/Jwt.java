@@ -1,14 +1,12 @@
 package com.recipe.app.src.user.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
+@AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity

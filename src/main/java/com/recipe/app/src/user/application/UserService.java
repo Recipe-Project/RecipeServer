@@ -1,9 +1,11 @@
 package com.recipe.app.src.user.application;
 
 import com.recipe.app.src.user.application.dto.UserDto;
+import com.recipe.app.src.user.domain.Jwt;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import com.recipe.app.src.user.exception.NotFoundUserException;
+import com.recipe.app.src.user.mapper.JwtBlacklistRepository;
 import com.recipe.app.src.user.mapper.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
@@ -27,6 +29,7 @@ import java.util.Map;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final JwtBlacklistRepository jwtBlacklistRepository;
 
     public User naverLogin(String accessToken, String fcmToken) throws IOException, ParseException {
         String header = "Bearer " + accessToken;
@@ -184,20 +187,13 @@ public class UserService {
         return user;
     }
 
-    /**
-     * 회원 탈퇴 API
-     * @param userIdx
-     * @throws BaseException
-     */
-    @Transactional(rollbackFor = Exception.class)
-    public void deleteUser(Integer jwtUserIdx, Integer userIdx) throws BaseException {
-        //jwt 확인
-        if(userIdx != (int)jwtUserIdx){
-            throw new BaseException(FORBIDDEN_USER);
-        }
-
-        User user = userProvider.retrieveUserByUserIdx(jwtUserIdx);
+    public void deleteUser(int userIdx) {
+        User user = retrieveUserByUserIdx(userIdx);
         userRepository.delete(user);
+    }
+
+    public void registerJwtBlackList(String jwt) {
+        jwtBlacklistRepository.save(new Jwt(jwt));
     }
 
     public User retrieveUserByUserIdx(Integer userIdx) {

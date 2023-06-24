@@ -149,20 +149,18 @@ public class UserController {
         return success(data);
     }
 
-    /**
-     * 회원 탈퇴 API
-     * [DELETE] /users/:userIdx
-     */
     @ResponseBody
     @DeleteMapping("/{userIdx}")
-    public BaseResponse<Void> deleteUser(final Authentication authentication, @PathVariable Integer userIdx) {
-        if(userIdx==null || userIdx<=0){
-            throw new BaseException(USERS_EMPTY_USER_ID);
+    public BaseResponse<Void> deleteUser(HttpServletRequest request, final Authentication authentication, @PathVariable int userIdx) {
+        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
+        if (userIdx != jwtUserIdx) {
+            throw new ForbiddenUserException();
         }
 
-        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
+        userService.deleteUser(userIdx);
+        String jwt = jwtService.resolveToken(request);
+        userService.registerJwtBlackList(jwt);
 
-        userService.deleteUser(jwtUserIdx, userIdx);
         return success();
     }
 
