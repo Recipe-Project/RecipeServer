@@ -7,10 +7,10 @@ import com.recipe.app.src.scrapBlog.models.ScrapBlog;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
 import com.recipe.app.src.userRecipe.models.UserRecipe;
-import com.recipe.app.src.viewBlog.models.ViewBlog;
-import com.recipe.app.src.viewPublic.models.ViewPublic;
-import com.recipe.app.src.viewYoutube.models.ViewYoutube;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -25,9 +25,9 @@ public class User extends BaseEntity {
     @Id
     @Column(name = "userIdx", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer userIdx;
+    private int userIdx;
 
-    @Column(name="socialId", nullable = false, length=45)
+    @Column(name = "socialId", nullable = false, length = 45)
     private String socialId;
 
     @Column(name = "profilePhoto", nullable = false)
@@ -72,7 +72,7 @@ public class User extends BaseEntity {
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
     private List<Fridge> fridges = new ArrayList<>();
 
-    public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber, String deviceToken){
+    public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber, String deviceToken) {
         this.socialId = socialId;
         this.profilePhoto = profilePhoto;
         this.userName = userName;
