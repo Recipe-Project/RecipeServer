@@ -31,6 +31,7 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtBlacklistRepository jwtBlacklistRepository;
 
+    @Transactional
     public User naverLogin(String accessToken, String fcmToken) throws IOException, ParseException {
         String header = "Bearer " + accessToken;
         String apiURL = "https://openapi.naver.com/v1/nid/me";
@@ -88,6 +89,7 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public User kakaoLogin(String accessToken, String fcmToken) throws IOException, ParseException {
 
         String header = "Bearer " + accessToken;
@@ -150,6 +152,7 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public User googleLogin(String idToken, String fcmToken) throws IOException, ParseException {
 
         JSONParser jsonParser = new JSONParser();
@@ -177,6 +180,7 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public User updateUser(int userIdx, UserDto.UserProfileRequest request) {
 
         User user = retrieveUserByUserIdx(userIdx);
@@ -187,6 +191,7 @@ public class UserService {
         return user;
     }
 
+    @Transactional
     public void deleteUser(int userIdx) {
         User user = retrieveUserByUserIdx(userIdx);
         userRepository.delete(user);
