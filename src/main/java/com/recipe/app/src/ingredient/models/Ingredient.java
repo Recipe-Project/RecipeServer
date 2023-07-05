@@ -3,7 +3,7 @@ package com.recipe.app.src.ingredient.models;
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
-import com.recipe.app.src.userRecipeIngredient.models.UserRecipeIngredient;
+import com.recipe.app.src.userRecipe.domain.UserRecipeIngredient;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

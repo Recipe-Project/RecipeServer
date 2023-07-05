@@ -6,7 +6,7 @@ import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.scrapBlog.models.ScrapBlog;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapYoutube.models.ScrapYoutube;
-import com.recipe.app.src.userRecipe.models.UserRecipe;
+import com.recipe.app.src.userRecipe.domain.UserRecipe;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
