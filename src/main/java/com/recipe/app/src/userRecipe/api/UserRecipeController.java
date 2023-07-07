@@ -1,7 +1,6 @@
 package com.recipe.app.src.userRecipe.api;
 
 import com.recipe.app.common.response.BaseResponse;
-import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.userRecipe.application.UserRecipeService;
 import com.recipe.app.src.userRecipe.application.dto.UserRecipeDto;
@@ -20,7 +19,6 @@ import static com.recipe.app.common.response.BaseResponse.success;
 @RequestMapping("/my-recipes")
 public class UserRecipeController {
     private final UserRecipeService userRecipeService;
-    private final JwtService jwtService;
 
     @GetMapping("")
     public BaseResponse<List<UserRecipeDto.UserRecipesResponse>> getUserRecipes(final Authentication authentication) {

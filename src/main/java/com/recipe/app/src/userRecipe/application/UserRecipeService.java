@@ -1,6 +1,5 @@
 package com.recipe.app.src.userRecipe.application;
 
-import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.userRecipe.application.dto.UserRecipeDto;
 import com.recipe.app.src.userRecipe.domain.UserRecipe;
@@ -8,9 +7,6 @@ import com.recipe.app.src.userRecipe.domain.UserRecipeIngredient;
 import com.recipe.app.src.userRecipe.exception.NotFoundUserRecipeException;
 import com.recipe.app.src.userRecipe.mapper.UserRecipeIngredientRepository;
 import com.recipe.app.src.userRecipe.mapper.UserRecipeRepository;
-import com.recipe.app.src.userRecipe.models.MyRecipeIngredient;
-import com.recipe.app.src.userRecipe.models.PatchMyRecipeReq;
-import com.recipe.app.src.userRecipe.models.PatchMyRecipeRes;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
