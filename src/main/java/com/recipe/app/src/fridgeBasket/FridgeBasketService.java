@@ -141,4 +141,8 @@ public class FridgeBasketService {
         }
         fridgeBasketRepository.saveAll(existIngredients);
     }
+
+    public long countFridgeBaskets(User user) {
+        return fridgeBasketRepository.countByUserAndStatus(user, "ACTIVE");
+    }
 }

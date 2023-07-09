@@ -106,8 +106,8 @@ public enum BaseResponseStatus {
     // [POST] /fridges
     POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST(2073, "냉장고 바구니 리스트를 입력해주세요."),
     POST_FRIDGES_EXIST_INGREDIENT_NAME(2075, "냉장고에 이미 있는 재료(%s)입니다."),
-    POST_FRIDGES_EMPTY_INGREDIENT_NAME(2084, "재료명을 입력하세요."),
-    POST_FRIDGES_EMPTY_INGREDIENT_ICON(2085, "재료 아이콘을 입력하세요."),
+    FRIDGES_EMPTY_INGREDIENT_NAME(2084, "재료명을 입력하세요."),
+    FRIDGES_EMPTY_INGREDIENT_ICON(2085, "재료 아이콘을 입력하세요."),
     EMPTY_STORAGE_METHOD(2086, "재료 보관방법을 입력하세요."),
     EMPTY_INGREDIENT_COUNT(2087, "재료 개수를 입력하세요."),
 

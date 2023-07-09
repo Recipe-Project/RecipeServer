@@ -1,7 +1,7 @@
 package com.recipe.app.src.user.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.fridge.models.Fridge;
+import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.fridgeBasket.models.FridgeBasket;
 import com.recipe.app.src.scrapBlog.models.ScrapBlog;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;

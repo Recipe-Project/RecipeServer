@@ -1,8 +1,8 @@
 package com.recipe.app.src.recipeInfo;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.fridge.FridgeRepository;
-import com.recipe.app.src.fridge.models.Fridge;
+import com.recipe.app.src.fridge.mapper.FridgeRepository;
+import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.ingredient.IngredientRepository;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.recipeInfo.models.*;

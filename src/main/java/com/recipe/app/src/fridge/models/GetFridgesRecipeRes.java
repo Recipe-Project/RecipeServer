@@ -11,5 +11,4 @@ import java.util.List;
 public class GetFridgesRecipeRes {
     private final Integer total;
     private final List<RecipeList> recipeList;
-
 }

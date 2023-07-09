@@ -80,9 +80,6 @@ public class RecipeInfo extends BaseEntity {
     @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL)
     private List<RecipeProcess> recipeProcesses = new ArrayList<>();
 
-    @OneToMany(mappedBy = "recipeInfo", cascade = CascadeType.ALL)
-    private List<ViewPublic> viewPublics = new ArrayList<>();
-
     public RecipeInfo(String recipeNmKo,String sumry,Integer nationCode, String nationNm,Integer tyCode,String tyNm,String cookingTime,String calorie,String qnt, String levelNm,String irdntCode ,
                       String pcNm, String imgUrl, String detUrl){
         this.recipeNmKo = recipeNmKo;
