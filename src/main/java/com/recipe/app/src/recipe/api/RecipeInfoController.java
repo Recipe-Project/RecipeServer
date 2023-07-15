@@ -6,7 +6,7 @@ import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.recipe.application.RecipeInfoService;
 import com.recipe.app.src.recipe.application.dto.RecipeInfoDto;
-import com.recipe.app.src.recipeKeyword.RecipeKeywordService;
+import com.recipe.app.src.keyword.application.RecipeKeywordService;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

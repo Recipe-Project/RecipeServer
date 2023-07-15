@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipeKeyword.models;
+package com.recipe.app.src.keyword.models;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
