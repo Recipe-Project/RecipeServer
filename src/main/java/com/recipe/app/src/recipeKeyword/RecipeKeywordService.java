@@ -28,8 +28,7 @@ public class RecipeKeywordService {
      * @return void
      * @throws BaseException
      */
-    public void createRecipeKeyword(int userIdx, String keyword) throws BaseException {
-        User user = userService.retrieveUserByUserIdx(userIdx);
+    public void createRecipeKeyword(String keyword) throws BaseException {
         recipeKeywordRepository.save(new RecipeKeyword(keyword));
     }
 

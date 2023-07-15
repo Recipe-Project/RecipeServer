@@ -2,7 +2,7 @@ package com.recipe.app.src.fridge.application.dto;
 
 import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
-import com.recipe.app.src.recipeInfo.models.RecipeInfo;
+import com.recipe.app.src.recipe.domain.RecipeInfo;
 import lombok.*;
 
 import java.time.format.DateTimeFormatter;

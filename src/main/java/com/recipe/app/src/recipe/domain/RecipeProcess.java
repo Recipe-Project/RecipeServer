@@ -1,7 +1,6 @@
-package com.recipe.app.src.recipeProcess.models;
+package com.recipe.app.src.recipe.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -10,13 +9,13 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC) // Unit Test 를 위해 PUBLIC
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @EqualsAndHashCode(callSuper = false)
-@Data // from lombok
-@Entity // 필수, Class 를 Database Table화 해주는 것이다
-@Table(name = "RecipeProcess") // Table 이름을 명시해주지 않으면 class 이름을 Table 이름으로 대체한다.
+@Data
+@Entity
+@Table(name = "RecipeProcess")
 public class RecipeProcess extends BaseEntity {
-    @Id // PK를 의미하는 어노테이션
+    @Id
     @Column(name = "idx", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer idx;
@@ -37,10 +36,10 @@ public class RecipeProcess extends BaseEntity {
     @Column(name = "stepTip", nullable = false, length = 500)
     private String stepTip;
 
-    @Column(name="status", nullable=false, length=10)
-    private String status="ACTIVE";
+    @Column(name = "status", nullable = false, length = 10)
+    private String status = "ACTIVE";
 
-    public RecipeProcess(RecipeInfo recipeInfo, Integer cookingNo, String cookingDc, String streStepImageUrl, String stepTip){
+    public RecipeProcess(RecipeInfo recipeInfo, Integer cookingNo, String cookingDc, String streStepImageUrl, String stepTip) {
         this.recipeInfo = recipeInfo;
         this.cookingNo = cookingNo;
         this.cookingDc = cookingDc;

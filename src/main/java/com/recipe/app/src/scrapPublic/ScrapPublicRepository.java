@@ -1,6 +1,6 @@
 package com.recipe.app.src.scrapPublic;
 
-import com.recipe.app.src.recipeInfo.models.RecipeInfo;
+import com.recipe.app.src.recipe.domain.RecipeInfo;
 import com.recipe.app.src.scrapPublic.models.ScrapPublic;
 import com.recipe.app.src.scrapPublic.models.ScrapPublicInfo;
 import com.recipe.app.src.user.domain.User;
