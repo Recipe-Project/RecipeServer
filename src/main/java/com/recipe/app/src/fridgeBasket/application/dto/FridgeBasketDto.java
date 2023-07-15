@@ -1,8 +1,6 @@
 package com.recipe.app.src.fridgeBasket.application.dto;
 
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import com.recipe.app.src.fridgeBasket.models.FridgeBasketList;
-import com.recipe.app.src.fridgeBasket.models.IngredientList;
 import lombok.*;
 
 import java.time.format.DateTimeFormatter;
