@@ -1,7 +1,6 @@
 package com.recipe.app.src.fridge.application.dto;
 
 import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridge.models.RecipeList;
 import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.recipeInfo.models.RecipeInfo;
 import lombok.*;

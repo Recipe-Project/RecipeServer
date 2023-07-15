@@ -7,7 +7,7 @@ import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.fridge.application.dto.FridgeDto;
 import com.recipe.app.src.fridge.models.PatchFcmTokenReq;
 import com.recipe.app.src.fridge.models.ShelfLifeUser;
-import com.recipe.app.src.fridgeBasket.FridgeBasketService;
+import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,7 +49,7 @@ public class FridgeController {
     public BaseResponse<FridgeDto.FridgesResponse> getFridges(final Authentication authentication) {
 
         User user = ((User) authentication.getPrincipal());
-        FridgeDto.FridgesResponse data = new FridgeDto.FridgesResponse(fridgeBasketService.countFridgeBaskets(user), fridgeService.retrieveFridges(user));
+        FridgeDto.FridgesResponse data = new FridgeDto.FridgesResponse(fridgeBasketService.countFridgeBasketsByUser(user), fridgeService.retrieveFridges(user));
 
         return success(data);
     }

@@ -1,6 +1,6 @@
 package com.recipe.app.src.ingredient;
 
-import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
+import com.recipe.app.src.fridgeBasket.mapper.FridgeBasketRepository;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryProvider;
 import com.recipe.app.src.ingredientCategory.IngredientCategoryRepository;
 import com.recipe.app.common.utils.JwtService;

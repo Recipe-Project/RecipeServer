@@ -1,7 +1,7 @@
 package com.recipe.app.src.ingredient;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.fridgeBasket.FridgeBasketRepository;
+import com.recipe.app.src.fridgeBasket.mapper.FridgeBasketRepository;
 import com.recipe.app.src.ingredient.models.GetIngredientsRes;
 import com.recipe.app.src.ingredient.models.Ingredient;
 import com.recipe.app.src.ingredient.models.IngredientList;
