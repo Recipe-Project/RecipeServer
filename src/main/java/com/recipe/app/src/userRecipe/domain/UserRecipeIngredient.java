@@ -1,8 +1,7 @@
 package com.recipe.app.src.userRecipe.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.ingredient.models.Ingredient;
+import com.recipe.app.src.ingredient.domain.Ingredient;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

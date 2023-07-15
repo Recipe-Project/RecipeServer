@@ -1,7 +1,7 @@
 package com.recipe.app.src.fridgeBasket.mapper;
 
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import com.recipe.app.src.ingredient.models.Ingredient;
+import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;

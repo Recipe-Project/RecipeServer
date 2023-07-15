@@ -1,6 +1,6 @@
-package com.recipe.app.src.ingredientCategory;
+package com.recipe.app.src.ingredient.mapper;
 
-import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
+import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

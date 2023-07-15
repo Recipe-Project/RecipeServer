@@ -2,8 +2,8 @@ package com.recipe.app.src.fridgeBasket.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.ingredient.models.Ingredient;
-import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
+import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -14,7 +14,6 @@ import org.springframework.util.StringUtils;
 import javax.persistence.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 import static com.recipe.app.common.response.BaseResponseStatus.*;
 

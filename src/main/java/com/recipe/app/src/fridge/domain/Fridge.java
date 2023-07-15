@@ -2,7 +2,7 @@ package com.recipe.app.src.fridge.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
+import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Data;
