@@ -11,6 +11,7 @@ import com.recipe.app.src.ingredientCategory.models.IngredientCategory;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -20,12 +21,14 @@ import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class FridgeBasketService {
 
     private final FridgeBasketRepository fridgeBasketRepository;
     private final IngredientCategoryRepository ingredientCategoryRepository;
     private final IngredientRepository ingredientRepository;
 
+    @Transactional
     public void createFridgesBasket(FridgeBasketDto.FridgeBasketIdsRequest request, User user) {
         List<Ingredient> ingredients = ingredientRepository.findAllByIngredientIdxIn(request.getIngredientList());
         Map<String, FridgeBasket> existFridgeBaskets = fridgeBasketRepository.findAllByUserAndStatusAndIngredientIn(user, "ACTIVE", ingredients)
@@ -45,6 +48,7 @@ public class FridgeBasketService {
         fridgeBasketRepository.saveAll(fridgeBaskets);
     }
 
+    @Transactional
     public FridgeBasket createDirectFridgeBasket(FridgeBasketDto.DirectFridgeBasketsRequest request, User user) {
 
         fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, request.getIngredientName(), "ACTIVE")
@@ -67,6 +71,7 @@ public class FridgeBasketService {
         return fridgeBasket;
     }
 
+    @Transactional
     public void deleteFridgeBasket(User user, String ingredient) {
         FridgeBasket fridgeBasket = fridgeBasketRepository.findByUserAndIngredientNameAndStatus(user, ingredient, "ACTIVE")
                 .orElseThrow(() -> {
@@ -76,6 +81,7 @@ public class FridgeBasketService {
         fridgeBasketRepository.delete(fridgeBasket);
     }
 
+    @Transactional
     public void updateFridgeBaskets(FridgeBasketDto.FridgeBasketsRequest request, User user) {
         List<String> ingredientNames = request.getFridgeBasketList().stream().map(FridgeBasketDto.FridgeBasketRequest::getIngredientName).collect(Collectors.toList());
         Map<String, FridgeBasket> existFridgeBaskets = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNames).stream()
