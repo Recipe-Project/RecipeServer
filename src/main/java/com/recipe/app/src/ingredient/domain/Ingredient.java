@@ -7,6 +7,7 @@ import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
 
 import javax.persistence.*;
 import java.util.ArrayList;
@@ -18,7 +19,7 @@ import java.util.List;
 @Data
 @Entity
 @Table(name = "Ingredient")
-public class Ingredient extends BaseEntity {
+public class Ingredient extends BaseEntity implements Comparable<Ingredient> {
     @Id
     @Column(name = "ingredientIdx", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,4 +53,14 @@ public class Ingredient extends BaseEntity {
         this.ingredientCategory = ingredientCategory;
     }
 
+    @Override
+    public int compareTo(@NotNull Ingredient ingredient) {
+        if (this.getName().length() < ingredient.getName().length()) {
+            return -1;
+        } else if (this.getName().length() > ingredient.getName().length()) {
+            return 1;
+        } else {
+            return 0;
+        }
+    }
 }
