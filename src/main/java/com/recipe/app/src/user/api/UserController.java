@@ -185,10 +185,4 @@ public class UserController {
 
         return success();
     }
-
-    @ResponseBody
-    @PostMapping("/test")
-    public BaseResponse<String> postTestJwt() {
-        return success(jwtService.createJwt(15));
-    }
 }
