@@ -4,7 +4,7 @@ import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.recipe.application.dto.RecipeInfoDto;
 import com.recipe.app.src.recipe.domain.RecipeInfo;
 import com.recipe.app.src.recipe.mapper.RecipeInfoRepository;
-import com.recipe.app.src.scrapBlog.ScrapBlogRepository;
+import com.recipe.app.src.scrap.mapper.ScrapBlogRepository;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONArray;

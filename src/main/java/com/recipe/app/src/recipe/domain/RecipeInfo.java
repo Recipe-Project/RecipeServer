@@ -1,7 +1,7 @@
 package com.recipe.app.src.recipe.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.scrapPublic.models.ScrapPublic;
+import com.recipe.app.src.scrap.domain.ScrapPublic;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
