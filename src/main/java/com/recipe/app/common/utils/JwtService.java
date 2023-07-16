@@ -1,12 +1,12 @@
 package com.recipe.app.common.utils;
 
-import org.springframework.beans.factory.annotation.Value;
-import com.recipe.app.config.secret.Secret;
 import com.recipe.app.src.user.mapper.JwtBlacklistRepository;
 import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -14,33 +14,34 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
+import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
+import java.security.Key;
+import java.util.Base64;
 import java.util.Date;
 
 @Service
 @RequiredArgsConstructor
 public class JwtService {
 
-    @Value("${jwt.secret}")
-    private String secretKey;
-
-    @Value("${jwt.token-header}")
-    private String tokenHeader;
-
-    @Value("${jwt.token-validity-in-ms}")
-    private String tokenValidMillisecond;
-
     private final UserDetailsService userDetailsService;
     private final JwtBlacklistRepository jwtBlacklistRepository;
     private final Logger logger = LoggerFactory.getLogger(JwtService.class);
+    @Value("${jwt.secret}")
+    private String secretKey;
+    @Value("${jwt.token-header}")
+    private String tokenHeader;
+    @Value("${jwt.token-validity-in-ms}")
+    private long tokenValidMillisecond;
 
     public String createJwt(int userId) {
         Date now = new Date();
+        Key key = new SecretKeySpec(Base64.getDecoder().decode(this.secretKey), SignatureAlgorithm.HS256.getJcaName());
         return Jwts.builder()
                 .claim("userId", userId)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidMillisecond))
-                .signWith(SignatureAlgorithm.HS256, Secret.JWT_SECRET_KEY)
+                .signWith(key)
                 .compact();
     }
 
@@ -70,7 +71,7 @@ public class JwtService {
     public boolean validateToken(String token) {
         try {
             logger.debug(this.secretKey);
-            if(jwtBlacklistRepository.findById(token).isPresent())
+            if (jwtBlacklistRepository.findById(token).isPresent())
                 return false;
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
