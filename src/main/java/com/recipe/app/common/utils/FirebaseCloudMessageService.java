@@ -3,7 +3,7 @@ package com.recipe.app.common.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
-import com.recipe.app.src.fridge.models.FcmMessage;
+import com.recipe.app.common.entity.FcmMessage;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
 import org.springframework.core.io.ClassPathResource;
