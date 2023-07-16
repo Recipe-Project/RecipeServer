@@ -10,6 +10,7 @@ import com.recipe.app.src.fridge.models.ShelfLifeUser;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -38,6 +39,9 @@ public class FridgeController {
     @PostMapping("/fridges")
     public BaseResponse<List<FridgeDto.FridgeResponse>> postFridges(final Authentication authentication, @RequestBody FridgeDto.FridgesRequest request) {
 
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         List<FridgeDto.FridgeResponse> data = fridgeService.createFridges(request, user).stream()
                 .map(FridgeDto.FridgeResponse::new)
@@ -49,6 +53,9 @@ public class FridgeController {
     @GetMapping("/fridges")
     public BaseResponse<FridgeDto.FridgesResponse> getFridges(final Authentication authentication) {
 
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         FridgeDto.FridgesResponse data = new FridgeDto.FridgesResponse(fridgeBasketService.countFridgeBasketsByUser(user), fridgeService.retrieveFridges(user));
 
@@ -57,6 +64,9 @@ public class FridgeController {
 
     @DeleteMapping("/fridges/ingredient")
     public BaseResponse<Void> deleteFridgeIngredients(final Authentication authentication, @RequestBody FridgeDto.FridgeIngredientsRequest request) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         fridgeService.deleteFridgeIngredients(user, request);
@@ -68,6 +78,9 @@ public class FridgeController {
     @PatchMapping("/fridges/ingredient")
     public BaseResponse<Void> patchFridgeIngredients(final Authentication authentication, @RequestBody FridgeDto.PatchFridgesRequest request) {
 
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         fridgeService.updateFridgeIngredients(user, request);
 
@@ -78,6 +91,9 @@ public class FridgeController {
     @GetMapping("/fridges/recipe")
     public BaseResponse<FridgeDto.FridgeRecipesResponse> getFridgesRecipe(final Authentication authentication, @RequestParam(value = "start") Integer start, @RequestParam(value = "display") Integer display) {
 
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         FridgeDto.FridgeRecipesResponse data = new FridgeDto.FridgeRecipesResponse(fridgeService.countFridgeRecipes(user), fridgeService.retrieveFridgeRecipes(user, start, display));
 
@@ -86,6 +102,10 @@ public class FridgeController {
 
     @PatchMapping("/fcm-token")
     public BaseResponse<Void> patchFcmToken(final Authentication authentication, @RequestBody PatchFcmTokenReq parameters) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         fridgeService.updateFcmToken(parameters, user);
 

@@ -7,6 +7,7 @@ import com.recipe.app.src.ingredient.application.dto.IngredientDto;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
@@ -30,6 +31,9 @@ public class IngredientController {
 
     @GetMapping("")
     public BaseResponse<IngredientDto.IngredientsResponse> getIngredients(final Authentication authentication, @RequestParam(value = "keyword") @Nullable String keyword) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
         IngredientDto.IngredientsResponse data = new IngredientDto.IngredientsResponse(fridgeBasketService.countFridgeBasketsByUser(user),

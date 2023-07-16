@@ -8,6 +8,7 @@ import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.EmptyFcmTokenException;
 import com.recipe.app.src.user.exception.EmptyTokenException;
 import com.recipe.app.src.user.exception.ForbiddenUserException;
+import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,6 +48,9 @@ public class UserController {
     @ResponseBody
     @PostMapping("/auto-login")
     public BaseResponse<Void> postAutoLogin(final Authentication authentication) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
         userService.retrieveUserByUserIdx(userIdx);
 
@@ -122,6 +126,9 @@ public class UserController {
     @ResponseBody
     @GetMapping("/{userIdx}")
     public BaseResponse<UserDto.UserProfileResponse> getUser(final Authentication authentication, @PathVariable Integer userIdx) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
         if (!userIdx.equals(jwtUserIdx)) {
             throw new ForbiddenUserException();
@@ -139,6 +146,9 @@ public class UserController {
     @ResponseBody
     @PatchMapping("/{userIdx}")
     public BaseResponse<UserDto.UserProfileResponse> patchUser(final Authentication authentication, @PathVariable int userIdx, @RequestBody UserDto.UserProfileRequest request) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
         if (userIdx != jwtUserIdx) {
             throw new ForbiddenUserException();
@@ -152,6 +162,9 @@ public class UserController {
     @ResponseBody
     @DeleteMapping("/{userIdx}")
     public BaseResponse<Void> deleteUser(HttpServletRequest request, final Authentication authentication, @PathVariable int userIdx) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
         if (userIdx != jwtUserIdx) {
             throw new ForbiddenUserException();

@@ -5,6 +5,7 @@ import com.recipe.app.src.scrap.application.ScrapYoutubeService;
 import com.recipe.app.src.scrap.application.dto.ScrapYoutubeDto;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +23,9 @@ public class ScrapYoutubeController {
 
     @PostMapping("")
     public BaseResponse<Void> postScrapsYoutube(final Authentication authentication, @RequestBody ScrapYoutubeDto.ScrapYoutubeRequest request) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         scrapYoutubeService.createOrDeleteScrapYoutube(request, user);
 
@@ -30,6 +34,9 @@ public class ScrapYoutubeController {
 
     @GetMapping("")
     public BaseResponse<ScrapYoutubeDto.ScrapYoutubesResponse> getScrapsYoutube(final Authentication authentication) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         ScrapYoutubeDto.ScrapYoutubesResponse data = new ScrapYoutubeDto.ScrapYoutubesResponse(scrapYoutubeService.countScrapYoutubesByUser(user),
                 scrapYoutubeService.retrieveScrapYoutubes(user).stream()

@@ -5,6 +5,7 @@ import com.recipe.app.src.scrap.application.ScrapPublicService;
 import com.recipe.app.src.scrap.application.dto.ScrapPublicDto;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +24,9 @@ public class ScrapPublicController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<Void> postScrapRecipe(final Authentication authentication, @RequestBody ScrapPublicDto.ScrapPublicRequest request) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         scrapPublicService.createOrDeleteScrapRecipe(request.getRecipeId(), user);
 
@@ -32,6 +36,9 @@ public class ScrapPublicController {
     @ResponseBody
     @GetMapping("")
     public BaseResponse<ScrapPublicDto.ScrapPublicsResponse> getScrapRecipes(final Authentication authentication) {
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         ScrapPublicDto.ScrapPublicsResponse data = new ScrapPublicDto.ScrapPublicsResponse(scrapPublicService.countScrapPublicsByUser(user),
                 scrapPublicService.retrieveScrapRecipes(user).stream()
