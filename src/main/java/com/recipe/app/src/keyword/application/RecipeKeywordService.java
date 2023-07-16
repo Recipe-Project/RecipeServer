@@ -26,12 +26,6 @@ public class RecipeKeywordService {
         recipeKeywordRepository.save(new RecipeKeyword(keyword));
     }
 
-
-    /**
-     * 인기 검색어 조회 API
-     * @return List<GetRecipesBestKeywordRes>
-     * @throws BaseException
-     */
     public List<String> retrieveRecipesBestKeyword() throws BaseException {
         List<Object[]> bestKeywordList = recipeKeywordRepository.findByBestKeywordTop10();
 

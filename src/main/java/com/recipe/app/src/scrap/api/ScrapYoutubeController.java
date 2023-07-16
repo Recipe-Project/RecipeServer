@@ -38,28 +38,4 @@ public class ScrapYoutubeController {
 
         return success(data);
     }
-//
-//    /**
-//     * 유튜브 스크랩 조회 API
-//     * [GET] /scraps/youtube
-//     * @return BaseResponse<List<GetScrapYoutubesRes>>
-//     * @PageableDefault pageable
-//     */
-//    @GetMapping("")
-//    public BaseResponse<GetScrapYoutubesRes> getScrapsYoutube(@RequestParam(value = "sort") @Nullable Integer sort) {
-//
-//        GetScrapYoutubesRes getScrapYoutubesRes = null;
-//        try {
-//            Integer userIdx = jwtService.getUserId();
-//
-//            getScrapYoutubesRes = scrapYoutubeProvider.retrieveScrapYoutubeList(userIdx,sort);
-//
-//            return new BaseResponse<>(getScrapYoutubesRes);
-//
-//        } catch (BaseException exception) {
-//            return new BaseResponse<>(exception.getStatus());
-//        }
-//    }
-
-
 }
