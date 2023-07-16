@@ -1,14 +1,8 @@
 package com.recipe.app.src.scrap.api;
 
-import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.scrap.application.ScrapYoutubeService;
 import com.recipe.app.src.scrap.application.dto.ScrapYoutubeDto;
-import com.recipe.app.src.scrapYoutube.models.GetScrapYoutubesRes;
-import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeReq;
-import com.recipe.app.src.scrapYoutube.models.PostScrapYoutubeRes;
-import com.recipe.app.src.scrap.domain.ScrapYoutube;
-import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -17,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import java.util.stream.Collectors;
 
 import static com.recipe.app.common.response.BaseResponse.success;
-import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @RestController
 @RequiredArgsConstructor
