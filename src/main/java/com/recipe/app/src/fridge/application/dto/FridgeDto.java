@@ -108,7 +108,7 @@ public class FridgeDto {
         public FridgeIngredientResponse(Fridge fridge) {
             this.ingredientName = fridge.getIngredientName();
             this.ingredientIcon = fridge.getIngredientIcon();
-            this.expiredAt = fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "까지";
+            this.expiredAt = fridge.getExpiredAt() != null ? fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "까지" : null;
             this.storageMethod = fridge.getStorageMethod();
             this.count = fridge.getCount();
             this.freshness = fridge.getFreshness();

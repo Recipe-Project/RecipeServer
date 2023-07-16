@@ -93,7 +93,8 @@ public class FridgeBasketDto {
                     fridgeBasket.getIngredientCategory().getIngredientCategoryIdx(),
                     fridgeBasket.getCount(),
                     fridgeBasket.getStorageMethod(),
-                    fridgeBasket.getExpiredAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "까지");
+                    fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "까지" : null
+            );
         }
     }
 
