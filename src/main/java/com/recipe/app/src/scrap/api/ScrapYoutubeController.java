@@ -3,6 +3,7 @@ package com.recipe.app.src.scrap.api;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.scrap.application.ScrapYoutubeService;
 import com.recipe.app.src.scrap.application.dto.ScrapYoutubeDto;
+import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -21,7 +22,7 @@ public class ScrapYoutubeController {
 
     @PostMapping("")
     public BaseResponse<Void> postScrapsYoutube(final Authentication authentication, @RequestBody ScrapYoutubeDto.ScrapYoutubeRequest request) {
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         scrapYoutubeService.createOrDeleteScrapYoutube(request, user);
 
         return success();
@@ -29,7 +30,7 @@ public class ScrapYoutubeController {
 
     @GetMapping("")
     public BaseResponse<ScrapYoutubeDto.ScrapYoutubesResponse> getScrapsYoutube(final Authentication authentication) {
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         ScrapYoutubeDto.ScrapYoutubesResponse data = new ScrapYoutubeDto.ScrapYoutubesResponse(scrapYoutubeService.countScrapYoutubesByUser(user),
                 scrapYoutubeService.retrieveScrapYoutubes(user).stream()
                         .map((sy) -> new ScrapYoutubeDto.ScrapYoutubeResponse(sy, scrapYoutubeService.countScrapYoutubesByYoutubeId(sy.getYoutubeId())))

@@ -3,6 +3,7 @@ package com.recipe.app.src.scrap.api;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.scrap.application.ScrapBlogService;
 import com.recipe.app.src.scrap.application.dto.ScrapBlogDto;
+import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
@@ -23,7 +24,7 @@ public class ScrapBlogController {
     @ResponseBody
     @PostMapping("")
     public BaseResponse<Void> postScrapBlog(final Authentication authentication, @RequestBody ScrapBlogDto.ScrapBlogRequest request) {
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         scrapBlogService.createOrDeleteScrapBlog(user, request);
 
         return success();
@@ -32,7 +33,7 @@ public class ScrapBlogController {
     @ResponseBody
     @GetMapping("")
     public BaseResponse<List<ScrapBlogDto.ScrapBlogResponse>> getScrapBlogs(final Authentication authentication) {
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         List<ScrapBlogDto.ScrapBlogResponse> data = scrapBlogService.retrieveScrapBlogs(user).stream()
                 .map((sb) -> new ScrapBlogDto.ScrapBlogResponse(sb, scrapBlogService.countScrapBlogs(sb.getBlogUrl())))
                 .collect(Collectors.toList());

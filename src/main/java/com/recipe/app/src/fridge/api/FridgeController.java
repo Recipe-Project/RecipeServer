@@ -8,6 +8,7 @@ import com.recipe.app.src.fridge.application.dto.FridgeDto;
 import com.recipe.app.src.fridge.models.PatchFcmTokenReq;
 import com.recipe.app.src.fridge.models.ShelfLifeUser;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
+import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,7 +38,7 @@ public class FridgeController {
     @PostMapping("/fridges")
     public BaseResponse<List<FridgeDto.FridgeResponse>> postFridges(final Authentication authentication, @RequestBody FridgeDto.FridgesRequest request) {
 
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         List<FridgeDto.FridgeResponse> data = fridgeService.createFridges(request, user).stream()
                 .map(FridgeDto.FridgeResponse::new)
                 .collect(Collectors.toList());
@@ -48,7 +49,7 @@ public class FridgeController {
     @GetMapping("/fridges")
     public BaseResponse<FridgeDto.FridgesResponse> getFridges(final Authentication authentication) {
 
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         FridgeDto.FridgesResponse data = new FridgeDto.FridgesResponse(fridgeBasketService.countFridgeBasketsByUser(user), fridgeService.retrieveFridges(user));
 
         return success(data);
@@ -57,7 +58,7 @@ public class FridgeController {
     @DeleteMapping("/fridges/ingredient")
     public BaseResponse<Void> deleteFridgeIngredients(final Authentication authentication, @RequestBody FridgeDto.FridgeIngredientsRequest request) {
 
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         fridgeService.deleteFridgeIngredients(user, request);
 
         return success();
@@ -67,7 +68,7 @@ public class FridgeController {
     @PatchMapping("/fridges/ingredient")
     public BaseResponse<Void> patchFridgeIngredients(final Authentication authentication, @RequestBody FridgeDto.PatchFridgesRequest request) {
 
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         fridgeService.updateFridgeIngredients(user, request);
 
         return success();
@@ -77,7 +78,7 @@ public class FridgeController {
     @GetMapping("/fridges/recipe")
     public BaseResponse<FridgeDto.FridgeRecipesResponse> getFridgesRecipe(final Authentication authentication, @RequestParam(value = "start") Integer start, @RequestParam(value = "display") Integer display) {
 
-        User user = ((User) authentication.getPrincipal());
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         FridgeDto.FridgeRecipesResponse data = new FridgeDto.FridgeRecipesResponse(fridgeService.countFridgeRecipes(user), fridgeService.retrieveFridgeRecipes(user, start, display));
 
         return success(data);
@@ -85,8 +86,7 @@ public class FridgeController {
 
     @PatchMapping("/fcm-token")
     public BaseResponse<Void> patchFcmToken(final Authentication authentication, @RequestBody PatchFcmTokenReq parameters) {
-        User user = ((User) authentication.getPrincipal());
-
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         fridgeService.updateFcmToken(parameters, user);
 
         return success();
