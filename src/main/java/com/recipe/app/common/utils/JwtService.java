@@ -75,7 +75,7 @@ public class JwtService {
                 return false;
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
-        } catch (SecurityException | MalformedJwtException | IllegalArgumentException exception) {
+        } catch (SecurityException | MalformedJwtException | IllegalArgumentException | SignatureException exception) {
             logger.info("잘못된 Jwt 토큰입니다");
         } catch (ExpiredJwtException exception) {
             logger.info("만료된 Jwt 토큰입니다");
