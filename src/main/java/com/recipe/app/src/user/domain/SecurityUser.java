@@ -22,6 +22,10 @@ public class SecurityUser implements UserDetails {
         return this.authorities;
     }
 
+    public User getUser() {
+        return this.user;
+    }
+
     public Integer getUserIdx() {
         return this.user.getUserIdx();
     }
