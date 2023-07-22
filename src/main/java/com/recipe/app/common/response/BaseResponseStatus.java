@@ -95,19 +95,19 @@ public enum BaseResponseStatus {
     POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_NAME(2065, "재료명을 입력하세요."),
     POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_ICON(2066, "재료 아이콘을 입력하세요."),
     POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX(2067, "재료 카테고리 인덱스를 입력하세요."),
-    POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS(2069, ""),
+    POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS(2069, "기본으로 제공되는 재료(%s)입니다. 재료에서 선택해주세요."),
 
     // [POST] /fridges/basket
     POST_FRIDGES_BASKET_EMPTY_INGREDIENT_LIST(2070, "재료리스트를 입력해주세요."),
     FAILED_TO_GET_INGREDIENT(2071, "재료조회에 실패했습니다."),
     NOT_FOUND_INGREDIENT(2072, "재료를 찾을 수 없습니다."),
-    POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME(2068, ""),
+    POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME(2068, "냉장고 바구니에 이미 담긴 재료(%s)가 있습니다. %s을/를 삭제해주세요"),
 
     // [POST] /fridges
     POST_FRIDGES_EMPTY_FRIDGE_BASKET_LIST(2073, "냉장고 바구니 리스트를 입력해주세요."),
     POST_FRIDGES_EXIST_INGREDIENT_NAME(2075, "냉장고에 이미 있는 재료(%s)입니다."),
-    POST_FRIDGES_EMPTY_INGREDIENT_NAME(2084, "재료명을 입력하세요."),
-    POST_FRIDGES_EMPTY_INGREDIENT_ICON(2085, "재료 아이콘을 입력하세요."),
+    FRIDGES_EMPTY_INGREDIENT_NAME(2084, "재료명을 입력하세요."),
+    FRIDGES_EMPTY_INGREDIENT_ICON(2085, "재료 아이콘을 입력하세요."),
     EMPTY_STORAGE_METHOD(2086, "재료 보관방법을 입력하세요."),
     EMPTY_INGREDIENT_COUNT(2087, "재료 개수를 입력하세요."),
 
@@ -201,6 +201,8 @@ public enum BaseResponseStatus {
     // [PATCH] /fcm/token
 
     NOT_FOUND_NOTICE(3075, "공지가 존재하지 않습니다."),
+
+    NOT_FOUND_USER_RECIPE(3076, "유저 레시피 상세 조회에 실패했습니다."),
 
     /**
      * 4000 : Database, Server 오류

@@ -36,6 +36,7 @@ public class GeneralExceptionHandler {
 
     @ExceptionHandler({Exception.class, RuntimeException.class})
     public ResponseEntity<?> handleException(Exception e) {
+        e.printStackTrace();
         log.error(e.getMessage());
         return newResponse(BaseResponseStatus.UNKNOWN_EXCEPTION, HttpStatus.INTERNAL_SERVER_ERROR);
     }
