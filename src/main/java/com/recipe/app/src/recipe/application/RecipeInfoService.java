@@ -14,6 +14,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.recipe.app.common.response.BaseResponseStatus.*;
-import static com.recipe.app.config.secret.Secret.NAVER_CLIENT_ID;
-import static com.recipe.app.config.secret.Secret.NAVER_CLINET_SECRET;
 
 @Service
 @RequiredArgsConstructor
@@ -41,6 +40,11 @@ import static com.recipe.app.config.secret.Secret.NAVER_CLINET_SECRET;
 public class RecipeInfoService {
     private final ScrapBlogRepository scrapBlogRepository;
     private final RecipeInfoRepository recipeInfoRepository;
+
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.client-secret}")
+    private String naverClientSecret;
 
     public List<RecipeInfo> retrieveRecipes(String keyword) {
         return recipeInfoRepository.searchRecipeInfos(keyword, "ACTIVE");
@@ -64,8 +68,8 @@ public class RecipeInfoService {
         String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&query=" + text + "&display=" + display + "&start=" + start;
 
         Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("X-Naver-Client-Id", NAVER_CLIENT_ID);
-        requestHeaders.put("X-Naver-Client-Secret", NAVER_CLINET_SECRET);
+        requestHeaders.put("X-Naver-Client-Id", naverClientId);
+        requestHeaders.put("X-Naver-Client-Secret", naverClientSecret);
 
         HttpURLConnection con;
         try {
