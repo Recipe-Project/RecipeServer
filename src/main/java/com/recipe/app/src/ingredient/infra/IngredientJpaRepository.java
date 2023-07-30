@@ -17,4 +17,7 @@ public interface IngredientJpaRepository extends JpaRepository<IngredientEntity,
     List<IngredientEntity> findByIngredientIdIn(List<Long> ingredientList);
 
     Optional<IngredientEntity> findByIngredientName(String ingredientName);
+
+    @Query("SELECT i FROM IngredientEntity i WHERE i.user is null AND i.defaultYn = 'Y' AND i.hiddenYn = 'N'")
+    List<IngredientEntity> findByDefaultIngredients();
 }

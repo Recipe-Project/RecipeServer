@@ -21,6 +21,11 @@ public class IngredientRepositoryImpl implements IngredientRepository {
     }
 
     @Override
+    public List<Ingredient> findByDefaultIngredients() {
+        return ingredientJpaRepository.findByDefaultIngredients().stream().map(IngredientEntity::toModel).collect(Collectors.toList());
+    }
+
+    @Override
     public List<Ingredient> findByUserIngredientsOrDefaultIngredientsByKeyword(User user, String keyword) {
         return ingredientJpaRepository.findByUserIngredientsOrDefaultIngredientsByKeyword(user, keyword).stream().map(IngredientEntity::toModel).collect(Collectors.toList());
     }

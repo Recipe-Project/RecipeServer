@@ -20,15 +20,24 @@ public class IngredientService {
 
     private final IngredientRepository ingredientRepository;
 
-    public Map<IngredientCategory, List<Ingredient>> getIngredientsGroupingByIngredientCategory(String keyword, User user) {
-        return getIngredients(keyword, user).stream()
+    public Map<IngredientCategory, List<Ingredient>> getUserIngredientsGroupingByIngredientCategory(String keyword, User user) {
+        return getUserIngredients(keyword, user).stream()
                 .collect(Collectors.groupingBy(Ingredient::getIngredientCategory));
     }
 
-    public List<Ingredient> getIngredients(String keyword, User user) {
+    public List<Ingredient> getUserIngredients(String keyword, User user) {
         if (!StringUtils.hasText(keyword)) {
             return ingredientRepository.findByUserIngredientsOrDefaultIngredients(user);
         }
         return ingredientRepository.findByUserIngredientsOrDefaultIngredientsByKeyword(user, keyword);
+    }
+
+    public Map<IngredientCategory, List<Ingredient>> getDefaultIngredientsGroupingByIngredientCategory() {
+        return getDefaultIngredients().stream()
+                .collect(Collectors.groupingBy(Ingredient::getIngredientCategory));
+    }
+
+    public List<Ingredient> getDefaultIngredients() {
+        return ingredientRepository.findByDefaultIngredients();
     }
 }

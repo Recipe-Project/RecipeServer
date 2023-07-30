@@ -9,4 +9,6 @@ public interface IngredientRepository {
     List<Ingredient> findByUserIngredientsOrDefaultIngredientsByKeyword(User user, String keyword);
 
     List<Ingredient> findByUserIngredientsOrDefaultIngredients(User user);
+
+    List<Ingredient> findByDefaultIngredients();
 }
