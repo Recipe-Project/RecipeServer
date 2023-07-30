@@ -47,7 +47,7 @@ public class IngredientDto {
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class IngredientResponse {
-        private Long ingredientIdx;
+        private Long ingredientId;
         private String ingredientName;
         private String ingredientIcon;
 
