@@ -14,8 +14,8 @@ public class IngredientCategoryRepositoryImpl implements IngredientCategoryRepos
     private final IngredientCategoryJpaRepository ingredientCategoryJpaRepository;
 
     @Override
-    public List<IngredientCategoryEntity> findByStatus(String status) {
-        return ingredientCategoryJpaRepository.findByStatus(status);
+    public List<IngredientCategoryEntity> findAll(String status) {
+        return null;
     }
 
     @Override

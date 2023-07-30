@@ -43,7 +43,7 @@ public class FridgeService {
     @Transactional
     public List<Fridge> createFridges(FridgeDto.FridgesRequest request, User user) {
 
-        List<IngredientCategoryEntity> ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
+        List<IngredientCategoryEntity> ingredientCategories = ingredientCategoryRepository.findAll();
         List<Fridge> fridges = request.getFridgeBasketList().stream()
                 .map((f) -> new Fridge(user, f.getIngredientName(), f.getIngredientIcon(), ingredientCategories.stream()
                         .filter((i) -> i.getIngredientCategoryId().equals(f.getIngredientCategoryIdx()))
