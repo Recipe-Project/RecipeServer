@@ -19,27 +19,14 @@ import java.util.List;
 @Table(name = "IngredientCategory")
 public class IngredientCategory extends BaseEntity {
     @Id
-    @Column(name = "ingredientCategoryIdx", nullable = false, updatable = false)
+    @Column(name = "ingredientCategoryId", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ingredientCategoryIdx;
+    private Long ingredientCategoryId;
 
-    @Column(name = "name", nullable = false, length = 45)
-    private String name;
+    @Column(name = "ingredientCategoryName", nullable = false, length = 10)
+    private String ingredientCategoryName;
 
     @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
     private List<Ingredient> ingredients = new ArrayList<>();
-
-    @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
-    private List<FridgeBasket> fridgeBasket = new ArrayList<>();
-
-    @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
-    private List<Fridge> fridge = new ArrayList<>();
-
-    @Column(name = "status", nullable = false, length = 10)
-    private String status = "ACTIVE";
-
-    public IngredientCategory(String name) {
-        this.name = name;
-    }
 
 }
