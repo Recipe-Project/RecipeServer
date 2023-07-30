@@ -1,7 +1,7 @@
 package com.recipe.app.src.ingredient.application;
 
 import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.ingredient.mapper.IngredientRepository;
+import com.recipe.app.src.ingredient.infra.IngredientRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

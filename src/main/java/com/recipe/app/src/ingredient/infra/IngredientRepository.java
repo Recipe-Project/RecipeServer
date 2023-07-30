@@ -1,4 +1,4 @@
-package com.recipe.app.src.ingredient.mapper;
+package com.recipe.app.src.ingredient.infra;
 
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import org.springframework.data.repository.CrudRepository;

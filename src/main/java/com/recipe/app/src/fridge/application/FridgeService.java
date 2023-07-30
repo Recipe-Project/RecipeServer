@@ -8,7 +8,7 @@ import com.recipe.app.src.fridge.models.PatchFcmTokenReq;
 import com.recipe.app.src.fridge.models.ShelfLifeUser;
 import com.recipe.app.src.fridgeBasket.mapper.FridgeBasketRepository;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import com.recipe.app.src.ingredient.mapper.IngredientCategoryRepository;
+import com.recipe.app.src.ingredient.infra.IngredientCategoryRepository;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.recipe.mapper.RecipeInfoRepository;
 import com.recipe.app.src.recipe.domain.RecipeInfo;
