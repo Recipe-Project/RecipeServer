@@ -1,32 +1,23 @@
 package com.recipe.app.src.ingredient.domain;
 
-import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
-@Entity
-@Table(name = "IngredientCategory")
-public class IngredientCategory extends BaseEntity {
-    @Id
-    @Column(name = "ingredientCategoryId", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long ingredientCategoryId;
+@Getter
+public class IngredientCategory {
 
-    @Column(name = "ingredientCategoryName", nullable = false, length = 10)
-    private String ingredientCategoryName;
+    private final Long ingredientCategoryId;
+    private final String ingredientCategoryName;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
-    private List<Ingredient> ingredients = new ArrayList<>();
-
+    @Builder
+    public IngredientCategory(Long ingredientCategoryId, String ingredientCategoryName, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.ingredientCategoryId = ingredientCategoryId;
+        this.ingredientCategoryName = ingredientCategoryName;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+    }
 }

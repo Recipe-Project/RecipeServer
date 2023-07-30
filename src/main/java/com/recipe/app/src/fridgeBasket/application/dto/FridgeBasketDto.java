@@ -52,10 +52,10 @@ public class FridgeBasketDto {
     public static class DirectFridgeBasketsResponse {
         private String ingredientName;
         private String ingredientIcon;
-        private Integer ingredientCategoryIdx;
+        private Long ingredientCategoryIdx;
 
         public DirectFridgeBasketsResponse(FridgeBasket fridgeBasket) {
-            this(fridgeBasket.getIngredientName(), fridgeBasket.getIngredientIcon(), fridgeBasket.getIngredientCategory().getIngredientCategoryIdx());
+            this(fridgeBasket.getIngredientName(), fridgeBasket.getIngredientIcon(), fridgeBasket.getIngredientCategoryEntity().getIngredientCategoryId());
         }
     }
 
@@ -78,19 +78,19 @@ public class FridgeBasketDto {
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class FridgeBasketResponse {
-        private Integer ingredientIdx;
+        private Long ingredientIdx;
         private String ingredientName;
         private String ingredientIcon;
-        private Integer ingredientCategoryIdx;
+        private Long ingredientCategoryIdx;
         private Integer ingredientCnt;
         private String storageMethod;
         private String expiredAt;
 
         public FridgeBasketResponse(FridgeBasket fridgeBasket) {
-            this(fridgeBasket.getIngredient() != null ? fridgeBasket.getIngredient().getIngredientIdx() : null,
+            this(fridgeBasket.getIngredient() != null ? fridgeBasket.getIngredient().getIngredientId() : null,
                     fridgeBasket.getIngredientName(),
                     fridgeBasket.getIngredientIcon(),
-                    fridgeBasket.getIngredientCategory().getIngredientCategoryIdx(),
+                    fridgeBasket.getIngredientCategoryEntity().getIngredientCategoryId(),
                     fridgeBasket.getCount(),
                     fridgeBasket.getStorageMethod(),
                     fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "까지" : null

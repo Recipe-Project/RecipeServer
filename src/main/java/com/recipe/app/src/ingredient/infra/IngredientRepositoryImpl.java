@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -16,21 +17,21 @@ public class IngredientRepositoryImpl implements IngredientRepository {
 
     @Override
     public List<Ingredient> findByNameContainingAndStatus(String name, String status) {
-        return ingredientJpaRepository.findByNameContainingAndStatus(name, status);
+        return ingredientJpaRepository.findByNameContainingAndStatus(name, status).stream().map(IngredientEntity::toModel).collect(Collectors.toList());
     }
 
     @Override
     public Optional<Ingredient> findByNameAndStatus(String name, String status) {
-        return ingredientJpaRepository.findByNameAndStatus(name, status);
+        return ingredientJpaRepository.findByNameAndStatus(name, status).map(IngredientEntity::toModel);
     }
 
     @Override
     public List<Ingredient> findByStatus(String status) {
-        return ingredientJpaRepository.findByStatus(status);
+        return ingredientJpaRepository.findByStatus(status).stream().map(IngredientEntity::toModel).collect(Collectors.toList());
     }
 
     @Override
     public List<Ingredient> findAllByIngredientIdxIn(List<Integer> idxList) {
-        return ingredientJpaRepository.findAllByIngredientIdxIn(idxList);
+        return ingredientJpaRepository.findAllByIngredientIdxIn(idxList).stream().map(IngredientEntity::toModel).collect(Collectors.toList());
     }
 }

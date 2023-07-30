@@ -8,6 +8,8 @@ import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import lombok.RequiredArgsConstructor;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
@@ -20,7 +22,7 @@ import java.util.stream.Collectors;
 
 import static com.recipe.app.common.response.BaseResponse.success;
 
-
+@Api(value = "재료 Controller")
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/ingredients")
@@ -29,6 +31,7 @@ public class IngredientController {
     private final FridgeBasketService fridgeBasketService;
     private final IngredientService ingredientService;
 
+    @ApiOperation(value = "재료 조회 API")
     @GetMapping("")
     public BaseResponse<IngredientDto.IngredientsResponse> getIngredients(final Authentication authentication, @RequestParam(value = "keyword") @Nullable String keyword) {
         if (authentication == null)

@@ -1,48 +1,35 @@
 package com.recipe.app.src.ingredient.domain;
 
-import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.user.domain.User;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.persistence.*;
+import java.time.LocalDateTime;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
-@Entity
-@Table(name = "Ingredient")
-public class Ingredient extends BaseEntity implements Comparable<Ingredient> {
-    @Id
-    @Column(name = "ingredientId", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ingredientId;
+@Getter
+public class Ingredient {
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredientCategoryId", nullable = false)
-    private IngredientCategory ingredientCategory;
+    private final Long ingredientId;
+    private final IngredientCategory ingredientCategory;
+    private final String ingredientName;
+    private final String ingredientIconUrl;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
+    private final User user;
+    private final boolean isDefault;
+    private final boolean isHidden;
 
-    @Column(name = "ingredientName", nullable = false, length = 64)
-    private String ingredientName;
-
-    @Column(name = "ingredientIconUrl", nullable = false)
-    private String ingredientIconUrl;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userId")
-    private User user;
-
-    @Column(name = "defaultYn", length = 1)
-    private String defaultYn;
-
-    @Column(name = "hiddenYn", length = 1)
-    private String hiddenYn;
-
-    @Override
-    public int compareTo(@NotNull Ingredient ingredient) {
-        return Integer.compare(this.getIngredientName().length(), ingredient.getIngredientName().length());
+    @Builder
+    public Ingredient(Long ingredientId, IngredientCategory ingredientCategory, String ingredientName, String ingredientIconUrl, LocalDateTime createdAt, LocalDateTime updatedAt,
+                      User user, boolean isDefault, boolean isHidden) {
+        this.ingredientId = ingredientId;
+        this.ingredientCategory = ingredientCategory;
+        this.ingredientName = ingredientName;
+        this.ingredientIconUrl = ingredientIconUrl;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.user = user;
+        this.isDefault = isDefault;
+        this.isHidden = isHidden;
     }
 }

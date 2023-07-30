@@ -2,6 +2,7 @@ package com.recipe.app.src.ingredient.application;
 
 import com.recipe.app.src.ingredient.application.port.IngredientRepository;
 import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

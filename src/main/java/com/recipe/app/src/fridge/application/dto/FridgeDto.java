@@ -1,7 +1,7 @@
 package com.recipe.app.src.fridge.application.dto;
 
 import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.ingredient.domain.IngredientCategory;
+import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
 import com.recipe.app.src.recipe.domain.RecipeInfo;
 import lombok.*;
 
@@ -28,7 +28,7 @@ public class FridgeDto {
     public static class FridgeRequest {
         private String ingredientName;
         private String ingredientIcon;
-        private Integer ingredientCategoryIdx;
+        private Long ingredientCategoryIdx;
         private String expiredAt;
         private String storageMethod;
         private int count;
@@ -69,10 +69,10 @@ public class FridgeDto {
 
         public FridgesResponse(long fridgeBasketCount, List<Fridge> fridges) {
             this.fridgeBasketCount = fridgeBasketCount;
-            Map<IngredientCategory, List<Fridge>> fridgesMappedByCategory = fridges.stream()
+            Map<IngredientCategoryEntity, List<Fridge>> fridgesMappedByCategory = fridges.stream()
                     .collect(Collectors.groupingBy(Fridge::getIngredientCategory));
-            for (IngredientCategory ingredientCategory : fridgesMappedByCategory.keySet()) {
-                this.fridges.add(new FridgeIngredientCategoryResponse(ingredientCategory, fridgesMappedByCategory.get(ingredientCategory)));
+            for (IngredientCategoryEntity ingredientCategoryEntity : fridgesMappedByCategory.keySet()) {
+                this.fridges.add(new FridgeIngredientCategoryResponse(ingredientCategoryEntity, fridgesMappedByCategory.get(ingredientCategoryEntity)));
             }
         }
     }
@@ -81,13 +81,13 @@ public class FridgeDto {
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class FridgeIngredientCategoryResponse {
-        private Integer ingredientCategoryIdx;
+        private Long ingredientCategoryIdx;
         private String ingredientCategoryName;
         private List<FridgeIngredientResponse> ingredientList;
 
-        public FridgeIngredientCategoryResponse(IngredientCategory ingredientCategory, List<Fridge> fridges) {
-            this.ingredientCategoryIdx = ingredientCategory.getIngredientCategoryIdx();
-            this.ingredientCategoryName = ingredientCategory.getName();
+        public FridgeIngredientCategoryResponse(IngredientCategoryEntity ingredientCategory, List<Fridge> fridges) {
+            this.ingredientCategoryIdx = ingredientCategory.getIngredientCategoryId();
+            this.ingredientCategoryName = ingredientCategory.getIngredientCategoryName();
             this.ingredientList = fridges.stream()
                     .map(FridgeIngredientResponse::new)
                     .collect(Collectors.toList());
@@ -121,7 +121,7 @@ public class FridgeDto {
     public static class FridgeResponse {
         private String ingredientName;
         private String ingredientIcon;
-        private Integer ingredientCategoryIdx;
+        private Long ingredientCategoryIdx;
         private String expiredAt;
         private String storageMethod;
         private int count;
@@ -129,7 +129,7 @@ public class FridgeDto {
         public FridgeResponse(Fridge fridge) {
             this.ingredientName = fridge.getIngredientName();
             this.ingredientIcon = fridge.getIngredientIcon();
-            this.ingredientCategoryIdx = fridge.getIngredientCategory().getIngredientCategoryIdx();
+            this.ingredientCategoryIdx = fridge.getIngredientCategory().getIngredientCategoryId();
             this.expiredAt = fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
             this.storageMethod = fridge.getStorageMethod();
             this.count = fridge.getCount();

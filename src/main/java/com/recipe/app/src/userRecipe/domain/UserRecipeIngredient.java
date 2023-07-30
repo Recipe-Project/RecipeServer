@@ -1,7 +1,7 @@
 package com.recipe.app.src.userRecipe.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -32,7 +32,7 @@ public class UserRecipeIngredient extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredientIdx")
-    private Ingredient ingredient;
+    private IngredientEntity ingredientEntity;
 
     @Column(name = "ingredientIcon", nullable = false)
     private String ingredientIcon;
@@ -43,7 +43,7 @@ public class UserRecipeIngredient extends BaseEntity {
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public UserRecipeIngredient(UserRecipe userRecipe, Ingredient ingredient, String ingredientIcon, String ingredientName) {
+    public UserRecipeIngredient(UserRecipe userRecipe, IngredientEntity ingredientEntity, String ingredientIcon, String ingredientName) {
         if (!StringUtils.hasText(ingredientName)) {
             throw new InvalidParameterException(EMPTY_INGREDIENT_NAME.getMessage());
         }
@@ -51,7 +51,7 @@ public class UserRecipeIngredient extends BaseEntity {
             throw new InvalidParameterException(EMPTY_INGREDIENT_ICON.getMessage());
         }
         this.userRecipe = userRecipe;
-        this.ingredient = ingredient;
+        this.ingredientEntity = ingredientEntity;
         this.ingredientIcon = ingredientIcon;
         this.ingredientName = ingredientName;
     }
