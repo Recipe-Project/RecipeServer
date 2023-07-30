@@ -50,7 +50,7 @@ public class RecipeInfoController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<Ingredient> ingredients = ingredientService.retrieveIngredients(null);
+        List<Ingredient> ingredients = ingredientService.getIngredients(null, user);
         RecipeInfoDto.RecipeDetailResponse data = new RecipeInfoDto.RecipeDetailResponse(recipeInfoService.retrieveRecipeInfo(recipeIdx), user, ingredients);
 
         return success(data);

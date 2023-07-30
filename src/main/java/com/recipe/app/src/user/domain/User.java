@@ -77,4 +77,7 @@ public class User extends BaseEntity {
         this.userName = userName;
     }
 
+    public boolean hasFridgeBaskets() {
+        return !fridgeBasket.isEmpty();
+    }
 }

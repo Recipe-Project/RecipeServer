@@ -34,14 +34,15 @@ public class IngredientController {
     @ApiOperation(value = "재료 조회 API")
     @GetMapping("")
     public BaseResponse<IngredientDto.IngredientsResponse> getIngredients(final Authentication authentication, @RequestParam(value = "keyword") @Nullable String keyword) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        IngredientDto.IngredientsResponse data = new IngredientDto.IngredientsResponse(fridgeBasketService.countFridgeBasketsByUser(user),
-                ingredientService.retrieveIngredients(keyword).stream()
-                        .collect(Collectors.groupingBy(Ingredient::getIngredientCategory)));
+        IngredientDto.IngredientsResponse data = new IngredientDto.IngredientsResponse(
+                user.hasFridgeBaskets(),
+                ingredientService.getIngredientsGroupingByIngredientCategory(keyword, user));
 
         return success(data);
     }

@@ -31,7 +31,7 @@ public class FridgeBasketService {
 
     @Transactional
     public void createFridgesBasket(FridgeBasketDto.FridgeBasketIdsRequest request, User user) {
-        List<IngredientEntity> ingredients = ingredientRepository.findAllByIngredientIdxIn(request.getIngredientList());
+        List<IngredientEntity> ingredients = ingredientRepository.findByIngredientIdIn(request.getIngredientList());
         Map<String, FridgeBasket> existFridgeBaskets = fridgeBasketRepository.findAllByUserAndStatusAndIngredientIn(user, "ACTIVE", ingredients)
                 .stream().collect(Collectors.toMap(FridgeBasket::getIngredientName, v -> v));
 
@@ -57,7 +57,7 @@ public class FridgeBasketService {
                     throw new BaseException(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME, fridgeBasket.getIngredientName());
                 });
 
-        ingredientRepository.findByNameAndStatus(request.getIngredientName(), "ACTIVE")
+        ingredientRepository.findByIngredientName(request.getIngredientName())
                 .ifPresent((ingredient -> {
                     throw new BaseException(POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS, ingredient.getIngredientName());
                 }));

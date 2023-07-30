@@ -14,7 +14,7 @@ public class FridgeBasketDto {
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class FridgeBasketIdsRequest {
-        private List<Integer> ingredientList;
+        private List<Long> ingredientList;
     }
 
     @Getter
