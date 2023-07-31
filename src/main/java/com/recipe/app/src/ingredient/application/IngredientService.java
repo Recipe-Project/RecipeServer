@@ -3,7 +3,6 @@ package com.recipe.app.src.ingredient.application;
 import com.recipe.app.src.ingredient.application.port.IngredientRepository;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
-import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,24 +19,15 @@ public class IngredientService {
 
     private final IngredientRepository ingredientRepository;
 
-    public Map<IngredientCategory, List<Ingredient>> getUserIngredientsGroupingByIngredientCategory(String keyword, User user) {
-        return getUserIngredients(keyword, user).stream()
+    public Map<IngredientCategory, List<Ingredient>> getIngredientsGroupingByIngredientCategory(String keyword) {
+        return getIngredients(keyword).stream()
                 .collect(Collectors.groupingBy(Ingredient::getIngredientCategory));
     }
 
-    public List<Ingredient> getUserIngredients(String keyword, User user) {
+    public List<Ingredient> getIngredients(String keyword) {
         if (!StringUtils.hasText(keyword)) {
-            return ingredientRepository.findByUserIngredientsOrDefaultIngredients(user);
+            return ingredientRepository.findDefaultIngredients();
         }
-        return ingredientRepository.findByUserIngredientsOrDefaultIngredientsByKeyword(user, keyword);
-    }
-
-    public Map<IngredientCategory, List<Ingredient>> getDefaultIngredientsGroupingByIngredientCategory() {
-        return getDefaultIngredients().stream()
-                .collect(Collectors.groupingBy(Ingredient::getIngredientCategory));
-    }
-
-    public List<Ingredient> getDefaultIngredients() {
-        return ingredientRepository.findByDefaultIngredients();
+        return ingredientRepository.findDefaultIngredientsByIngredientNameContaining(keyword);
     }
 }
