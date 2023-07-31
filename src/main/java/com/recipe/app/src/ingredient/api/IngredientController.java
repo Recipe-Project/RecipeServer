@@ -40,7 +40,7 @@ public class IngredientController {
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
         IngredientDto.IngredientsResponse data = new IngredientDto.IngredientsResponse(
-                user.hasFridgeBaskets(),
+                user.getFridgeBasketCount(),
                 ingredientService.getIngredientsGroupingByIngredientCategory(keyword));
 
         return success(data);

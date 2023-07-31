@@ -16,11 +16,11 @@ public class IngredientDto {
     @Getter
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class IngredientsResponse {
-        private Boolean hasFridgeBaskets;
+        private int fridgeBasketCount;
         private List<IngredientCategoryResponse> ingredients;
 
-        public IngredientsResponse(boolean hasFridgeBaskets, Map<IngredientCategory, List<Ingredient>> ingredientsGroupingByIngredientCategory) {
-            this.hasFridgeBaskets = hasFridgeBaskets;
+        public IngredientsResponse(int fridgeBasketCount, Map<IngredientCategory, List<Ingredient>> ingredientsGroupingByIngredientCategory) {
+            this.fridgeBasketCount = fridgeBasketCount;
             this.ingredients = ingredientsGroupingByIngredientCategory.keySet().stream()
                     .map((category) -> new IngredientCategoryResponse(category, ingredientsGroupingByIngredientCategory.get(category)))
                     .collect(Collectors.toList());
