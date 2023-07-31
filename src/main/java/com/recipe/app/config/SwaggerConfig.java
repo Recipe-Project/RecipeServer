@@ -6,11 +6,17 @@ import org.springframework.web.bind.annotation.RestController;
 import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.RequestParameterBuilder;
+import springfox.documentation.schema.ScalarType;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ParameterType;
+import springfox.documentation.service.RequestParameter;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Configuration
@@ -18,7 +24,19 @@ public class SwaggerConfig {
 
     @Bean
     public Docket api() {
+        RequestParameter parameter = new RequestParameterBuilder()
+                .name("X-ACCESS-TOKEN")
+                .in(ParameterType.HEADER)
+                .query(p -> p.model(m -> m.scalarModel(ScalarType.STRING)))
+                .description("Authorization Header")
+                .required(false)
+                .build();
+
+        List<RequestParameter> parameters = new ArrayList<>();
+        parameters.add(parameter);
+
         return new Docket(DocumentationType.SWAGGER_2)
+                .globalRequestParameters(parameters)
                 .useDefaultResponseMessages(false)
                 .consumes(getConsumeContentTypes())
                 .produces(getProduceContentTypes())
