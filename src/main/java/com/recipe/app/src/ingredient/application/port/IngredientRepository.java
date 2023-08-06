@@ -8,4 +8,6 @@ public interface IngredientRepository {
     List<Ingredient> findDefaultIngredientsByIngredientNameContaining(String keyword);
 
     List<Ingredient> findDefaultIngredients();
+
+    List<Ingredient> findByIngredientIdIn(List<Long> ingredientIds);
 }
