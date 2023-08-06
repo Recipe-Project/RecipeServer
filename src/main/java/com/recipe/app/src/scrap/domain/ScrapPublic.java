@@ -2,7 +2,7 @@ package com.recipe.app.src.scrap.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipe.domain.RecipeInfo;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -23,7 +23,7 @@ public class ScrapPublic extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userIdx", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "publicIdx", nullable = false)
@@ -32,7 +32,7 @@ public class ScrapPublic extends BaseEntity {
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public ScrapPublic(User user, RecipeInfo recipeInfo) {
+    public ScrapPublic(UserEntity user, RecipeInfo recipeInfo) {
         this.user = user;
         this.recipeInfo = recipeInfo;
     }

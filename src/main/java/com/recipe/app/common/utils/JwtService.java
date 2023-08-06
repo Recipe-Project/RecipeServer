@@ -34,7 +34,7 @@ public class JwtService {
     @Value("${jwt.token-validity-in-ms}")
     private long tokenValidMillisecond;
 
-    public String createJwt(int userId) {
+    public String createJwt(Long userId) {
         Date now = new Date();
         Key key = new SecretKeySpec(Base64.getDecoder().decode(this.secretKey), SignatureAlgorithm.HS256.getJcaName());
         return Jwts.builder()

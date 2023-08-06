@@ -2,7 +2,7 @@ package com.recipe.app.src.scrap.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +28,7 @@ public class ScrapBlog extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userIdx", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @Column(name = "title", nullable = false, length = 45)
     private String title;
@@ -51,7 +51,7 @@ public class ScrapBlog extends BaseEntity {
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public ScrapBlog(User user, String title, String thumbnail, String blogUrl, String description, String bloggerName, String postDate) {
+    public ScrapBlog(UserEntity user, String title, String thumbnail, String blogUrl, String description, String bloggerName, String postDate) {
         if (!StringUtils.hasText(title)) {
             throw new BaseException(POST_SCRAP_BLOG_EMPTY_TITLE);
         }

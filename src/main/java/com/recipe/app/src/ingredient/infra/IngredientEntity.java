@@ -2,7 +2,7 @@ package com.recipe.app.src.ingredient.infra;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -34,7 +34,7 @@ public class IngredientEntity extends BaseEntity implements Comparable<Ingredien
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private User user;
+    private UserEntity user;
 
     @Column(name = "defaultYn", length = 1)
     private String defaultYn;

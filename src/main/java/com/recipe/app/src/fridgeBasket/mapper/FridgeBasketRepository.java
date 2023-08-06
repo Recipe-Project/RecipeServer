@@ -2,7 +2,7 @@ package com.recipe.app.src.fridgeBasket.mapper;
 
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.ingredient.infra.IngredientEntity;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,13 +11,13 @@ import java.util.Optional;
 
 @Repository
 public interface FridgeBasketRepository extends CrudRepository<FridgeBasket, Integer> {
-    Optional<FridgeBasket> findByUserAndIngredientNameAndStatus(User user, String name, String status);
+    Optional<FridgeBasket> findByUserAndIngredientNameAndStatus(UserEntity user, String name, String status);
 
-    Long countByUserAndStatus(User user, String status);
+    Long countByUserAndStatus(UserEntity user, String status);
 
-    List<FridgeBasket> findByUserAndStatus(User user, String status);
+    List<FridgeBasket> findByUserAndStatus(UserEntity user, String status);
 
-    List<FridgeBasket> findAllByUserAndStatusAndIngredientIn(User user, String status, List<IngredientEntity> ingredientEntityList);
+    List<FridgeBasket> findAllByUserAndStatusAndIngredientIn(UserEntity user, String status, List<IngredientEntity> ingredientEntityList);
 
-    List<FridgeBasket> findAllByUserAndStatusAndIngredientNameIn(User user, String status, List<String> ingredientNameList);
+    List<FridgeBasket> findAllByUserAndStatusAndIngredientNameIn(UserEntity user, String status, List<String> ingredientNameList);
 }

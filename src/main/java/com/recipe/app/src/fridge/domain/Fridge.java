@@ -3,7 +3,7 @@ package com.recipe.app.src.fridge.domain;
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -31,7 +31,7 @@ public class Fridge extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userIdx", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @Column(name = "ingredientName", nullable = false, length = 20)
     private String ingredientName;
@@ -55,7 +55,7 @@ public class Fridge extends BaseEntity {
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public Fridge(User user, String ingredientName, String ingredientIcon, IngredientCategoryEntity ingredientCategory, String storageMethod, String expiredAt, int count) {
+    public Fridge(UserEntity user, String ingredientName, String ingredientIcon, IngredientCategoryEntity ingredientCategory, String storageMethod, String expiredAt, int count) {
 
         if (!StringUtils.hasText(ingredientName)) {
             throw new InvalidParameterException(FRIDGES_EMPTY_INGREDIENT_NAME.getMessage());

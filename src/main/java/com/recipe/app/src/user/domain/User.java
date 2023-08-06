@@ -1,83 +1,99 @@
 package com.recipe.app.src.user.domain;
 
-import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import com.recipe.app.src.scrap.domain.ScrapBlog;
-import com.recipe.app.src.scrap.domain.ScrapPublic;
-import com.recipe.app.src.scrap.domain.ScrapYoutube;
-import com.recipe.app.src.userRecipe.domain.UserRecipe;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
-@Entity
-@Table(name = "UserInfo")
-public class User extends BaseEntity {
-    @Id
-    @Column(name = "userIdx", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int userIdx;
+@Getter
+public class User {
+    private final Long userId;
+    private final String socialId;
+    private final String profileImgUrl;
+    private final String nickname;
+    private final String email;
+    private final String phoneNumber;
+    private final String deviceToken;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
+    private final LocalDateTime recentLoginAt;
 
-    @Column(name = "socialId", nullable = false, length = 45)
-    private String socialId;
-
-    @Column(name = "profilePhoto", nullable = false)
-    private String profilePhoto;
-
-    @Column(name = "userName", nullable = false, length = 45)
-    private String userName;
-
-    @Column(name = "email", length = 45)
-    private String email;
-
-    @Column(name = "phoneNumber", nullable = false, length = 45)
-    private String phoneNumber;
-
-    @Column(name = "deviceToken", length = 500)
-    private String deviceToken;
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<UserRecipe> userRecipes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ScrapYoutube> scrapYoutubes = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ScrapBlog> scrapBlogs = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<ScrapPublic> scrapPublics = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<FridgeBasket> fridgeBasket = new ArrayList<>();
-
-    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL)
-    private List<Fridge> fridges = new ArrayList<>();
-
-    public User(String socialId, String profilePhoto, String userName, String email, String phoneNumber, String deviceToken) {
+    @Builder
+    public User(Long userId, String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken,
+                LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime recentLoginAt) {
+        this.userId = userId;
         this.socialId = socialId;
-        this.profilePhoto = profilePhoto;
-        this.userName = userName;
+        this.profileImgUrl = profileImgUrl;
+        this.nickname = nickname;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.deviceToken = deviceToken;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
+        this.recentLoginAt = recentLoginAt;
     }
 
-    public void changeProfile(String profilePhoto, String userName) {
-        this.profilePhoto = profilePhoto;
-        this.userName = userName;
+    public static User from(String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken) {
+        LocalDateTime now = LocalDateTime.now();
+        return User.builder()
+                .socialId(socialId)
+                .profileImgUrl(profileImgUrl)
+                .nickname(nickname)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .deviceToken(deviceToken)
+                .createdAt(now)
+                .updatedAt(now)
+                .recentLoginAt(now)
+                .build();
+    }
+
+    public User changeProfile(String profileImgUrl, String nickname) {
+        return User.builder()
+                .userId(userId)
+                .socialId(socialId)
+                .profileImgUrl(profileImgUrl)
+                .nickname(nickname)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .deviceToken(deviceToken)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .recentLoginAt(recentLoginAt)
+                .build();
+    }
+
+    public User changeRecentLoginAt() {
+        return User.builder()
+                .userId(userId)
+                .socialId(socialId)
+                .profileImgUrl(profileImgUrl)
+                .nickname(nickname)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .deviceToken(deviceToken)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .recentLoginAt(LocalDateTime.now())
+                .build();
     }
 
     public int getFridgeBasketCount() {
-        return fridgeBasket.size();
+        return 0;
+    }
+
+    public User changeDeviceToken(String fcmToken) {
+        return User.builder()
+                .userId(userId)
+                .socialId(socialId)
+                .profileImgUrl(profileImgUrl)
+                .nickname(nickname)
+                .email(email)
+                .phoneNumber(phoneNumber)
+                .deviceToken(fcmToken)
+                .createdAt(createdAt)
+                .updatedAt(updatedAt)
+                .recentLoginAt(recentLoginAt)
+                .build();
     }
 }

@@ -1,7 +1,7 @@
 package com.recipe.app.src.userRecipe.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -29,7 +29,7 @@ public class UserRecipe extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userIdx", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @Column(name = "thumbnail")
     private String thumbnail;
@@ -46,7 +46,7 @@ public class UserRecipe extends BaseEntity {
     @OneToMany(mappedBy = "userRecipe", cascade = CascadeType.ALL)
     private List<UserRecipeIngredient> userRecipeIngredients = new ArrayList<>();
 
-    public UserRecipe(User user, String thumbnail, String title, String content) {
+    public UserRecipe(UserEntity user, String thumbnail, String title, String content) {
         if (!StringUtils.hasText(title)) {
             throw new InvalidParameterException(EMPTY_TITLE.getMessage());
         }
