@@ -1,8 +1,9 @@
 package com.recipe.app.src.user.application;
 
+import com.recipe.app.src.user.application.port.UserRepository;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.exception.NotFoundUserException;
-import com.recipe.app.src.user.mapper.UserRepository;
+import com.recipe.app.src.user.infra.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -17,7 +18,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return new SecurityUser(userRepository.findById(Integer.parseInt(username))
+        return new SecurityUser(userRepository.findById(Long.parseLong(username))
                 .orElseThrow(NotFoundUserException::new));
     }
 }

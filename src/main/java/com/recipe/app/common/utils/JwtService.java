@@ -1,6 +1,6 @@
 package com.recipe.app.common.utils;
 
-import com.recipe.app.src.user.mapper.JwtBlacklistRepository;
+import com.recipe.app.src.user.application.port.JwtBlacklistRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
