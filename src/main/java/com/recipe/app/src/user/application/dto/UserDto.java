@@ -1,5 +1,6 @@
 package com.recipe.app.src.user.application.dto;
 
+import com.recipe.app.src.user.domain.LoginProvider;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.*;
@@ -25,7 +26,7 @@ public class UserDto {
         private String profileImgUrl;
         private String nickname;
         private String email;
-        private String loginProvider;
+        private LoginProvider loginProvider;
         private long youtubeScrapCnt;
         private long blogScrapCnt;
         private long recipeScrapCnt;
@@ -38,6 +39,7 @@ public class UserDto {
                     .profileImgUrl(user.getProfileImgUrl())
                     .nickname(user.getNickname())
                     .email(user.getEmail())
+                    .loginProvider(LoginProvider.findLoginProvider(user.getSocialId()))
                     .build();
         }
     }
