@@ -179,12 +179,12 @@ public class RecipeInfoService {
                 }
             }
 
-            String userScrapYN = user.getScrapBlogs().stream()
-                    .anyMatch((s) -> s.getStatus().equals("ACTIVE") && s.getBlogUrl().equals(blogUrl)) ? "Y" : "N";
+//            String userScrapYN = user.getScrapBlogs().stream()
+//                    .anyMatch((s) -> s.getStatus().equals("ACTIVE") && s.getBlogUrl().equals(blogUrl)) ? "Y" : "N";
 
             Integer userScrapCnt = Math.toIntExact(scrapBlogRepository.countByBlogUrlAndStatus(blogUrl, "ACTIVE"));
 
-            blogs.add(new RecipeInfoDto.BlogRecipeResponse(title, blogUrl, description, bloggerName, postDate, thumbnail, userScrapYN, userScrapCnt));
+            blogs.add(new RecipeInfoDto.BlogRecipeResponse(title, blogUrl, description, bloggerName, postDate, thumbnail, null, userScrapCnt));
         }
 
         return blogs;

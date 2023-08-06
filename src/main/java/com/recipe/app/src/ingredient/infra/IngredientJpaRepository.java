@@ -1,6 +1,5 @@
 package com.recipe.app.src.ingredient.infra;
 
-import com.recipe.app.src.user.domain.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

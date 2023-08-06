@@ -6,6 +6,7 @@ import com.recipe.app.src.recipe.mapper.RecipeInfoRepository;
 import com.recipe.app.src.scrap.domain.ScrapPublic;
 import com.recipe.app.src.scrap.mapper.ScrapPublicRepository;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,14 +29,14 @@ public class ScrapPublicService {
             throw new BaseException(NOT_FOUND_RECIPE_INFO);
         });
 
-        scrapPublicRepository.findByUserAndRecipeInfoAndStatus(user, recipeInfo, "ACTIVE")
+        scrapPublicRepository.findByUserAndRecipeInfoAndStatus(UserEntity.fromModel(user), recipeInfo, "ACTIVE")
                 .ifPresentOrElse(scrapPublicRepository::delete, () -> {
-                    scrapPublicRepository.save(new ScrapPublic(user, recipeInfo));
+                    scrapPublicRepository.save(new ScrapPublic(UserEntity.fromModel(user), recipeInfo));
                 });
     }
 
     public List<ScrapPublic> retrieveScrapRecipes(User user) {
-        return scrapPublicRepository.findByUserAndStatusOrderByCreatedAtDesc(user, "ACTIVE");
+        return scrapPublicRepository.findByUserAndStatusOrderByCreatedAtDesc(UserEntity.fromModel(user), "ACTIVE");
     }
 
     public long countScrapPublicsByRecipe(RecipeInfo recipeInfo) {
@@ -43,7 +44,7 @@ public class ScrapPublicService {
     }
 
     public long countScrapPublicsByUser(User user) {
-        return scrapPublicRepository.countByUserAndStatus(user, "ACTIVE");
+        return scrapPublicRepository.countByUserAndStatus(UserEntity.fromModel(user), "ACTIVE");
     }
 
 

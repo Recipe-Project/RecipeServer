@@ -2,7 +2,7 @@ package com.recipe.app.src.scrap.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,8 +25,8 @@ public class ScrapYoutube extends BaseEntity {
     private Integer idx;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userIdx", nullable = false)
-    private User user;
+    @JoinColumn(name = "userId", nullable = false)
+    private UserEntity user;
 
     @Column(name = "youtubeId", nullable = false, length = 45)
     private String youtubeId;
@@ -52,7 +52,7 @@ public class ScrapYoutube extends BaseEntity {
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public ScrapYoutube(User user, String youtubeId, String title, String thumbnail, String youtubeUrl, String postDate, String channelName, String playTime) {
+    public ScrapYoutube(UserEntity user, String youtubeId, String title, String thumbnail, String youtubeUrl, String postDate, String channelName, String playTime) {
         if (!StringUtils.hasText(title)) {
             throw new BaseException(EMPTY_TITLE);
         }

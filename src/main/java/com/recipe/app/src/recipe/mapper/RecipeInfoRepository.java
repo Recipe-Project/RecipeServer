@@ -1,7 +1,7 @@
 package com.recipe.app.src.recipe.mapper;
 
 import com.recipe.app.src.recipe.domain.RecipeInfo;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -18,5 +18,5 @@ public interface RecipeInfoRepository extends CrudRepository<RecipeInfo, Integer
             + "    INNER JOIN RecipeInfo r on r.recipeId = ri.recipeInfo.recipeId AND r.status=:status"
             + " WHERE f.user=:user AND f.status=:status"
             + " GROUP BY ri.recipeInfo.recipeId ORDER BY COUNT(f) DESC")
-    List<RecipeInfo> searchRecipeListOrderByIngredientCntWhichUserHasDesc(User user, String status);
+    List<RecipeInfo> searchRecipeListOrderByIngredientCntWhichUserHasDesc(UserEntity user, String status);
 }

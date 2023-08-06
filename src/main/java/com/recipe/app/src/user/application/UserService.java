@@ -1,12 +1,10 @@
 package com.recipe.app.src.user.application;
 
 import com.recipe.app.src.user.application.dto.UserDto;
-import com.recipe.app.src.user.domain.Jwt;
+import com.recipe.app.src.user.application.port.JwtBlacklistRepository;
+import com.recipe.app.src.user.application.port.UserRepository;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
-import com.recipe.app.src.user.exception.NotFoundUserException;
-import com.recipe.app.src.user.mapper.JwtBlacklistRepository;
-import com.recipe.app.src.user.mapper.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -30,6 +28,12 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtBlacklistRepository jwtBlacklistRepository;
+
+    @Transactional
+    public User autoLogin(User user) {
+        user = user.changeRecentLoginAt();
+        return userRepository.save(user);
+    }
 
     @Transactional
     public User naverLogin(String accessToken, String fcmToken) throws IOException, ParseException {
@@ -76,17 +80,13 @@ public class UserService {
         String response = jsonObject.get("response").toString();
         JSONObject responObj = (JSONObject) jsonParser.parse(response);
         String socialId = "naver_" + responObj.get("id").toString();
-        String profilePhoto = null;
-        String userName = responObj.get("name").toString();
+        String profileImgUrl = null;
+        String nickname = responObj.get("name").toString();
         String email = responObj.get("email") != null ? responObj.get("email").toString() : null;
         String phoneNumber = responObj.get("mobile") != null ? responObj.get("mobile").toString() : null;
 
-        User user = userRepository.findBySocialId(socialId).orElse(null);
-        if (user == null) {
-            user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber, fcmToken));
-        }
-
-        return user;
+        return userRepository.findBySocialId(socialId).orElseGet(() ->
+                userRepository.save(User.from(socialId, profileImgUrl, nickname, email, phoneNumber, fcmToken)));
     }
 
     @Transactional
@@ -131,25 +131,17 @@ public class UserService {
         String socialId = "kakao_" + jsonObject.get("id").toString();
         String response = jsonObject.get("kakao_account").toString();
 
-        String profilePhoto = null;
-        String email = null;
+        String profileImgUrl = null;
         String phoneNumber = null;
 
         JSONObject responObj = (JSONObject) jsonParser.parse(response);
-        if (responObj.get("email") != null) {
-            email = responObj.get("email").toString();
-        }
-
+        String email = responObj.get("email") != null ? responObj.get("email").toString() : null;
         String profile = responObj.get("profile").toString();
         JSONObject profileObj = (JSONObject) jsonParser.parse(profile);
-        String userName = profileObj.get("nickname").toString();
+        String nickname = profileObj.get("nickname").toString();
 
-        User user = userRepository.findBySocialId(socialId).orElse(null);
-        if (user == null) {
-            user = userRepository.save(new User(socialId, profilePhoto, userName, email, phoneNumber, fcmToken));
-        }
-
-        return user;
+        return userRepository.findBySocialId(socialId).orElseGet(() ->
+                userRepository.save(User.from(socialId, profileImgUrl, nickname, email, phoneNumber, fcmToken)));
     }
 
     @Transactional
@@ -167,41 +159,30 @@ public class UserService {
         BufferedReader in = new BufferedReader(isr);
 
         JSONObject jsonObj = (JSONObject) jsonParser.parse(in);
-        String userId = "google_" + jsonObj.get("sub").toString();
-        String name = jsonObj.get("name").toString();
+        String socialId = "google_" + jsonObj.get("sub").toString();
+        String nickname = jsonObj.get("name").toString();
         String email = jsonObj.get("email").toString();
-        String imageUrl = null;
+        String profileImgUrl = null;
+        String phoneNumber = null;
 
-        User user = userRepository.findBySocialId(userId).orElse(null);
-        if (user == null) {
-            user = userRepository.save(new User(userId, imageUrl, name, email, null, fcmToken));
-        }
-
-        return user;
+        return userRepository.findBySocialId(socialId).orElseGet(() ->
+                userRepository.save(User.from(socialId, profileImgUrl, nickname, email, phoneNumber, fcmToken)));
     }
 
     @Transactional
-    public User updateUser(int userIdx, UserDto.UserProfileRequest request) {
-
-        User user = retrieveUserByUserIdx(userIdx);
-
-        user.changeProfile(request.getProfilePhoto(), request.getUserName());
-        user = userRepository.save(user);
-
-        return user;
+    public User updateUser(User user, UserDto.UserProfileRequest request) {
+        user = user.changeProfile(request.getProfileImgUrl(), request.getNickname());
+        return userRepository.save(user);
     }
 
     @Transactional
-    public void deleteUser(int userIdx) {
-        User user = retrieveUserByUserIdx(userIdx);
+    public void deleteUser(User user, String jwt) {
         userRepository.delete(user);
+        registerJwtBlackList(jwt);
     }
 
+    @Transactional
     public void registerJwtBlackList(String jwt) {
-        jwtBlacklistRepository.save(new Jwt(jwt));
-    }
-
-    public User retrieveUserByUserIdx(Integer userIdx) {
-        return userRepository.findById(userIdx).orElseThrow(NotFoundUserException::new);
+        jwtBlacklistRepository.save(jwt);
     }
 }

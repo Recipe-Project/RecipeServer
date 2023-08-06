@@ -33,7 +33,7 @@ public class ScrapYoutubeDto {
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class ScrapYoutubeResponse {
-        private Integer userIdx;
+        private Long userIdx;
         private String youtubeId;
         private String title;
         private String thumbnail;
@@ -45,7 +45,7 @@ public class ScrapYoutubeDto {
 
         public ScrapYoutubeResponse(ScrapYoutube scrapYoutube, long heartCount) {
             this(
-                    scrapYoutube.getUser().getUserIdx(),
+                    scrapYoutube.getUser().getUserId(),
                     scrapYoutube.getYoutubeId(),
                     scrapYoutube.getTitle().length() > 30 ? scrapYoutube.getTitle().substring(0, 30) + "..." : scrapYoutube.getTitle(),
                     scrapYoutube.getThumbnail(),

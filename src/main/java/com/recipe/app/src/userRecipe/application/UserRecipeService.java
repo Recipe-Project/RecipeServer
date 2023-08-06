@@ -1,6 +1,7 @@
 package com.recipe.app.src.userRecipe.application;
 
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import com.recipe.app.src.userRecipe.application.dto.UserRecipeDto;
 import com.recipe.app.src.userRecipe.domain.UserRecipe;
 import com.recipe.app.src.userRecipe.domain.UserRecipeIngredient;
@@ -23,18 +24,18 @@ public class UserRecipeService {
     private final UserRecipeIngredientRepository userRecipeIngredientRepository;
 
     public List<UserRecipe> retrieveUserRecipes(User user) {
-        return userRecipeRepository.findByUserAndStatusOrderByCreatedAtDesc(user, "ACTIVE");
+        return userRecipeRepository.findByUserAndStatusOrderByCreatedAtDesc(UserEntity.fromModel(user), "ACTIVE");
     }
 
     public UserRecipe retrieveUserRecipe(User user, int myRecipeIdx) {
-        return userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(user, myRecipeIdx, "ACTIVE")
+        return userRecipeRepository.findByUserAndUserRecipeIdxAndStatus(UserEntity.fromModel(user), myRecipeIdx, "ACTIVE")
                 .orElseThrow(NotFoundUserRecipeException::new);
     }
 
     @Transactional
     public UserRecipe createUserRecipe(User user, UserRecipeDto.UserRecipeRequest request) {
 
-        UserRecipe userRecipe = userRecipeRepository.save(new UserRecipe(user, request.getThumbnail(), request.getTitle(), request.getContent()));
+        UserRecipe userRecipe = userRecipeRepository.save(new UserRecipe(UserEntity.fromModel(user), request.getThumbnail(), request.getTitle(), request.getContent()));
 
         List<UserRecipeIngredient> ingredients = request.getIngredientList().stream()
                 .map((ingredient) -> new UserRecipeIngredient(userRecipe, null, ingredient.getIngredientIcon(), ingredient.getIngredientName()))

@@ -15,7 +15,7 @@ import java.util.List;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-@Table(name = "IngredientCategoryEntity")
+@Table(name = "IngredientCategory")
 public class IngredientCategoryEntity extends BaseEntity {
     @Id
     @Column(name = "ingredientCategoryId", nullable = false, updatable = false)

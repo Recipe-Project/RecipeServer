@@ -1,4 +1,4 @@
-package com.recipe.app.src.user.domain;
+package com.recipe.app.src.user.infra;
 
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -15,7 +15,7 @@ import java.time.LocalDateTime;
 @Data
 @Entity
 @Table(name = "JwtBlacklist")
-public class Jwt {
+public class JwtEntity {
     @Id
     @Column(name = "jwt", nullable = false, updatable = false)
     private String jwt;
@@ -24,7 +24,13 @@ public class Jwt {
     @Column(name = "createdAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public Jwt(String jwt) {
+    public JwtEntity(String jwt) {
         this.jwt = jwt;
+    }
+
+    public static JwtEntity fromModel(String jwt) {
+        JwtEntity jwtEntity = new JwtEntity();
+        jwtEntity.jwt = jwt;
+        return jwtEntity;
     }
 }

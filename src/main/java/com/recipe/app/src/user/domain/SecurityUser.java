@@ -26,10 +26,6 @@ public class SecurityUser implements UserDetails {
         return this.user;
     }
 
-    public Integer getUserIdx() {
-        return this.user.getUserIdx();
-    }
-
     @Override
     public String getPassword() {
         return null;
@@ -37,7 +33,7 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.user.getUserName();
+        return this.user.getNickname();
     }
 
     @Override

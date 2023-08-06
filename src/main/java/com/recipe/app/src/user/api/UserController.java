@@ -4,11 +4,16 @@ import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDto;
+import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import com.recipe.app.src.user.exception.EmptyFcmTokenException;
 import com.recipe.app.src.user.exception.EmptyTokenException;
 import com.recipe.app.src.user.exception.ForbiddenUserException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,12 +21,14 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 import static com.recipe.app.common.response.BaseResponse.success;
 
+@Api(tags = {"유저 Controller"})
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -45,21 +52,26 @@ public class UserController {
     @Value("${jwt.token-header}")
     private String jwt;
 
+    @ApiOperation(value = "자동 로그인 API")
     @ResponseBody
     @PostMapping("/auto-login")
-    public BaseResponse<Void> postAutoLogin(final Authentication authentication) {
+    public BaseResponse<UserDto.UserProfileResponse> autoLogin(@ApiIgnore final Authentication authentication) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
-        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        userService.retrieveUserByUserIdx(userIdx);
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        user = userService.autoLogin(user);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
-        return success();
+        return success(data);
     }
 
+    @ApiOperation(value = "네이버 로그인 API")
     @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<UserDto.UserProfileResponse> postNaverLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> naverLogin(HttpServletRequest request) throws IOException, ParseException {
+
         String accessToken = request.getHeader(this.naverToken);
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
@@ -72,16 +84,17 @@ public class UserController {
 
         User user = userService.naverLogin(accessToken, fcmToken);
         HttpHeaders httpHeaders = new HttpHeaders();
-        String jwt = jwtService.createJwt(user.getUserIdx());
+        String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
+    @ApiOperation(value = "카카오 로그인 API")
     @ResponseBody
     @PostMapping("/kakao-login")
-    public BaseResponse<UserDto.UserProfileResponse> postKakaoLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> kakaoLogin(HttpServletRequest request) throws IOException, ParseException {
         String accessToken = request.getHeader(this.kakaoToken);
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
@@ -94,16 +107,17 @@ public class UserController {
 
         User user = userService.kakaoLogin(accessToken, fcmToken);
         HttpHeaders httpHeaders = new HttpHeaders();
-        String jwt = jwtService.createJwt(user.getUserIdx());
+        String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
+    @ApiOperation(value = "구글 로그인 API")
     @ResponseBody
     @PostMapping("/google-login")
-    public BaseResponse<UserDto.UserProfileResponse> postGoogleLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> googleLogin(HttpServletRequest request) throws IOException, ParseException {
         String accessToken = request.getHeader(this.googleToken);
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
@@ -116,71 +130,69 @@ public class UserController {
 
         User user = userService.googleLogin(accessToken, fcmToken);
         HttpHeaders httpHeaders = new HttpHeaders();
-        String jwt = jwtService.createJwt(user.getUserIdx());
+        String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
+    @ApiOperation(value = "유저 프로필 조회 API")
     @ResponseBody
-    @GetMapping("/{userIdx}")
-    public BaseResponse<UserDto.UserProfileResponse> getUser(final Authentication authentication, @PathVariable Integer userIdx) {
+    @GetMapping("")
+    public BaseResponse<UserDto.UserProfileResponse> getUser(@ApiIgnore final Authentication authentication) {
         if (authentication == null)
             throw new UserTokenNotExistException();
 
-        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        if (!userIdx.equals(jwtUserIdx)) {
-            throw new ForbiddenUserException();
-        }
-
-        User user = userService.retrieveUserByUserIdx(userIdx);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        String jwt = jwtService.createJwt(user.getUserIdx());
-        httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
+    @ApiOperation(value = "유저 프로필 수정 API")
     @ResponseBody
-    @PatchMapping("/{userIdx}")
-    public BaseResponse<UserDto.UserProfileResponse> patchUser(final Authentication authentication, @PathVariable int userIdx, @RequestBody UserDto.UserProfileRequest request) {
+    @PatchMapping("")
+    public BaseResponse<UserDto.UserProfileResponse> patchUser(@ApiIgnore final Authentication authentication,
+                                                               @ApiParam(value = "수정할 회원 정보", required = true)
+                                                               @RequestBody UserDto.UserProfileRequest request) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
-        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        if (userIdx != jwtUserIdx) {
-            throw new ForbiddenUserException();
-        }
-
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(userService.updateUser(userIdx, request));
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        user = userService.updateUser(user, request);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
+    @ApiOperation(value = "회원 탈퇴 API")
     @ResponseBody
-    @DeleteMapping("/{userIdx}")
-    public BaseResponse<Void> deleteUser(HttpServletRequest request, final Authentication authentication, @PathVariable int userIdx) {
-        if (authentication == null)
-            throw new UserTokenNotExistException();
+    @DeleteMapping("")
+    public BaseResponse<Void> deleteUser(HttpServletRequest request, @ApiIgnore final Authentication authentication) {
 
-        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        if (userIdx != jwtUserIdx) {
-            throw new ForbiddenUserException();
-        }
-
-        userService.deleteUser(userIdx);
         String jwt = jwtService.resolveToken(request);
-        userService.registerJwtBlackList(jwt);
+
+        if (authentication == null || !StringUtils.hasText(jwt))
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+
+        userService.deleteUser(user, jwt);
 
         return success();
     }
 
+    @ApiOperation(value = "로그아웃 API")
     @ResponseBody
     @PostMapping("/logout")
     public BaseResponse<Void> logout(HttpServletRequest request) {
         String jwt = jwtService.resolveToken(request);
+
+        if (!StringUtils.hasText(jwt))
+            throw new UserTokenNotExistException();
+
         userService.registerJwtBlackList(jwt);
 
         return success();

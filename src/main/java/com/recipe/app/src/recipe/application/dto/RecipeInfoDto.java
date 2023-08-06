@@ -1,7 +1,6 @@
 package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.recipe.domain.RecipeInfo;
 import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import com.recipe.app.src.recipe.domain.RecipeProcess;
@@ -32,8 +31,11 @@ public class RecipeInfoDto {
                     recipe.getRecipeNmKo(),
                     recipe.getSumry(),
                     recipe.getImgUrl(),
-                    user.getScrapPublics().stream()
-                            .anyMatch((s) -> s.getRecipeInfo().getRecipeId().equals(recipe.getRecipeId()) && s.getStatus().equals("ACTIVE")) ? "Y" : "N",
+                    /*user.getScrapPublics().stream()
+                            .anyMatch((s) -> s.getRecipeInfo().getRecipeId().equals(recipe.getRecipeId()) && s.getStatus().equals("ACTIVE")) ? "Y" : "N"
+
+                     */
+                    null,
                     recipe.getScrapPublics().stream()
                             .filter((s) -> s.getStatus().equals("ACTIVE"))
                             .count()
@@ -69,8 +71,8 @@ public class RecipeInfoDto {
             this.recipeProcessList = recipe.getRecipeProcesses().stream()
                     .map(RecipeProcessResponse::new)
                     .collect(Collectors.toList());
-            this.userScrapYN = user.getScrapPublics().stream()
-                    .anyMatch((s) -> s.getRecipeInfo().getRecipeId().equals(recipe.getRecipeId()) && s.getStatus().equals("ACTIVE")) ? "Y" : "N";
+//            this.userScrapYN = user.getScrapPublics().stream()
+//                    .anyMatch((s) -> s.getRecipeInfo().getRecipeId().equals(recipe.getRecipeId()) && s.getStatus().equals("ACTIVE")) ? "Y" : "N";
             this.userScrapCnt = recipe.getScrapPublics().stream()
                     .filter((s) -> s.getStatus().equals("ACTIVE"))
                     .count();
@@ -92,11 +94,11 @@ public class RecipeInfoDto {
             this.recipeIngredientName = ingredient.getIrdntNm();
             this.recipeIngredientIcon = ingredient.getIcon(ingredients);
             this.recipeIngredientCpcty = ingredient.getIrdntCpcty();
-            this.inFridgeYN = user.getFridges().stream()
-                    .anyMatch((f) -> f.getStatus().equals("ACTIVE")
-                            && recipeIngredientName.contains(f.getIngredientName())
-                            && recipeIngredientIcon != null
-                            && recipeIngredientIcon.equals(f.getIngredientIcon())) ? "Y" : "N";
+//            this.inFridgeYN = user.getFridges().stream()
+//                    .anyMatch((f) -> f.getStatus().equals("ACTIVE")
+//                            && recipeIngredientName.contains(f.getIngredientName())
+//                            && recipeIngredientIcon != null
+//                            && recipeIngredientIcon.equals(f.getIngredientIcon())) ? "Y" : "N";
         }
     }
 

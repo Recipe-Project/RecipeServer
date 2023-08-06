@@ -4,7 +4,7 @@ import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
 import com.recipe.app.src.ingredient.infra.IngredientEntity;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -30,7 +30,7 @@ public class FridgeBasket extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userIdx", nullable = false)
-    private User user;
+    private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredientIdx")
@@ -58,7 +58,7 @@ public class FridgeBasket extends BaseEntity {
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public FridgeBasket(User user, IngredientEntity ingredient, String ingredientName, String ingredientIcon, IngredientCategoryEntity ingredientCategoryEntity) {
+    public FridgeBasket(UserEntity user, IngredientEntity ingredient, String ingredientName, String ingredientIcon, IngredientCategoryEntity ingredientCategoryEntity) {
         if (StringUtils.hasText(ingredientName)) {
             throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_NAME);
         }

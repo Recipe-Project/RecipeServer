@@ -8,13 +8,13 @@ import com.recipe.app.src.fridge.models.PatchFcmTokenReq;
 import com.recipe.app.src.fridge.models.ShelfLifeUser;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.fridgeBasket.mapper.FridgeBasketRepository;
-import com.recipe.app.src.ingredient.application.port.IngredientCategoryRepository;
 import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
 import com.recipe.app.src.ingredient.infra.IngredientCategoryJpaRepository;
 import com.recipe.app.src.recipe.domain.RecipeInfo;
 import com.recipe.app.src.recipe.mapper.RecipeInfoRepository;
+import com.recipe.app.src.user.application.port.UserRepository;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.mapper.UserRepository;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,13 +45,13 @@ public class FridgeService {
 
         List<IngredientCategoryEntity> ingredientCategories = ingredientCategoryRepository.findAll();
         List<Fridge> fridges = request.getFridgeBasketList().stream()
-                .map((f) -> new Fridge(user, f.getIngredientName(), f.getIngredientIcon(), ingredientCategories.stream()
+                .map((f) -> new Fridge(UserEntity.fromModel(user), f.getIngredientName(), f.getIngredientIcon(), ingredientCategories.stream()
                         .filter((i) -> i.getIngredientCategoryId().equals(f.getIngredientCategoryIdx()))
                         .findAny().orElse(null), f.getStorageMethod(), f.getExpiredAt(), f.getCount()))
                 .collect(Collectors.toList());
 
         List<String> ingredientNames = fridges.stream().map(Fridge::getIngredientName).collect(Collectors.toList());
-        List<FridgeBasket> fridgeBaskets = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNames);
+        List<FridgeBasket> fridgeBaskets = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(UserEntity.fromModel(user), "ACTIVE", ingredientNames);
 
         if (fridges.size() != fridgeBaskets.size())
             throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
@@ -63,11 +63,11 @@ public class FridgeService {
         fridgeRepository.saveAll(fridges);
         fridgeBasketRepository.deleteAll(fridgeBaskets);
 
-        return fridgeRepository.findAllByUserAndStatus(user, "ACTIVE");
+        return fridgeRepository.findAllByUserAndStatus(UserEntity.fromModel(user), "ACTIVE");
     }
 
     public List<Fridge> retrieveFridges(User user) {
-        return fridgeRepository.findAllByUserAndStatus(user, "ACTIVE");
+        return fridgeRepository.findAllByUserAndStatus(UserEntity.fromModel(user), "ACTIVE");
     }
 
     @Transactional
@@ -107,23 +107,23 @@ public class FridgeService {
     @Transactional
     public void updateFcmToken(PatchFcmTokenReq patchFcmTokenReq, User user) {
         String fcmToken = patchFcmTokenReq.getFcmToken();
-        user.setDeviceToken(fcmToken);
+        user = user.changeDeviceToken(fcmToken);
         userRepository.save(user);
     }
 
     public List<Fridge> getExistIngredients(List<String> ingredientNameList, User user) throws BaseException {
-        return fridgeRepository.findAllByUserAndStatusAndIngredientNameIn(user, "ACTIVE", ingredientNameList);
+        return fridgeRepository.findAllByUserAndStatusAndIngredientNameIn(UserEntity.fromModel(user), "ACTIVE", ingredientNameList);
     }
 
     public List<RecipeInfo> retrieveFridgeRecipes(User user, Integer start, Integer display) {
-        return recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(user, "ACTIVE").stream()
+        return recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(UserEntity.fromModel(user), "ACTIVE").stream()
                 .skip(start == 0 ? 0 : start - 1)
                 .limit(display)
                 .collect(Collectors.toList());
     }
 
     public int countFridgeRecipes(User user) {
-        return recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(user, "ACTIVE").size();
+        return recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(UserEntity.fromModel(user), "ACTIVE").size();
     }
 
     public List<ShelfLifeUser> retreiveShelfLifeUserList() throws BaseException {
