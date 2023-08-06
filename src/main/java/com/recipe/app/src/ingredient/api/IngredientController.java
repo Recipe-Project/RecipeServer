@@ -31,7 +31,7 @@ public class IngredientController {
     @ApiOperation(value = "재료 목록 조회 API")
     @GetMapping("")
     public BaseResponse<IngredientDto.IngredientsResponse> getIngredients(@ApiIgnore final Authentication authentication,
-                                                                          @ApiParam(name = "keyword", type = "String", example = "감자")
+                                                                          @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                                                           @RequestParam(value = "keyword", required = false) @Nullable String keyword) {
 
         if (authentication == null)
