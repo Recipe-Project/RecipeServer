@@ -15,7 +15,7 @@ import javax.persistence.*;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-@Table(name = "IngredientEntity")
+@Table(name = "Ingredient")
 public class IngredientEntity extends BaseEntity implements Comparable<IngredientEntity> {
     @Id
     @Column(name = "ingredientId", nullable = false, updatable = false)
