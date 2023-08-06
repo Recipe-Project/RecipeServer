@@ -1,82 +1,34 @@
 package com.recipe.app.src.fridgeBasket.domain;
 
-import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
-import com.recipe.app.src.ingredient.infra.IngredientEntity;
-import com.recipe.app.src.user.infra.UserEntity;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
+import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.user.domain.User;
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 
-import static com.recipe.app.common.response.BaseResponseStatus.*;
+@Getter
+public class FridgeBasket {
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
-@Entity
-@Table(name = "FridgeBasket")
-public class FridgeBasket extends BaseEntity {
-    @Id
-    @Column(name = "idx", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idx;
+    private final Long fridgeBasketId;
+    private final User user;
+    private final Ingredient ingredient;
+    private final LocalDate expiredAt;
+    private final float quantity;
+    private final String unit;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userIdx", nullable = false)
-    private UserEntity user;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredientIdx")
-    private IngredientEntity ingredient;
-
-    @Column(name = "ingredientName", nullable = false, length = 45)
-    private String ingredientName;
-
-    @Column(name = "ingredientIcon")
-    private String ingredientIcon;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredientCategoryIdx", nullable = false)
-    private IngredientCategoryEntity ingredientCategoryEntity;
-
-    @Column(name = "count")
-    private Integer count = 1;
-
-    @Column(name = "storageMethod", nullable = false, length = 4)
-    private String storageMethod = "냉장";
-
-    @Column(name = "expiredAt")
-    private LocalDate expiredAt;
-
-    @Column(name = "status", nullable = false, length = 10)
-    private String status = "ACTIVE";
-
-    public FridgeBasket(UserEntity user, IngredientEntity ingredient, String ingredientName, String ingredientIcon, IngredientCategoryEntity ingredientCategoryEntity) {
-        if (StringUtils.hasText(ingredientName)) {
-            throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_NAME);
-        }
-        if (StringUtils.hasText(ingredientIcon)) {
-            throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_ICON);
-        }
-        if (ingredientCategoryEntity == null) {
-            throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
-        }
-
+    @Builder
+    public FridgeBasket(Long fridgeBasketId, User user, Ingredient ingredient, LocalDate expiredAt, float quantity, String unit, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.fridgeBasketId = fridgeBasketId;
         this.user = user;
         this.ingredient = ingredient;
-        this.ingredientName = ingredientName;
-        this.ingredientIcon = ingredientIcon;
-        this.ingredientCategoryEntity = ingredientCategoryEntity;
-    }
-
-    public void setExpiredAt(String expiredAt) {
-        this.expiredAt = LocalDate.parse(expiredAt, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+        this.expiredAt = expiredAt;
+        this.quantity = quantity;
+        this.unit = unit;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 }
