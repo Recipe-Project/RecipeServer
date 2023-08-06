@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 public class IngredientCategory {
@@ -19,5 +20,18 @@ public class IngredientCategory {
         this.ingredientCategoryName = ingredientCategoryName;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof IngredientCategory))
+            return false;
+        IngredientCategory category = (IngredientCategory) o;
+        return ingredientCategoryId.equals(category.getIngredientCategoryId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ingredientCategoryId);
     }
 }
