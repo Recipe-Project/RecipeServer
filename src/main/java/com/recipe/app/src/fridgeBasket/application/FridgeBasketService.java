@@ -4,10 +4,11 @@ import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketDto;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.fridgeBasket.mapper.FridgeBasketRepository;
-import com.recipe.app.src.ingredient.mapper.IngredientRepository;
-import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.ingredient.mapper.IngredientCategoryRepository;
-import com.recipe.app.src.ingredient.domain.IngredientCategory;
+import com.recipe.app.src.ingredient.application.port.IngredientRepository;
+import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
+import com.recipe.app.src.ingredient.infra.IngredientCategoryJpaRepository;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
+import com.recipe.app.src.ingredient.infra.IngredientJpaRepository;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,23 +26,23 @@ import static com.recipe.app.common.response.BaseResponseStatus.*;
 public class FridgeBasketService {
 
     private final FridgeBasketRepository fridgeBasketRepository;
-    private final IngredientCategoryRepository ingredientCategoryRepository;
-    private final IngredientRepository ingredientRepository;
+    private final IngredientCategoryJpaRepository ingredientCategoryRepository;
+    private final IngredientJpaRepository ingredientRepository;
 
     @Transactional
     public void createFridgesBasket(FridgeBasketDto.FridgeBasketIdsRequest request, User user) {
-        List<Ingredient> ingredients = ingredientRepository.findAllByIngredientIdxIn(request.getIngredientList());
+        List<IngredientEntity> ingredients = ingredientRepository.findByIngredientIdIn(request.getIngredientList());
         Map<String, FridgeBasket> existFridgeBaskets = fridgeBasketRepository.findAllByUserAndStatusAndIngredientIn(user, "ACTIVE", ingredients)
                 .stream().collect(Collectors.toMap(FridgeBasket::getIngredientName, v -> v));
 
         List<FridgeBasket> fridgeBaskets = ingredients.stream()
                 .map(ingredient -> {
-                    if (existFridgeBaskets.containsKey(ingredient.getName())) {
-                        FridgeBasket fridgeBasket = existFridgeBaskets.get(ingredient.getName());
+                    if (existFridgeBaskets.containsKey(ingredient.getIngredientName())) {
+                        FridgeBasket fridgeBasket = existFridgeBaskets.get(ingredient.getIngredientName());
                         fridgeBasket.setCount(fridgeBasket.getCount() + 1);
                         return fridgeBasket;
                     }
-                    return new FridgeBasket(user, ingredient, ingredient.getName(), ingredient.getIcon(), ingredient.getIngredientCategory());
+                    return new FridgeBasket(user, ingredient, ingredient.getIngredientName(), ingredient.getIngredientIconUrl(), ingredient.getIngredientCategoryEntity());
                 })
                 .collect(Collectors.toList());
 
@@ -56,16 +57,16 @@ public class FridgeBasketService {
                     throw new BaseException(POST_FRIDGES_BASKET_EXIST_INGREDIENT_NAME, fridgeBasket.getIngredientName());
                 });
 
-        ingredientRepository.findByNameAndStatus(request.getIngredientName(), "ACTIVE")
+        ingredientRepository.findByIngredientName(request.getIngredientName())
                 .ifPresent((ingredient -> {
-                    throw new BaseException(POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS, ingredient.getName());
+                    throw new BaseException(POST_FRIDGES_DIRECT_BASKET_DUPLICATED_INGREDIENT_NAME_IN_INGREDIENTS, ingredient.getIngredientName());
                 }));
 
-        IngredientCategory ingredientCategory = ingredientCategoryRepository.findById(request.getIngredientCategoryIdx()).orElseThrow(() -> {
+        IngredientCategoryEntity ingredientCategoryEntity = ingredientCategoryRepository.findById(request.getIngredientCategoryIdx()).orElseThrow(() -> {
             throw new BaseException(NOT_FOUND_INGREDIENT_CATEGORY);
         });
 
-        FridgeBasket fridgeBasket = new FridgeBasket(user, null, request.getIngredientName(), request.getIngredientIcon(), ingredientCategory);
+        FridgeBasket fridgeBasket = new FridgeBasket(user, null, request.getIngredientName(), request.getIngredientIcon(), ingredientCategoryEntity);
         fridgeBasket = fridgeBasketRepository.save(fridgeBasket);
 
         return fridgeBasket;

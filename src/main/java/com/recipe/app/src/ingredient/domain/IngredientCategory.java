@@ -1,45 +1,23 @@
 package com.recipe.app.src.ingredient.domain;
 
-import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
-@Entity
-@Table(name = "IngredientCategory")
-public class IngredientCategory extends BaseEntity {
-    @Id
-    @Column(name = "ingredientCategoryIdx", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer ingredientCategoryIdx;
+@Getter
+public class IngredientCategory {
 
-    @Column(name = "name", nullable = false, length = 45)
-    private String name;
+    private final Long ingredientCategoryId;
+    private final String ingredientCategoryName;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
-    @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
-    private List<Ingredient> ingredients = new ArrayList<>();
-
-    @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
-    private List<FridgeBasket> fridgeBasket = new ArrayList<>();
-
-    @OneToMany(mappedBy = "ingredientCategory", cascade = CascadeType.ALL)
-    private List<Fridge> fridge = new ArrayList<>();
-
-    @Column(name = "status", nullable = false, length = 10)
-    private String status = "ACTIVE";
-
-    public IngredientCategory(String name) {
-        this.name = name;
+    @Builder
+    public IngredientCategory(Long ingredientCategoryId, String ingredientCategoryName, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.ingredientCategoryId = ingredientCategoryId;
+        this.ingredientCategoryName = ingredientCategoryName;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
-
 }

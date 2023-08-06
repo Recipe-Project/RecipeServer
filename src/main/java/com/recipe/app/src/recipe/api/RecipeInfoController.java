@@ -4,6 +4,7 @@ package com.recipe.app.src.recipe.api;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.recipe.application.RecipeInfoService;
 import com.recipe.app.src.recipe.application.dto.RecipeInfoDto;
 import com.recipe.app.src.keyword.application.RecipeKeywordService;
@@ -49,7 +50,7 @@ public class RecipeInfoController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<Ingredient> ingredients = ingredientService.retrieveIngredients(null);
+        List<Ingredient> ingredients = ingredientService.getIngredients(null);
         RecipeInfoDto.RecipeDetailResponse data = new RecipeInfoDto.RecipeDetailResponse(recipeInfoService.retrieveRecipeInfo(recipeIdx), user, ingredients);
 
         return success(data);

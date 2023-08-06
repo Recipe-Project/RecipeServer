@@ -1,7 +1,7 @@
 package com.recipe.app.src.fridgeBasket.mapper;
 
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -17,7 +17,7 @@ public interface FridgeBasketRepository extends CrudRepository<FridgeBasket, Int
 
     List<FridgeBasket> findByUserAndStatus(User user, String status);
 
-    List<FridgeBasket> findAllByUserAndStatusAndIngredientIn(User user, String status, List<Ingredient> ingredientList);
+    List<FridgeBasket> findAllByUserAndStatusAndIngredientIn(User user, String status, List<IngredientEntity> ingredientEntityList);
 
     List<FridgeBasket> findAllByUserAndStatusAndIngredientNameIn(User user, String status, List<String> ingredientNameList);
 }

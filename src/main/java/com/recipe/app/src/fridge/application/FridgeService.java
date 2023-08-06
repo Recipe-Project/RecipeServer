@@ -6,12 +6,13 @@ import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.fridge.mapper.FridgeRepository;
 import com.recipe.app.src.fridge.models.PatchFcmTokenReq;
 import com.recipe.app.src.fridge.models.ShelfLifeUser;
-import com.recipe.app.src.fridgeBasket.mapper.FridgeBasketRepository;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import com.recipe.app.src.ingredient.mapper.IngredientCategoryRepository;
-import com.recipe.app.src.ingredient.domain.IngredientCategory;
-import com.recipe.app.src.recipe.mapper.RecipeInfoRepository;
+import com.recipe.app.src.fridgeBasket.mapper.FridgeBasketRepository;
+import com.recipe.app.src.ingredient.application.port.IngredientCategoryRepository;
+import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
+import com.recipe.app.src.ingredient.infra.IngredientCategoryJpaRepository;
 import com.recipe.app.src.recipe.domain.RecipeInfo;
+import com.recipe.app.src.recipe.mapper.RecipeInfoRepository;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.mapper.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,17 +36,17 @@ public class FridgeService {
     private static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
     private final FridgeRepository fridgeRepository;
     private final FridgeBasketRepository fridgeBasketRepository;
-    private final IngredientCategoryRepository ingredientCategoryRepository;
+    private final IngredientCategoryJpaRepository ingredientCategoryRepository;
     private final RecipeInfoRepository recipeInfoRepository;
     private final UserRepository userRepository;
 
     @Transactional
     public List<Fridge> createFridges(FridgeDto.FridgesRequest request, User user) {
 
-        List<IngredientCategory> ingredientCategories = ingredientCategoryRepository.findByStatus("ACTIVE");
+        List<IngredientCategoryEntity> ingredientCategories = ingredientCategoryRepository.findAll();
         List<Fridge> fridges = request.getFridgeBasketList().stream()
                 .map((f) -> new Fridge(user, f.getIngredientName(), f.getIngredientIcon(), ingredientCategories.stream()
-                        .filter((i) -> i.getIngredientCategoryIdx().equals(f.getIngredientCategoryIdx()))
+                        .filter((i) -> i.getIngredientCategoryId().equals(f.getIngredientCategoryIdx()))
                         .findAny().orElse(null), f.getStorageMethod(), f.getExpiredAt(), f.getCount()))
                 .collect(Collectors.toList());
 

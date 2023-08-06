@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -100,8 +101,8 @@ public class RecipeIngredient extends BaseEntity {
         }
         String keyword = iconNm;
         return ingredients.stream()
-                .filter((i) -> i.getName().equals(keyword))
-                .map(Ingredient::getIcon)
+                .filter((i) -> i.getIngredientName().equals(keyword))
+                .map(Ingredient::getIngredientIconUrl)
                 .findFirst()
                 .orElse(null);
     }

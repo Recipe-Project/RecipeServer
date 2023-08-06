@@ -2,8 +2,8 @@ package com.recipe.app.src.fridgeBasket.domain;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.ingredient.domain.IngredientCategory;
+import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -34,7 +34,7 @@ public class FridgeBasket extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredientIdx")
-    private Ingredient ingredient;
+    private IngredientEntity ingredient;
 
     @Column(name = "ingredientName", nullable = false, length = 45)
     private String ingredientName;
@@ -44,7 +44,7 @@ public class FridgeBasket extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredientCategoryIdx", nullable = false)
-    private IngredientCategory ingredientCategory;
+    private IngredientCategoryEntity ingredientCategoryEntity;
 
     @Column(name = "count")
     private Integer count = 1;
@@ -58,14 +58,14 @@ public class FridgeBasket extends BaseEntity {
     @Column(name = "status", nullable = false, length = 10)
     private String status = "ACTIVE";
 
-    public FridgeBasket(User user, Ingredient ingredient, String ingredientName, String ingredientIcon, IngredientCategory ingredientCategory) {
+    public FridgeBasket(User user, IngredientEntity ingredient, String ingredientName, String ingredientIcon, IngredientCategoryEntity ingredientCategoryEntity) {
         if (StringUtils.hasText(ingredientName)) {
             throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_NAME);
         }
         if (StringUtils.hasText(ingredientIcon)) {
             throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_ICON);
         }
-        if (ingredientCategory == null) {
+        if (ingredientCategoryEntity == null) {
             throw new BaseException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX);
         }
 
@@ -73,7 +73,7 @@ public class FridgeBasket extends BaseEntity {
         this.ingredient = ingredient;
         this.ingredientName = ingredientName;
         this.ingredientIcon = ingredientIcon;
-        this.ingredientCategory = ingredientCategory;
+        this.ingredientCategoryEntity = ingredientCategoryEntity;
     }
 
     public void setExpiredAt(String expiredAt) {

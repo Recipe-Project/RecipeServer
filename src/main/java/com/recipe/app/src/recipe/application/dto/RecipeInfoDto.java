@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.recipe.domain.RecipeInfo;
 import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import com.recipe.app.src.recipe.domain.RecipeProcess;
