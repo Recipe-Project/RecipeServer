@@ -4,11 +4,14 @@ import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDto;
+import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import com.recipe.app.src.user.exception.EmptyFcmTokenException;
 import com.recipe.app.src.user.exception.EmptyTokenException;
 import com.recipe.app.src.user.exception.ForbiddenUserException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
+import io.swagger.annotations.Api;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
@@ -47,19 +50,22 @@ public class UserController {
 
     @ResponseBody
     @PostMapping("/auto-login")
-    public BaseResponse<Void> postAutoLogin(final Authentication authentication) {
+    public BaseResponse<UserDto.UserProfileResponse> autoLogin(final Authentication authentication) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
-        Integer userIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        userService.retrieveUserByUserIdx(userIdx);
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        user = userService.autoLogin(user);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
-        return success();
+        return success(data);
     }
 
     @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<UserDto.UserProfileResponse> postNaverLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> naverLogin(HttpServletRequest request) throws IOException, ParseException {
+
         String accessToken = request.getHeader(this.naverToken);
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
@@ -72,16 +78,16 @@ public class UserController {
 
         User user = userService.naverLogin(accessToken, fcmToken);
         HttpHeaders httpHeaders = new HttpHeaders();
-        String jwt = jwtService.createJwt(user.getUserIdx());
+        String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
     @ResponseBody
     @PostMapping("/kakao-login")
-    public BaseResponse<UserDto.UserProfileResponse> postKakaoLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> kakaoLogin(HttpServletRequest request) throws IOException, ParseException {
         String accessToken = request.getHeader(this.kakaoToken);
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
@@ -94,16 +100,16 @@ public class UserController {
 
         User user = userService.kakaoLogin(accessToken, fcmToken);
         HttpHeaders httpHeaders = new HttpHeaders();
-        String jwt = jwtService.createJwt(user.getUserIdx());
+        String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
     @ResponseBody
     @PostMapping("/google-login")
-    public BaseResponse<UserDto.UserProfileResponse> postGoogleLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> googleLogin(HttpServletRequest request) throws IOException, ParseException {
         String accessToken = request.getHeader(this.googleToken);
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
@@ -116,63 +122,51 @@ public class UserController {
 
         User user = userService.googleLogin(accessToken, fcmToken);
         HttpHeaders httpHeaders = new HttpHeaders();
-        String jwt = jwtService.createJwt(user.getUserIdx());
+        String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
     @ResponseBody
-    @GetMapping("/{userIdx}")
-    public BaseResponse<UserDto.UserProfileResponse> getUser(final Authentication authentication, @PathVariable Integer userIdx) {
+    @GetMapping("")
+    public BaseResponse<UserDto.UserProfileResponse> getUser(final Authentication authentication) {
         if (authentication == null)
             throw new UserTokenNotExistException();
 
-        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        if (!userIdx.equals(jwtUserIdx)) {
-            throw new ForbiddenUserException();
-        }
-
-        User user = userService.retrieveUserByUserIdx(userIdx);
-        HttpHeaders httpHeaders = new HttpHeaders();
-        String jwt = jwtService.createJwt(user.getUserIdx());
-        httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(user);
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
     @ResponseBody
-    @PatchMapping("/{userIdx}")
-    public BaseResponse<UserDto.UserProfileResponse> patchUser(final Authentication authentication, @PathVariable int userIdx, @RequestBody UserDto.UserProfileRequest request) {
+    @PatchMapping("")
+    public BaseResponse<UserDto.UserProfileResponse> patchUser(final Authentication authentication, @RequestBody UserDto.UserProfileRequest request) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
-        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        if (userIdx != jwtUserIdx) {
-            throw new ForbiddenUserException();
-        }
-
-        UserDto.UserProfileResponse data = new UserDto.UserProfileResponse(userService.updateUser(userIdx, request));
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        user = userService.updateUser(user, request);
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
 
         return success(data);
     }
 
     @ResponseBody
-    @DeleteMapping("/{userIdx}")
-    public BaseResponse<Void> deleteUser(HttpServletRequest request, final Authentication authentication, @PathVariable int userIdx) {
-        if (authentication == null)
-            throw new UserTokenNotExistException();
+    @DeleteMapping("")
+    public BaseResponse<Void> deleteUser(HttpServletRequest request, final Authentication authentication) {
 
-        int jwtUserIdx = ((User) authentication.getPrincipal()).getUserIdx();
-        if (userIdx != jwtUserIdx) {
-            throw new ForbiddenUserException();
-        }
-
-        userService.deleteUser(userIdx);
         String jwt = jwtService.resolveToken(request);
-        userService.registerJwtBlackList(jwt);
+
+        if (authentication == null || !StringUtils.hasText(jwt))
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+
+        userService.deleteUser(user, jwt);
 
         return success();
     }
@@ -181,6 +175,10 @@ public class UserController {
     @PostMapping("/logout")
     public BaseResponse<Void> logout(HttpServletRequest request) {
         String jwt = jwtService.resolveToken(request);
+
+        if (!StringUtils.hasText(jwt))
+            throw new UserTokenNotExistException();
+
         userService.registerJwtBlackList(jwt);
 
         return success();

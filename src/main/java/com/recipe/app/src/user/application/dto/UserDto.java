@@ -1,6 +1,7 @@
 package com.recipe.app.src.user.application.dto;
 
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.infra.UserEntity;
 import lombok.*;
 
 import java.util.List;
@@ -13,46 +14,31 @@ public class UserDto {
     @AllArgsConstructor
     @NoArgsConstructor
     public static class UserProfileRequest {
-        private String profilePhoto;
-        private String userName;
+        private String profileImgUrl;
+        private String nickname;
     }
 
     @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
     public static class UserProfileResponse {
-        private int userIdx;
-        private String socialId;
-        private String profilePhoto;
-        private String userName;
+        private Long userId;
+        private String profileImgUrl;
+        private String nickname;
+        private String email;
+        private String loginProvider;
         private long youtubeScrapCnt;
         private long blogScrapCnt;
         private long recipeScrapCnt;
         private long myRecipeTotalSize;
         private List<UserRecipeResponse> userRecipes;
 
-        public UserProfileResponse(User user) {
-            this(user.getUserIdx(),
-                    user.getSocialId(),
-                    user.getProfilePhoto(),
-                    user.getUserName(),
-                    user.getScrapYoutubes().stream()
-                            .filter((scrap) -> scrap.getStatus().equals("ACTIVE"))
-                            .count(),
-                    user.getScrapBlogs().stream()
-                            .filter((scrap) -> scrap.getStatus().equals("ACTIVE"))
-                            .count(),
-                    user.getScrapPublics().stream()
-                            .filter((scrap) -> scrap.getStatus().equals("ACTIVE"))
-                            .count(),
-                    user.getUserRecipes().stream()
-                            .filter((scrap) -> scrap.getStatus().equals("ACTIVE"))
-                            .count(),
-                    user.getUserRecipes().stream()
-                            .filter((scrap) -> scrap.getStatus().equals("ACTIVE"))
-                            .map((r) -> new UserRecipeResponse(r.getUserRecipeIdx(), r.getThumbnail()))
-                            .collect(Collectors.toList())
-            );
+        public static UserProfileResponse from(User user) {
+            return UserProfileResponse.builder()
+                    .userId(user.getUserId())
+                    .profileImgUrl(user.getProfileImgUrl())
+                    .nickname(user.getNickname())
+                    .email(user.getEmail())
+                    .build();
         }
     }
 
@@ -60,7 +46,7 @@ public class UserDto {
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class UserRecipeResponse {
-        private int userRecipeIdx;
-        private String thumbnail;
+        private Long recipeId;
+        private String thumbnailImgUrl;
     }
 }
