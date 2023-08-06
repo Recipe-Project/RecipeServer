@@ -1,13 +1,7 @@
 package com.recipe.app.src.user.infra;
 
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import com.recipe.app.src.scrap.domain.ScrapBlog;
-import com.recipe.app.src.scrap.domain.ScrapPublic;
-import com.recipe.app.src.scrap.domain.ScrapYoutube;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.userRecipe.domain.UserRecipe;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -15,8 +9,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @EqualsAndHashCode(callSuper = false)
@@ -49,15 +41,6 @@ public class UserEntity extends BaseEntity {
 
     @Column(name = "recentLoginAt")
     private LocalDateTime recentLoginAt;
-
-    public UserEntity(String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken) {
-        this.socialId = socialId;
-        this.profileImgUrl = profileImgUrl;
-        this.nickname = nickname;
-        this.email = email;
-        this.phoneNumber = phoneNumber;
-        this.deviceToken = deviceToken;
-    }
 
     public User toModel() {
         return User.builder()
