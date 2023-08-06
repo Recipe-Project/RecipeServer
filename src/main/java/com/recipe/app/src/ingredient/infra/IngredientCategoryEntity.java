@@ -8,8 +8,6 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @EqualsAndHashCode(callSuper = false)
@@ -25,8 +23,12 @@ public class IngredientCategoryEntity extends BaseEntity {
     @Column(name = "ingredientCategoryName", nullable = false, length = 10)
     private String ingredientCategoryName;
 
-    @OneToMany(mappedBy = "ingredientCategoryEntity", cascade = CascadeType.ALL)
-    private List<IngredientEntity> ingredientEntities = new ArrayList<>();
+    public static IngredientCategoryEntity fromModel(IngredientCategory ingredientCategory) {
+        IngredientCategoryEntity ingredientCategoryEntity = new IngredientCategoryEntity();
+        ingredientCategoryEntity.ingredientCategoryId = ingredientCategory.getIngredientCategoryId();
+        ingredientCategoryEntity.ingredientCategoryName = ingredientCategory.getIngredientCategoryName();
+        return ingredientCategoryEntity;
+    }
 
     public IngredientCategory toModel() {
         return IngredientCategory.builder()
