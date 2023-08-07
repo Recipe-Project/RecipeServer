@@ -1,5 +1,6 @@
 package com.recipe.app.src.ingredient.infra;
 
+import com.recipe.app.src.user.infra.UserEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -16,4 +17,6 @@ public interface IngredientJpaRepository extends JpaRepository<IngredientEntity,
     List<IngredientEntity> findByIngredientIdIn(List<Long> ingredientIds);
 
     Optional<IngredientEntity> findByIngredientName(String ingredientName);
+
+    Optional<IngredientEntity> findByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategoryEntity(UserEntity user, String ingredientName, String ingredientIconUrl, IngredientCategoryEntity ingredientCategoryEntity);
 }
