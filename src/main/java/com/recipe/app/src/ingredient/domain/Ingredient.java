@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 public class Ingredient {
@@ -31,5 +32,32 @@ public class Ingredient {
         this.user = user;
         this.isDefault = isDefault;
         this.isHidden = isHidden;
+    }
+
+    public static Ingredient from(IngredientCategory ingredientCategory, String ingredientName, String ingredientIconUrl, User user) {
+        LocalDateTime now = LocalDateTime.now();
+        return Ingredient.builder()
+                .ingredientCategory(ingredientCategory)
+                .ingredientName(ingredientName)
+                .ingredientIconUrl(ingredientIconUrl)
+                .createdAt(now)
+                .updatedAt(now)
+                .user(user)
+                .isDefault(false)
+                .isHidden(true)
+                .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Ingredient))
+            return false;
+        Ingredient category = (Ingredient) o;
+        return ingredientId.equals(category.getIngredientId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(ingredientId);
     }
 }
