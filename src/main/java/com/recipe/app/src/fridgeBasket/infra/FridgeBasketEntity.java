@@ -1,6 +1,7 @@
-package com.recipe.app.src.fridgeBasket.mapper;
+package com.recipe.app.src.fridgeBasket.infra;
 
 import com.recipe.app.common.entity.BaseEntity;
+import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
@@ -39,4 +40,26 @@ public class FridgeBasketEntity extends BaseEntity {
 
     @Column(name = "unit")
     private String unit;
+
+    public static FridgeBasketEntity fromModel(FridgeBasket fridgeBasket) {
+        FridgeBasketEntity fridgeBasketEntity = new FridgeBasketEntity();
+        fridgeBasketEntity.fridgeBasketId = fridgeBasket.getFridgeBasketId();
+        fridgeBasketEntity.user = UserEntity.fromModel(fridgeBasket.getUser());
+        fridgeBasketEntity.ingredient = IngredientEntity.fromModel(fridgeBasket.getIngredient());
+        fridgeBasketEntity.expiredAt = fridgeBasket.getExpiredAt();
+        fridgeBasketEntity.quantity = fridgeBasket.getQuantity();
+        fridgeBasketEntity.unit = fridgeBasket.getUnit();
+        return fridgeBasketEntity;
+    }
+
+    public FridgeBasket toModel() {
+        return FridgeBasket.builder()
+                .fridgeBasketId(fridgeBasketId)
+                .user(user.toModel())
+                .ingredient(ingredient.toModel())
+                .expiredAt(expiredAt)
+                .quantity(quantity)
+                .unit(unit)
+                .build();
+    }
 }
