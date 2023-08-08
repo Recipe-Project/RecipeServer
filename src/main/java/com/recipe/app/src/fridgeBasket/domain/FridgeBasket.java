@@ -31,4 +31,42 @@ public class FridgeBasket {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public static FridgeBasket from(User user, Ingredient ingredient) {
+        LocalDateTime now = LocalDateTime.now();
+        return FridgeBasket.builder()
+                .user(user)
+                .ingredient(ingredient)
+                .quantity(1)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
+    public FridgeBasket plusCount(int cnt) {
+        return FridgeBasket.builder()
+                .fridgeBasketId(fridgeBasketId)
+                .user(user)
+                .ingredient(ingredient)
+                .expiredAt(expiredAt)
+                .quantity(quantity + cnt)
+                .unit(unit)
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
+                .build();
+    }
+
+    public FridgeBasket changeExpiredAtAndQuantityAndUnit(LocalDate expiredAt, float quantity, String unit) {
+        LocalDateTime now = LocalDateTime.now();
+        return FridgeBasket.builder()
+                .fridgeBasketId(fridgeBasketId)
+                .user(user)
+                .ingredient(ingredient)
+                .expiredAt(expiredAt)
+                .quantity(quantity)
+                .unit(unit)
+                .createdAt(getCreatedAt())
+                .updatedAt(now)
+                .build();
+    }
 }
