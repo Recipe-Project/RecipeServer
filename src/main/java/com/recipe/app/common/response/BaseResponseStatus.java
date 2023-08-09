@@ -169,7 +169,6 @@ public enum BaseResponseStatus {
     // [POST] /fridges
 
 
-
     // receipts
     NOT_FOUND_RECEIPT(3048, "존재하지 않는 영수증입니다."),
     NOT_FOUND_BUY(3049, "존재하지 않는 구매 품목입니다."),
@@ -206,6 +205,8 @@ public enum BaseResponseStatus {
 
     NOT_FOUND_FRIDGE_BASKET(3077, "냉장고 바구니 조회에 실패했습니다."),
 
+    NOT_FOUND_FRIDGE(3078, "냉장고 조회에 실패했습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
@@ -225,7 +226,7 @@ public enum BaseResponseStatus {
     FAILED_TO_URL_ENCODER(4026, "검색어 인코딩에 실패했습니다."),
     FAILED_TO_CRAWLING(4027, "크롤링에 실패했습니다."),
 
-    UNKNOWN_EXCEPTION(9999,"알수 없는 에러가 발생하였습니다.");
+    UNKNOWN_EXCEPTION(9999, "알수 없는 에러가 발생하였습니다.");
 
     private final int code;
     private final String message;

@@ -5,6 +5,7 @@ import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.common.utils.FirebaseCloudMessageService;
 import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.fridge.application.dto.FridgeDto;
+import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.fridge.models.PatchFcmTokenReq;
 import com.recipe.app.src.fridge.models.ShelfLifeUser;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
@@ -27,7 +28,7 @@ import java.util.stream.Collectors;
 import static com.recipe.app.common.response.BaseResponse.success;
 
 @Slf4j
-@RestController
+@RestController("/fridges")
 @RequiredArgsConstructor
 public class FridgeController {
 
@@ -36,55 +37,61 @@ public class FridgeController {
     private final FirebaseCloudMessageService firebaseCloudMessageService;
 
     @ResponseBody
-    @PostMapping("/fridges")
-    public BaseResponse<List<FridgeDto.FridgeResponse>> postFridges(final Authentication authentication, @RequestBody FridgeDto.FridgesRequest request) {
+    @PostMapping("")
+    public BaseResponse<FridgeDto.FridgesResponse> postFridges(final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<FridgeDto.FridgeResponse> data = fridgeService.createFridges(request, user).stream()
-                .map(FridgeDto.FridgeResponse::new)
-                .collect(Collectors.toList());
+        long fridgeBasketsCnt = fridgeBasketService.countFridgeBasketByUser(user);
+        List<Fridge> fridges = fridgeService.createFridges(user);
+        FridgeDto.FridgesResponse data = FridgeDto.FridgesResponse.from(fridgeBasketsCnt, fridges);
 
         return success(data);
     }
 
-    @GetMapping("/fridges")
+    @GetMapping("")
     public BaseResponse<FridgeDto.FridgesResponse> getFridges(final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        FridgeDto.FridgesResponse data = new FridgeDto.FridgesResponse(fridgeBasketService.countFridgeBasketsByUser(user), fridgeService.retrieveFridges(user));
+        long fridgeBasketsCnt = fridgeBasketService.countFridgeBasketByUser(user);
+        List<Fridge> fridges = fridgeService.getFridges(user);
+        FridgeDto.FridgesResponse data = FridgeDto.FridgesResponse.from(fridgeBasketsCnt, fridges);
 
         return success(data);
     }
 
-    @DeleteMapping("/fridges/ingredient")
-    public BaseResponse<Void> deleteFridgeIngredients(final Authentication authentication, @RequestBody FridgeDto.FridgeIngredientsRequest request) {
+    @DeleteMapping("/{fridgeId}")
+    public BaseResponse<FridgeDto.FridgesResponse> deleteFridge(final Authentication authentication, @RequestParam Long fridgeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeService.deleteFridgeIngredients(user, request);
+        long fridgeBasketsCnt = fridgeBasketService.countFridgeBasketByUser(user);
+        List<Fridge> fridges = fridgeService.deleteFridge(user, fridgeId);
+        FridgeDto.FridgesResponse data = FridgeDto.FridgesResponse.from(fridgeBasketsCnt, fridges);
 
-        return success();
+        return success(data);
     }
 
     @ResponseBody
-    @PatchMapping("/fridges/ingredient")
-    public BaseResponse<Void> patchFridgeIngredients(final Authentication authentication, @RequestBody FridgeDto.PatchFridgesRequest request) {
+    @PatchMapping("/{fridgeId}")
+    public BaseResponse<FridgeDto.FridgesResponse> patchFridge(final Authentication authentication, @RequestParam Long fridgeId, @RequestBody FridgeDto.FridgeRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeService.updateFridgeIngredients(user, request);
+        long fridgeBasketsCnt = fridgeBasketService.countFridgeBasketByUser(user);
+        List<Fridge> fridges = fridgeService.updateFridge(user, fridgeId, request);
+        FridgeDto.FridgesResponse data = FridgeDto.FridgesResponse.from(fridgeBasketsCnt, fridges);
 
-        return success();
+        return success(data);
     }
 
     @ResponseBody
