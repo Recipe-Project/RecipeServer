@@ -204,6 +204,8 @@ public enum BaseResponseStatus {
 
     NOT_FOUND_USER_RECIPE(3076, "유저 레시피 상세 조회에 실패했습니다."),
 
+    NOT_FOUND_FRIDGE_BASKET(3077, "냉장고 바구니 조회에 실패했습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
