@@ -1,112 +1,78 @@
 package com.recipe.app.src.fridge.domain;
 
-import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
-import com.recipe.app.src.user.infra.UserEntity;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import org.springframework.util.StringUtils;
+import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
+import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.user.domain.User;
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.persistence.*;
-import java.security.InvalidParameterException;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
-import static com.recipe.app.common.response.BaseResponseStatus.*;
+@Getter
+public class Fridge {
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
-@Entity
-@Table(name = "Fridge")
-public class Fridge extends BaseEntity {
-    @Id
-    @Column(name = "idx", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idx;
+    private final Long fridgeId;
+    private final User user;
+    private final Ingredient ingredient;
+    private final LocalDate expiredAt;
+    private final float quantity;
+    private final String unit;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "userIdx", nullable = false)
-    private UserEntity user;
-
-    @Column(name = "ingredientName", nullable = false, length = 20)
-    private String ingredientName;
-
-    @Column(name = "ingredientIcon")
-    private String ingredientIcon;
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "ingredientCategoryIdx", nullable = false)
-    private IngredientCategoryEntity ingredientCategory;
-
-    @Column(name = "storageMethod", nullable = false, length = 2)
-    private String storageMethod;
-
-    @Column(name = "expiredAt", nullable = false)
-    private LocalDate expiredAt;
-
-    @Column(name = "count", nullable = false)
-    private int count;
-
-    @Column(name = "status", nullable = false, length = 10)
-    private String status = "ACTIVE";
-
-    public Fridge(UserEntity user, String ingredientName, String ingredientIcon, IngredientCategoryEntity ingredientCategory, String storageMethod, String expiredAt, int count) {
-
-        if (!StringUtils.hasText(ingredientName)) {
-            throw new InvalidParameterException(FRIDGES_EMPTY_INGREDIENT_NAME.getMessage());
-        }
-        if (!StringUtils.hasText(ingredientIcon)) {
-            throw new InvalidParameterException(FRIDGES_EMPTY_INGREDIENT_ICON.getMessage());
-        }
-        if (ingredientCategory == null) {
-            throw new InvalidParameterException(POST_FRIDGES_DIRECT_BASKET_EMPTY_INGREDIENT_CATEGORY_IDX.getMessage());
-        }
-        if (!StringUtils.hasText(storageMethod)) {
-            throw new InvalidParameterException(EMPTY_STORAGE_METHOD.getMessage());
-        }
-        if (count <= 0) {
-            throw new BaseException(EMPTY_INGREDIENT_COUNT);
-        }
-        if (expiredAt == null) {
-            throw new BaseException(INVALID_DATE);
-        }
-        if (!storageMethod.equals("냉장") && !storageMethod.equals("냉동") && !storageMethod.equals("실온")) {
-            throw new BaseException(INVALID_STORAGE_METHOD);
-        }
-
+    @Builder
+    public Fridge(Long fridgeId, User user, Ingredient ingredient, LocalDate expiredAt, float quantity, String unit, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.fridgeId = fridgeId;
         this.user = user;
-        this.ingredientName = ingredientName;
-        this.ingredientIcon = ingredientIcon;
-        this.ingredientCategory = ingredientCategory;
-        this.storageMethod = storageMethod;
-        this.expiredAt = LocalDate.parse(expiredAt, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-        this.count = count;
+        this.ingredient = ingredient;
+        this.expiredAt = expiredAt;
+        this.quantity = quantity;
+        this.unit = unit;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
 
-    public Integer getFreshness() {
+    public static Fridge from(FridgeBasket fridgeBasket) {
+        LocalDateTime now = LocalDateTime.now();
+        return Fridge.builder()
+                .user(fridgeBasket.getUser())
+                .ingredient(fridgeBasket.getIngredient())
+                .expiredAt(fridgeBasket.getExpiredAt())
+                .quantity(fridgeBasket.getQuantity())
+                .unit(fridgeBasket.getUnit())
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
+    public Freshness getFreshness() {
         if (this.expiredAt == null) {
-            return 555;
+            return Freshness.FRESH;
         }
         long diffDay = ChronoUnit.DAYS.between(LocalDate.now(), expiredAt);
-        if (diffDay < 0) {
-            return 444;
+        if (diffDay <= 0) {
+            return Freshness.DISPOSAL;
         }
-        if (diffDay <= 3) {
-            return 1;
+        if (diffDay < 7) {
+            return Freshness.DANGER;
         }
-        if (diffDay <= 7) {
-            return 2;
-        }
-        return 3;
+        return Freshness.FRESH;
     }
 
-    public void setExpiredAt(String expiredAt) {
-        this.expiredAt = LocalDate.parse(expiredAt, DateTimeFormatter.ofPattern("yyyy.MM.dd"));
+    public Fridge changeExpiredAtAndQuantityAndUnit(LocalDate expiredAt, float quantity, String unit) {
+        LocalDateTime now = LocalDateTime.now();
+        return Fridge.builder()
+                .fridgeId(fridgeId)
+                .user(user)
+                .ingredient(ingredient)
+                .expiredAt(expiredAt)
+                .quantity(quantity)
+                .unit(unit)
+                .createdAt(getCreatedAt())
+                .updatedAt(now)
+                .build();
     }
 
 }
