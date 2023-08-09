@@ -13,7 +13,7 @@ public interface FridgeBasketJpaRepository extends CrudRepository<FridgeBasketEn
 
     List<FridgeBasketEntity> saveAll(List<FridgeBasketEntity> fridgeBasketEntities);
 
-    List<FridgeBasketEntity> findByUserAndFridgeBasketIdIn(UserEntity user, List<Long> fridgeBasketIds);
+    Optional<FridgeBasketEntity> findByUserAndFridgeBasketId(UserEntity user, Long fridgeBasketId);
 
     long countByUser(UserEntity user);
 

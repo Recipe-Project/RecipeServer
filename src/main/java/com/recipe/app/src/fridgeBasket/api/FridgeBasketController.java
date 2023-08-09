@@ -62,27 +62,27 @@ public class FridgeBasketController {
         return success(data);
     }
 
-    @DeleteMapping("")
-    public BaseResponse<Void> deleteFridgeBasket(final Authentication authentication, @RequestBody FridgeBasketDto.FridgeBasketIdsRequest request) {
+    @DeleteMapping("/{fridgeBasketId}")
+    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> deleteFridgeBasket(final Authentication authentication, @RequestParam Long fridgeBasketId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeBasketService.deleteFridgeBaskets(user, request);
+        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBasketService.deleteFridgeBasket(user, fridgeBasketId));
 
-        return success();
+        return success(data);
     }
 
     @ResponseBody
-    @PatchMapping("")
-    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> patchFridgeBasket(final Authentication authentication, @RequestBody FridgeBasketDto.FridgeBasketsRequest request) {
+    @PatchMapping("/{fridgeBasketId}")
+    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> patchFridgeBasket(final Authentication authentication, @RequestParam Long fridgeBasketId, @RequestBody FridgeBasketDto.FridgeBasketRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBasketService.updateFridgeBaskets(user, request));
+        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBasketService.updateFridgeBasket(user, fridgeBasketId, request));
 
         return success(data);
     }

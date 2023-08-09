@@ -12,7 +12,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -42,9 +41,7 @@ public class FridgeBasketService {
                 })
                 .collect(Collectors.toList());
 
-        fridgeBasketRepository.saveAll(fridgeBaskets);
-
-        return getFridgeBasketsByUser(user);
+        return fridgeBasketRepository.saveAll(fridgeBaskets);
     }
 
     @Transactional
@@ -68,25 +65,18 @@ public class FridgeBasketService {
     }
 
     @Transactional
-    public void deleteFridgeBaskets(User user, FridgeBasketDto.FridgeBasketIdsRequest request) {
-        List<FridgeBasket> fridgeBaskets = fridgeBasketRepository.findByUserAndFridgeBasketIdIn(user, request.getFridgeBasketIds());
-        fridgeBasketRepository.deleteAll(fridgeBaskets);
+    public List<FridgeBasket> deleteFridgeBasket(User user, Long fridgeBasketId) {
+        FridgeBasket fridgeBasket = fridgeBasketRepository.findByUserAndFridgeBasketId(user, fridgeBasketId).orElseThrow(NotFoundFridgeBasketException::new);
+        fridgeBasketRepository.delete(fridgeBasket);
+
+        return getFridgeBasketsByUser(user);
     }
 
     @Transactional
-    public List<FridgeBasket> updateFridgeBaskets(User user, FridgeBasketDto.FridgeBasketsRequest request) {
-        List<Long> fridgeBasketIds = request.getFridgeBaskets().stream().map(FridgeBasketDto.FridgeBasketRequest::getFridgeBasketId).collect(Collectors.toList());
-        List<FridgeBasket> fridgeBaskets = fridgeBasketRepository.findByFridgeBasketIdIn(fridgeBasketIds);
-        if (fridgeBasketIds.size() != fridgeBaskets.size())
-            throw new NotFoundFridgeBasketException();
-
-        Map<Long, FridgeBasket> fridgeBasketMap = fridgeBaskets.stream().collect(Collectors.toMap(FridgeBasket::getFridgeBasketId, v -> v));
-        List<FridgeBasket> updateFridgeBaskets = new ArrayList<>();
-        for (FridgeBasketDto.FridgeBasketRequest f : request.getFridgeBaskets()) {
-            FridgeBasket fridgeBasket = fridgeBasketMap.get(f.getFridgeBasketId());
-            updateFridgeBaskets.add(fridgeBasket.changeExpiredAtAndQuantityAndUnit(f.getExpiredAt(), f.getQuantity(), f.getUnit()));
-        }
-        fridgeBasketRepository.saveAll(updateFridgeBaskets);
+    public List<FridgeBasket> updateFridgeBasket(User user, Long fridgeBasketId, FridgeBasketDto.FridgeBasketRequest request) {
+        FridgeBasket fridgeBasket = fridgeBasketRepository.findByUserAndFridgeBasketId(user, fridgeBasketId).orElseThrow(NotFoundFridgeBasketException::new);
+        fridgeBasket = fridgeBasket.changeExpiredAtAndQuantityAndUnit(request.getExpiredAt(), request.getQuantity(), request.getUnit());
+        fridgeBasketRepository.save(fridgeBasket);
 
         return getFridgeBasketsByUser(user);
     }

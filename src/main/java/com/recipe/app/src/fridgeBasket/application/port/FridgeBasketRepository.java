@@ -12,15 +12,13 @@ public interface FridgeBasketRepository {
 
     List<FridgeBasket> findByUser(User user);
 
-    List<FridgeBasket> findByUserAndFridgeBasketIdIn(User user, List<Long> fridgeBasketIds);
+    Optional<FridgeBasket> findByUserAndFridgeBasketId(User user, Long fridgeBasketId);
 
-    void deleteAll(List<FridgeBasket> fridgeBaskets);
+    void delete(FridgeBasket fridgeBasket);
 
     long countByUser(User user);
 
     FridgeBasket save(FridgeBasket fridgeBasket);
-
-    List<FridgeBasket> findByFridgeBasketIdIn(List<Long> fridgeBasketIds);
 
     Optional<FridgeBasket> findByIngredientAndUser(Ingredient ingredient, User user);
 }

@@ -36,15 +36,13 @@ public class FridgeBasketRepositoryImpl implements FridgeBasketRepository {
     }
 
     @Override
-    public List<FridgeBasket> findByUserAndFridgeBasketIdIn(User user, List<Long> fridgeBasketIds) {
-        return fridgeBasketJpaRepository.findByUserAndFridgeBasketIdIn(UserEntity.fromModel(user), fridgeBasketIds).stream()
-                .map(FridgeBasketEntity::toModel)
-                .collect(Collectors.toList());
+    public Optional<FridgeBasket> findByUserAndFridgeBasketId(User user, Long fridgeBasketId) {
+        return fridgeBasketJpaRepository.findByUserAndFridgeBasketId(UserEntity.fromModel(user), fridgeBasketId).map(FridgeBasketEntity::toModel);
     }
 
     @Override
-    public void deleteAll(List<FridgeBasket> fridgeBaskets) {
-        fridgeBasketJpaRepository.deleteAll(fridgeBaskets.stream().map(FridgeBasketEntity::fromModel).collect(Collectors.toList()));
+    public void delete(FridgeBasket fridgeBasket) {
+        fridgeBasketJpaRepository.delete(FridgeBasketEntity.fromModel(fridgeBasket));
     }
 
     @Override
@@ -55,11 +53,6 @@ public class FridgeBasketRepositoryImpl implements FridgeBasketRepository {
     @Override
     public FridgeBasket save(FridgeBasket fridgeBasket) {
         return fridgeBasketJpaRepository.save(FridgeBasketEntity.fromModel(fridgeBasket)).toModel();
-    }
-
-    @Override
-    public List<FridgeBasket> findByFridgeBasketIdIn(List<Long> fridgeBasketIds) {
-        return fridgeBasketJpaRepository.findByFridgeBasketIdIn(fridgeBasketIds).stream().map(FridgeBasketEntity::toModel).collect(Collectors.toList());
     }
 
     @Override

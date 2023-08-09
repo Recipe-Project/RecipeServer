@@ -34,24 +34,7 @@ public class FridgeBasketDto {
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgeBasketIdsRequest {
-        List<Long> fridgeBasketIds;
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgeBasketsRequest {
-        List<FridgeBasketRequest> fridgeBaskets;
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class FridgeBasketRequest {
-        private Long fridgeBasketId;
         private LocalDate expiredAt;
         private float quantity;
         private String unit;
