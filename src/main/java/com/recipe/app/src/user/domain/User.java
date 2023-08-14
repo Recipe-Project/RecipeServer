@@ -1,9 +1,12 @@
 package com.recipe.app.src.user.domain;
 
+import com.recipe.app.src.fridge.domain.Fridge;
+import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class User {
@@ -17,10 +20,12 @@ public class User {
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
     private final LocalDateTime recentLoginAt;
+    private final List<Fridge> fridges;
+    private final List<FridgeBasket> fridgeBaskets;
 
     @Builder
     public User(Long userId, String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken,
-                LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime recentLoginAt) {
+                LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime recentLoginAt, List<Fridge> fridges, List<FridgeBasket> fridgeBaskets) {
         this.userId = userId;
         this.socialId = socialId;
         this.profileImgUrl = profileImgUrl;
@@ -31,6 +36,8 @@ public class User {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
         this.recentLoginAt = recentLoginAt;
+        this.fridges = fridges;
+        this.fridgeBaskets = fridgeBaskets;
     }
 
     public static User from(String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken) {
@@ -60,6 +67,8 @@ public class User {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .recentLoginAt(recentLoginAt)
+                .fridges(fridges)
+                .fridgeBaskets(fridgeBaskets)
                 .build();
     }
 
@@ -75,11 +84,13 @@ public class User {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .recentLoginAt(LocalDateTime.now())
+                .fridges(fridges)
+                .fridgeBaskets(fridgeBaskets)
                 .build();
     }
 
     public int getFridgeBasketCount() {
-        return 0;
+        return fridgeBaskets.size();
     }
 
     public User changeDeviceToken(String fcmToken) {
@@ -94,6 +105,8 @@ public class User {
                 .createdAt(createdAt)
                 .updatedAt(updatedAt)
                 .recentLoginAt(recentLoginAt)
+                .fridges(fridges)
+                .fridgeBaskets(fridgeBaskets)
                 .build();
     }
 }
