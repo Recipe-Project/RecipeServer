@@ -19,6 +19,7 @@ public class RecipeDto {
         private String imgUrl;
         private String postUserName;
         private String postDate;
+        private String linkUrl;
         private Boolean isUserScrap;
         private long scrapCnt;
         private long viewCnt;
@@ -44,6 +45,7 @@ public class RecipeDto {
                     .imgUrl(recipe.getBlogThumbanilImgUrl())
                     .postUserName(recipe.getBlogName())
                     .postDate(recipe.getPublishedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
+                    .linkUrl(recipe.getBlogUrl())
                     .isUserScrap(recipe.isScrapByUser(user))
                     .scrapCnt(recipe.getScrapUsers().size())
                     .viewCnt(recipe.getViewUsers().size())
@@ -57,6 +59,7 @@ public class RecipeDto {
                     .imgUrl(recipe.getThumbnailImgUrl())
                     .postUserName(recipe.getChannelName())
                     .postDate(recipe.getPostDate().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
+                    .linkUrl("https://www.youtube.com/watch?v=" + recipe.getYoutubeId())
                     .isUserScrap(recipe.isScrapByUser(user))
                     .scrapCnt(recipe.getScrapUsers().size())
                     .viewCnt(recipe.getViewUsers().size())
