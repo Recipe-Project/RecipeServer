@@ -49,5 +49,5 @@ public interface RecipeRepository {
 
     List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs);
 
-    void saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes);
+    List<YoutubeRecipe> saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes);
 }
