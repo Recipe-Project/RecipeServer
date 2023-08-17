@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Repository
 @RequiredArgsConstructor
@@ -66,7 +67,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     @Override
     public List<BlogRecipe> getBlogRecipes(String keyword) {
-        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContaining(keyword).stream()
+        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContaining(keyword, keyword).stream()
                 .map(BlogRecipeEntity::toModel)
                 .collect(Collectors.toList());
     }
@@ -104,7 +105,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     @Override
     public List<YoutubeRecipe> getYoutubeRecipes(String keyword) {
-        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContaining(keyword).stream()
+        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContaining(keyword, keyword).stream()
                 .map(YoutubeRecipeEntity::toModel)
                 .collect(Collectors.toList());
     }
@@ -143,18 +144,18 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     @Override
     public List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs) {
-        return blogRecipeJpaRepository.saveAll(blogs.stream()
+        return StreamSupport.stream(blogRecipeJpaRepository.saveAll(blogs.stream()
                         .map(BlogRecipeEntity::fromModel)
-                        .collect(Collectors.toList())).stream()
+                        .collect(Collectors.toList())).spliterator(), false)
                 .map(BlogRecipeEntity::toModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public List<YoutubeRecipe> saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes) {
-        return youtubeRecipeJpaRepository.saveAll(youtubeRecipes.stream()
+        return StreamSupport.stream(youtubeRecipeJpaRepository.saveAll(youtubeRecipes.stream()
                         .map(YoutubeRecipeEntity::fromModel)
-                        .collect(Collectors.toList())).stream()
+                        .collect(Collectors.toList())).spliterator(), false)
                 .map(YoutubeRecipeEntity::toModel)
                 .collect(Collectors.toList());
     }

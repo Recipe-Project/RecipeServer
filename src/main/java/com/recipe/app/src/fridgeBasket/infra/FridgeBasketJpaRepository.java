@@ -11,13 +11,9 @@ public interface FridgeBasketJpaRepository extends CrudRepository<FridgeBasketEn
 
     List<FridgeBasketEntity> findByUser(UserEntity user);
 
-    List<FridgeBasketEntity> saveAll(List<FridgeBasketEntity> fridgeBasketEntities);
-
     Optional<FridgeBasketEntity> findByUserAndFridgeBasketId(UserEntity user, Long fridgeBasketId);
 
     long countByUser(UserEntity user);
-
-    List<FridgeBasketEntity> findByFridgeBasketIdIn(List<Long> fridgeBasketIds);
 
     Optional<FridgeBasketEntity> findByIngredientAndUser(IngredientEntity ingredient, UserEntity user);
 }

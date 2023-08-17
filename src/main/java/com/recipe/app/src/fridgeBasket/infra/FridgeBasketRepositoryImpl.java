@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import java.util.stream.StreamSupport;
 
 @Repository
 @RequiredArgsConstructor
@@ -21,9 +22,9 @@ public class FridgeBasketRepositoryImpl implements FridgeBasketRepository {
 
     @Override
     public List<FridgeBasket> saveAll(List<FridgeBasket> fridgeBaskets) {
-        return fridgeBasketJpaRepository.saveAll(fridgeBaskets.stream()
+        return StreamSupport.stream(fridgeBasketJpaRepository.saveAll(fridgeBaskets.stream()
                         .map(FridgeBasketEntity::fromModel)
-                        .collect(Collectors.toList())).stream()
+                        .collect(Collectors.toList())).spliterator(), false)
                 .map(FridgeBasketEntity::toModel)
                 .collect(Collectors.toList());
     }
