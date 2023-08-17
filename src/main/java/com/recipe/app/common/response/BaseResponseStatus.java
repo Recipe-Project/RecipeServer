@@ -149,7 +149,7 @@ public enum BaseResponseStatus {
     NO_FOUND_MY_RECIPE(3026, "존재하지 않는 나만의 레시피입니다."),
 
     // [POST] /scraps/recipe
-    NOT_FOUND_RECIPE_INFO(3036, "공공레시피 정보를 찾지 못하였습니다."),
+    NOT_FOUND_RECIPE_INFO(3036, "레시피 정보를 찾지 못하였습니다."),
 
     // [GET] /ingredients
     NOT_FOUND_INGREDIENT_CATEGORY(3039, "재료 카테고리인덱스를 찾을 수 없습니다."),

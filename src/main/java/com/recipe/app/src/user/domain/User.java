@@ -2,6 +2,7 @@ package com.recipe.app.src.user.domain;
 
 import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
+import com.recipe.app.src.ingredient.domain.Ingredient;
 import lombok.Builder;
 import lombok.Getter;
 
@@ -108,5 +109,11 @@ public class User {
                 .fridges(fridges)
                 .fridgeBaskets(fridgeBaskets)
                 .build();
+    }
+
+    public boolean hasIngredientInFridges(Ingredient ingredient) {
+        return fridges.stream()
+                .map(Fridge::getIngredient)
+                .anyMatch(i -> i.equals(ingredient));
     }
 }

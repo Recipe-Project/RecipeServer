@@ -1,50 +1,30 @@
 package com.recipe.app.src.recipe.domain;
 
-import com.recipe.app.common.entity.BaseEntity;
-import lombok.AccessLevel;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
 
-import javax.persistence.*;
+import java.time.LocalDateTime;
 
+@Getter
+public class RecipeProcess {
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
-@Entity
-@Table(name = "RecipeProcess")
-public class RecipeProcess extends BaseEntity {
-    @Id
-    @Column(name = "idx", nullable = false, updatable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer idx;
+    private final Long recipeProcessId;
+    private final Recipe recipe;
+    private final int cookingNo;
+    private final String cookingDescription;
+    private final String recipeProcessImgUrl;
+    private final LocalDateTime createdAt;
+    private final LocalDateTime updatedAt;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "recipeId", nullable = false)
-    private RecipeInfo recipeInfo;
-
-    @Column(name = "cookingNo", nullable = false)
-    private Integer cookingNo;
-
-    @Column(name = "cookingDc", nullable = false, length = 500)
-    private String cookingDc;
-
-    @Column(name = "streStepImageUrl", nullable = false)
-    private String streStepImageUrl;
-
-    @Column(name = "stepTip", nullable = false, length = 500)
-    private String stepTip;
-
-    @Column(name = "status", nullable = false, length = 10)
-    private String status = "ACTIVE";
-
-    public RecipeProcess(RecipeInfo recipeInfo, Integer cookingNo, String cookingDc, String streStepImageUrl, String stepTip) {
-        this.recipeInfo = recipeInfo;
+    @Builder
+    public RecipeProcess(Long recipeProcessId, Recipe recipe, int cookingNo, String cookingDescription,
+                         String recipeProcessImgUrl, LocalDateTime createdAt, LocalDateTime updatedAt) {
+        this.recipeProcessId = recipeProcessId;
+        this.recipe = recipe;
         this.cookingNo = cookingNo;
-        this.cookingDc = cookingDc;
-        this.streStepImageUrl = streStepImageUrl;
-        this.stepTip = stepTip;
+        this.cookingDescription = cookingDescription;
+        this.recipeProcessImgUrl = recipeProcessImgUrl;
+        this.createdAt = createdAt;
+        this.updatedAt = updatedAt;
     }
-
 }
