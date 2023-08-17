@@ -1,29 +1,19 @@
 package com.recipe.app.src.fridge.api;
 
-import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.common.response.BaseResponse;
-import com.recipe.app.common.utils.FirebaseCloudMessageService;
 import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.fridge.application.dto.FridgeDto;
 import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridge.models.PatchFcmTokenReq;
-import com.recipe.app.src.fridge.models.ShelfLifeUser;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 import static com.recipe.app.common.response.BaseResponse.success;
 
@@ -34,7 +24,6 @@ public class FridgeController {
 
     private final FridgeService fridgeService;
     private final FridgeBasketService fridgeBasketService;
-    private final FirebaseCloudMessageService firebaseCloudMessageService;
 
     @ResponseBody
     @PostMapping("")
@@ -94,19 +83,7 @@ public class FridgeController {
         return success(data);
     }
 
-    @ResponseBody
-    @GetMapping("/fridges/recipe")
-    public BaseResponse<FridgeDto.FridgeRecipesResponse> getFridgesRecipe(final Authentication authentication, @RequestParam(value = "start") Integer start, @RequestParam(value = "display") Integer display) {
-
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        FridgeDto.FridgeRecipesResponse data = new FridgeDto.FridgeRecipesResponse(fridgeService.countFridgeRecipes(user), fridgeService.retrieveFridgeRecipes(user, start, display));
-
-        return success(data);
-    }
-
+    /*
     @PatchMapping("/fcm-token")
     public BaseResponse<Void> patchFcmToken(final Authentication authentication, @RequestBody PatchFcmTokenReq parameters) {
 
@@ -151,6 +128,7 @@ public class FridgeController {
         }
         return success();
     }
+     */
 
 
 }

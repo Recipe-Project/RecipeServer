@@ -2,7 +2,6 @@ package com.recipe.app.src.fridge.application.dto;
 
 import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
-import com.recipe.app.src.recipe.domain.RecipeInfo;
 import lombok.*;
 
 import java.time.LocalDate;
@@ -83,38 +82,4 @@ public class FridgeDto {
         }
     }
 
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgeRecipesResponse {
-        private int total;
-        private List<FridgeRecipeResponse> recipeList;
-
-        public FridgeRecipesResponse(int total, List<RecipeInfo> recipes) {
-            this.total = total;
-            this.recipeList = recipes.stream()
-                    .map(FridgeRecipeResponse::new)
-                    .collect(Collectors.toList());
-        }
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgeRecipeResponse {
-        private Integer recipeId;
-        private String title;
-        private String content;
-        private String thumbnail;
-        private String cookingTime;
-        private long scrapCount;
-
-        public FridgeRecipeResponse(RecipeInfo recipe) {
-            this.recipeId = recipe.getRecipeId();
-            this.title = recipe.getRecipeNmKo();
-            this.content = recipe.getSumry();
-            this.thumbnail = recipe.getImgUrl();
-            this.cookingTime = recipe.getCookingTime();
-            this.scrapCount = recipe.getScrapPublics().size();
-        }
-    }
 }
