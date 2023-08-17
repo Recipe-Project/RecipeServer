@@ -52,12 +52,15 @@ public class Ingredient {
     public boolean equals(Object o) {
         if (!(o instanceof Ingredient))
             return false;
-        Ingredient category = (Ingredient) o;
-        return ingredientId.equals(category.getIngredientId());
+        Ingredient ingredient = (Ingredient) o;
+        if (ingredientId.equals(ingredient.getIngredientId()))
+            return true;
+        return ingredientName.equals(ingredient.getIngredientName())
+                && ingredientIconUrl.equals(ingredient.getIngredientIconUrl());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ingredientId);
+        return Objects.hash(ingredientId, ingredientName, ingredientIconUrl);
     }
 }
