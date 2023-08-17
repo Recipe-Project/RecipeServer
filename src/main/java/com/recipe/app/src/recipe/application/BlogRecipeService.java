@@ -57,16 +57,19 @@ public class BlogRecipeService {
         return recipeRepository.getBlogRecipe(blogRecipeId).orElseThrow(NotFoundRecipeException::new);
     }
 
+    @Transactional
     public void createBlogView(Long blogRecipeId, User user) {
         BlogRecipe blogRecipe = getBlogRecipe(blogRecipeId);
         recipeRepository.saveBlogRecipeView(blogRecipe, user);
     }
 
+    @Transactional
     public void createBlogRecipeScrap(Long blogRecipeId, User user) {
         BlogRecipe blogRecipe = getBlogRecipe(blogRecipeId);
         recipeRepository.saveBlogRecipeScrap(blogRecipe, user);
     }
 
+    @Transactional
     public void deleteBlogRecipeScrap(Long blogRecipeId, User user) {
         BlogRecipe blogRecipe = getBlogRecipe(blogRecipeId);
         recipeRepository.deleteBlogRecipeScrap(blogRecipe, user);
@@ -76,6 +79,7 @@ public class BlogRecipeService {
         return recipeRepository.findBlogRecipesByUser(user);
     }
 
+    @Transactional
     public List<BlogRecipe> searchNaverBlogRecipes(String keyword) {
         JSONObject jsonObject;
         String text;
