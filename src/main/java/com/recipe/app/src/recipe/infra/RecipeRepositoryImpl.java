@@ -140,4 +140,13 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                 .map(YoutubeRecipeEntity::toModel)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs) {
+        return blogRecipeJpaRepository.saveAll(blogs.stream()
+                        .map(BlogRecipeEntity::fromModel)
+                        .collect(Collectors.toList())).stream()
+                .map(BlogRecipeEntity::toModel)
+                .collect(Collectors.toList());
+    }
 }

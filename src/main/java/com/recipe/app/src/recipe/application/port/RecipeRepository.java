@@ -46,4 +46,8 @@ public interface RecipeRepository {
     void deleteYoutubeRecipeScrap(YoutubeRecipe youtubeRecipe, User user);
 
     List<YoutubeRecipe> findYoutubeRecipesByUser(User user);
+
+    List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs);
+
+    void saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes);
 }
