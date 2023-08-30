@@ -105,4 +105,54 @@ public class RecipeController {
         return success(data);
     }
      */
+
+    @GetMapping("/registration")
+    public BaseResponse<List<RecipeDto.RecipeResponse>> getRegisteredRecipes(final Authentication authentication) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        List<RecipeDto.RecipeResponse> data = recipeService.getRegisteredRecipes(user).stream()
+                .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
+                .collect(Collectors.toList());
+
+        return success(data);
+    }
+
+    @PostMapping("")
+    public BaseResponse<Void> postRecipe(final Authentication authentication, @RequestBody RecipeDto.RecipeRequest request) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        recipeService.createRecipe(user, request);
+
+        return success();
+    }
+
+    @PatchMapping("/{recipeId}")
+    public BaseResponse<Void> patchRecipe(final Authentication authentication, @PathVariable Long recipeId, @RequestBody RecipeDto.RecipeRequest request) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        recipeService.updateRecipe(user, recipeId, request);
+
+        return success();
+    }
+
+    @DeleteMapping("/{recipeId}")
+    public BaseResponse<Void> deleteRecipe(final Authentication authentication, @PathVariable Long recipeId) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        recipeService.deleteRecipe(user, recipeId);
+
+        return success();
+    }
 }

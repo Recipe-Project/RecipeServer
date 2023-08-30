@@ -33,6 +33,15 @@ public class RecipeIngredientEntity extends BaseEntity {
     @Column(name = "capacity")
     private String capacity;
 
+    public static RecipeIngredientEntity fromModel(RecipeIngredient recipeIngredient) {
+        RecipeIngredientEntity recipeIngredientEntity = new RecipeIngredientEntity();
+        recipeIngredientEntity.recipeIngredientId = recipeIngredient.getRecipeIngredientId();
+        recipeIngredientEntity.recipe = RecipeEntity.fromModel(recipeIngredient.getRecipe());
+        recipeIngredientEntity.ingredient = IngredientEntity.fromModel(recipeIngredient.getIngredient());
+        recipeIngredientEntity.capacity = recipeIngredient.getCapacity();
+        return recipeIngredientEntity;
+    }
+
     public RecipeIngredient toModel() {
         return RecipeIngredient.builder()
                 .recipeIngredientId(recipeIngredientId)

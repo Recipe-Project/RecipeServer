@@ -1,8 +1,6 @@
 package com.recipe.app.src.recipe.application.port;
 
-import com.recipe.app.src.recipe.domain.BlogRecipe;
-import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.YoutubeRecipe;
+import com.recipe.app.src.recipe.domain.*;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Repository;
 
@@ -50,4 +48,18 @@ public interface RecipeRepository {
     List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs);
 
     List<YoutubeRecipe> saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes);
+
+    List<Recipe> findByUser(User user);
+
+    void delete(Recipe recipe);
+
+    Recipe save(Recipe recipe);
+
+    void saveRecipeProcess(RecipeProcess recipeProcess);
+
+    void saveRecipeIngredients(List<RecipeIngredient> recipeIngredients);
+
+    RecipeProcess findRecipeProcessByRecipe(Recipe recipe);
+
+    void deleteRecipeIngredients(List<RecipeIngredient> recipeIngredients);
 }

@@ -27,4 +27,28 @@ public class RecipeProcess {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public static RecipeProcess from(Recipe recipe, int cookingNo, String cookingDescription, String recipeProcessImgUrl) {
+        LocalDateTime now = LocalDateTime.now();
+        return RecipeProcess.builder()
+                .recipe(recipe)
+                .cookingNo(cookingNo)
+                .cookingDescription(cookingDescription)
+                .recipeProcessImgUrl(recipeProcessImgUrl)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
+    public RecipeProcess update(String cookingDescription, String recipeProcessImgUrl) {
+        LocalDateTime now = LocalDateTime.now();
+        return RecipeProcess.builder()
+                .recipe(recipe)
+                .cookingNo(cookingNo)
+                .cookingDescription(cookingDescription)
+                .recipeProcessImgUrl(recipeProcessImgUrl)
+                .createdAt(createdAt)
+                .updatedAt(now)
+                .build();
+    }
 }

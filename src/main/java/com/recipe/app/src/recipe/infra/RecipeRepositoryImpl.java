@@ -1,9 +1,7 @@
 package com.recipe.app.src.recipe.infra;
 
 import com.recipe.app.src.recipe.application.port.RecipeRepository;
-import com.recipe.app.src.recipe.domain.BlogRecipe;
-import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.YoutubeRecipe;
+import com.recipe.app.src.recipe.domain.*;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +17,8 @@ import java.util.stream.StreamSupport;
 public class RecipeRepositoryImpl implements RecipeRepository {
 
     private final RecipeJpaRepository recipeJpaRepository;
+    private final RecipeProcessJpaRepository recipeProcessJpaRepository;
+    private final RecipeIngredientJpaRepository recipeIngredientJpaRepository;
     private final RecipeScrapJpaRepository recipeScrapJpaRepository;
     private final RecipeViewJpaRepository recipeViewJpaRepository;
     private final BlogRecipeJpaRepository blogRecipeJpaRepository;
@@ -158,5 +158,48 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                         .collect(Collectors.toList())).spliterator(), false)
                 .map(YoutubeRecipeEntity::toModel)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Recipe> findByUser(User user) {
+        return recipeJpaRepository.findByUser(UserEntity.fromModel(user)).stream()
+                .map(RecipeEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public void delete(Recipe recipe) {
+        recipeJpaRepository.delete(RecipeEntity.fromModel(recipe));
+    }
+
+    @Override
+    public Recipe save(Recipe recipe) {
+        return recipeJpaRepository.save(RecipeEntity.fromModel(recipe)).toModel();
+    }
+
+    @Override
+    public void saveRecipeProcess(RecipeProcess recipeProcess) {
+        recipeProcessJpaRepository.save(RecipeProcessEntity.fromModel(recipeProcess)).toModel();
+    }
+
+    @Override
+    public void saveRecipeIngredients(List<RecipeIngredient> recipeIngredients) {
+        StreamSupport.stream(recipeIngredientJpaRepository.saveAll(recipeIngredients.stream()
+                        .map(RecipeIngredientEntity::fromModel)
+                        .collect(Collectors.toList())).spliterator(), false)
+                .map(RecipeIngredientEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public RecipeProcess findRecipeProcessByRecipe(Recipe recipe) {
+        return recipeProcessJpaRepository.findByRecipeAndCookingNo(RecipeEntity.fromModel(recipe), 1).toModel();
+    }
+
+    @Override
+    public void deleteRecipeIngredients(List<RecipeIngredient> recipeIngredients) {
+        recipeIngredientJpaRepository.deleteAll(recipeIngredients.stream()
+                .map(RecipeIngredientEntity::fromModel)
+                .collect(Collectors.toList()));
     }
 }

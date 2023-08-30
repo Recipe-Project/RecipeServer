@@ -26,4 +26,15 @@ public class RecipeIngredient {
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }
+
+    public static RecipeIngredient from(Recipe recipe, Ingredient ingredient, String capacity) {
+        LocalDateTime now = LocalDateTime.now();
+        return RecipeIngredient.builder()
+                .recipe(recipe)
+                .ingredient(ingredient)
+                .capacity(capacity)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
 }

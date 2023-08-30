@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.recipe.domain.*;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.userRecipe.application.dto.UserRecipeDto;
 import lombok.*;
 
 import java.time.format.DateTimeFormatter;
@@ -9,6 +10,26 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class RecipeDto {
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class RecipeRequest {
+        private String thumbnail;
+        private String title;
+        private String content;
+        private List<RecipeIngredientRequest> ingredients;
+    }
+
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    public static class RecipeIngredientRequest {
+        private Long ingredientId;
+        private String capacity;
+    }
 
     @Getter
     @Builder

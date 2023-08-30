@@ -34,6 +34,16 @@ public class RecipeProcessEntity extends BaseEntity {
     @Column(name = "recipeProcessImgUrl")
     private String recipeProcessImgUrl;
 
+    public static RecipeProcessEntity fromModel(RecipeProcess recipeProcess) {
+        RecipeProcessEntity recipeProcessEntity = new RecipeProcessEntity();
+        recipeProcessEntity.recipeProcessId = recipeProcess.getRecipeProcessId();
+        recipeProcessEntity.recipe = RecipeEntity.fromModel(recipeProcess.getRecipe());
+        recipeProcessEntity.cookingNo = recipeProcess.getCookingNo();
+        recipeProcessEntity.cookingDescription = recipeProcess.getCookingDescription();
+        recipeProcessEntity.recipeProcessImgUrl = recipeProcess.getRecipeProcessImgUrl();
+        return recipeProcessEntity;
+    }
+
     public RecipeProcess toModel() {
         return RecipeProcess.builder()
                 .recipeProcessId(recipeProcessId)

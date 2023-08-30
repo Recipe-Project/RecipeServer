@@ -49,7 +49,44 @@ public class Recipe {
         this.viewUsers = viewUsers;
     }
 
+    public static Recipe from(String recipeNm, String introduction, Long cookingTime, String levelNm, String imgUrl,
+                              Long quantity, Long calorie, User user, boolean isHidden) {
+        LocalDateTime now = LocalDateTime.now();
+        return Recipe.builder()
+                .recipeNm(recipeNm)
+                .introduction(introduction)
+                .cookingTime(cookingTime)
+                .levelNm(levelNm)
+                .imgUrl(imgUrl)
+                .quantity(quantity)
+                .calorie(calorie)
+                .user(user)
+                .isHidden(isHidden)
+                .createdAt(now)
+                .updatedAt(now)
+                .build();
+    }
+
     public boolean isScrapByUser(User user) {
         return scrapUsers.contains(user);
+    }
+
+    public Recipe update(Long recipeId, String recipeNm, String introduction, Long cookingTime, String levelNm, String imgUrl,
+                       Long quantity, Long calorie, boolean isHidden) {
+        LocalDateTime now = LocalDateTime.now();
+        return Recipe.builder()
+                .recipeId(recipeId)
+                .recipeNm(recipeNm)
+                .introduction(introduction)
+                .cookingTime(cookingTime)
+                .levelNm(levelNm)
+                .imgUrl(imgUrl)
+                .quantity(quantity)
+                .calorie(calorie)
+                .user(user)
+                .isHidden(isHidden)
+                .createdAt(createdAt)
+                .updatedAt(now)
+                .build();
     }
 }
