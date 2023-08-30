@@ -40,12 +40,12 @@ public class BlogRecipe {
         this.viewUsers = viewUsers;
     }
 
-    public static BlogRecipe from(String blogUrl, String blogThumbanilImgUrl, String title, String description,
+    public static BlogRecipe from(String blogUrl, String blogThumbnailImgUrl, String title, String description,
                                   LocalDate publishedAt, String blogName) {
         LocalDateTime now = LocalDateTime.now();
         return BlogRecipe.builder()
                 .blogUrl(blogUrl)
-                .blogThumbanilImgUrl(blogThumbanilImgUrl)
+                .blogThumbanilImgUrl(blogThumbnailImgUrl)
                 .title(title)
                 .description(description)
                 .publishedAt(publishedAt)
