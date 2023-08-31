@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.infra;
+package com.recipe.app.src.recipe.infra.youtube;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipe.domain.YoutubeRecipe;

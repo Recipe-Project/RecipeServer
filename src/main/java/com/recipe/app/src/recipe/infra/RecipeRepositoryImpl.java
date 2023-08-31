@@ -2,6 +2,8 @@ package com.recipe.app.src.recipe.infra;
 
 import com.recipe.app.src.recipe.application.port.RecipeRepository;
 import com.recipe.app.src.recipe.domain.*;
+import com.recipe.app.src.recipe.infra.blog.*;
+import com.recipe.app.src.recipe.infra.youtube.*;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;

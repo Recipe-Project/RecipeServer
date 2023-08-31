@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.infra;
+package com.recipe.app.src.recipe.infra.youtube;
 
 import com.recipe.app.src.recipe.domain.YoutubeRecipe;
 import com.recipe.app.src.user.domain.User;
@@ -16,13 +16,13 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-@Table(name = "YoutubeView")
-public class YoutubeViewEntity {
+@Table(name = "YoutubeScrap")
+public class YoutubeScrapEntity {
 
     @Id
-    @Column(name = "youtubeViewId", nullable = false, updatable = false)
+    @Column(name = "youtubeScrapId", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long youtubeViewId;
+    private Long youtubeScrapId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
@@ -35,10 +35,10 @@ public class YoutubeViewEntity {
     @Column(name = "createdAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public static YoutubeViewEntity create(User user, YoutubeRecipe youtubeRecipe) {
-        YoutubeViewEntity youtubeViewEntity = new YoutubeViewEntity();
-        youtubeViewEntity.user = UserEntity.fromModel(user);
-        youtubeViewEntity.youtubeRecipe = YoutubeRecipeEntity.fromModel(youtubeRecipe);
-        return youtubeViewEntity;
+    public static YoutubeScrapEntity create(User user, YoutubeRecipe youtubeRecipe) {
+        YoutubeScrapEntity youtubeScrapEntity = new YoutubeScrapEntity();
+        youtubeScrapEntity.user = UserEntity.fromModel(user);
+        youtubeScrapEntity.youtubeRecipe = YoutubeRecipeEntity.fromModel(youtubeRecipe);
+        return youtubeScrapEntity;
     }
 }

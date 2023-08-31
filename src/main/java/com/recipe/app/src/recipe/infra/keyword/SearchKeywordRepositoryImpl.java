@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.infra;
+package com.recipe.app.src.recipe.infra.keyword;
 
 import com.recipe.app.src.recipe.application.port.SearchKeywordRepository;
 import com.recipe.app.src.user.domain.User;

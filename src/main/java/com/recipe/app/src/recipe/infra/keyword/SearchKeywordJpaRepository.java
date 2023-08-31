@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.infra;
+package com.recipe.app.src.recipe.infra.keyword;
 
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;

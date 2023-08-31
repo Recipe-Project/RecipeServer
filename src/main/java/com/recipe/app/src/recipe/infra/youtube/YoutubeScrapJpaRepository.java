@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.infra;
+package com.recipe.app.src.recipe.infra.youtube;
 
 import com.recipe.app.src.user.infra.UserEntity;
 import org.springframework.data.repository.CrudRepository;

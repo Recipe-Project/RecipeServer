@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.infra;
+package com.recipe.app.src.recipe.infra.blog;
 
 import com.recipe.app.src.recipe.domain.BlogRecipe;
 import com.recipe.app.src.user.domain.User;
@@ -16,30 +16,29 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
-@Table(name = "BlogScrap")
-public class BlogScrapEntity {
+@Table(name = "BlogView")
+public class BlogViewEntity {
 
     @Id
-    @Column(name = "blogScrapId", nullable = false, updatable = false)
+    @Column(name = "blogViewId", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long blogScrapId;
+    private Long blogViewId;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "blogRecipeId")
     private BlogRecipeEntity blogRecipe;
 
     @CreatedDate
     @Column(name = "createdAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public static BlogScrapEntity createBlogScrap(User user, BlogRecipe blogRecipe) {
-        BlogScrapEntity blogScrapEntity = new BlogScrapEntity();
-        blogScrapEntity.user = UserEntity.fromModel(user);
-        blogScrapEntity.blogRecipe = BlogRecipeEntity.fromModel(blogRecipe);
-        return blogScrapEntity;
+    public static BlogViewEntity create(User user, BlogRecipe blogRecipe) {
+        BlogViewEntity blogViewEntity = new BlogViewEntity();
+        blogViewEntity.user = UserEntity.fromModel(user);
+        blogViewEntity.blogRecipe = BlogRecipeEntity.fromModel(blogRecipe);
+        return blogViewEntity;
     }
 }

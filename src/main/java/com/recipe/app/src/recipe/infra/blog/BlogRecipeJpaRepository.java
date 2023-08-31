@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.infra;
+package com.recipe.app.src.recipe.infra.blog;
 
 import org.springframework.data.repository.CrudRepository;
 
