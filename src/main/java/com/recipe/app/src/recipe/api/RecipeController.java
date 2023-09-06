@@ -9,6 +9,7 @@ import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
@@ -92,19 +93,19 @@ public class RecipeController {
         return success(data);
     }
 
-    /*
     @GetMapping("/fridges-recommendation")
-    public BaseResponse<List<RecipeDto.RecipeResponse>> getFridgesRecips(final Authentication authentication, @RequestParam(value = "start") Integer start, @RequestParam(value = "display") Integer display) {
+    public BaseResponse<List<RecipeDto.RecipeResponse>> getFridgesRecipes(final Authentication authentication, Pageable pageable) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        FridgeDto.FridgeRecipesResponse data = new FridgeDto.FridgeRecipesResponse(fridgeService.countFridgeRecipes(user), fridgeService.retrieveFridgeRecipes(user, start, display));
+        List<RecipeDto.RecipeResponse> data = recipeService.retrieveFridgeRecipes(user, pageable).stream()
+                .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
+                .collect(Collectors.toList());
 
         return success(data);
     }
-     */
 
     @GetMapping("/registration")
     public BaseResponse<List<RecipeDto.RecipeResponse>> getRegisteredRecipes(final Authentication authentication) {

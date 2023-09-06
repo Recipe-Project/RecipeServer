@@ -1,5 +1,7 @@
 package com.recipe.app.src.recipe.application;
 
+import com.recipe.app.src.fridge.application.port.FridgeRepository;
+import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.ingredient.application.port.IngredientRepository;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.exception.NotFoundIngredientException;
@@ -12,7 +14,7 @@ import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -29,6 +31,7 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
+    private final FridgeRepository fridgeRepository;
 
     public List<Recipe> getRecipes(String keyword) {
         return recipeRepository.getRecipes(keyword);
@@ -126,18 +129,14 @@ public class RecipeService {
         recipeRepository.saveRecipeIngredients(recipeIngredients);
     }
 
-    /*
-    public List<RecipeInfo> retrieveFridgeRecipes(User user, Integer start, Integer display) {
-        return recipeRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(UserEntity.fromModel(user), "ACTIVE").stream()
-                .skip(start == 0 ? 0 : start - 1)
-                .limit(display)
+    public List<Recipe> retrieveFridgeRecipes(User user, Pageable pageable) {
+
+        List<Ingredient> fridgeIngredients = fridgeRepository.findByUser(user).stream()
+                .map(Fridge::getIngredient)
                 .collect(Collectors.toList());
+
+        return recipeRepository.findRecipesOrderByFridgeIngredientCntDesc(fridgeIngredients, pageable);
     }
 
-    public int countFridgeRecipes(User user) {
-        return recipeRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(UserEntity.fromModel(user), "ACTIVE").size();
-    }
-
-     */
 }
 

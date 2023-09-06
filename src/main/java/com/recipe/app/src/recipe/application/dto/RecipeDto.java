@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.recipe.domain.*;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.userRecipe.application.dto.UserRecipeDto;
 import lombok.*;
 
 import java.time.format.DateTimeFormatter;

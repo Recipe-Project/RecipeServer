@@ -1,5 +1,7 @@
 package com.recipe.app.src.recipe.infra;
 
+import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.recipe.application.port.RecipeRepository;
 import com.recipe.app.src.recipe.domain.*;
 import com.recipe.app.src.recipe.infra.blog.*;
@@ -7,6 +9,7 @@ import com.recipe.app.src.recipe.infra.youtube.*;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -203,5 +206,14 @@ public class RecipeRepositoryImpl implements RecipeRepository {
         recipeIngredientJpaRepository.deleteAll(recipeIngredients.stream()
                 .map(RecipeIngredientEntity::fromModel)
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<Recipe> findRecipesOrderByFridgeIngredientCntDesc(List<Ingredient> ingredients, Pageable pageable) {
+        return recipeJpaRepository.findRecipesOrderByFridgeIngredientCntDesc(ingredients.stream()
+                        .map(IngredientEntity::fromModel)
+                        .collect(Collectors.toList()), pageable).stream()
+                .map(RecipeEntity::toModel)
+                .collect(Collectors.toList());
     }
 }

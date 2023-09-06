@@ -1,7 +1,9 @@
 package com.recipe.app.src.recipe.application.port;
 
+import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.recipe.domain.*;
 import com.recipe.app.src.user.domain.User;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -62,4 +64,6 @@ public interface RecipeRepository {
     RecipeProcess findRecipeProcessByRecipe(Recipe recipe);
 
     void deleteRecipeIngredients(List<RecipeIngredient> recipeIngredients);
+
+    List<Recipe> findRecipesOrderByFridgeIngredientCntDesc(List<Ingredient> ingredients, Pageable pageable);
 }
