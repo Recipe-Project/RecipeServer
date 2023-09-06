@@ -23,34 +23,6 @@ public interface RecipeRepository {
 
     void saveRecipeView(Recipe recipe, User user);
 
-    List<BlogRecipe> getBlogRecipes(String keyword);
-
-    Optional<BlogRecipe> getBlogRecipe(Long blogRecipeId);
-
-    void saveBlogRecipeView(BlogRecipe blogRecipe, User user);
-
-    void saveBlogRecipeScrap(BlogRecipe blogRecipe, User user);
-
-    void deleteBlogRecipeScrap(BlogRecipe blogRecipe, User user);
-
-    List<BlogRecipe> findBlogRecipesByUser(User user);
-
-    List<YoutubeRecipe> getYoutubeRecipes(String keyword);
-
-    Optional<YoutubeRecipe> getYoutubeRecipe(Long youtubeRecipeId);
-
-    void saveYoutubeRecipeView(YoutubeRecipe youtubeRecipe, User user);
-
-    void saveYoutubeRecipeScrap(YoutubeRecipe youtubeRecipe, User user);
-
-    void deleteYoutubeRecipeScrap(YoutubeRecipe youtubeRecipe, User user);
-
-    List<YoutubeRecipe> findYoutubeRecipesByUser(User user);
-
-    List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs);
-
-    List<YoutubeRecipe> saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes);
-
     List<Recipe> findByUser(User user);
 
     void delete(Recipe recipe);

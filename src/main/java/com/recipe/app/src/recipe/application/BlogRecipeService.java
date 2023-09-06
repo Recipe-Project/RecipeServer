@@ -1,7 +1,7 @@
 package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.recipe.application.port.RecipeRepository;
+import com.recipe.app.src.recipe.application.port.BlogRecipeRepository;
 import com.recipe.app.src.recipe.domain.BlogRecipe;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.user.domain.User;
@@ -38,7 +38,7 @@ import static com.recipe.app.common.response.BaseResponseStatus.*;
 @Transactional(readOnly = true)
 public class BlogRecipeService {
 
-    private final RecipeRepository recipeRepository;
+    private final BlogRecipeRepository blogRecipeRepository;
 
     @Value("${naver.client-id}")
     private String naverClientId;
@@ -46,7 +46,7 @@ public class BlogRecipeService {
     private String naverClientSecret;
 
     public List<BlogRecipe> getBlogRecipes(String keyword) {
-        List<BlogRecipe> blogRecipes = recipeRepository.getBlogRecipes(keyword);
+        List<BlogRecipe> blogRecipes = blogRecipeRepository.getBlogRecipes(keyword);
         if (blogRecipes.size() < 10)
             blogRecipes = searchNaverBlogRecipes(keyword);
 
@@ -54,29 +54,29 @@ public class BlogRecipeService {
     }
 
     public BlogRecipe getBlogRecipe(Long blogRecipeId) {
-        return recipeRepository.getBlogRecipe(blogRecipeId).orElseThrow(NotFoundRecipeException::new);
+        return blogRecipeRepository.getBlogRecipe(blogRecipeId).orElseThrow(NotFoundRecipeException::new);
     }
 
     @Transactional
     public void createBlogView(Long blogRecipeId, User user) {
         BlogRecipe blogRecipe = getBlogRecipe(blogRecipeId);
-        recipeRepository.saveBlogRecipeView(blogRecipe, user);
+        blogRecipeRepository.saveBlogRecipeView(blogRecipe, user);
     }
 
     @Transactional
     public void createBlogRecipeScrap(Long blogRecipeId, User user) {
         BlogRecipe blogRecipe = getBlogRecipe(blogRecipeId);
-        recipeRepository.saveBlogRecipeScrap(blogRecipe, user);
+        blogRecipeRepository.saveBlogRecipeScrap(blogRecipe, user);
     }
 
     @Transactional
     public void deleteBlogRecipeScrap(Long blogRecipeId, User user) {
         BlogRecipe blogRecipe = getBlogRecipe(blogRecipeId);
-        recipeRepository.deleteBlogRecipeScrap(blogRecipe, user);
+        blogRecipeRepository.deleteBlogRecipeScrap(blogRecipe, user);
     }
 
     public List<BlogRecipe> getScrapBlogRecipes(User user) {
-        return recipeRepository.findBlogRecipesByUser(user);
+        return blogRecipeRepository.findBlogRecipesByUser(user);
     }
 
     @Transactional
@@ -204,6 +204,6 @@ public class BlogRecipeService {
             blogs.add(BlogRecipe.from(blogUrl, thumbnail, title, description, postDate, bloggerName));
         }
 
-        return recipeRepository.saveBlogRecipes(blogs);
+        return blogRecipeRepository.saveBlogRecipes(blogs);
     }
 }

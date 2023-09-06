@@ -10,7 +10,7 @@ import com.google.api.client.json.jackson.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
-import com.recipe.app.src.recipe.application.port.RecipeRepository;
+import com.recipe.app.src.recipe.application.port.YoutubeRecipeRepository;
 import com.recipe.app.src.recipe.domain.YoutubeRecipe;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.user.domain.User;
@@ -36,12 +36,14 @@ public class YoutubeRecipeService {
     private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
     private static final String GOOGLE_YOUTUBE_URL = "https://www.youtube.com/watch?v=";
     private static final String YOUTUBE_SEARCH_FIELDS = "items(id/kind,id/videoId,snippet/title,snippet/channelTitle,snippet/thumbnails/default/url,snippet/publishedAt)";
-    private final RecipeRepository recipeRepository;
+
+    private final YoutubeRecipeRepository youtubeRecipeRepository;
+
     @Value("${youtube.api-key}")
     private String youtubeApiKey;
 
     public List<YoutubeRecipe> getYoutubeRecipes(String keyword) {
-        List<YoutubeRecipe> youtubeRecipes = recipeRepository.getYoutubeRecipes(keyword);
+        List<YoutubeRecipe> youtubeRecipes = youtubeRecipeRepository.getYoutubeRecipes(keyword);
         if (youtubeRecipes.size() < 10)
             youtubeRecipes = searchYoutubes(keyword);
 
@@ -49,29 +51,29 @@ public class YoutubeRecipeService {
     }
 
     public YoutubeRecipe getYoutubeRecipe(Long youtubeRecipeId) {
-        return recipeRepository.getYoutubeRecipe(youtubeRecipeId).orElseThrow(NotFoundRecipeException::new);
+        return youtubeRecipeRepository.getYoutubeRecipe(youtubeRecipeId).orElseThrow(NotFoundRecipeException::new);
     }
 
     @Transactional
     public void createYoutubeView(Long youtubeRecipeId, User user) {
         YoutubeRecipe youtubeRecipe = getYoutubeRecipe(youtubeRecipeId);
-        recipeRepository.saveYoutubeRecipeView(youtubeRecipe, user);
+        youtubeRecipeRepository.saveYoutubeRecipeView(youtubeRecipe, user);
     }
 
     @Transactional
     public void createYoutubeScrap(Long youtubeRecipeId, User user) {
         YoutubeRecipe youtubeRecipe = getYoutubeRecipe(youtubeRecipeId);
-        recipeRepository.saveYoutubeRecipeScrap(youtubeRecipe, user);
+        youtubeRecipeRepository.saveYoutubeRecipeScrap(youtubeRecipe, user);
     }
 
     @Transactional
     public void deleteYoutubeScrap(Long youtubeRecipeId, User user) {
         YoutubeRecipe youtubeRecipe = getYoutubeRecipe(youtubeRecipeId);
-        recipeRepository.deleteYoutubeRecipeScrap(youtubeRecipe, user);
+        youtubeRecipeRepository.deleteYoutubeRecipeScrap(youtubeRecipe, user);
     }
 
     public List<YoutubeRecipe> getScrapYoutubeRecipes(User user) {
-        return recipeRepository.findYoutubeRecipesByUser(user);
+        return youtubeRecipeRepository.findYoutubeRecipesByUser(user);
     }
 
     @Transactional
@@ -102,7 +104,7 @@ public class YoutubeRecipeService {
                             LocalDate.ofInstant(Instant.ofEpochMilli(rid.getSnippet().getPublishedAt().getValue()), ZoneId.systemDefault()), rid.getSnippet().getChannelTitle(), rid.getId().getVideoId()));
 
                 }
-                return recipeRepository.saveYoutubeRecipes(youtubeRecipes);
+                return youtubeRecipeRepository.saveYoutubeRecipes(youtubeRecipes);
             }
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
