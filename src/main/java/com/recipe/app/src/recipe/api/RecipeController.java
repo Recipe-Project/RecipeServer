@@ -1,6 +1,8 @@
 package com.recipe.app.src.recipe.api;
 
 import com.recipe.app.common.response.BaseResponse;
+import com.recipe.app.src.fridge.application.FridgeService;
+import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.recipe.application.RecipeService;
 import com.recipe.app.src.recipe.application.SearchKeywordService;
 import com.recipe.app.src.recipe.application.dto.RecipeDto;
@@ -25,6 +27,7 @@ public class RecipeController {
 
     private final RecipeService recipeService;
     private final SearchKeywordService recipeKeywordService;
+    private final FridgeService fridgeService;
 
     @GetMapping("")
     public BaseResponse<List<RecipeDto.RecipeResponse>> getRecipes(final Authentication authentication, @RequestParam(value = "keyword") String keyword) {
@@ -48,9 +51,10 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        List<Fridge> fridges = fridgeService.getFridges(user);
         Recipe recipe = recipeService.getRecipe(recipeId);
         recipeService.createRecipeView(recipeId, user);
-        RecipeDto.RecipeDetailResponse data = RecipeDto.RecipeDetailResponse.from(recipe, user);
+        RecipeDto.RecipeDetailResponse data = RecipeDto.RecipeDetailResponse.from(recipe, user, fridges);
 
         return success(data);
     }
@@ -114,7 +118,7 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<RecipeDto.RecipeResponse> data = recipeService.getRegisteredRecipes(user).stream()
+        List<RecipeDto.RecipeResponse> data = recipeService.getRecipesByUser(user).stream()
                 .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
                 .collect(Collectors.toList());
 

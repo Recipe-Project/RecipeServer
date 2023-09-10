@@ -1,10 +1,12 @@
 package com.recipe.app.src.recipe.domain;
 
+import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 public class RecipeIngredient {
@@ -36,5 +38,10 @@ public class RecipeIngredient {
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
+    }
+
+    public boolean isInFridges(List<Fridge> fridges) {
+        return fridges.stream()
+                .anyMatch(f -> f.getIngredient().equals(ingredient));
     }
 }

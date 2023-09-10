@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.application.dto;
 
+import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.recipe.domain.*;
 import com.recipe.app.src.user.domain.User;
 import lombok.*;
@@ -102,7 +103,7 @@ public class RecipeDto {
         private long scrapCnt;
         private long viewCnt;
 
-        public static RecipeDetailResponse from(Recipe recipe, User user) {
+        public static RecipeDetailResponse from(Recipe recipe, User user, List<Fridge> fridges) {
             return RecipeDetailResponse.builder()
                     .recipeId(recipe.getRecipeId())
                     .recipeNm(recipe.getRecipeNm())
@@ -111,7 +112,7 @@ public class RecipeDto {
                     .cookingTime(recipe.getCookingTime())
                     .level(recipe.getLevelNm())
                     .recipeIngredients(recipe.getRecipeIngredients().stream()
-                            .map(ri -> RecipeIngredientResponse.from(ri, user))
+                            .map(ri -> RecipeIngredientResponse.from(ri, fridges))
                             .collect(Collectors.toList()))
                     .recipeProcesses(recipe.getRecipeProcesses().stream()
                             .map(RecipeProcessResponse::from)
@@ -132,13 +133,13 @@ public class RecipeDto {
         private String recipeIngredientCapacity;
         private Boolean isInUserFridge;
 
-        public static RecipeIngredientResponse from(RecipeIngredient recipeIngredient, User user) {
+        public static RecipeIngredientResponse from(RecipeIngredient recipeIngredient, List<Fridge> fridges) {
             return RecipeIngredientResponse.builder()
                     .recipeIngredientId(recipeIngredient.getRecipeIngredientId())
                     .recipeIngredientName(recipeIngredient.getIngredient().getIngredientName())
                     .recipeIngredientIconUrl(recipeIngredient.getIngredient().getIngredientIconUrl())
                     .recipeIngredientCapacity(recipeIngredient.getCapacity())
-                    .isInUserFridge(user.hasIngredientInFridges(recipeIngredient.getIngredient()))
+                    .isInUserFridge(recipeIngredient.isInFridges(fridges))
                     .build();
         }
     }
