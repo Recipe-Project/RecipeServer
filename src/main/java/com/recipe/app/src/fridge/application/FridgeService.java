@@ -58,12 +58,6 @@ public class FridgeService {
     }
 
     /*
-    @Transactional
-    public void updateFcmToken(PatchFcmTokenReq patchFcmTokenReq, User user) {
-        String fcmToken = patchFcmTokenReq.getFcmToken();
-        user = user.changeDeviceToken(fcmToken);
-        userRepository.save(user);
-    }
 
     public List<ShelfLifeUser> retreiveShelfLifeUserList() throws BaseException {
         SimpleDateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");

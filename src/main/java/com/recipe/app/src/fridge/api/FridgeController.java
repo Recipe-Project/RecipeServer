@@ -84,18 +84,6 @@ public class FridgeController {
     }
 
     /*
-    @PatchMapping("/fcm-token")
-    public BaseResponse<Void> patchFcmToken(final Authentication authentication, @RequestBody PatchFcmTokenReq parameters) {
-
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeService.updateFcmToken(parameters, user);
-
-        return success();
-    }
-
     @PostMapping("/fcm-test")
     public BaseResponse<Void> posFcmTest() throws BaseException, IOException {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
