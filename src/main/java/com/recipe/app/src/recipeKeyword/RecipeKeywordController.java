@@ -38,6 +38,7 @@ public class RecipeKeywordController {
         try {
             int jwtUserIdx = jwtService.getUserId();
 
+
             recipeKeywordService.createRecipeKeyword(jwtUserIdx, keyword);
 
             return new BaseResponse<>(SUCCESS);

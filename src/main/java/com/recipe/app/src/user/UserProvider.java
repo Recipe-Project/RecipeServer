@@ -44,8 +44,12 @@ public class UserProvider {
         }
 
         // 2. 존재하는 회원인지 확인
-        if (user == null || !user.getStatus().equals("ACTIVE")) {
+        if (user == null) {
             throw new BaseException(NOT_FOUND_USER);
+        }
+        else {
+            if (user.getStatus().equals("SUSPEND"))
+                throw new BaseException(SUSPENDED_USER);
         }
 
         // 3. User를 return
@@ -70,9 +74,10 @@ public class UserProvider {
         User userInfo;
         if (existsUserInfoList != null && existsUserInfoList.size() > 0) {
             userInfo = existsUserInfoList.get(0);
+            if (userInfo.getStatus().equals("SUSPEND"))
+                throw new BaseException(SUSPENDED_USER);
         } else {
             userInfo = null;
-
         }
 
         // 3. UserInfo를 return
