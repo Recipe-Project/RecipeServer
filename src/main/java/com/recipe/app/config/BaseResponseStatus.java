@@ -275,6 +275,8 @@ public enum BaseResponseStatus {
     FAILED_TO_GET_NOTICE(false, 3074, "공지 조회에 실패했습니다."),
     NOT_FOUND_NOTICE(false, 3075, "공지가 존재하지 않습니다."),
 
+    SUSPENDED_USER(false, 3076, "위반 행위로 인하여 활동 정지된 회원입니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
