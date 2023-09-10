@@ -21,4 +21,6 @@ public interface BlogRecipeRepository {
     List<BlogRecipe> findBlogRecipesByUser(User user);
 
     List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs);
+
+    long countBlogScrapByUser(User user);
 }

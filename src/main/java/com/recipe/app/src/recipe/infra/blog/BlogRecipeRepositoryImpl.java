@@ -65,4 +65,9 @@ public class BlogRecipeRepositoryImpl implements BlogRecipeRepository {
                 .map(BlogRecipeEntity::toModel)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public long countBlogScrapByUser(User user) {
+        return blogScrapJpaRepository.countByUser(UserEntity.fromModel(user));
+    }
 }

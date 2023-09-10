@@ -76,6 +76,10 @@ public class YoutubeRecipeService {
         return youtubeRecipeRepository.findYoutubeRecipesByUser(user);
     }
 
+    public long countYoutubeScrapByUser(User user) {
+        return youtubeRecipeRepository.countYoutubeScrapByUser(user);
+    }
+
     @Transactional
     public List<YoutubeRecipe> searchYoutubes(String keyword) {
 

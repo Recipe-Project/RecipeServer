@@ -10,4 +10,6 @@ public interface YoutubeScrapJpaRepository extends CrudRepository<YoutubeScrapEn
     Optional<YoutubeScrapEntity> findByUserAndYoutubeRecipe(UserEntity user, YoutubeRecipeEntity youtubeRecipe);
 
     List<YoutubeScrapEntity> findByUser(UserEntity user);
+
+    long countByUser(UserEntity user);
 }

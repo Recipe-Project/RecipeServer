@@ -68,4 +68,9 @@ public class YoutubeRecipeRepositoryImpl implements YoutubeRecipeRepository {
                 .map(YoutubeRecipeEntity::toModel)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public long countYoutubeScrapByUser(User user) {
+        return youtubeScrapJpaRepository.countByUser(UserEntity.fromModel(user));
+    }
 }

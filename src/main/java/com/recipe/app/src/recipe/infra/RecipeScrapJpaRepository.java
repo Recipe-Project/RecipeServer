@@ -10,4 +10,6 @@ public interface RecipeScrapJpaRepository extends CrudRepository<RecipeScrapEnti
     Optional<RecipeScrapEntity> findByUserAndRecipe(UserEntity user, RecipeEntity recipe);
 
     List<RecipeScrapEntity> findByUser(UserEntity user);
+
+    long countByUser(UserEntity user);
 }

@@ -21,4 +21,6 @@ public interface YoutubeRecipeRepository {
     List<YoutubeRecipe> findYoutubeRecipesByUser(User user);
 
     List<YoutubeRecipe> saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes);
+
+    long countYoutubeScrapByUser(User user);
 }

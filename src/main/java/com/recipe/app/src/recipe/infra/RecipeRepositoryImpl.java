@@ -115,4 +115,9 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                 .map(RecipeEntity::toModel)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public long countRecipeScrapByUser(User user) {
+        return recipeScrapJpaRepository.countByUser(UserEntity.fromModel(user));
+    }
 }

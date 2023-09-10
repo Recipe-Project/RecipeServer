@@ -206,4 +206,8 @@ public class BlogRecipeService {
 
         return blogRecipeRepository.saveBlogRecipes(blogs);
     }
+
+    public long countBlogScrapByUser(User user) {
+        return blogRecipeRepository.countBlogScrapByUser(user);
+    }
 }

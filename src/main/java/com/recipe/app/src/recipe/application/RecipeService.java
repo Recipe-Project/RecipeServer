@@ -63,7 +63,7 @@ public class RecipeService {
         return recipeRepository.findScrapRecipesByUser(user);
     }
 
-    public List<Recipe> getRegisteredRecipes(User user) {
+    public List<Recipe> getRecipesByUser(User user) {
         return recipeRepository.findByUser(user);
     }
 
@@ -138,5 +138,8 @@ public class RecipeService {
         return recipeRepository.findRecipesOrderByFridgeIngredientCntDesc(fridgeIngredients, pageable);
     }
 
+    public long countRecipeScrapByUser(User user) {
+        return recipeRepository.countRecipeScrapByUser(user);
+    }
 }
 

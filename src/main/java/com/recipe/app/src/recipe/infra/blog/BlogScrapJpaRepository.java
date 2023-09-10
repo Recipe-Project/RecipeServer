@@ -10,4 +10,6 @@ public interface BlogScrapJpaRepository extends CrudRepository<BlogScrapEntity, 
     Optional<BlogScrapEntity> findByUserAndBlogRecipe(UserEntity user, BlogRecipeEntity blogRecipe);
 
     List<BlogScrapEntity> findByUser(UserEntity user);
+
+    long countByUser(UserEntity user);
 }
