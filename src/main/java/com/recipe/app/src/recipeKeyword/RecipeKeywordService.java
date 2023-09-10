@@ -32,11 +32,9 @@ public class RecipeKeywordService {
     public void createRecipeKeyword(int userIdx, String keyword) throws BaseException {
         User user = userProvider.retrieveUserByUserIdx(userIdx);
 
-
         try {
-            RecipeKeyword keywordYoutube = new RecipeKeyword(keyword);
+            RecipeKeyword keywordYoutube = new RecipeKeyword(keyword, userIdx);
             keywordYoutube = recipeKeywordRepository.save(keywordYoutube);
-
 
         } catch (Exception exception) {
             throw new BaseException(FAILED_TO_POST_RECIPE_KEYWORD);

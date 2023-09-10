@@ -26,7 +26,11 @@ public class RecipeKeyword extends BaseEntity {
     @Column(name="status", nullable=false, length=10)
     private String status="ACTIVE";
 
-    public RecipeKeyword( String keyword){
+    @Column(name="userId")
+    private Integer userId;
+
+    public RecipeKeyword(String keyword, Integer userId){
         this.keyword = keyword;
+        this.userId = userId;
     }
 }

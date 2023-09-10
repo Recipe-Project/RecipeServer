@@ -18,14 +18,11 @@ import com.recipe.app.utils.JwtService;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -37,12 +34,10 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
-import java.util.stream.Collectors;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
 import static com.recipe.app.config.secret.Secret.NAVER_CLIENT_ID;
 import static com.recipe.app.config.secret.Secret.NAVER_CLINET_SECRET;
-import static com.sun.el.util.MessageFactory.get;
 
 @Service
 public class RecipeInfoProvider {
@@ -130,7 +125,7 @@ public class RecipeInfoProvider {
 
         }
 
-        RecipeKeyword recipeKeyword = new RecipeKeyword(keyword);
+        RecipeKeyword recipeKeyword = new RecipeKeyword(keyword, user.getUserIdx());
         try{
             recipeKeyword = recipeKeywordRepository.save(recipeKeyword);
         }catch (Exception e){
@@ -625,7 +620,7 @@ public class RecipeInfoProvider {
             blogList.add(new BlogList(title, blogUrl, description, bloggerName, postdate, thumbnail, userScrapYN, userScrapCnt));
         }
 
-        RecipeKeyword recipeKeyword = new RecipeKeyword(keyword);
+        RecipeKeyword recipeKeyword = new RecipeKeyword(keyword, user.getUserIdx());
         try{
             recipeKeyword = recipeKeywordRepository.save(recipeKeyword);
         }catch (Exception e){
