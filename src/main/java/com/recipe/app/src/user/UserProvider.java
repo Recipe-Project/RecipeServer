@@ -65,7 +65,7 @@ public class UserProvider {
         // 1. userId 이용해서 UserInfo DB 접근
         List<User> existsUserInfoList;
         try {
-            existsUserInfoList = userRepository.findBySocialIdAndStatus(userID, "ACTIVE");
+            existsUserInfoList = userRepository.findBySocialId(userID);
         } catch (Exception ignored) {
             throw new BaseException(DATABASE_ERROR);
         }
