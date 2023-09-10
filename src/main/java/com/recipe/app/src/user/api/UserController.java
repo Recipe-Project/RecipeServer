@@ -230,4 +230,18 @@ public class UserController {
 
         return success();
     }
+
+    @ApiOperation(value = "FCM 디바이스 토큰 수정 API")
+    @ResponseBody
+    @PatchMapping("/fcm-token")
+    public BaseResponse<Void> patchFcmToken(final Authentication authentication, @RequestBody UserDto.UserDeviceTokenRequest request) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        userService.updateFcmToken(request, user);
+
+        return success();
+    }
 }

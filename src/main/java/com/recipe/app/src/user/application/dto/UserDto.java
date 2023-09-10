@@ -26,6 +26,16 @@ public class UserDto {
         private String nickname;
     }
 
+    @ApiModel(value = "수정할 디바이스 토큰 요청 DTO", description = "FCM 디바이스 토큰 정보")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserDeviceTokenRequest {
+        @ApiModelProperty(value = "FCM 디바이스 토큰")
+        private String fcmToken;
+    }
+
     @Schema(description = "회원 프로필 응답 DTO")
     @Getter
     @Builder
