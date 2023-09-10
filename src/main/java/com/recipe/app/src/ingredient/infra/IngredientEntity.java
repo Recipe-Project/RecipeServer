@@ -67,7 +67,7 @@ public class IngredientEntity extends BaseEntity implements Comparable<Ingredien
                 .ingredientIconUrl(ingredientIconUrl)
                 .createdAt(getCreatedAt())
                 .updatedAt(getUpdatedAt())
-                .user(user.toModel())
+                .user(user != null ? user.toModel() : null)
                 .isDefault(defaultYn.equals("Y"))
                 .isHidden(hiddenYn.equals("Y"))
                 .build();
