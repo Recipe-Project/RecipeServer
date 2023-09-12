@@ -234,7 +234,9 @@ public class UserController {
     @ApiOperation(value = "FCM 디바이스 토큰 수정 API")
     @ResponseBody
     @PatchMapping("/fcm-token")
-    public BaseResponse<Void> patchFcmToken(final Authentication authentication, @RequestBody UserDto.UserDeviceTokenRequest request) {
+    public BaseResponse<Void> patchFcmToken(@ApiIgnore final Authentication authentication,
+                                            @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
+                                            @RequestBody UserDto.UserDeviceTokenRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
