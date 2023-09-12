@@ -91,7 +91,7 @@ public class FridgeBasketDto {
                     .fridgeBasketId(fridgeBasket.getFridgeBasketId())
                     .ingredientName(fridgeBasket.getIngredient().getIngredientName())
                     .ingredientIconUrl(fridgeBasket.getIngredient().getIngredientIconUrl())
-                    .expiredAt(fridgeBasket.getExpiredAt().format(DateTimeFormatter.ofPattern("yy.MM.dd")))
+                    .expiredAt(fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().format(DateTimeFormatter.ofPattern("yy.MM.dd")) : null)
                     .quantity(fridgeBasket.getQuantity())
                     .unit(fridgeBasket.getUnit())
                     .build();

@@ -74,7 +74,7 @@ public class FridgeDto {
                     .fridgeId(fridge.getFridgeId())
                     .ingredientName(fridge.getIngredient().getIngredientName())
                     .ingredientIconUrl(fridge.getIngredient().getIngredientIconUrl())
-                    .expiredAt(fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yy.MM.dd 까지")))
+                    .expiredAt(fridge.getExpiredAt() != null ? fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yy.MM.dd 까지")) : null)
                     .quantity(fridge.getQuantity())
                     .unit(fridge.getUnit())
                     .freshness(fridge.getFreshness().getName())
