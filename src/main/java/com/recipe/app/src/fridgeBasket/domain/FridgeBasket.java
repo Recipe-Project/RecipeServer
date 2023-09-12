@@ -38,6 +38,7 @@ public class FridgeBasket {
                 .user(user)
                 .ingredient(ingredient)
                 .quantity(1)
+                .unit("00")
                 .createdAt(now)
                 .updatedAt(now)
                 .build();
