@@ -43,6 +43,10 @@ public class UserEntity extends BaseEntity {
     private LocalDateTime recentLoginAt;
 
     public static UserEntity fromModel(User user) {
+
+        if (user == null)
+            return null;
+
         UserEntity userEntity = new UserEntity();
         userEntity.userId = user.getUserId();
         userEntity.socialId = user.getSocialId();
