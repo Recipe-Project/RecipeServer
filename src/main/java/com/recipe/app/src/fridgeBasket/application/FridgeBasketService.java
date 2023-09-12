@@ -41,7 +41,9 @@ public class FridgeBasketService {
                 })
                 .collect(Collectors.toList());
 
-        return fridgeBasketRepository.saveAll(fridgeBaskets);
+        fridgeBasketRepository.saveAll(fridgeBaskets);
+
+        return getFridgeBasketsByUser(user);
     }
 
     @Transactional
