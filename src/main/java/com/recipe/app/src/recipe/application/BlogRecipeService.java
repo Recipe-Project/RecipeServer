@@ -14,6 +14,8 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -45,8 +47,17 @@ public class BlogRecipeService {
     @Value("${naver.client-secret}")
     private String naverClientSecret;
 
-    public List<BlogRecipe> getBlogRecipes(String keyword) {
-        List<BlogRecipe> blogRecipes = blogRecipeRepository.getBlogRecipes(keyword);
+    public List<BlogRecipe> getBlogRecipes(String keyword, int page, int size, String sort) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        List<BlogRecipe> blogRecipes;
+        if (sort.equals("blogScraps"))
+            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByBlogScrapSizeDesc(keyword, pageable);
+        else if (sort.equals("blogViews"))
+            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByBlogViewSizeDesc(keyword, pageable);
+        else
+            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByCreatedAtDesc(keyword, pageable);
+
         if (blogRecipes.size() < 10)
             blogRecipes = searchNaverBlogRecipes(keyword);
 

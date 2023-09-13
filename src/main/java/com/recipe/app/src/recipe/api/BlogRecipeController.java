@@ -10,6 +10,7 @@ import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,13 +26,14 @@ public class BlogRecipeController {
     private final SearchKeywordService recipeKeywordService;
 
     @GetMapping("")
-    public BaseResponse<List<RecipeDto.RecipeResponse>> getBlogRecipes(final Authentication authentication, @RequestParam(value = "keyword") String keyword) {
+    public BaseResponse<List<RecipeDto.RecipeResponse>> getBlogRecipes(final Authentication authentication, @RequestParam(value = "keyword") String keyword,
+                                                                       @RequestParam(value = "page") int page, @RequestParam(value = "size") int size, @RequestParam(value = "sort") String sort) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<RecipeDto.RecipeResponse> data = blogRecipeService.getBlogRecipes(keyword).stream()
+        List<RecipeDto.RecipeResponse> data = blogRecipeService.getBlogRecipes(keyword, page, size, sort).stream()
                 .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
                 .collect(Collectors.toList());
         recipeKeywordService.createSearchKeyword(keyword, user);

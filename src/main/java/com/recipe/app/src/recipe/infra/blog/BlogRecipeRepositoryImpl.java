@@ -5,6 +5,7 @@ import com.recipe.app.src.recipe.domain.BlogRecipe;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -20,8 +21,22 @@ public class BlogRecipeRepositoryImpl implements BlogRecipeRepository {
     private final BlogViewJpaRepository blogViewJpaRepository;
 
     @Override
-    public List<BlogRecipe> getBlogRecipes(String keyword) {
-        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContaining(keyword, keyword).stream()
+    public List<BlogRecipe> getBlogRecipesOrderByCreatedAtDesc(String keyword, Pageable pageable) {
+        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByCreatedAtDesc(keyword, keyword, pageable).stream()
+                .map(BlogRecipeEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BlogRecipe> getBlogRecipesOrderByBlogScrapSizeDesc(String keyword, Pageable pageable) {
+        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByBlogScrapSizeDesc(keyword, keyword, pageable).stream()
+                .map(BlogRecipeEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<BlogRecipe> getBlogRecipesOrderByBlogViewSizeDesc(String keyword, Pageable pageable) {
+        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByBlogViewSizeDesc(keyword, keyword, pageable).stream()
                 .map(BlogRecipeEntity::toModel)
                 .collect(Collectors.toList());
     }
