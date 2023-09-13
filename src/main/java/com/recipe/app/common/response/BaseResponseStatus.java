@@ -207,6 +207,10 @@ public enum BaseResponseStatus {
 
     NOT_FOUND_FRIDGE(3078, "냉장고 조회에 실패했습니다."),
 
+    FRIDGE_SAVE_EXPIRED_DATE_NOT_MATCH(3079, "냉장고에 존재하는 재료(%s)의 유통 기한과 냉장고 바구니의 재료 유통 기한이 일치하지 않습니다"),
+
+    FRIDGE_SAVE_UNIT_NOT_MATCH(3080, "냉장고에 존재하는 재료(%s)의 단위와 냉장고 바구니의 재료 단위가 일치하지 않습니다"),
+
     /**
      * 4000 : Database, Server 오류
      */
