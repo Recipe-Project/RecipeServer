@@ -14,6 +14,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -50,15 +51,16 @@ public class BlogRecipeService {
     public List<BlogRecipe> getBlogRecipes(String keyword, int page, int size, String sort) {
 
         Pageable pageable = PageRequest.of(page, size);
-        List<BlogRecipe> blogRecipes;
+        Page<BlogRecipe> blogRecipePages;
         if (sort.equals("blogScraps"))
-            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByBlogScrapSizeDesc(keyword, pageable);
+            blogRecipePages = blogRecipeRepository.getBlogRecipesOrderByBlogScrapSizeDesc(keyword, pageable);
         else if (sort.equals("blogViews"))
-            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByBlogViewSizeDesc(keyword, pageable);
+            blogRecipePages = blogRecipeRepository.getBlogRecipesOrderByBlogViewSizeDesc(keyword, pageable);
         else
-            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByCreatedAtDesc(keyword, pageable);
+            blogRecipePages = blogRecipeRepository.getBlogRecipesOrderByCreatedAtDesc(keyword, pageable);
 
-        if (blogRecipes.size() < 10)
+        List<BlogRecipe> blogRecipes = blogRecipePages.toList();
+        if (blogRecipePages.getTotalElements() < 10)
             blogRecipes = searchNaverBlogRecipes(keyword);
 
         return blogRecipes;
