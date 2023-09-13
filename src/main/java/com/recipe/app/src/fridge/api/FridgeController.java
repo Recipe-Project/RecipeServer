@@ -8,26 +8,31 @@ import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 
 import static com.recipe.app.common.response.BaseResponse.success;
 
-@Slf4j
-@RestController("/fridges")
+@Api(tags = {"냉장고 Controller"})
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/fridges")
 public class FridgeController {
 
     private final FridgeService fridgeService;
     private final FridgeBasketService fridgeBasketService;
 
+    @ApiOperation(value = "냉장고 채우기 API")
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<FridgeDto.FridgesResponse> postFridges(final Authentication authentication) {
+    public BaseResponse<FridgeDto.FridgesResponse> postFridges(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -40,8 +45,10 @@ public class FridgeController {
         return success(data);
     }
 
+    @ApiOperation(value = "냉장고 목록 조회 API")
+    @ResponseBody
     @GetMapping("")
-    public BaseResponse<FridgeDto.FridgesResponse> getFridges(final Authentication authentication) {
+    public BaseResponse<FridgeDto.FridgesResponse> getFridges(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -54,8 +61,10 @@ public class FridgeController {
         return success(data);
     }
 
+    @ApiOperation(value = "냉장고 삭제 API")
+    @ResponseBody
     @DeleteMapping("/{fridgeId}")
-    public BaseResponse<FridgeDto.FridgesResponse> deleteFridge(final Authentication authentication, @RequestParam Long fridgeId) {
+    public BaseResponse<FridgeDto.FridgesResponse> deleteFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -68,9 +77,12 @@ public class FridgeController {
         return success(data);
     }
 
+    @ApiOperation(value = "냉장고 수정 API")
     @ResponseBody
     @PatchMapping("/{fridgeId}")
-    public BaseResponse<FridgeDto.FridgesResponse> patchFridge(final Authentication authentication, @RequestParam Long fridgeId, @RequestBody FridgeDto.FridgeRequest request) {
+    public BaseResponse<FridgeDto.FridgesResponse> patchFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId,
+                                                               @ApiParam(value = "냉장고 수정 입력 정보", required = true)
+                                                               @RequestBody FridgeDto.FridgeRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
