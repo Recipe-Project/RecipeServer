@@ -27,7 +27,7 @@ public class FridgeBasketService {
     @Transactional
     public List<FridgeBasket> createFridgeBasketByIngredientId(User user, FridgeBasketDto.FridgeBasketIngredientIdsRequest request) {
         List<Ingredient> ingredients = ingredientService.getIngredientsByIngredientIds(request.getIngredientIds());
-        List<FridgeBasket> existFridgeBaskets = fridgeBasketRepository.findByUser(user);
+        List<FridgeBasket> existFridgeBaskets = getFridgeBasketsByUser(user);
         Map<Ingredient, FridgeBasket> existIngredients = existFridgeBaskets.stream().collect(Collectors.toMap(FridgeBasket::getIngredient, v -> v));
 
         List<FridgeBasket> fridgeBaskets = ingredients.stream()
