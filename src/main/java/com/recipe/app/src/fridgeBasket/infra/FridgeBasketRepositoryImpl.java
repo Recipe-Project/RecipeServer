@@ -21,8 +21,8 @@ public class FridgeBasketRepositoryImpl implements FridgeBasketRepository {
     private final FridgeBasketJpaRepository fridgeBasketJpaRepository;
 
     @Override
-    public List<FridgeBasket> saveAll(List<FridgeBasket> fridgeBaskets) {
-        return StreamSupport.stream(fridgeBasketJpaRepository.saveAll(fridgeBaskets.stream()
+    public void saveAll(List<FridgeBasket> fridgeBaskets) {
+        StreamSupport.stream(fridgeBasketJpaRepository.saveAll(fridgeBaskets.stream()
                         .map(FridgeBasketEntity::fromModel)
                         .collect(Collectors.toList())).spliterator(), false)
                 .map(FridgeBasketEntity::toModel)

@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface FridgeBasketRepository {
-    List<FridgeBasket> saveAll(List<FridgeBasket> fridgeBaskets);
+    void saveAll(List<FridgeBasket> fridgeBaskets);
 
     List<FridgeBasket> findByUser(User user);
 
