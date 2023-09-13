@@ -3,15 +3,19 @@ package com.recipe.app.src.fridge.application;
 import com.recipe.app.src.fridge.application.dto.FridgeDto;
 import com.recipe.app.src.fridge.application.port.FridgeRepository;
 import com.recipe.app.src.fridge.domain.Fridge;
+import com.recipe.app.src.fridge.exception.FridgeSaveExpiredDateNotMatchException;
+import com.recipe.app.src.fridge.exception.FridgeSaveUnitNotMatchException;
 import com.recipe.app.src.fridge.exception.NotFoundFridgeException;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
+import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,11 +31,31 @@ public class FridgeService {
     public List<Fridge> createFridges(User user) {
 
         List<FridgeBasket> fridgeBaskets = fridgeBasketService.getFridgeBasketsByUser(user);
+        List<Fridge> existFridges = getFridges(user);
+        Map<Ingredient, Fridge> existIngredients = existFridges.stream().collect(Collectors.toMap(Fridge::getIngredient, v -> v));
+
         List<Fridge> fridges = fridgeBaskets.stream()
-                .map(Fridge::from)
+                .map(fridgeBasket -> {
+                    Ingredient ingredient = fridgeBasket.getIngredient();
+                    if (existIngredients.containsKey(ingredient)) {
+                        Fridge fridge = existIngredients.get(ingredient);
+                        if ((fridge.getExpiredAt() != null && !fridge.getExpiredAt().equals(fridgeBasket.getExpiredAt()))
+                        || (fridgeBasket.getExpiredAt() != null && !fridgeBasket.getExpiredAt().equals(fridge.getExpiredAt())))
+                            throw new FridgeSaveExpiredDateNotMatchException(ingredient.getIngredientName());
+                        if (!fridge.getUnit().equals(fridgeBasket.getUnit()))
+                            throw new FridgeSaveUnitNotMatchException(ingredient.getIngredientName());
+
+                        fridge = fridge.plusQuantity(fridgeBasket.getQuantity());
+                        return fridge;
+                    }
+                    return Fridge.from(fridgeBasket);
+                })
                 .collect(Collectors.toList());
 
-        return fridgeRepository.saveAll(fridges);
+        fridgeRepository.saveAll(fridges);
+        fridgeBasketService.deleteFridgeBaskets(fridgeBaskets);
+
+        return getFridges(user);
     }
 
     public List<Fridge> getFridges(User user) {
