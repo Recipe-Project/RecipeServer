@@ -60,4 +60,11 @@ public class FridgeBasketRepositoryImpl implements FridgeBasketRepository {
     public Optional<FridgeBasket> findByIngredientAndUser(Ingredient ingredient, User user) {
         return fridgeBasketJpaRepository.findByIngredientAndUser(IngredientEntity.fromModel(ingredient), UserEntity.fromModel(user)).map(FridgeBasketEntity::toModel);
     }
+
+    @Override
+    public void deleteAll(List<FridgeBasket> fridgeBaskets) {
+        fridgeBasketJpaRepository.deleteAll(fridgeBaskets.stream()
+                .map(FridgeBasketEntity::fromModel)
+                .collect(Collectors.toList()));
+    }
 }

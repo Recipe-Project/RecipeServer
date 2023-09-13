@@ -21,4 +21,6 @@ public interface FridgeBasketRepository {
     FridgeBasket save(FridgeBasket fridgeBasket);
 
     Optional<FridgeBasket> findByIngredientAndUser(Ingredient ingredient, User user);
+
+    void deleteAll(List<FridgeBasket> fridgeBaskets);
 }

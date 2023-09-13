@@ -90,4 +90,8 @@ public class FridgeBasketService {
     public List<FridgeBasket> getFridgeBasketsByUser(User user) {
         return fridgeBasketRepository.findByUser(user);
     }
+
+    public void deleteFridgeBaskets(List<FridgeBasket> fridgeBaskets) {
+        fridgeBasketRepository.deleteAll(fridgeBaskets);
+    }
 }
