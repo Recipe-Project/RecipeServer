@@ -75,4 +75,17 @@ public class Fridge {
                 .build();
     }
 
+    public Fridge plusQuantity(float quantity) {
+        LocalDateTime now = LocalDateTime.now();
+        return Fridge.builder()
+                .fridgeId(fridgeId)
+                .user(user)
+                .ingredient(ingredient)
+                .expiredAt(expiredAt)
+                .quantity(this.quantity + quantity)
+                .unit(unit)
+                .createdAt(getCreatedAt())
+                .updatedAt(now)
+                .build();
+    }
 }
