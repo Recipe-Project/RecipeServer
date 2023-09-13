@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 @EqualsAndHashCode(callSuper = false)
 @Data
 @Entity
+@EntityListeners(AuditingEntityListener.class)
 @Table(name = "BlogView")
 public class BlogViewEntity {
 
