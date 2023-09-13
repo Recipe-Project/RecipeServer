@@ -6,8 +6,8 @@ import com.recipe.app.src.recipe.domain.BlogRecipe;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
-import org.json.JSONObject;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.recipe.app.common.response.BaseResponseStatus.*;
 
@@ -48,6 +49,7 @@ public class BlogRecipeService {
     @Value("${naver.client-secret}")
     private String naverClientSecret;
 
+    @Transactional
     public List<BlogRecipe> getBlogRecipes(String keyword, int page, int size, String sort) {
 
         Pageable pageable = PageRequest.of(page, size);
@@ -102,7 +104,7 @@ public class BlogRecipeService {
             throw new BaseException(FAILED_TO_URL_ENCODER);
         }
 
-        String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&query=" + text;
+        String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&start=1&display=100&query=" + text;
 
         Map<String, String> requestHeaders = new HashMap<>();
         requestHeaders.put("X-Naver-Client-Id", naverClientId);
@@ -217,7 +219,19 @@ public class BlogRecipeService {
             blogs.add(BlogRecipe.from(blogUrl, thumbnail, title, description, postDate, bloggerName));
         }
 
-        return blogRecipeRepository.saveBlogRecipes(blogs);
+        List<String> blogUrls = blogs.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
+        List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findBlogRecipesByBlogUrlIn(blogUrls);
+        Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, v -> v));
+        List<BlogRecipe> blogRecipes = blogs.stream()
+                .map(blog -> {
+                    if (existBlogRecipeMapByBlogUrl.containsKey(blog.getBlogUrl())) {
+                        return existBlogRecipeMapByBlogUrl.get(blog.getBlogUrl());
+                    }
+                    return blog;
+                })
+                .collect(Collectors.toList());
+
+        return blogRecipeRepository.saveBlogRecipes(blogRecipes);
     }
 
     public long countBlogScrapByUser(User user) {

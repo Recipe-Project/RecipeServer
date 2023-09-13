@@ -19,4 +19,6 @@ public interface BlogRecipeJpaRepository extends CrudRepository<BlogRecipeEntity
             "where br.title like concat('%', :titleKeyword,'%') or br.description like concat('%', :descriptionKeyword,'%')\n" +
             "group by br.blogRecipeId order by count(br) desc")
     Page<BlogRecipeEntity> findByTitleContainingOrDescriptionContainingOrderByBlogViewSizeDesc(String titleKeyword, String descriptionKeyword, Pageable pageable);
+
+    List<BlogRecipeEntity> findByBlogUrlIn(List<String> blogUrls);
 }

@@ -80,4 +80,11 @@ public class BlogRecipeRepositoryImpl implements BlogRecipeRepository {
     public long countBlogScrapByUser(User user) {
         return blogScrapJpaRepository.countByUser(UserEntity.fromModel(user));
     }
+
+    @Override
+    public List<BlogRecipe> findBlogRecipesByBlogUrlIn(List<String> blogUrls) {
+        return blogRecipeJpaRepository.findByBlogUrlIn(blogUrls).stream()
+                .map(BlogRecipeEntity::toModel)
+                .collect(Collectors.toList());
+    }
 }
