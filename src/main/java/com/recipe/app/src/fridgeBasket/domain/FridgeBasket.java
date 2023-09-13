@@ -44,16 +44,17 @@ public class FridgeBasket {
                 .build();
     }
 
-    public FridgeBasket plusCount(int cnt) {
+    public FridgeBasket plusQuantity(float quantity) {
+        LocalDateTime now = LocalDateTime.now();
         return FridgeBasket.builder()
                 .fridgeBasketId(fridgeBasketId)
                 .user(user)
                 .ingredient(ingredient)
                 .expiredAt(expiredAt)
-                .quantity(quantity + cnt)
+                .quantity(this.quantity + quantity)
                 .unit(unit)
                 .createdAt(getCreatedAt())
-                .updatedAt(getUpdatedAt())
+                .updatedAt(now)
                 .build();
     }
 

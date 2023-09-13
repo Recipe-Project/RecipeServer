@@ -34,7 +34,7 @@ public class FridgeBasketService {
                 .map(ingredient -> {
                     if (existIngredients.containsKey(ingredient)) {
                         FridgeBasket fridgeBasket = existIngredients.get(ingredient);
-                        fridgeBasket = fridgeBasket.plusCount(1);
+                        fridgeBasket = fridgeBasket.plusQuantity(1);
                         return fridgeBasket;
                     }
                     return FridgeBasket.from(user, ingredient);
@@ -58,7 +58,7 @@ public class FridgeBasketService {
                 .orElseGet(() -> ingredientService.createIngredient(Ingredient.from(ingredientCategory, request.getIngredientName(), request.getIngredientIconUrl(), user)));
 
         FridgeBasket fridgeBasket = fridgeBasketRepository.findByIngredientAndUser(ingredient, user)
-                .map(f -> f.plusCount(1))
+                .map(f -> f.plusQuantity(1))
                 .orElseGet(() -> FridgeBasket.from(user, ingredient));
 
         fridgeBasketRepository.save(fridgeBasket);
