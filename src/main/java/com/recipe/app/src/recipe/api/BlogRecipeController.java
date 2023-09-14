@@ -26,16 +26,20 @@ public class BlogRecipeController {
     private final SearchKeywordService recipeKeywordService;
 
     @GetMapping("")
-    public BaseResponse<List<RecipeDto.RecipeResponse>> getBlogRecipes(final Authentication authentication, @RequestParam(value = "keyword") String keyword,
-                                                                       @RequestParam(value = "page") int page, @RequestParam(value = "size") int size, @RequestParam(value = "sort") String sort) {
+    public BaseResponse<RecipeDto.RecipesResponse> getBlogRecipes(@ApiIgnore final Authentication authentication,
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<RecipeDto.RecipeResponse> data = blogRecipeService.getBlogRecipes(keyword, page, size, sort).stream()
-                .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
-                .collect(Collectors.toList());
+        Page<BlogRecipe> blogRecipes = blogRecipeService.getBlogRecipes(keyword, page, size, sort);
+        if (blogRecipes.getTotalElements() < 10) {
+            blogRecipes = blogRecipeService.searchNaverBlogRecipes(keyword, page, size, sort);
+        }
+
+        RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(blogRecipes.getTotalElements(), blogRecipes.stream()
+                .map(blogRecipe -> RecipeDto.RecipeResponse.from(blogRecipe, user))
+                .collect(Collectors.toList()));
         recipeKeywordService.createSearchKeyword(keyword, user);
 
         return success(data);
@@ -54,15 +58,16 @@ public class BlogRecipeController {
     }
 
     @GetMapping("/scrap")
-    public BaseResponse<List<RecipeDto.RecipeResponse>> getScrapBlogRecipes(final Authentication authentication) {
+    public BaseResponse<RecipeDto.RecipesResponse> getScrapBlogRecipes(@ApiIgnore final Authentication authentication,
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<RecipeDto.RecipeResponse> data = blogRecipeService.getScrapBlogRecipes(user).stream()
+        Page<BlogRecipe> blogRecipes = blogRecipeService.getScrapBlogRecipes(user, page, size);
+        RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(blogRecipes.getTotalElements(), blogRecipes.stream()
                 .map(blogRecipe -> RecipeDto.RecipeResponse.from(blogRecipe, user))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
 
         return success(data);
     }

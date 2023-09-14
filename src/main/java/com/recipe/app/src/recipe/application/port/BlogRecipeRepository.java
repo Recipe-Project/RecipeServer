@@ -24,7 +24,7 @@ public interface BlogRecipeRepository {
 
     void deleteBlogRecipeScrap(BlogRecipe blogRecipe, User user);
 
-    List<BlogRecipe> findBlogRecipesByUser(User user);
+    Page<BlogRecipe> findBlogRecipesByUser(User user, Pageable pageable);
 
     List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs);
 

@@ -32,6 +32,13 @@ public class RecipeDto {
     }
 
     @Getter
+    @AllArgsConstructor
+    public static class RecipesResponse {
+        private long totalCnt;
+        private List<RecipeResponse> recipes;
+    }
+
+    @Getter
     @Builder
     public static class RecipeResponse {
         private Long recipeId;

@@ -60,11 +60,10 @@ public class BlogRecipeRepositoryImpl implements BlogRecipeRepository {
     }
 
     @Override
-    public List<BlogRecipe> findBlogRecipesByUser(User user) {
-        return blogScrapJpaRepository.findByUser(UserEntity.fromModel(user)).stream()
+    public Page<BlogRecipe> findBlogRecipesByUser(User user, Pageable pageable) {
+        return blogScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
                 .map(BlogScrapEntity::getBlogRecipe)
-                .map(BlogRecipeEntity::toModel)
-                .collect(Collectors.toList());
+                .map(BlogRecipeEntity::toModel);
     }
 
     @Override

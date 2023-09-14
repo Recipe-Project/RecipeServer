@@ -49,21 +49,16 @@ public class BlogRecipeService {
     @Value("${naver.client-secret}")
     private String naverClientSecret;
 
-    @Transactional
-    public List<BlogRecipe> getBlogRecipes(String keyword, int page, int size, String sort) {
+    public Page<BlogRecipe> getBlogRecipes(String keyword, int page, int size, String sort) {
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<BlogRecipe> blogRecipePages;
+        Page<BlogRecipe> blogRecipes;
         if (sort.equals("blogScraps"))
-            blogRecipePages = blogRecipeRepository.getBlogRecipesOrderByBlogScrapSizeDesc(keyword, pageable);
+            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByBlogScrapSizeDesc(keyword, pageable);
         else if (sort.equals("blogViews"))
-            blogRecipePages = blogRecipeRepository.getBlogRecipesOrderByBlogViewSizeDesc(keyword, pageable);
+            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByBlogViewSizeDesc(keyword, pageable);
         else
-            blogRecipePages = blogRecipeRepository.getBlogRecipesOrderByCreatedAtDesc(keyword, pageable);
-
-        List<BlogRecipe> blogRecipes = blogRecipePages.toList();
-        if (blogRecipePages.getTotalElements() < 10)
-            blogRecipes = searchNaverBlogRecipes(keyword);
+            blogRecipes = blogRecipeRepository.getBlogRecipesOrderByCreatedAtDesc(keyword, pageable);
 
         return blogRecipes;
     }
@@ -90,12 +85,13 @@ public class BlogRecipeService {
         blogRecipeRepository.deleteBlogRecipeScrap(blogRecipe, user);
     }
 
-    public List<BlogRecipe> getScrapBlogRecipes(User user) {
-        return blogRecipeRepository.findBlogRecipesByUser(user);
+    public Page<BlogRecipe> getScrapBlogRecipes(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return blogRecipeRepository.findBlogRecipesByUser(user, pageable);
     }
 
     @Transactional
-    public List<BlogRecipe> searchNaverBlogRecipes(String keyword) {
+    public Page<BlogRecipe> searchNaverBlogRecipes(String keyword, int page, int size, String sort) {
         JSONObject jsonObject;
         String text;
         try {
@@ -231,7 +227,9 @@ public class BlogRecipeService {
                 })
                 .collect(Collectors.toList());
 
-        return blogRecipeRepository.saveBlogRecipes(blogRecipes);
+        blogRecipeRepository.saveBlogRecipes(blogRecipes);
+
+        return getBlogRecipes(keyword, page, size, sort);
     }
 
     public long countBlogScrapByUser(User user) {
