@@ -44,10 +44,10 @@ public class BlogRecipeEntity extends BaseEntity {
     @Column(name = "blogName", nullable = false, length = 45)
     private String blogName;
 
-    @OneToMany(mappedBy = "blogRecipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "blogRecipe")
     private List<BlogScrapEntity> blogScraps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "blogRecipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "blogRecipe")
     private List<BlogViewEntity> blogViews = new ArrayList<>();
 
     public BlogRecipe toModel() {
