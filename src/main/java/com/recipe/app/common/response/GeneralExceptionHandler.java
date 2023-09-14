@@ -24,12 +24,14 @@ public class GeneralExceptionHandler {
 
     @ExceptionHandler({BaseException.class})
     public ResponseEntity<?> handleBaseException(BaseException e) {
+        e.printStackTrace();
         log.error(e.getMessage());
         return newResponse(e, HttpStatus.OK);
     }
 
     @ExceptionHandler({SQLException.class})
     public ResponseEntity<?> handleSQLException(Exception e) {
+        e.printStackTrace();
         log.error(e.getMessage());
         return newResponse(new BaseException(BaseResponseStatus.DATABASE_ERROR), HttpStatus.OK);
     }
