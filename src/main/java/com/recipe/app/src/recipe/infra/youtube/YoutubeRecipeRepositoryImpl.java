@@ -63,11 +63,10 @@ public class YoutubeRecipeRepositoryImpl implements YoutubeRecipeRepository {
     }
 
     @Override
-    public List<YoutubeRecipe> findYoutubeRecipesByUser(User user) {
-        return youtubeScrapJpaRepository.findByUser(UserEntity.fromModel(user)).stream()
+    public Page<YoutubeRecipe> findYoutubeRecipesByUser(User user, Pageable pageable) {
+        return youtubeScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
                 .map(YoutubeScrapEntity::getYoutubeRecipe)
-                .map(YoutubeRecipeEntity::toModel)
-                .collect(Collectors.toList());
+                .map(YoutubeRecipeEntity::toModel);
     }
 
     @Override
@@ -82,5 +81,12 @@ public class YoutubeRecipeRepositoryImpl implements YoutubeRecipeRepository {
     @Override
     public long countYoutubeScrapByUser(User user) {
         return youtubeScrapJpaRepository.countByUser(UserEntity.fromModel(user));
+    }
+
+    @Override
+    public List<YoutubeRecipe> findYoutubeRecipesByYoutubeIdIn(List<String> youtubeIds) {
+        return youtubeRecipeJpaRepository.findByYoutubeIdIn(youtubeIds).stream()
+                .map(YoutubeRecipeEntity::toModel)
+                .collect(Collectors.toList());
     }
 }

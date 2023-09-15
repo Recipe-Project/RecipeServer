@@ -20,4 +20,6 @@ public interface YoutubeRecipeJpaRepository extends CrudRepository<YoutubeRecipe
             "where yr.title like concat('%', :titleKeyword,'%') or yr.description like concat('%', :descriptionKeyword,'%')\n" +
             "group by yr.youtubeRecipeId order by count(yr) desc")
     Page<YoutubeRecipeEntity> findByTitleContainingOrDescriptionContainingOrderByYoutubeViewSizeDesc(String titleKeyword, String descriptionKeyword, Pageable pageable);
+
+    List<YoutubeRecipeEntity> findByYoutubeIdIn(List<String> youtubeIds);
 }

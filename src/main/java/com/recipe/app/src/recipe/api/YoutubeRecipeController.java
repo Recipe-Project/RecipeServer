@@ -17,7 +17,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.recipe.app.common.response.BaseResponse.success;
@@ -70,15 +69,20 @@ public class YoutubeRecipeController {
     }
 
     @GetMapping("/scrap")
-    public BaseResponse<List<RecipeDto.RecipeResponse>> getScrapYoutubeRecipes(final Authentication authentication) {
+    public BaseResponse<RecipeDto.RecipesResponse> getScrapYoutubeRecipes(@ApiIgnore final Authentication authentication,
+                                                                          @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
+                                                                          @RequestParam(value = "page") int page,
+                                                                          @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                                                          @RequestParam(value = "size") int size) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<RecipeDto.RecipeResponse> data = youtubeRecipeService.getScrapYoutubeRecipes(user).stream()
+        Page<YoutubeRecipe> youtubeRecipes = youtubeRecipeService.getScrapYoutubeRecipes(user, page, size);
+        RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(youtubeRecipes.getTotalElements(), youtubeRecipes.stream()
                 .map((youtubeRecipe) -> RecipeDto.RecipeResponse.from(youtubeRecipe, user))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
 
         return success(data);
     }

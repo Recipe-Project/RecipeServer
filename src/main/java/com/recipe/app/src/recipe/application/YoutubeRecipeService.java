@@ -83,8 +83,9 @@ public class YoutubeRecipeService {
         youtubeRecipeRepository.deleteYoutubeRecipeScrap(youtubeRecipe, user);
     }
 
-    public List<YoutubeRecipe> getScrapYoutubeRecipes(User user) {
-        return youtubeRecipeRepository.findYoutubeRecipesByUser(user);
+    public Page<YoutubeRecipe> getScrapYoutubeRecipes(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return youtubeRecipeRepository.findYoutubeRecipesByUser(user, pageable);
     }
 
     public long countYoutubeScrapByUser(User user) {

@@ -2,6 +2,8 @@ package com.recipe.app.src.recipe.application.port;
 
 import com.recipe.app.src.recipe.domain.YoutubeRecipe;
 import com.recipe.app.src.user.domain.User;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.Optional;
@@ -27,4 +29,6 @@ public interface YoutubeRecipeRepository {
     List<YoutubeRecipe> saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes);
 
     long countYoutubeScrapByUser(User user);
+
+    List<YoutubeRecipe> findYoutubeRecipesByYoutubeIdIn(List<String> youtubeIds);
 }
