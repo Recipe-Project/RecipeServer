@@ -8,7 +8,11 @@ import java.util.Optional;
 
 public interface YoutubeRecipeRepository {
 
-    List<YoutubeRecipe> getYoutubeRecipes(String keyword);
+    Page<YoutubeRecipe> getYoutubeRecipesOrderByCreatedAtDesc(String keyword, Pageable pageable);
+
+    Page<YoutubeRecipe> getYoutubeRecipesOrderByYoutubeScrapSizeDesc(String keyword, Pageable pageable);
+
+    Page<YoutubeRecipe> getYoutubeRecipesOrderByYoutubeViewSizeDesc(String keyword, Pageable pageable);
 
     Optional<YoutubeRecipe> getYoutubeRecipe(Long youtubeRecipeId);
 
@@ -18,7 +22,7 @@ public interface YoutubeRecipeRepository {
 
     void deleteYoutubeRecipeScrap(YoutubeRecipe youtubeRecipe, User user);
 
-    List<YoutubeRecipe> findYoutubeRecipesByUser(User user);
+    Page<YoutubeRecipe> findYoutubeRecipesByUser(User user, Pageable pageable);
 
     List<YoutubeRecipe> saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes);
 

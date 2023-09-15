@@ -5,6 +5,8 @@ import com.recipe.app.src.recipe.domain.YoutubeRecipe;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -22,10 +24,18 @@ public class YoutubeRecipeRepositoryImpl implements YoutubeRecipeRepository {
 
 
     @Override
-    public List<YoutubeRecipe> getYoutubeRecipes(String keyword) {
-        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContaining(keyword, keyword).stream()
-                .map(YoutubeRecipeEntity::toModel)
-                .collect(Collectors.toList());
+    public Page<YoutubeRecipe> getYoutubeRecipesOrderByCreatedAtDesc(String keyword, Pageable pageable) {
+        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByCreatedAtDesc(keyword, keyword, pageable).map(YoutubeRecipeEntity::toModel);
+    }
+
+    @Override
+    public Page<YoutubeRecipe> getYoutubeRecipesOrderByYoutubeScrapSizeDesc(String keyword, Pageable pageable) {
+        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByYoutubeScrapSizeDesc(keyword, keyword, pageable).map(YoutubeRecipeEntity::toModel);
+    }
+
+    @Override
+    public Page<YoutubeRecipe> getYoutubeRecipesOrderByYoutubeViewSizeDesc(String keyword, Pageable pageable) {
+        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByYoutubeViewSizeDesc(keyword, keyword, pageable).map(YoutubeRecipeEntity::toModel);
     }
 
     @Override

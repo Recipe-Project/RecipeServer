@@ -16,6 +16,9 @@ import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,6 +28,8 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,10 +47,16 @@ public class YoutubeRecipeService {
     @Value("${youtube.api-key}")
     private String youtubeApiKey;
 
-    public List<YoutubeRecipe> getYoutubeRecipes(String keyword) {
-        List<YoutubeRecipe> youtubeRecipes = youtubeRecipeRepository.getYoutubeRecipes(keyword);
-        if (youtubeRecipes.size() < 10)
-            youtubeRecipes = searchYoutubes(keyword);
+    public Page<YoutubeRecipe> getYoutubeRecipes(String keyword, int page, int size, String sort) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<YoutubeRecipe> youtubeRecipes;
+        if (sort.equals("youtubeScraps"))
+            youtubeRecipes = youtubeRecipeRepository.getYoutubeRecipesOrderByYoutubeScrapSizeDesc(keyword, pageable);
+        else if (sort.equals("youtubeViews"))
+            youtubeRecipes = youtubeRecipeRepository.getYoutubeRecipesOrderByYoutubeViewSizeDesc(keyword, pageable);
+        else
+            youtubeRecipes = youtubeRecipeRepository.getYoutubeRecipesOrderByCreatedAtDesc(keyword, pageable);
 
         return youtubeRecipes;
     }
@@ -81,9 +92,8 @@ public class YoutubeRecipeService {
     }
 
     @Transactional
-    public List<YoutubeRecipe> searchYoutubes(String keyword) {
+    public Page<YoutubeRecipe> searchYoutubes(String keyword, int page, int size, String sort) {
 
-        List<YoutubeRecipe> youtubeRecipes = new ArrayList<>();
         try {
             YouTube youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
                 public void initialize(HttpRequest request) throws IOException {
@@ -103,12 +113,24 @@ public class YoutubeRecipeService {
             List<SearchResult> searchResultList = searchResponse.getItems();
 
             if (searchResultList != null) {
+                List<YoutubeRecipe> youtubes = new ArrayList<>();
                 for (SearchResult rid : searchResultList) {
-                    youtubeRecipes.add(YoutubeRecipe.from(rid.getSnippet().getTitle(), rid.getSnippet().getDescription(), rid.getSnippet().getThumbnails().getDefault().getUrl(),
+                    youtubes.add(YoutubeRecipe.from(rid.getSnippet().getTitle(), rid.getSnippet().getDescription(), rid.getSnippet().getThumbnails().getDefault().getUrl(),
                             LocalDate.ofInstant(Instant.ofEpochMilli(rid.getSnippet().getPublishedAt().getValue()), ZoneId.systemDefault()), rid.getSnippet().getChannelTitle(), rid.getId().getVideoId()));
-
                 }
-                return youtubeRecipeRepository.saveYoutubeRecipes(youtubeRecipes);
+                List<String> youtubeIds = youtubes.stream().map(YoutubeRecipe::getYoutubeId).collect(Collectors.toList());
+                List<YoutubeRecipe> existYoutubeRecipes = youtubeRecipeRepository.findYoutubeRecipesByYoutubeIdIn(youtubeIds);
+                Map<String, YoutubeRecipe> existYoutubeRecipesMapByYoutubeId = existYoutubeRecipes.stream().collect(Collectors.toMap(YoutubeRecipe::getYoutubeId, v -> v));
+                List<YoutubeRecipe> youtubeRecipes = youtubes.stream()
+                        .map(youtubeRecipe -> {
+                            if (existYoutubeRecipesMapByYoutubeId.containsKey(youtubeRecipe.getYoutubeId())) {
+                                return existYoutubeRecipesMapByYoutubeId.get(youtubeRecipe.getYoutubeId());
+                            }
+                            return youtubeRecipe;
+                        })
+                        .collect(Collectors.toList());
+
+                youtubeRecipeRepository.saveYoutubeRecipes(youtubeRecipes);
             }
         } catch (GoogleJsonResponseException e) {
             System.err.println("There was a service error: " + e.getDetails().getCode() + " : "
@@ -118,6 +140,7 @@ public class YoutubeRecipeService {
         } catch (Throwable t) {
             t.printStackTrace();
         }
-        return youtubeRecipes;
+
+        return getYoutubeRecipes(keyword, page, size, sort);
     }
 }

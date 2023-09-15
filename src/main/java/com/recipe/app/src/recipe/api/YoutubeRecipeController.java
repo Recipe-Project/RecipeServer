@@ -4,12 +4,18 @@ import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.recipe.application.SearchKeywordService;
 import com.recipe.app.src.recipe.application.YoutubeRecipeService;
 import com.recipe.app.src.recipe.application.dto.RecipeDto;
+import com.recipe.app.src.recipe.domain.YoutubeRecipe;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,15 +31,27 @@ public class YoutubeRecipeController {
     private final SearchKeywordService recipeKeywordService;
 
     @GetMapping("")
-    public BaseResponse<List<RecipeDto.RecipeResponse>> getYoutubeRecipes(final Authentication authentication, @RequestParam(value = "keyword") String keyword) {
+    public BaseResponse<RecipeDto.RecipesResponse> getYoutubeRecipes(@ApiIgnore final Authentication authentication,
+                                                                     @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
+                                                                     @RequestParam(value = "keyword") String keyword,
+                                                                     @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
+                                                                     @RequestParam(value = "page") int page,
+                                                                     @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                                                     @RequestParam(value = "size") int size,
+                                                                     @ApiParam(name = "sort", type = "String", example = "조회수순(blogViews) / 좋아요순(blogScraps) / 최신순(blogRecipeId) = 기본값", value = "정렬")
+                                                                     @RequestParam(value = "sort") String sort) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<RecipeDto.RecipeResponse> data = youtubeRecipeService.getYoutubeRecipes(keyword).stream()
+        Page<YoutubeRecipe> youtubeRecipes = youtubeRecipeService.getYoutubeRecipes(keyword, page, size, sort);
+        if (youtubeRecipes.getTotalElements() < 10)
+            youtubeRecipes = youtubeRecipeService.searchYoutubes(keyword, page, size, sort);
+
+        RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(youtubeRecipes.getTotalElements(), youtubeRecipes.stream()
                 .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
         recipeKeywordService.createSearchKeyword(keyword, user);
 
         return success(data);
