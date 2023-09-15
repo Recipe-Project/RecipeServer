@@ -44,10 +44,10 @@ public class YoutubeRecipeEntity extends BaseEntity {
     @Column(name = "youtubeId", nullable = false, length = 16)
     private String youtubeId;
 
-    @OneToMany(mappedBy = "youtubeRecipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "youtubeRecipe")
     private List<YoutubeScrapEntity> youtubeScraps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "youtubeRecipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "youtubeRecipe")
     private List<YoutubeViewEntity> youtubeViews = new ArrayList<>();
 
     public static YoutubeRecipeEntity fromModel(YoutubeRecipe youtubeRecipe) {
