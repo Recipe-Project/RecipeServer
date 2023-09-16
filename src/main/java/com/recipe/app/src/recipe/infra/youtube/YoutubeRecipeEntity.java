@@ -29,7 +29,7 @@ public class YoutubeRecipeEntity extends BaseEntity {
     @Column(name = "title", nullable = false, length = 128)
     private String title;
 
-    @Column(name = "description", nullable = false, length = 200)
+    @Column(name = "description", length = 200)
     private String description;
 
     @Column(name = "thumbnailImgUrl", nullable = false)
