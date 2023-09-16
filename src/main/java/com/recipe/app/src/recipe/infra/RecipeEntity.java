@@ -69,7 +69,7 @@ public class RecipeEntity extends BaseEntity {
                 .imgUrl(imgUrl)
                 .quantity(quantity)
                 .calorie(calorie)
-                .user(user.toModel())
+                .user(user != null ? user.toModel() : null)
                 .isHidden(hiddenYn.equals("Y"))
                 .recipeIngredients(recipeIngredients.stream()
                         .map(RecipeIngredientEntity::toModel)
