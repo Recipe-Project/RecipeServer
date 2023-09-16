@@ -169,26 +169,4 @@ public class RecipeDto {
         }
     }
 
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class BlogRecipesResponse {
-        private Integer total;
-        private List<BlogRecipeResponse> blogList;
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class BlogRecipeResponse {
-        private String title;
-        private String blogUrl;
-        private String description;
-        private String bloggerName;
-        private String postDate;
-        private String thumbnail;
-        private String userScrapYN;
-        private Integer userScrapCnt;
-    }
-
 }
