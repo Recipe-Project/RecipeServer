@@ -29,6 +29,7 @@ public class YoutubeScrapEntity {
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "youtubeRecipeId")
     private YoutubeRecipeEntity youtubeRecipe;
 
     @CreatedDate
