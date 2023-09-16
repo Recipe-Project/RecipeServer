@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -21,7 +22,10 @@ public class SearchKeywordService {
         searchKeywordRepository.save(keyword, user);
     }
 
-    public List<String> retrieveRecipesBestKeyword() throws BaseException {
-        return searchKeywordRepository.findSearchKeywordsTop10();
+    public List<String> retrieveRecipesDayBestKeyword() throws BaseException {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime yesterday = now.minusDays(1).withMinute(0).withSecond(0);
+        LocalDateTime today = now.withMinute(0).withSecond(0);
+        return searchKeywordRepository.findSearchKeywordsTop10(yesterday, today);
     }
 }
