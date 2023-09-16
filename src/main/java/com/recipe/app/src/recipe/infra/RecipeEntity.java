@@ -53,16 +53,10 @@ public class RecipeEntity extends BaseEntity {
     @Column(name = "hiddenYn", nullable = false)
     private String hiddenYn = "Y";
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
-    private List<RecipeIngredientEntity> recipeIngredients = new ArrayList<>();
-
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
-    private List<RecipeProcessEntity> recipeProcesses = new ArrayList<>();
-
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recipe")
     private List<RecipeScrapEntity> recipeScraps = new ArrayList<>();
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recipe")
     private List<RecipeViewEntity> recipeViews = new ArrayList<>();
 
     public Recipe toModel() {
