@@ -39,7 +39,7 @@ public class BlogRecipeController {
                                                                   @RequestParam(value = "page") int page,
                                                                   @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                                   @RequestParam(value = "size") int size,
-                                                                  @ApiParam(name = "sort", type = "String", example = "조회수순(blogViews) / 좋아요순(blogScraps) / 최신순(blogRecipeId) = 기본값", value = "정렬")
+                                                                  @ApiParam(name = "sort", type = "String", example = "조회수순(blogViews) / 좋아요순(blogScraps) / 최신순(createdAt) = 기본값", value = "정렬")
                                                                   @RequestParam(value = "sort") String sort) {
 
         if (authentication == null)
