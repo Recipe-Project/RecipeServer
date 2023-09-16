@@ -13,12 +13,12 @@ public interface YoutubeRecipeJpaRepository extends CrudRepository<YoutubeRecipe
 
     @Query("select yr from YoutubeRecipeEntity yr left join YoutubeScrapEntity ys on ys.youtubeRecipe.youtubeRecipeId = yr.youtubeRecipeId\n" +
             "where yr.title like concat('%', :titleKeyword,'%') or yr.description like concat('%', :descriptionKeyword,'%')\n" +
-            "group by yr.youtubeRecipeId order by count(yr) desc")
+            "group by yr.youtubeRecipeId order by count(ys) desc")
     Page<YoutubeRecipeEntity> findByTitleContainingOrDescriptionContainingOrderByYoutubeScrapSizeDesc(String titleKeyword, String descriptionKeyword, Pageable pageable);
 
     @Query("select yr from YoutubeRecipeEntity yr left join YoutubeViewEntity yv on yv.youtubeRecipe.youtubeRecipeId = yr.youtubeRecipeId\n" +
             "where yr.title like concat('%', :titleKeyword,'%') or yr.description like concat('%', :descriptionKeyword,'%')\n" +
-            "group by yr.youtubeRecipeId order by count(yr) desc")
+            "group by yr.youtubeRecipeId order by count(yv) desc")
     Page<YoutubeRecipeEntity> findByTitleContainingOrDescriptionContainingOrderByYoutubeViewSizeDesc(String titleKeyword, String descriptionKeyword, Pageable pageable);
 
     List<YoutubeRecipeEntity> findByYoutubeIdIn(List<String> youtubeIds);

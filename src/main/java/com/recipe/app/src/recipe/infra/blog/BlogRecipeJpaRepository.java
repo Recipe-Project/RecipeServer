@@ -12,12 +12,12 @@ public interface BlogRecipeJpaRepository extends CrudRepository<BlogRecipeEntity
 
     @Query("select br from BlogRecipeEntity br left join BlogScrapEntity bs on bs.blogRecipe.blogRecipeId = br.blogRecipeId\n" +
             "where br.title like concat('%', :titleKeyword,'%') or br.description like concat('%', :descriptionKeyword,'%')\n" +
-            "group by br.blogRecipeId order by count(br) desc")
+            "group by br.blogRecipeId order by count(bs) desc")
     Page<BlogRecipeEntity> findByTitleContainingOrDescriptionContainingOrderByBlogScrapSizeDesc(String titleKeyword, String descriptionKeyword, Pageable pageable);
 
     @Query("select br from BlogRecipeEntity br left join BlogViewEntity bv on bv.blogRecipe.blogRecipeId = br.blogRecipeId\n" +
             "where br.title like concat('%', :titleKeyword,'%') or br.description like concat('%', :descriptionKeyword,'%')\n" +
-            "group by br.blogRecipeId order by count(br) desc")
+            "group by br.blogRecipeId order by count(bv) desc")
     Page<BlogRecipeEntity> findByTitleContainingOrDescriptionContainingOrderByBlogViewSizeDesc(String titleKeyword, String descriptionKeyword, Pageable pageable);
 
     List<BlogRecipeEntity> findByBlogUrlIn(List<String> blogUrls);
