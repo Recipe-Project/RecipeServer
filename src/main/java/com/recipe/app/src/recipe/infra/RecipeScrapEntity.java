@@ -29,6 +29,7 @@ public class RecipeScrapEntity {
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipeId")
     private RecipeEntity recipe;
 
     @CreatedDate

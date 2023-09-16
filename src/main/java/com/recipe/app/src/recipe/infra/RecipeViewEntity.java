@@ -29,6 +29,7 @@ public class RecipeViewEntity {
     private UserEntity user;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipeId")
     private RecipeEntity recipe;
 
     @CreatedDate
