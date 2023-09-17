@@ -48,6 +48,8 @@ public class RecipeIngredientEntity extends BaseEntity {
                 .recipe(recipe.toModel())
                 .ingredient(ingredient.toModel())
                 .capacity(capacity)
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .build();
     }
 }

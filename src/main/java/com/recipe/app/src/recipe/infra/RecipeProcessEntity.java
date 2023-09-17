@@ -51,6 +51,8 @@ public class RecipeProcessEntity extends BaseEntity {
                 .cookingNo(cookingNo)
                 .cookingDescription(cookingDescription)
                 .recipeProcessImgUrl(recipeProcessImgUrl)
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .build();
     }
 }
