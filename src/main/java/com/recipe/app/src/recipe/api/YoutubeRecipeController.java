@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.api;
 
 import com.recipe.app.common.response.BaseResponse;
+import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.recipe.application.SearchKeywordService;
 import com.recipe.app.src.recipe.application.YoutubeRecipeService;
 import com.recipe.app.src.recipe.application.dto.RecipeDto;
@@ -29,6 +30,7 @@ public class YoutubeRecipeController {
 
     private final YoutubeRecipeService youtubeRecipeService;
     private final SearchKeywordService recipeKeywordService;
+    private final BadWordService badWordService;
 
     @ApiOperation(value = "유튜브 레시피 목록 조회 API")
     @GetMapping("")
@@ -46,6 +48,7 @@ public class YoutubeRecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(keyword);
         Page<YoutubeRecipe> youtubeRecipes = youtubeRecipeService.getYoutubeRecipes(keyword, page, size, sort);
         if (youtubeRecipes.getTotalElements() < 10)
             youtubeRecipes = youtubeRecipeService.searchYoutubes(keyword, page, size, sort);

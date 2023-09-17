@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.api;
 
 import com.recipe.app.common.response.BaseResponse;
+import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.recipe.application.BlogRecipeService;
 import com.recipe.app.src.recipe.application.SearchKeywordService;
 import com.recipe.app.src.recipe.application.dto.RecipeDto;
@@ -28,6 +29,7 @@ import static com.recipe.app.common.response.BaseResponse.success;
 public class BlogRecipeController {
 
     private final BlogRecipeService blogRecipeService;
+    private final BadWordService badWordService;
     private final SearchKeywordService recipeKeywordService;
 
     @ApiOperation(value = "블로그 레시피 목록 조회 API")
@@ -46,6 +48,7 @@ public class BlogRecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(keyword);
         Page<BlogRecipe> blogRecipes = blogRecipeService.getBlogRecipes(keyword, page, size, sort);
         if (blogRecipes.getTotalElements() < 10) {
             blogRecipes = blogRecipeService.searchNaverBlogRecipes(keyword, page, size, sort);
