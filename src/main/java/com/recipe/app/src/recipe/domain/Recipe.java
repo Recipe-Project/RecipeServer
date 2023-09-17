@@ -86,4 +86,17 @@ public class Recipe {
                 .updatedAt(now)
                 .build();
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Recipe))
+            return false;
+        Recipe recipe = (Recipe) o;
+        return recipeId.equals(recipe.getRecipeId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(recipeId);
+    }
 }
