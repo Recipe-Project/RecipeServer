@@ -99,6 +99,13 @@ public class RecipeService {
         Recipe recipe = getRecipe(recipeId, user.getUserId());
         if (!user.equals(recipe.getUser()))
             throw new ForbiddenAccessException();
+        List<RecipeIngredient> recipeIngredients = recipeRepository.findRecipeIngredientsByRecipe(recipe);
+        List<RecipeProcess> recipeProcesses = recipeRepository.findRecipeProcessesByRecipe(recipe);
+
+        recipeRepository.deleteRecipeIngredients(recipeIngredients);
+        recipeRepository.deleteRecipeProcesses(recipeProcesses);
+        recipeRepository.deleteRecipeScrapsByRecipe(recipe);
+        recipeRepository.deleteRecipeViewsByRecipe(recipe);
         recipeRepository.delete(recipe);
     }
 

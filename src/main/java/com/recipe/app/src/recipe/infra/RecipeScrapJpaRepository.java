@@ -14,4 +14,6 @@ public interface RecipeScrapJpaRepository extends CrudRepository<RecipeScrapEnti
     Page<RecipeScrapEntity> findByUser(UserEntity user, Pageable pageable);
 
     long countByUser(UserEntity user);
+
+    List<RecipeScrapEntity> findByRecipe(RecipeEntity recipe);
 }

@@ -152,4 +152,14 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                 .map(RecipeIngredientEntity::toModel)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public void deleteRecipeScrapsByRecipe(Recipe recipe) {
+        recipeScrapJpaRepository.deleteAll(recipeScrapJpaRepository.findByRecipe(RecipeEntity.fromModel(recipe)));
+    }
+
+    @Override
+    public void deleteRecipeViewsByRecipe(Recipe recipe) {
+        recipeViewJpaRepository.deleteAll(recipeViewJpaRepository.findByRecipe(RecipeEntity.fromModel(recipe)));
+    }
 }
