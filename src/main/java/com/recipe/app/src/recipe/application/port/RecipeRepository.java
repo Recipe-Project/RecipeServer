@@ -47,4 +47,6 @@ public interface RecipeRepository {
     long countRecipeScrapByUser(User user);
 
     List<RecipeIngredient> findRecipeIngredientsByRecipe(Recipe recipe);
+
+    List<RecipeIngredient> findRecipeIngredientsByRecipeIn(List<Recipe> recipes);
 }

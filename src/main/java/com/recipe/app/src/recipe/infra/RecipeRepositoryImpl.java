@@ -138,4 +138,12 @@ public class RecipeRepositoryImpl implements RecipeRepository {
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public List<RecipeIngredient> findRecipeIngredientsByRecipeIn(List<Recipe> recipes) {
+        return recipeIngredientJpaRepository.findByRecipeIn(recipes.stream()
+                        .map(RecipeEntity::fromModel)
+                        .collect(Collectors.toList())).stream()
+                .map(RecipeIngredientEntity::toModel)
+                .collect(Collectors.toList());
+    }
 }

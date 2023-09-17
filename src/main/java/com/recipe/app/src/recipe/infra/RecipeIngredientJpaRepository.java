@@ -7,4 +7,5 @@ import java.util.List;
 public interface RecipeIngredientJpaRepository extends CrudRepository<RecipeIngredientEntity, Long> {
     List<RecipeIngredientEntity> findByRecipe(RecipeEntity recipe);
 
+    List<RecipeIngredientEntity> findByRecipeIn(List<RecipeEntity> recipes);
 }
