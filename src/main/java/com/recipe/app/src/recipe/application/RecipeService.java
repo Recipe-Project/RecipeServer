@@ -2,8 +2,10 @@ package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.fridge.application.port.FridgeRepository;
 import com.recipe.app.src.fridge.domain.Fridge;
+import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.ingredient.application.port.IngredientRepository;
 import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.ingredient.exception.NotFoundIngredientException;
 import com.recipe.app.src.recipe.application.dto.RecipeDto;
 import com.recipe.app.src.recipe.application.port.RecipeRepository;
@@ -34,6 +36,7 @@ public class RecipeService {
 
     private final RecipeRepository recipeRepository;
     private final IngredientRepository ingredientRepository;
+    private final IngredientService ingredientService;
     private final FridgeRepository fridgeRepository;
 
     public Page<Recipe> getRecipes(String keyword, int page, int size, String sort) {
@@ -113,12 +116,13 @@ public class RecipeService {
     public void createRecipe(User user, RecipeDto.RecipeRequest request) {
         Recipe recipe = Recipe.from(request.getTitle(), null, null, null, request.getThumbnail(),
                 null, null, user, true);
-        recipe = recipeRepository.save(recipe);
+        Recipe newRecipe = recipeRepository.save(recipe);
 
-        RecipeProcess recipeProcess = RecipeProcess.from(recipe, 1, request.getContent(), null);
+        RecipeProcess recipeProcess = RecipeProcess.from(newRecipe, 1, request.getContent(), null);
         recipeRepository.saveRecipeProcess(recipeProcess);
 
         Map<Long, String> capacitiesByIngredientId = request.getIngredients().stream()
+                .filter(ingredient -> ingredient.getIngredientId() != null)
                 .collect(Collectors.toMap(RecipeDto.RecipeIngredientRequest::getIngredientId, RecipeDto.RecipeIngredientRequest::getCapacity));
         List<Ingredient> ingredients = ingredientRepository.findByIngredientIdIn(new ArrayList<>(capacitiesByIngredientId.keySet()));
         if (ingredients.size() != capacitiesByIngredientId.keySet().size())
@@ -127,9 +131,25 @@ public class RecipeService {
         List<RecipeIngredient> recipeIngredients = new ArrayList<>();
         for (Ingredient ingredient : ingredients) {
             String capacity = capacitiesByIngredientId.get(ingredient.getIngredientId());
-            RecipeIngredient recipeIngredient = RecipeIngredient.from(recipe, ingredient, capacity);
+            RecipeIngredient recipeIngredient = RecipeIngredient.from(newRecipe, ingredient, capacity);
             recipeIngredients.add(recipeIngredient);
         }
+
+        List<RecipeIngredient> newRecipeIngredients = request.getIngredients().stream()
+                .filter(ingredient -> ingredient.getIngredientId() == null)
+                .map(ingredient -> {
+                    IngredientCategory ingredientCategory = ingredientService.getIngredientCategoryByIngredientCategoryId(ingredient.getIngredientCategoryId());
+                    Ingredient newIngredient = ingredientService.getIngredientByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategory(
+                                    user,
+                                    ingredient.getIngredientName(),
+                                    ingredient.getIngredientIconUrl(),
+                                    ingredientCategory)
+                            .orElseGet(() -> ingredientService.createIngredient(Ingredient.from(ingredientCategory, ingredient.getIngredientName(), ingredient.getIngredientIconUrl(), user)));
+                    return RecipeIngredient.from(newRecipe, newIngredient, ingredient.getCapacity());
+                })
+                .collect(Collectors.toList());
+        recipeIngredients.addAll(newRecipeIngredients);
+
         recipeRepository.saveRecipeIngredients(recipeIngredients);
     }
 
@@ -141,18 +161,19 @@ public class RecipeService {
 
         recipe = recipe.update(recipe.getRecipeId(), request.getTitle(), null, null, null, request.getThumbnail(),
                 null, null, true);
-        recipe = recipeRepository.save(recipe);
+        Recipe updateRecipe = recipeRepository.save(recipe);
 
-        List<RecipeProcess> existRecipeProcesses = getRecipeProcessesByRecipe(recipe);
+        List<RecipeProcess> existRecipeProcesses = getRecipeProcessesByRecipe(updateRecipe);
         recipeRepository.deleteRecipeProcesses(existRecipeProcesses);
 
-        RecipeProcess recipeProcess = RecipeProcess.from(recipe, 1, request.getContent(), null);
+        RecipeProcess recipeProcess = RecipeProcess.from(updateRecipe, 1, request.getContent(), null);
         recipeRepository.saveRecipeProcess(recipeProcess);
 
-        List<RecipeIngredient> existRecipeIngredients = getRecipeIngredientsByRecipe(recipe);
+        List<RecipeIngredient> existRecipeIngredients = getRecipeIngredientsByRecipe(updateRecipe);
         recipeRepository.deleteRecipeIngredients(existRecipeIngredients);
 
         Map<Long, String> capacitiesByIngredientId = request.getIngredients().stream()
+                .filter(ingredient -> ingredient.getIngredientId() != null)
                 .collect(Collectors.toMap(RecipeDto.RecipeIngredientRequest::getIngredientId, RecipeDto.RecipeIngredientRequest::getCapacity));
         List<Ingredient> ingredients = ingredientRepository.findByIngredientIdIn(new ArrayList<>(capacitiesByIngredientId.keySet()));
         if (ingredients.size() != capacitiesByIngredientId.keySet().size())
@@ -161,9 +182,25 @@ public class RecipeService {
         List<RecipeIngredient> recipeIngredients = new ArrayList<>();
         for (Ingredient ingredient : ingredients) {
             String capacity = capacitiesByIngredientId.get(ingredient.getIngredientId());
-            RecipeIngredient recipeIngredient = RecipeIngredient.from(recipe, ingredient, capacity);
+            RecipeIngredient recipeIngredient = RecipeIngredient.from(updateRecipe, ingredient, capacity);
             recipeIngredients.add(recipeIngredient);
         }
+
+        List<RecipeIngredient> newRecipeIngredients = request.getIngredients().stream()
+                .filter(ingredient -> ingredient.getIngredientId() == null)
+                .map(ingredient -> {
+                    IngredientCategory ingredientCategory = ingredientService.getIngredientCategoryByIngredientCategoryId(ingredient.getIngredientCategoryId());
+                    Ingredient newIngredient = ingredientService.getIngredientByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategory(
+                                    user,
+                                    ingredient.getIngredientName(),
+                                    ingredient.getIngredientIconUrl(),
+                                    ingredientCategory)
+                            .orElseGet(() -> ingredientService.createIngredient(Ingredient.from(ingredientCategory, ingredient.getIngredientName(), ingredient.getIngredientIconUrl(), user)));
+                    return RecipeIngredient.from(updateRecipe, newIngredient, ingredient.getCapacity());
+                })
+                .collect(Collectors.toList());
+        recipeIngredients.addAll(newRecipeIngredients);
+
         recipeRepository.saveRecipeIngredients(recipeIngredients);
     }
 
