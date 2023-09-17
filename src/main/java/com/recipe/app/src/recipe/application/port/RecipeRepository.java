@@ -45,4 +45,6 @@ public interface RecipeRepository {
     List<Recipe> findRecipesOrderByFridgeIngredientCntDesc(List<Ingredient> ingredients, Pageable pageable);
 
     long countRecipeScrapByUser(User user);
+
+    List<RecipeIngredient> findRecipeIngredientsByRecipe(Recipe recipe);
 }

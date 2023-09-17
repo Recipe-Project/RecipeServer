@@ -130,4 +130,12 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     public long countRecipeScrapByUser(User user) {
         return recipeScrapJpaRepository.countByUser(UserEntity.fromModel(user));
     }
+
+    @Override
+    public List<RecipeIngredient> findRecipeIngredientsByRecipe(Recipe recipe) {
+        return recipeIngredientJpaRepository.findByRecipe(RecipeEntity.fromModel(recipe)).stream()
+                .map(RecipeIngredientEntity::toModel)
+                .collect(Collectors.toList());
+    }
+
 }
