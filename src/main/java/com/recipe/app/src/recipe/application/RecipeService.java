@@ -137,7 +137,9 @@ public class RecipeService {
         RecipeProcess recipeProcess = RecipeProcess.from(recipe, 1, request.getContent(), null);
         recipeRepository.saveRecipeProcess(recipeProcess);
 
-        recipeRepository.deleteRecipeIngredients(recipe.getRecipeIngredients());
+        List<RecipeIngredient> existRecipeIngredients = getRecipeIngredientsByRecipe(recipe);
+        recipeRepository.deleteRecipeIngredients(existRecipeIngredients);
+
         Map<Long, String> capacitiesByIngredientId = request.getIngredients().stream()
                 .collect(Collectors.toMap(RecipeDto.RecipeIngredientRequest::getIngredientId, RecipeDto.RecipeIngredientRequest::getCapacity));
         List<Ingredient> ingredients = ingredientRepository.findByIngredientIdIn(new ArrayList<>(capacitiesByIngredientId.keySet()));

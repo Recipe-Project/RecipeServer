@@ -139,6 +139,13 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
+    public void deleteRecipeProcesses(List<RecipeProcess> recipeProcesses) {
+        recipeProcessJpaRepository.deleteAll(recipeProcesses.stream()
+                .map(RecipeProcessEntity::fromModel)
+                .collect(Collectors.toList()));
+    }
+
+    @Override
     public List<RecipeIngredient> findRecipeIngredientsByRecipeIn(List<Recipe> recipes) {
         return recipeIngredientJpaRepository.findByRecipeIn(recipes.stream()
                         .map(RecipeEntity::fromModel)

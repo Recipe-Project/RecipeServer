@@ -48,5 +48,7 @@ public interface RecipeRepository {
 
     List<RecipeIngredient> findRecipeIngredientsByRecipe(Recipe recipe);
 
+    void deleteRecipeProcesses(List<RecipeProcess> existRecipeProcesses);
+
     List<RecipeIngredient> findRecipeIngredientsByRecipeIn(List<Recipe> recipes);
 }
