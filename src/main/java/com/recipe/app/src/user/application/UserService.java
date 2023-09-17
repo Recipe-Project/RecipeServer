@@ -185,4 +185,10 @@ public class UserService {
     public void registerJwtBlackList(String jwt) {
         jwtBlacklistRepository.save(jwt);
     }
+
+    @Transactional
+    public void updateFcmToken(UserDto.UserDeviceTokenRequest request, User user) {
+        user = user.changeDeviceToken(request.getFcmToken());
+        userRepository.save(user);
+    }
 }

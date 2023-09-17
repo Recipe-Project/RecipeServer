@@ -2,14 +2,16 @@ package com.recipe.app.src.user.api;
 
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.recipe.application.BlogRecipeService;
+import com.recipe.app.src.recipe.application.RecipeService;
+import com.recipe.app.src.recipe.application.YoutubeRecipeService;
+import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDto;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import com.recipe.app.src.user.exception.EmptyFcmTokenException;
 import com.recipe.app.src.user.exception.EmptyTokenException;
-import com.recipe.app.src.user.exception.ForbiddenUserException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -25,6 +27,7 @@ import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
+import java.util.List;
 
 import static com.recipe.app.common.response.BaseResponse.success;
 
@@ -35,6 +38,9 @@ import static com.recipe.app.common.response.BaseResponse.success;
 public class UserController {
 
     private final UserService userService;
+    private final RecipeService recipeService;
+    private final YoutubeRecipeService youtubeRecipeService;
+    private final BlogRecipeService blogRecipeService;
     private final JwtService jwtService;
 
     @Value("${header.naver-token}")
@@ -62,7 +68,11 @@ public class UserController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         user = userService.autoLogin(user);
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
+        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
+        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
+        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
@@ -86,7 +96,11 @@ public class UserController {
         HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
+        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
+        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
+        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0 , 6).toList();
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
@@ -95,6 +109,7 @@ public class UserController {
     @ResponseBody
     @PostMapping("/kakao-login")
     public BaseResponse<UserDto.UserProfileResponse> kakaoLogin(HttpServletRequest request) throws IOException, ParseException {
+
         String accessToken = request.getHeader(this.kakaoToken);
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
@@ -109,7 +124,11 @@ public class UserController {
         HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
+        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
+        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
+        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
@@ -118,6 +137,7 @@ public class UserController {
     @ResponseBody
     @PostMapping("/google-login")
     public BaseResponse<UserDto.UserProfileResponse> googleLogin(HttpServletRequest request) throws IOException, ParseException {
+
         String accessToken = request.getHeader(this.googleToken);
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
@@ -132,7 +152,11 @@ public class UserController {
         HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserId());
         httpHeaders.add(this.jwt, jwt);
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
+        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
+        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
+        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
@@ -141,11 +165,16 @@ public class UserController {
     @ResponseBody
     @GetMapping("")
     public BaseResponse<UserDto.UserProfileResponse> getUser(@ApiIgnore final Authentication authentication) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
+        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
+        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
+        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
@@ -162,7 +191,11 @@ public class UserController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         user = userService.updateUser(user, request);
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user);
+        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
+        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
+        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
+        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
@@ -194,6 +227,22 @@ public class UserController {
             throw new UserTokenNotExistException();
 
         userService.registerJwtBlackList(jwt);
+
+        return success();
+    }
+
+    @ApiOperation(value = "FCM 디바이스 토큰 수정 API")
+    @ResponseBody
+    @PatchMapping("/fcm-token")
+    public BaseResponse<Void> patchFcmToken(@ApiIgnore final Authentication authentication,
+                                            @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
+                                            @RequestBody UserDto.UserDeviceTokenRequest request) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        userService.updateFcmToken(request, user);
 
         return success();
     }

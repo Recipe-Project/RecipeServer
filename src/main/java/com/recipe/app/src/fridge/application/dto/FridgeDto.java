@@ -1,173 +1,105 @@
 package com.recipe.app.src.fridge.application.dto;
 
 import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
-import com.recipe.app.src.recipe.domain.RecipeInfo;
+import com.recipe.app.src.ingredient.domain.IngredientCategory;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
 public class FridgeDto {
 
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgesRequest {
-        private List<FridgeRequest> fridgeBasketList;
-    }
-
+    @Schema(description = "냉장고 수정 요청 DTO")
     @Getter
     @Setter
     @AllArgsConstructor
     @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class FridgeRequest {
-        private String ingredientName;
-        private String ingredientIcon;
-        private Long ingredientCategoryIdx;
-        private String expiredAt;
-        private String storageMethod;
-        private int count;
+        @Schema(description = "유통기한")
+        private LocalDate expiredAt;
+        @Schema(description = "수량")
+        private float quantity;
+        @Schema(description = "단위")
+        private String unit;
     }
 
+    @Schema(description = "냉장고 목록 응답 DTO")
     @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class PatchFridgesRequest {
-        private List<PatchFridgeRequest> patchFridgeList;
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class PatchFridgeRequest {
-        private String ingredientName;
-        private String expiredAt;
-        private String storageMethod;
-        private Integer count;
-    }
-
-    @Getter
-    @Setter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgeIngredientsRequest {
-        private List<String> ingredientName;
-    }
-
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
     public static class FridgesResponse {
-        private final List<FridgeIngredientCategoryResponse> fridges = new ArrayList<>();
+        @Schema(description = "카테고리별 냉장고 목록")
+        private List<FridgeIngredientCategoryResponse> fridges;
+        @Schema(description = "냉장고 바구니 갯수")
         private long fridgeBasketCount;
 
-        public FridgesResponse(long fridgeBasketCount, List<Fridge> fridges) {
-            this.fridgeBasketCount = fridgeBasketCount;
-            Map<IngredientCategoryEntity, List<Fridge>> fridgesMappedByCategory = fridges.stream()
-                    .collect(Collectors.groupingBy(Fridge::getIngredientCategory));
-            for (IngredientCategoryEntity ingredientCategoryEntity : fridgesMappedByCategory.keySet()) {
-                this.fridges.add(new FridgeIngredientCategoryResponse(ingredientCategoryEntity, fridgesMappedByCategory.get(ingredientCategoryEntity)));
-            }
+        public static FridgesResponse from(long fridgeBasketCount, List<Fridge> fridges) {
+            Map<IngredientCategory, List<Fridge>> fridgesGroupByIngredientCategory = fridges.stream()
+                    .collect(Collectors.groupingBy(f -> f.getIngredient().getIngredientCategory()));
+            return FridgesResponse.builder()
+                    .fridges(fridgesGroupByIngredientCategory.keySet().stream()
+                            .map(category -> FridgeIngredientCategoryResponse.from(category, fridges))
+                            .collect(Collectors.toList()))
+                    .fridgeBasketCount(fridgeBasketCount)
+                    .build();
         }
     }
 
+    @Schema(description = "카테고리별 냉장고 응답 DTO")
     @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
     public static class FridgeIngredientCategoryResponse {
-        private Long ingredientCategoryIdx;
+        @Schema(description = "재료 카테고리 고유 번호")
+        private Long ingredientCategoryId;
+        @Schema(description = "재료 카테고리명")
         private String ingredientCategoryName;
-        private List<FridgeIngredientResponse> ingredientList;
+        @Schema(description = "냉장고 목록")
+        private List<FridgeResponse> fridges;
 
-        public FridgeIngredientCategoryResponse(IngredientCategoryEntity ingredientCategory, List<Fridge> fridges) {
-            this.ingredientCategoryIdx = ingredientCategory.getIngredientCategoryId();
-            this.ingredientCategoryName = ingredientCategory.getIngredientCategoryName();
-            this.ingredientList = fridges.stream()
-                    .map(FridgeIngredientResponse::new)
-                    .collect(Collectors.toList());
+        public static FridgeIngredientCategoryResponse from(IngredientCategory ingredientCategory, List<Fridge> fridges) {
+            return FridgeIngredientCategoryResponse.builder()
+                    .ingredientCategoryId(ingredientCategory.getIngredientCategoryId())
+                    .ingredientCategoryName(ingredientCategory.getIngredientCategoryName())
+                    .fridges(fridges.stream()
+                            .map(FridgeResponse::from)
+                            .collect(Collectors.toList()))
+                    .build();
         }
     }
 
+    @Schema(description = "냉장고 응답 DTO")
     @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgeIngredientResponse {
-        private String ingredientName;
-        private String ingredientIcon;
-        private String expiredAt;
-        private String storageMethod;
-        private Integer count;
-        private Integer freshness;
-
-        public FridgeIngredientResponse(Fridge fridge) {
-            this.ingredientName = fridge.getIngredientName();
-            this.ingredientIcon = fridge.getIngredientIcon();
-            this.expiredAt = fridge.getExpiredAt() != null ? fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd")) + "까지" : null;
-            this.storageMethod = fridge.getStorageMethod();
-            this.count = fridge.getCount();
-            this.freshness = fridge.getFreshness();
-        }
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
+    @Builder
     public static class FridgeResponse {
+        @Schema(description = "냉장고 고유 번호")
+        private Long fridgeId;
+        @Schema(description = "재료명")
         private String ingredientName;
-        private String ingredientIcon;
-        private Long ingredientCategoryIdx;
+        @Schema(description = "재료 아이콘 url")
+        private String ingredientIconUrl;
+        @Schema(description = "유통기한")
         private String expiredAt;
-        private String storageMethod;
-        private int count;
+        @Schema(description = "수량")
+        private float quantity;
+        @Schema(description = "단위")
+        private String unit;
+        @Schema(description = "신선도")
+        private String freshness;
 
-        public FridgeResponse(Fridge fridge) {
-            this.ingredientName = fridge.getIngredientName();
-            this.ingredientIcon = fridge.getIngredientIcon();
-            this.ingredientCategoryIdx = fridge.getIngredientCategory().getIngredientCategoryId();
-            this.expiredAt = fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yyyy.MM.dd"));
-            this.storageMethod = fridge.getStorageMethod();
-            this.count = fridge.getCount();
+        public static FridgeResponse from(Fridge fridge) {
+            return FridgeResponse.builder()
+                    .fridgeId(fridge.getFridgeId())
+                    .ingredientName(fridge.getIngredient().getIngredientName())
+                    .ingredientIconUrl(fridge.getIngredient().getIngredientIconUrl())
+                    .expiredAt(fridge.getExpiredAt() != null ? fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yy.MM.dd 까지")) : null)
+                    .quantity(fridge.getQuantity())
+                    .unit(fridge.getUnit())
+                    .freshness(fridge.getFreshness().getName())
+                    .build();
         }
     }
 
-    @Getter
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgeRecipesResponse {
-        private int total;
-        private List<FridgeRecipeResponse> recipeList;
-
-        public FridgeRecipesResponse(int total, List<RecipeInfo> recipes) {
-            this.total = total;
-            this.recipeList = recipes.stream()
-                    .map(FridgeRecipeResponse::new)
-                    .collect(Collectors.toList());
-        }
-    }
-
-    @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
-    public static class FridgeRecipeResponse {
-        private Integer recipeId;
-        private String title;
-        private String content;
-        private String thumbnail;
-        private String cookingTime;
-        private long scrapCount;
-
-        public FridgeRecipeResponse(RecipeInfo recipe) {
-            this.recipeId = recipe.getRecipeId();
-            this.title = recipe.getRecipeNmKo();
-            this.content = recipe.getSumry();
-            this.thumbnail = recipe.getImgUrl();
-            this.cookingTime = recipe.getCookingTime();
-            this.scrapCount = recipe.getScrapPublics().size();
-        }
-    }
 }

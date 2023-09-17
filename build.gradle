@@ -66,6 +66,14 @@ dependencies {
     implementation 'io.springfox:springfox-boot-starter:3.0.0'
     implementation 'io.springfox:springfox-swagger-ui:3.0.0'
 
+    compile group: 'com.google.api-client', name: 'google-api-client', version: '1.25.0'
+    compile group: 'com.google.apis', name: 'google-api-services-youtube', version: 'v3-rev212-1.25.0'
+    compile("com.google.oauth-client:google-oauth-client-jetty:1.25.0") {
+        exclude group: 'org.mortbay.jetty', module: 'servlet-api'
+    }
+    compile group: 'com.google.http-client', name: 'google-http-client-jackson2', version: '1.25.0'
+    compile group: 'com.google.collections', name: 'google-collections', version: '1.0'
+
 }
 
 test {

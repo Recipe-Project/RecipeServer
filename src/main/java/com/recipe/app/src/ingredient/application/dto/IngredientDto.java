@@ -20,11 +20,11 @@ public class IngredientDto {
     @Schema(description = "재료 목록 응답 DTO")
     public static class IngredientsResponse {
         @Schema(description = "냉장고 바구니 갯수")
-        private int fridgeBasketCount;
+        private long fridgeBasketCount;
         @Schema(description = "카테고리별 재료 목록")
         private List<IngredientCategoryResponse> ingredientCategories;
 
-        public IngredientsResponse(int fridgeBasketCount, Map<IngredientCategory, List<Ingredient>> ingredientsGroupingByIngredientCategory) {
+        public IngredientsResponse(long fridgeBasketCount, Map<IngredientCategory, List<Ingredient>> ingredientsGroupingByIngredientCategory) {
             this.fridgeBasketCount = fridgeBasketCount;
             this.ingredientCategories = ingredientsGroupingByIngredientCategory.keySet().stream()
                     .map((category) -> new IngredientCategoryResponse(category, ingredientsGroupingByIngredientCategory.get(category)))

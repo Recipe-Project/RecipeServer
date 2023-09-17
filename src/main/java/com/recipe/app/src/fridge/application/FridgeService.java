@@ -1,32 +1,22 @@
 package com.recipe.app.src.fridge.application;
 
-import com.recipe.app.common.exception.BaseException;
 import com.recipe.app.src.fridge.application.dto.FridgeDto;
+import com.recipe.app.src.fridge.application.port.FridgeRepository;
 import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridge.mapper.FridgeRepository;
-import com.recipe.app.src.fridge.models.PatchFcmTokenReq;
-import com.recipe.app.src.fridge.models.ShelfLifeUser;
+import com.recipe.app.src.fridge.exception.FridgeSaveExpiredDateNotMatchException;
+import com.recipe.app.src.fridge.exception.FridgeSaveUnitNotMatchException;
+import com.recipe.app.src.fridge.exception.NotFoundFridgeException;
+import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
-import com.recipe.app.src.fridgeBasket.mapper.FridgeBasketRepository;
-import com.recipe.app.src.ingredient.infra.IngredientCategoryEntity;
-import com.recipe.app.src.ingredient.infra.IngredientCategoryJpaRepository;
-import com.recipe.app.src.recipe.domain.RecipeInfo;
-import com.recipe.app.src.recipe.mapper.RecipeInfoRepository;
-import com.recipe.app.src.user.application.port.UserRepository;
+import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.stream.Collectors;
-
-import static com.recipe.app.common.response.BaseResponseStatus.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,110 +25,79 @@ public class FridgeService {
 
     private static final String FIREBASE_API_URL = "https://fcm.googleapis.com/fcm/send";
     private final FridgeRepository fridgeRepository;
-    private final FridgeBasketRepository fridgeBasketRepository;
-    private final IngredientCategoryJpaRepository ingredientCategoryRepository;
-    private final RecipeInfoRepository recipeInfoRepository;
-    private final UserRepository userRepository;
+    private final FridgeBasketService fridgeBasketService;
 
     @Transactional
-    public List<Fridge> createFridges(FridgeDto.FridgesRequest request, User user) {
+    public List<Fridge> createFridges(User user) {
 
-        List<IngredientCategoryEntity> ingredientCategories = ingredientCategoryRepository.findAll();
-        List<Fridge> fridges = request.getFridgeBasketList().stream()
-                .map((f) -> new Fridge(UserEntity.fromModel(user), f.getIngredientName(), f.getIngredientIcon(), ingredientCategories.stream()
-                        .filter((i) -> i.getIngredientCategoryId().equals(f.getIngredientCategoryIdx()))
-                        .findAny().orElse(null), f.getStorageMethod(), f.getExpiredAt(), f.getCount()))
+        List<FridgeBasket> fridgeBaskets = fridgeBasketService.getFridgeBasketsByUser(user);
+        List<Fridge> existFridges = getFridges(user);
+        Map<Ingredient, Fridge> existIngredients = existFridges.stream().collect(Collectors.toMap(Fridge::getIngredient, v -> v));
+
+        List<Fridge> fridges = fridgeBaskets.stream()
+                .map(fridgeBasket -> {
+                    Ingredient ingredient = fridgeBasket.getIngredient();
+                    if (existIngredients.containsKey(ingredient)) {
+                        Fridge fridge = existIngredients.get(ingredient);
+                        if ((fridge.getExpiredAt() != null && !fridge.getExpiredAt().equals(fridgeBasket.getExpiredAt()))
+                        || (fridgeBasket.getExpiredAt() != null && !fridgeBasket.getExpiredAt().equals(fridge.getExpiredAt())))
+                            throw new FridgeSaveExpiredDateNotMatchException(ingredient.getIngredientName());
+                        if (!fridge.getUnit().equals(fridgeBasket.getUnit()))
+                            throw new FridgeSaveUnitNotMatchException(ingredient.getIngredientName());
+
+                        fridge = fridge.plusQuantity(fridgeBasket.getQuantity());
+                        return fridge;
+                    }
+                    return Fridge.from(fridgeBasket);
+                })
                 .collect(Collectors.toList());
 
-        List<String> ingredientNames = fridges.stream().map(Fridge::getIngredientName).collect(Collectors.toList());
-        List<FridgeBasket> fridgeBaskets = fridgeBasketRepository.findAllByUserAndStatusAndIngredientNameIn(UserEntity.fromModel(user), "ACTIVE", ingredientNames);
-
-        if (fridges.size() != fridgeBaskets.size())
-            throw new BaseException(FAILED_TO_GET_FRIDGE_BASKET);
-
-        List<Fridge> existIngredients = getExistIngredients(ingredientNames, user);
-        if (existIngredients.size() > 0)
-            throw new BaseException(POST_FRIDGES_EXIST_INGREDIENT_NAME, existIngredients.get(0).getIngredientName());
-
         fridgeRepository.saveAll(fridges);
-        fridgeBasketRepository.deleteAll(fridgeBaskets);
+        fridgeBasketService.deleteFridgeBaskets(fridgeBaskets);
 
-        return fridgeRepository.findAllByUserAndStatus(UserEntity.fromModel(user), "ACTIVE");
+        return getFridges(user);
     }
 
-    public List<Fridge> retrieveFridges(User user) {
-        return fridgeRepository.findAllByUserAndStatus(UserEntity.fromModel(user), "ACTIVE");
-    }
-
-    @Transactional
-    public void deleteFridgeIngredients(User user, FridgeDto.FridgeIngredientsRequest request) {
-        List<String> ingredientNames = request.getIngredientName();
-        List<Fridge> existIngredients = getExistIngredients(ingredientNames, user);
-        if (existIngredients.size() != ingredientNames.size())
-            throw new BaseException(NOT_FOUND_INGREDIENT);
-
-        fridgeRepository.deleteAll(existIngredients);
+    public List<Fridge> getFridges(User user) {
+        return fridgeRepository.findByUser(user);
     }
 
     @Transactional
-    public void updateFridgeIngredients(User user, FridgeDto.PatchFridgesRequest request) {
+    public List<Fridge> deleteFridge(User user, Long fridgeId) {
 
-        List<String> ingredientNames = request.getPatchFridgeList().stream().map(FridgeDto.PatchFridgeRequest::getIngredientName).collect(Collectors.toList());
-        List<Fridge> fridges = getExistIngredients(ingredientNames, user);
-        if (fridges.size() != ingredientNames.size())
-            throw new BaseException(NOT_FOUND_INGREDIENT);
+        Fridge fridge = fridgeRepository.findByUserAndFridgeId(user, fridgeId).orElseThrow(NotFoundFridgeException::new);
+        fridgeRepository.delete(fridge);
 
-        for (Fridge fridge : fridges) {
-            Optional<FridgeDto.PatchFridgeRequest> patchRequest = request.getPatchFridgeList().stream()
-                    .filter((pf) -> pf.getIngredientName().equals(fridge.getIngredientName()))
-                    .findFirst();
-
-            patchRequest.ifPresent(patchFridgeRequest -> {
-                fridge.setIngredientName(patchFridgeRequest.getIngredientName());
-                fridge.setExpiredAt(patchFridgeRequest.getExpiredAt());
-                fridge.setStorageMethod(patchFridgeRequest.getStorageMethod());
-                fridge.setCount(patchFridgeRequest.getCount());
-            });
-        }
-
-        fridgeRepository.saveAll(fridges);
+        return getFridges(user);
     }
 
     @Transactional
-    public void updateFcmToken(PatchFcmTokenReq patchFcmTokenReq, User user) {
-        String fcmToken = patchFcmTokenReq.getFcmToken();
-        user = user.changeDeviceToken(fcmToken);
-        userRepository.save(user);
+    public List<Fridge> updateFridge(User user, Long fridgeId, FridgeDto.FridgeRequest request) {
+
+        Fridge fridge = fridgeRepository.findByUserAndFridgeId(user, fridgeId).orElseThrow(NotFoundFridgeException::new);
+        fridge = fridge.changeExpiredAtAndQuantityAndUnit(request.getExpiredAt(), request.getQuantity(), request.getUnit());
+        fridgeRepository.save(fridge);
+
+        return getFridges(user);
     }
 
-    public List<Fridge> getExistIngredients(List<String> ingredientNameList, User user) throws BaseException {
-        return fridgeRepository.findAllByUserAndStatusAndIngredientNameIn(UserEntity.fromModel(user), "ACTIVE", ingredientNameList);
-    }
-
-    public List<RecipeInfo> retrieveFridgeRecipes(User user, Integer start, Integer display) {
-        return recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(UserEntity.fromModel(user), "ACTIVE").stream()
-                .skip(start == 0 ? 0 : start - 1)
-                .limit(display)
-                .collect(Collectors.toList());
-    }
-
-    public int countFridgeRecipes(User user) {
-        return recipeInfoRepository.searchRecipeListOrderByIngredientCntWhichUserHasDesc(UserEntity.fromModel(user), "ACTIVE").size();
-    }
+    /*
 
     public List<ShelfLifeUser> retreiveShelfLifeUserList() throws BaseException {
         SimpleDateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
         String today = sdFormat.format(new Date());
 
-        List<Fridge> fridgeList = fridgeRepository.findAllByStatusAnd3DaysBeforeExpiredAt("ACTIVE", today);
+        List<Fridge> fridges = fridgeRepository.findAllByStatusAnd3DaysBeforeExpiredAt("ACTIVE", today);
 
         List<ShelfLifeUser> shelfLifeUsers = new ArrayList<>();
-        for (Fridge fridge : fridgeList) {
-            String deviceToken = fridge.getUser().getDeviceToken();
-            String ingredientName = fridge.getIngredientName();
+        for (FridgeEntity fridgeEntity : fridgeEntityList) {
+            String deviceToken = fridgeEntity.getUser().getDeviceToken();
+            String ingredientName = fridgeEntity.getIngredient().getIngredientName();
             ShelfLifeUser shelfLifeUser = new ShelfLifeUser(deviceToken, ingredientName);
             shelfLifeUsers.add(shelfLifeUser);
         }
         return shelfLifeUsers;
     }
+
+     */
 }

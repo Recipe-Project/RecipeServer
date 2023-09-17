@@ -140,7 +140,7 @@ public enum BaseResponseStatus {
      */
     // users
     NOT_FOUND_USER(3010, "존재하지 않는 회원입니다."),
-    FORBIDDEN_USER(3011, "해당 회원에 접근할 수 없습니다."),
+    FORBIDDEN_USER(3011, "해당 정보에 접근할 수 없는 회원입니다."),
 
     // [POST] /users
     DUPLICATED_USER(3013, "이미 존재하는 회원입니다."),
@@ -149,7 +149,7 @@ public enum BaseResponseStatus {
     NO_FOUND_MY_RECIPE(3026, "존재하지 않는 나만의 레시피입니다."),
 
     // [POST] /scraps/recipe
-    NOT_FOUND_RECIPE_INFO(3036, "공공레시피 정보를 찾지 못하였습니다."),
+    NOT_FOUND_RECIPE_INFO(3036, "레시피 정보를 찾지 못하였습니다."),
 
     // [GET] /ingredients
     NOT_FOUND_INGREDIENT_CATEGORY(3039, "재료 카테고리인덱스를 찾을 수 없습니다."),
@@ -167,7 +167,6 @@ public enum BaseResponseStatus {
     FAILED_TO_RETREIVE_FRIDGE_BY_USER(3047, "유저로 냉장고 조회에 실패했습니다."),
 
     // [POST] /fridges
-
 
 
     // receipts
@@ -204,6 +203,14 @@ public enum BaseResponseStatus {
 
     NOT_FOUND_USER_RECIPE(3076, "유저 레시피 상세 조회에 실패했습니다."),
 
+    NOT_FOUND_FRIDGE_BASKET(3077, "냉장고 바구니 조회에 실패했습니다."),
+
+    NOT_FOUND_FRIDGE(3078, "냉장고 조회에 실패했습니다."),
+
+    FRIDGE_SAVE_EXPIRED_DATE_NOT_MATCH(3079, "냉장고에 존재하는 재료(%s)의 유통 기한과 냉장고 바구니의 재료 유통 기한이 일치하지 않습니다"),
+
+    FRIDGE_SAVE_UNIT_NOT_MATCH(3080, "냉장고에 존재하는 재료(%s)의 단위와 냉장고 바구니의 재료 단위가 일치하지 않습니다"),
+
     /**
      * 4000 : Database, Server 오류
      */
@@ -223,7 +230,7 @@ public enum BaseResponseStatus {
     FAILED_TO_URL_ENCODER(4026, "검색어 인코딩에 실패했습니다."),
     FAILED_TO_CRAWLING(4027, "크롤링에 실패했습니다."),
 
-    UNKNOWN_EXCEPTION(9999,"알수 없는 에러가 발생하였습니다.");
+    UNKNOWN_EXCEPTION(9999, "알수 없는 에러가 발생하였습니다.");
 
     private final int code;
     private final String message;

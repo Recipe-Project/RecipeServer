@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 public class User {
@@ -78,10 +79,6 @@ public class User {
                 .build();
     }
 
-    public int getFridgeBasketCount() {
-        return 0;
-    }
-
     public User changeDeviceToken(String fcmToken) {
         return User.builder()
                 .userId(userId)
@@ -95,5 +92,18 @@ public class User {
                 .updatedAt(updatedAt)
                 .recentLoginAt(recentLoginAt)
                 .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User))
+            return false;
+        User user = (User) o;
+        return userId.equals(user.getUserId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
     }
 }

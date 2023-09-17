@@ -1,6 +1,7 @@
 package com.recipe.app.src.ingredient.api;
 
 import com.recipe.app.common.response.BaseResponse;
+import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.ingredient.application.dto.IngredientDto;
 import com.recipe.app.src.user.domain.SecurityUser;
@@ -27,6 +28,7 @@ import static com.recipe.app.common.response.BaseResponse.success;
 public class IngredientController {
 
     private final IngredientService ingredientService;
+    private final FridgeBasketService fridgeBasketService;
 
     @ApiOperation(value = "재료 목록 조회 API")
     @GetMapping("")
@@ -40,7 +42,7 @@ public class IngredientController {
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
         IngredientDto.IngredientsResponse data = new IngredientDto.IngredientsResponse(
-                user.getFridgeBasketCount(),
+                fridgeBasketService.countFridgeBasketByUser(user),
                 ingredientService.getIngredientsGroupingByIngredientCategory(keyword));
 
         return success(data);

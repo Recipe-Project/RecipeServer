@@ -42,6 +42,18 @@ public class IngredientEntity extends BaseEntity implements Comparable<Ingredien
     @Column(name = "hiddenYn", length = 1)
     private String hiddenYn;
 
+    public static IngredientEntity fromModel(Ingredient ingredient) {
+        IngredientEntity ingredientEntity = new IngredientEntity();
+        ingredientEntity.ingredientId = ingredient.getIngredientId();
+        ingredientEntity.ingredientCategoryEntity = IngredientCategoryEntity.fromModel(ingredient.getIngredientCategory());
+        ingredientEntity.ingredientName = ingredient.getIngredientName();
+        ingredientEntity.ingredientIconUrl = ingredient.getIngredientIconUrl();
+        ingredientEntity.user = UserEntity.fromModel(ingredient.getUser());
+        ingredientEntity.defaultYn = ingredient.isDefault() ? "Y" : "N";
+        ingredientEntity.hiddenYn = ingredient.isHidden() ? "Y" : "N";
+        return ingredientEntity;
+    }
+
     @Override
     public int compareTo(@NotNull IngredientEntity ingredientEntity) {
         return Integer.compare(this.getIngredientName().length(), ingredientEntity.getIngredientName().length());
@@ -55,7 +67,7 @@ public class IngredientEntity extends BaseEntity implements Comparable<Ingredien
                 .ingredientIconUrl(ingredientIconUrl)
                 .createdAt(getCreatedAt())
                 .updatedAt(getUpdatedAt())
-                .user(user)
+                .user(user != null ? user.toModel() : null)
                 .isDefault(defaultYn.equals("Y"))
                 .isHidden(hiddenYn.equals("Y"))
                 .build();

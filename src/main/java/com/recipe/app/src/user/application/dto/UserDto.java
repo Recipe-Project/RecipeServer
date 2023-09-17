@@ -1,5 +1,6 @@
 package com.recipe.app.src.user.application.dto;
 
+import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.user.domain.LoginProvider;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.annotations.ApiModel;
@@ -7,7 +8,9 @@ import io.swagger.annotations.ApiModelProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UserDto {
 
@@ -21,6 +24,16 @@ public class UserDto {
         private String profileImgUrl;
         @ApiModelProperty(value = "닉네임")
         private String nickname;
+    }
+
+    @ApiModel(value = "수정할 디바이스 토큰 요청 DTO", description = "FCM 디바이스 토큰 정보")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserDeviceTokenRequest {
+        @ApiModelProperty(value = "FCM 디바이스 토큰")
+        private String fcmToken;
     }
 
     @Schema(description = "회원 프로필 응답 DTO")
@@ -44,17 +57,24 @@ public class UserDto {
         @Schema(description = "레시피 스크랩 수")
         private long recipeScrapCnt;
         @Schema(description = "나만의 레시피 전체 등록 수")
-        private long myRecipeTotalSize;
+        private int userRecipeTotalSize;
         @Schema(description = "나만의 레시피 목록")
-        private List<UserDto.UserRecipeResponse> userRecipes;
+        private List<UserDto.UserRecipeResponse> userRecipes = new ArrayList<>();
 
-        public static UserProfileResponse from(User user) {
+        public static UserProfileResponse from(User user, List<Recipe> userRecipes, long youtubeScrapCnt, long blogScrapCnt, long recipeScrapCnt) {
             return UserProfileResponse.builder()
                     .userId(user.getUserId())
                     .profileImgUrl(user.getProfileImgUrl())
                     .nickname(user.getNickname())
                     .email(user.getEmail())
                     .loginProvider(LoginProvider.findLoginProvider(user.getSocialId()))
+                    .youtubeScrapCnt(youtubeScrapCnt)
+                    .blogScrapCnt(blogScrapCnt)
+                    .recipeScrapCnt(recipeScrapCnt)
+                    .userRecipeTotalSize(userRecipes.size())
+                    .userRecipes(userRecipes.stream()
+                            .map(r -> new UserRecipeResponse(r.getRecipeId(), r.getImgUrl()))
+                            .collect(Collectors.toList()))
                     .build();
         }
     }

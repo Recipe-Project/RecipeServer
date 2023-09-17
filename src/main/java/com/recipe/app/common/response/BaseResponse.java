@@ -1,5 +1,6 @@
 package com.recipe.app.common.response;
 
+import com.recipe.app.common.exception.BaseException;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,8 +25,8 @@ public class BaseResponse<T> {
         return new BaseResponse<>(true, SUCCESS, result);
     }
 
-    public static BaseResponse<?> error(BaseResponseStatus status) {
-        return new BaseResponse<>(false, status, null);
+    public static BaseResponse<?> error(BaseException e) {
+        return new BaseResponse<>(false, e.getMessage(), e.getStatus().getCode(), null);
     }
 
     public BaseResponse(boolean success, BaseResponseStatus status, T result) {

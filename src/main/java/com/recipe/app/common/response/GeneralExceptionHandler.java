@@ -18,26 +18,28 @@ public class GeneralExceptionHandler {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private ResponseEntity<BaseResponse<?>> newResponse(BaseResponseStatus response, HttpStatus status) {
-        return new ResponseEntity<>(error(response), status);
+    private ResponseEntity<BaseResponse<?>> newResponse(BaseException e, HttpStatus status) {
+        return new ResponseEntity<>(error(e), status);
     }
 
     @ExceptionHandler({BaseException.class})
     public ResponseEntity<?> handleBaseException(BaseException e) {
+        e.printStackTrace();
         log.error(e.getMessage());
-        return newResponse(e.getStatus(), HttpStatus.OK);
+        return newResponse(e, HttpStatus.OK);
     }
 
     @ExceptionHandler({SQLException.class})
     public ResponseEntity<?> handleSQLException(Exception e) {
+        e.printStackTrace();
         log.error(e.getMessage());
-        return newResponse(BaseResponseStatus.DATABASE_ERROR, HttpStatus.OK);
+        return newResponse(new BaseException(BaseResponseStatus.DATABASE_ERROR), HttpStatus.OK);
     }
 
     @ExceptionHandler({Exception.class, RuntimeException.class})
     public ResponseEntity<?> handleException(Exception e) {
         e.printStackTrace();
         log.error(e.getMessage());
-        return newResponse(BaseResponseStatus.UNKNOWN_EXCEPTION, HttpStatus.INTERNAL_SERVER_ERROR);
+        return newResponse(new BaseException(BaseResponseStatus.UNKNOWN_EXCEPTION), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 }

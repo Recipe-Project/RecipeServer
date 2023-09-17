@@ -3,87 +3,119 @@ package com.recipe.app.src.fridgeBasket.api;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketDto;
+import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiParam;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
+
+import java.util.List;
 
 import static com.recipe.app.common.response.BaseResponse.success;
 
+@Api(tags = {"냉장고 바구니 Controller"})
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/fridges")
+@RequestMapping("/fridges/basket")
 public class FridgeBasketController {
 
     private final FridgeBasketService fridgeBasketService;
 
+    @ApiOperation(value = "재료 선택하여 냉장고 바구니 채우기 API")
     @ResponseBody
-    @PostMapping("/basket")
-    public BaseResponse<Void> postFridgesBasket(final Authentication authentication, @RequestBody FridgeBasketDto.FridgeBasketIdsRequest request) {
+    @PostMapping("")
+    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> postFridgeBasketByIngredientId(@ApiIgnore final Authentication authentication,
+                                                                                              @ApiParam(value = "재료 선택 목록", required = true)
+                                                                                              @RequestBody FridgeBasketDto.FridgeBasketIngredientIdsRequest request) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeBasketService.createFridgesBasket(request, user);
-
-        return success();
-    }
-
-    @ResponseBody
-    @PostMapping("/direct-basket")
-    public BaseResponse<FridgeBasketDto.DirectFridgeBasketsResponse> postFridgesDirectBasket(final Authentication authentication, @RequestBody FridgeBasketDto.DirectFridgeBasketsRequest request) {
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        FridgeBasketDto.DirectFridgeBasketsResponse data = new FridgeBasketDto.DirectFridgeBasketsResponse(fridgeBasketService.createDirectFridgeBasket(request, user));
+        List<FridgeBasket> fridgeBaskets = fridgeBasketService.createFridgeBasketByIngredientId(user, request);
+        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBaskets);
 
         return success(data);
     }
 
-    @GetMapping("/basket")
-    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> getFridgesBasket(final Authentication authentication) {
+    @ApiOperation(value = "재료 직접 입력하여 냉장고 바구니 채우기 API")
+    @ResponseBody
+    @PostMapping("/direct")
+    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> postFridgeBasketWithIngredientSave(@ApiIgnore final Authentication authentication,
+                                                                                                  @ApiParam(value = "재료 직접 입력 정보", required = true)
+                                                                                                  @RequestBody FridgeBasketDto.FridgeBasketIngredientRequest request) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        FridgeBasketDto.FridgeBasketsResponse data = new FridgeBasketDto.FridgeBasketsResponse(fridgeBasketService.countFridgeBasketsByUser(user), fridgeBasketService.retrieveFridgeBasketsByUser(user));
+        List<FridgeBasket> fridgeBaskets = fridgeBasketService.createFridgeBasketWithIngredientSave(user, request);
+        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBaskets);
 
         return success(data);
     }
 
-    @DeleteMapping("/basket")
-    public BaseResponse<Void> deleteFridgeBasket(final Authentication authentication, @RequestParam(value = "ingredient") String ingredient) {
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeBasketService.deleteFridgeBasket(user, ingredient);
-
-        return success();
-    }
-
+    @ApiOperation(value = "냉장고 바구니 조회 API")
     @ResponseBody
-    @PatchMapping("/basket")
-    public BaseResponse<Void> patchFridgeBaskets(final Authentication authentication, @RequestBody FridgeBasketDto.FridgeBasketsRequest request) {
+    @GetMapping("")
+    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> getFridgeBasket(@ApiIgnore final Authentication authentication) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeBasketService.updateFridgeBaskets(request, user);
+        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBasketService.getFridgeBasketsByUser(user));
 
-        return success();
+        return success(data);
     }
 
-    @GetMapping("/basket/count")
-    public BaseResponse<FridgeBasketDto.FridgeBasketsCountResponse> getFridgesBasketCount(final Authentication authentication) {
+    @ApiOperation(value = "냉장고 바구니 삭제 API")
+    @ResponseBody
+    @DeleteMapping("/{fridgeBasketId}")
+    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> deleteFridgeBasket(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeBasketId) {
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        FridgeBasketDto.FridgeBasketsCountResponse data = new FridgeBasketDto.FridgeBasketsCountResponse(fridgeBasketService.countFridgeBasketsByUser(user));
+        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBasketService.deleteFridgeBasket(user, fridgeBasketId));
+
+        return success(data);
+    }
+
+    @ApiOperation(value = "냉장고 바구니 수정 API")
+    @ResponseBody
+    @PatchMapping("/{fridgeBasketId}")
+    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> patchFridgeBasket(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeBasketId,
+                                                                                 @ApiParam(value = "냉장고 바구니 수정 정보", required = true)
+                                                                                 @RequestBody FridgeBasketDto.FridgeBasketRequest request) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBasketService.updateFridgeBasket(user, fridgeBasketId, request));
+
+        return success(data);
+    }
+
+    @ApiOperation(value = "냉장고 바구니 갯수 조회 API")
+    @ResponseBody
+    @GetMapping("/count")
+    public BaseResponse<FridgeBasketDto.FridgeBasketCountResponse> getFridgeBasketCount(@ApiIgnore final Authentication authentication) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        long fridgeBasketCount = fridgeBasketService.countFridgeBasketByUser(user);
+        FridgeBasketDto.FridgeBasketCountResponse data = FridgeBasketDto.FridgeBasketCountResponse.from(fridgeBasketCount);
 
         return success(data);
     }
