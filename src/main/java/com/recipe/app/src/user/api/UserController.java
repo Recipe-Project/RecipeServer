@@ -71,7 +71,7 @@ public class UserController {
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
         UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
@@ -99,7 +99,7 @@ public class UserController {
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0 , 6).toList();
         UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
@@ -127,7 +127,7 @@ public class UserController {
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
         UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
@@ -155,7 +155,7 @@ public class UserController {
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
         UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
@@ -173,7 +173,7 @@ public class UserController {
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
         UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
@@ -194,7 +194,7 @@ public class UserController {
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user);
+        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
         UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);

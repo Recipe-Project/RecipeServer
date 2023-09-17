@@ -76,6 +76,9 @@ public class RecipeService {
         return recipeRepository.findScrapRecipesByUser(user, pageable);
     }
 
+    public Page<Recipe> getRecipesByUser(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return recipeRepository.findByUser(user, pageable);
     }
 
     public List<RecipeIngredient> getRecipeIngredientsByRecipe(Recipe recipe) {

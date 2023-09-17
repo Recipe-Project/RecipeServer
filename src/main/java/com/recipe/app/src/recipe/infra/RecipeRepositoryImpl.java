@@ -75,10 +75,8 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public List<Recipe> findByUser(User user) {
-        return recipeJpaRepository.findByUser(UserEntity.fromModel(user)).stream()
-                .map(RecipeEntity::toModel)
-                .collect(Collectors.toList());
+    public Page<Recipe> findByUser(User user, Pageable pageable) {
+        return recipeJpaRepository.findByUser(UserEntity.fromModel(user), pageable).map(RecipeEntity::toModel);
     }
 
     @Override

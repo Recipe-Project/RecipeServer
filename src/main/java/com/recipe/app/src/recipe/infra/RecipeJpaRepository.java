@@ -25,6 +25,5 @@ public interface RecipeJpaRepository extends CrudRepository<RecipeEntity, Long> 
             "group by r.recipeId order by r.recipeViews.size desc")
     Page<RecipeEntity> getRecipesOrderByRecipeViewSizeDesc(String keyword, Pageable pageable);
 
-    @Query("select ri.recipe from RecipeIngredientEntity ri where ri.ingredient in :ingredients group by ri.recipe order by count(ri) desc")
-    List<RecipeEntity> findRecipesOrderByFridgeIngredientCntDesc(List<IngredientEntity> ingredients, Pageable pageable);
+    Page<RecipeEntity> findByUser(UserEntity user, Pageable pageable);
 }
