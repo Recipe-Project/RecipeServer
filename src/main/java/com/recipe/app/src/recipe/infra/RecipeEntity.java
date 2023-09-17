@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.infra;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipe.domain.Recipe;
+import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
@@ -58,6 +59,21 @@ public class RecipeEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "recipe")
     private List<RecipeViewEntity> recipeViews = new ArrayList<>();
+
+    public RecipeEntity(RecipeEntityWithRate recipeEntityWithRate) {
+        this.recipeId = recipeEntityWithRate.getRecipeId();
+        this.recipeNm = recipeEntityWithRate.getRecipeNm();
+        this.introduction = recipeEntityWithRate.getIntroduction();
+        this.cookingTime = recipeEntityWithRate.getCookingTime();
+        this.levelNm = recipeEntityWithRate.getLevelNm();
+        this.imgUrl = recipeEntityWithRate.getImgUrl();
+        this.quantity = recipeEntityWithRate.getQuantity();
+        this.calorie = recipeEntityWithRate.getCalorie();
+        this.user = UserEntity.fromModel(User.builder().userId(recipeEntityWithRate.getUserId()).build());
+        this.hiddenYn = recipeEntityWithRate.getHiddenYn();
+        this.setCreatedAt(recipeEntityWithRate.getCreatedAt());
+        this.setUpdatedAt(recipeEntityWithRate.getUpdatedAt());
+    }
 
     public Recipe toModel() {
         return Recipe.builder()

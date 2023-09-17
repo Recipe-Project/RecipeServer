@@ -114,15 +114,21 @@ public class RecipeController {
     }
 
     @GetMapping("/fridges-recommendation")
-    public BaseResponse<List<RecipeDto.RecipeResponse>> getFridgesRecipes(final Authentication authentication, Pageable pageable) {
+    public BaseResponse<RecipeDto.RecipesResponse> getFridgesRecipes(@ApiIgnore final Authentication authentication,
+                                                                     @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
+                                                                     @RequestParam(value = "page") int page,
+                                                                     @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                                                     @RequestParam(value = "size") int size) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<RecipeDto.RecipeResponse> data = recipeService.retrieveFridgeRecipes(user, pageable).stream()
-                .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
-                .collect(Collectors.toList());
+        Page<Recipe> recipes = recipeService.retrieveFridgeRecipes(user, page, size);
+        Map<Recipe, Integer> ingredientsMatchRateMapByRecipe = recipeService.getIngredientsMatchRateByRecipes(user, recipes.toList());
+        RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(recipes.getTotalElements(), recipes.stream()
+                .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user, ingredientsMatchRateMapByRecipe.get(recipe)))
+                .collect(Collectors.toList()));
 
         return success(data);
     }

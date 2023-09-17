@@ -51,6 +51,22 @@ public class RecipeDto {
         private Boolean isUserScrap;
         private long scrapCnt;
         private long viewCnt;
+        private Integer ingredientsMatchRate;
+
+        public static RecipeResponse from(Recipe recipe, User user, int ingredientsMatchRate) {
+
+            return RecipeResponse.builder()
+                    .recipeId(recipe.getRecipeId())
+                    .recipeNm(recipe.getRecipeNm())
+                    .imgUrl(recipe.getImgUrl())
+                    .postUserName(recipe.getUser() != null ? recipe.getUser().getNickname() : null)
+                    .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
+                    .isUserScrap(recipe.isScrapByUser(user))
+                    .scrapCnt(recipe.getScrapUsers().size())
+                    .viewCnt(recipe.getViewUsers().size())
+                    .ingredientsMatchRate(ingredientsMatchRate)
+                    .build();
+        }
 
         public static RecipeResponse from(Recipe recipe, User user) {
 

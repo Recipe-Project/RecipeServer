@@ -21,7 +21,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -155,17 +155,48 @@ public class RecipeService {
         recipeRepository.saveRecipeIngredients(recipeIngredients);
     }
 
-    public List<Recipe> retrieveFridgeRecipes(User user, Pageable pageable) {
+    public Page<Recipe> retrieveFridgeRecipes(User user, int page, int size) {
 
+        Pageable pageable = PageRequest.of(page, size);
         List<Ingredient> fridgeIngredients = fridgeRepository.findByUser(user).stream()
                 .map(Fridge::getIngredient)
                 .collect(Collectors.toList());
+        List<String> fridgeIngredientNames = fridgeIngredients.stream()
+                .flatMap(fridgeIngredient -> {
+                    List<String> ingredientNames = new ArrayList<>();
+                    ingredientNames.add(fridgeIngredient.getIngredientName());
+                    ingredientNames.addAll(fridgeIngredient.getSimilarIngredientName());
+                    return ingredientNames.stream();
+                })
+                .collect(Collectors.toList());
 
-        return recipeRepository.findRecipesOrderByFridgeIngredientCntDesc(fridgeIngredients, pageable);
+        return recipeRepository.findRecipesOrderByFridgeIngredientCntDesc(fridgeIngredients, fridgeIngredientNames, pageable);
     }
 
     public long countRecipeScrapByUser(User user) {
         return recipeRepository.countRecipeScrapByUser(user);
+    }
+
+    public Map<Recipe, Integer> getIngredientsMatchRateByRecipes(User user, List<Recipe> recipes) {
+        Map<Recipe, List<RecipeIngredient>> recipeIngredientsMapByRecipe = recipeRepository.findRecipeIngredientsByRecipeIn(recipes).stream()
+                .collect(Collectors.groupingBy(RecipeIngredient::getRecipe));
+
+        List<Ingredient> ingredientsInFridge = fridgeRepository.findByUser(user).stream()
+                .map(Fridge::getIngredient)
+                .collect(Collectors.toList());
+
+        Map<Recipe, Integer> ingredientsMatchRateMapByRecipe = new HashMap<>();
+        for (Recipe recipe : recipeIngredientsMapByRecipe.keySet()) {
+            List<RecipeIngredient> recipeIngredients = recipeIngredientsMapByRecipe.get(recipe);
+            System.out.println(recipeIngredients.size());
+            long ingredientsMatchCount = recipeIngredients.stream()
+                    .filter(recipeIngredient -> ingredientsInFridge.contains(recipeIngredient.getIngredient()))
+                    .count();
+            System.out.println(recipe.getRecipeId() +" "+ingredientsMatchCount+" "+ recipeIngredients.size()+" "+(double) ingredientsMatchCount / recipeIngredients.size() * 100);
+            ingredientsMatchRateMapByRecipe.put(recipe, (int) ((double) ingredientsMatchCount / recipeIngredients.size() * 100));
+        }
+
+        return ingredientsMatchRateMapByRecipe;
     }
 }
 
