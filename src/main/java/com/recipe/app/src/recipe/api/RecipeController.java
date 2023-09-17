@@ -62,8 +62,10 @@ public class RecipeController {
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         List<Fridge> fridges = fridgeService.getFridges(user);
         Recipe recipe = recipeService.getRecipe(recipeId);
+        List<RecipeIngredient> recipeIngredients = recipeService.getRecipeIngredientsByRecipe(recipe);
+        List<RecipeProcess> recipeProcesses = recipeService.getRecipeProcessesByRecipe(recipe);
         recipeService.createRecipeView(recipeId, user);
-        RecipeDto.RecipeDetailResponse data = RecipeDto.RecipeDetailResponse.from(recipe, user, fridges);
+        RecipeDto.RecipeDetailResponse data = RecipeDto.RecipeDetailResponse.from(recipe, user, fridges, recipeIngredients, recipeProcesses);
 
         return success(data);
     }
