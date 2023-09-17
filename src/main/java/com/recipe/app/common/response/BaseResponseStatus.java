@@ -211,6 +211,8 @@ public enum BaseResponseStatus {
 
     FRIDGE_SAVE_UNIT_NOT_MATCH(3080, "냉장고에 존재하는 재료(%s)의 단위와 냉장고 바구니의 재료 단위가 일치하지 않습니다"),
 
+    BAD_WORD_CONTAIN(3081, "금칙어 설정된 단어(%s)를 포함하고 있습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */
