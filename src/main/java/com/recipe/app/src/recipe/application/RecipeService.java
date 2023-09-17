@@ -13,6 +13,7 @@ import com.recipe.app.src.recipe.domain.RecipeProcess;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
+import com.recipe.app.src.user.exception.ForbiddenUserException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -49,25 +50,29 @@ public class RecipeService {
         return recipes;
     }
 
-    public Recipe getRecipe(Long recipeId) {
-        return recipeRepository.findById(recipeId).orElseThrow(NotFoundRecipeException::new);
+    public Recipe getRecipe(Long recipeId, Long userId) {
+        Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(NotFoundRecipeException::new);
+        if (recipe.isHidden() && !userId.equals(recipe.getUser().getUserId()))
+            throw new ForbiddenUserException();
+
+        return recipe;
     }
 
     @Transactional
     public void createRecipeView(Long recipeId, User user) {
-        Recipe recipe = getRecipe(recipeId);
+        Recipe recipe = getRecipe(recipeId, user.getUserId());
         recipeRepository.saveRecipeView(recipe, user);
     }
 
     @Transactional
     public void createRecipeScrap(Long recipeId, User user) {
-        Recipe recipe = getRecipe(recipeId);
+        Recipe recipe = getRecipe(recipeId, user.getUserId());
         recipeRepository.saveRecipeScrap(recipe, user);
     }
 
     @Transactional
     public void deleteRecipeScrap(Long recipeId, User user) {
-        Recipe recipe = getRecipe(recipeId);
+        Recipe recipe = getRecipe(recipeId, user.getUserId());
         recipeRepository.deleteRecipeScrap(recipe, user);
     }
 
@@ -91,7 +96,7 @@ public class RecipeService {
 
     @Transactional
     public void deleteRecipe(User user, Long recipeId) {
-        Recipe recipe = getRecipe(recipeId);
+        Recipe recipe = getRecipe(recipeId, user.getUserId());
         if (!user.equals(recipe.getUser()))
             throw new ForbiddenAccessException();
         recipeRepository.delete(recipe);
@@ -123,7 +128,7 @@ public class RecipeService {
 
     @Transactional
     public void updateRecipe(User user, Long recipeId, RecipeDto.RecipeRequest request) {
-        Recipe recipe = getRecipe(recipeId);
+        Recipe recipe = getRecipe(recipeId, user.getUserId());
         if (!user.equals(recipe.getUser()))
             throw new ForbiddenAccessException();
 
