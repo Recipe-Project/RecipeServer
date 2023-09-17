@@ -1,6 +1,7 @@
 package com.recipe.app.src.fridgeBasket.api;
 
 import com.recipe.app.common.response.BaseResponse;
+import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketDto;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
@@ -26,6 +27,7 @@ import static com.recipe.app.common.response.BaseResponse.success;
 public class FridgeBasketController {
 
     private final FridgeBasketService fridgeBasketService;
+    private final BadWordService badWordService;
 
     @ApiOperation(value = "재료 선택하여 냉장고 바구니 채우기 API")
     @ResponseBody
@@ -55,6 +57,7 @@ public class FridgeBasketController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(request.getIngredientName());
         List<FridgeBasket> fridgeBaskets = fridgeBasketService.createFridgeBasketWithIngredientSave(user, request);
         FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBaskets);
 

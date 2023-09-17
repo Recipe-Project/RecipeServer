@@ -2,6 +2,7 @@ package com.recipe.app.src.user.api;
 
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.recipe.application.BlogRecipeService;
 import com.recipe.app.src.recipe.application.RecipeService;
 import com.recipe.app.src.recipe.application.YoutubeRecipeService;
@@ -41,6 +42,7 @@ public class UserController {
     private final RecipeService recipeService;
     private final YoutubeRecipeService youtubeRecipeService;
     private final BlogRecipeService blogRecipeService;
+    private final BadWordService badWordService;
     private final JwtService jwtService;
 
     @Value("${header.naver-token}")
@@ -190,6 +192,7 @@ public class UserController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(request.getNickname());
         user = userService.updateUser(user, request);
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);

@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.api;
 
 import com.recipe.app.common.response.BaseResponse;
+import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.recipe.application.RecipeService;
@@ -36,6 +37,7 @@ public class RecipeController {
     private final RecipeService recipeService;
     private final SearchKeywordService recipeKeywordService;
     private final FridgeService fridgeService;
+    private final BadWordService badWordService;
 
     @ApiOperation(value = "레시피 목록 조회 API")
     @GetMapping("")
@@ -53,6 +55,7 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(keyword);
         Page<Recipe> recipes = recipeService.getRecipes(keyword, page, size, sort);
         RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(recipes.getTotalElements(), recipes.stream()
                 .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
@@ -177,6 +180,8 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(request.getTitle());
+        badWordService.checkBadWords(request.getContent());
         recipeService.createRecipe(user, request);
 
         return success();
@@ -192,6 +197,8 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(request.getTitle());
+        badWordService.checkBadWords(request.getContent());
         recipeService.updateRecipe(user, recipeId, request);
 
         return success();
