@@ -75,8 +75,14 @@ public class RecipeService {
         return recipeRepository.findScrapRecipesByUser(user);
     }
 
-    public List<Recipe> getRecipesByUser(User user) {
-        return recipeRepository.findByUser(user);
+    }
+
+    public List<RecipeIngredient> getRecipeIngredientsByRecipe(Recipe recipe) {
+        return recipeRepository.findRecipeIngredientsByRecipe(recipe);
+    }
+
+    public List<RecipeProcess> getRecipeProcessesByRecipe(Recipe recipe) {
+        return recipeRepository.findRecipeProcessesByRecipe(recipe);
     }
 
     @Transactional

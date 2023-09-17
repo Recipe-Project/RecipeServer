@@ -71,18 +71,14 @@ public class RecipeEntity extends BaseEntity {
                 .calorie(calorie)
                 .user(user != null ? user.toModel() : null)
                 .isHidden(hiddenYn.equals("Y"))
-                .recipeIngredients(recipeIngredients.stream()
-                        .map(RecipeIngredientEntity::toModel)
-                        .collect(Collectors.toList()))
-                .recipeProcesses(recipeProcesses.stream()
-                        .map(RecipeProcessEntity::toModel)
-                        .collect(Collectors.toList()))
                 .scrapUsers(recipeScraps.stream()
                         .map(s -> s.getUser().toModel())
                         .collect(Collectors.toList()))
                 .viewUsers(recipeViews.stream()
                         .map(v -> v.getUser().toModel())
                         .collect(Collectors.toList()))
+                .createdAt(getCreatedAt())
+                .updatedAt(getUpdatedAt())
                 .build();
     }
 

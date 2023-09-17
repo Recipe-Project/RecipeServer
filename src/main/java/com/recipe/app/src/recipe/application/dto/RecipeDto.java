@@ -110,7 +110,7 @@ public class RecipeDto {
         private long scrapCnt;
         private long viewCnt;
 
-        public static RecipeDetailResponse from(Recipe recipe, User user, List<Fridge> fridges) {
+        public static RecipeDetailResponse from(Recipe recipe, User user, List<Fridge> fridges, List<RecipeIngredient> recipeIngredients, List<RecipeProcess> recipeProcesses) {
             return RecipeDetailResponse.builder()
                     .recipeId(recipe.getRecipeId())
                     .recipeNm(recipe.getRecipeNm())
@@ -118,10 +118,10 @@ public class RecipeDto {
                     .imgUrl(recipe.getImgUrl())
                     .cookingTime(recipe.getCookingTime())
                     .level(recipe.getLevelNm())
-                    .recipeIngredients(recipe.getRecipeIngredients().stream()
+                    .recipeIngredients(recipeIngredients.stream()
                             .map(ri -> RecipeIngredientResponse.from(ri, fridges))
                             .collect(Collectors.toList()))
-                    .recipeProcesses(recipe.getRecipeProcesses().stream()
+                    .recipeProcesses(recipeProcesses.stream()
                             .map(RecipeProcessResponse::from)
                             .collect(Collectors.toList()))
                     .isUserScrap(recipe.isScrapByUser(user))
