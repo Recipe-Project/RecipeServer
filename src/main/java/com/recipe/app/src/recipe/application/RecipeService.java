@@ -71,8 +71,9 @@ public class RecipeService {
         recipeRepository.deleteRecipeScrap(recipe, user);
     }
 
-    public List<Recipe> getScrapRecipes(User user) {
-        return recipeRepository.findScrapRecipesByUser(user);
+    public Page<Recipe> getScrapRecipes(User user, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        return recipeRepository.findScrapRecipesByUser(user, pageable);
     }
 
     }

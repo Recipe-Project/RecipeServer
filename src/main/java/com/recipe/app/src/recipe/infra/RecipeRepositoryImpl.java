@@ -62,11 +62,10 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public List<Recipe> findScrapRecipesByUser(User user) {
-        return recipeScrapJpaRepository.findByUser(UserEntity.fromModel(user)).stream()
+    public Page<Recipe> findScrapRecipesByUser(User user, Pageable pageable) {
+        return recipeScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
                 .map(RecipeScrapEntity::getRecipe)
-                .map(RecipeEntity::toModel)
-                .collect(Collectors.toList());
+                .map(RecipeEntity::toModel);
     }
 
     @Override

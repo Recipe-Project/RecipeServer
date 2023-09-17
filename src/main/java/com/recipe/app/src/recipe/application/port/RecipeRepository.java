@@ -24,7 +24,7 @@ public interface RecipeRepository {
 
     void deleteRecipeScrap(Recipe recipe, User user);
 
-    List<Recipe> findScrapRecipesByUser(User user);
+    Page<Recipe> findScrapRecipesByUser(User user, Pageable pageable);
 
     void saveRecipeView(Recipe recipe, User user);
 
