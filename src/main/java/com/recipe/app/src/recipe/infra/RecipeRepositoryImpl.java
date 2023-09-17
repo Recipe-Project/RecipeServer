@@ -118,11 +118,16 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public Page<Recipe> findRecipesOrderByFridgeIngredientCntDesc(List<Ingredient> ingredients, List<String> ingredientNames, Pageable pageable) {
+    public Page<Recipe> findRecipesOrderByFridgeIngredientCntDesc(List<Ingredient> ingredients, List<String> ingredientNames, User user, Pageable pageable) {
         return recipeJpaRepository.findRecipesOrderByFridgeIngredientCntDesc(ingredients.stream()
                         .map(Ingredient::getIngredientId)
-                        .collect(Collectors.toList()), ingredientNames, pageable)
-                .map(recipeEntityWithRate -> (new RecipeEntity(recipeEntityWithRate)).toModel());
+                        .collect(Collectors.toList()), ingredientNames, user.getUserId(), pageable)
+                .map(recipeEntityWithRate -> {
+                    Recipe recipe = new RecipeEntity(recipeEntityWithRate).toModel();
+                    recipe.addScrapUser(recipeEntityWithRate.getScrapUserId());
+                    recipe.addViewUser(recipeEntityWithRate.getViewUserId());
+                    return recipe;
+                });
     }
 
     @Override

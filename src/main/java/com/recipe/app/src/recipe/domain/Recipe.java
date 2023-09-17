@@ -99,4 +99,20 @@ public class Recipe {
     public int hashCode() {
         return Objects.hash(recipeId);
     }
+
+    public void addScrapUser(Long userId) {
+        if (userId == null)
+            return;
+        this.scrapUsers.add(User.builder()
+                .userId(userId)
+                .build());
+    }
+
+    public void addViewUser(Long userId) {
+        if (userId == null)
+            return;
+        this.viewUsers.add(User.builder()
+                .userId(userId)
+                .build());
+    }
 }

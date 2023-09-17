@@ -182,7 +182,7 @@ public class RecipeService {
                 })
                 .collect(Collectors.toList());
 
-        return recipeRepository.findRecipesOrderByFridgeIngredientCntDesc(fridgeIngredients, fridgeIngredientNames, pageable);
+        return recipeRepository.findRecipesOrderByFridgeIngredientCntDesc(fridgeIngredients, fridgeIngredientNames, user, pageable);
     }
 
     public long countRecipeScrapByUser(User user) {

@@ -16,4 +16,6 @@ public interface RecipeEntityWithRate {
     Double getMatchRate();
     LocalDateTime getCreatedAt();
     LocalDateTime getUpdatedAt();
+    Long getScrapUserId();
+    Long getViewUserId();
 }

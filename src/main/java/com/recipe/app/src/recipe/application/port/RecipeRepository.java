@@ -42,7 +42,7 @@ public interface RecipeRepository {
 
     void deleteRecipeIngredients(List<RecipeIngredient> recipeIngredients);
 
-    Page<Recipe> findRecipesOrderByFridgeIngredientCntDesc(List<Ingredient> ingredients, List<String> ingredientNames, Pageable pageable);
+    Page<Recipe> findRecipesOrderByFridgeIngredientCntDesc(List<Ingredient> ingredients, List<String> ingredientNames, User user, Pageable pageable);
 
     long countRecipeScrapByUser(User user);
 

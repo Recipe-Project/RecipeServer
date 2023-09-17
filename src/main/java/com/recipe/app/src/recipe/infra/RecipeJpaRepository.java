@@ -27,9 +27,11 @@ public interface RecipeJpaRepository extends CrudRepository<RecipeEntity, Long> 
 
     Page<RecipeEntity> findByUser(UserEntity user, Pageable pageable);
 
-    @Query(value = "select r.*, (count(*) / (select count(*) from RecipeIngredient where recipeId = r.recipeId) * 100) as matchRate from RecipeIngredient ri " +
+    @Query(value = "select r.*, rs.userId as scrapUserId, (count(*) / (select count(*) from RecipeIngredient where recipeId = r.recipeId) * 100) as matchRate from RecipeIngredient ri " +
             "inner join Recipe r on ri.recipeId = r.recipeId " +
             "inner join Ingredient i on i.ingredientId = ri.ingredientId " +
+            "left join RecipeScrap rs on rs.recipeId = r.recipeId and rs.userId = :userId " +
+            "left join RecipeView rv on rv.recipeId = r.recipeId and rv.userId = :userId " +
             "where r.hiddenYn = 'N' and (ri.ingredientId in :ingredientIds or i.ingredientName in :ingredientNames) " +
             "group by ri.recipeId order by matchRate desc",
             countQuery="select count(*) from RecipeIngredient ri " +
@@ -38,5 +40,5 @@ public interface RecipeJpaRepository extends CrudRepository<RecipeEntity, Long> 
             "where (ri.ingredientId in :ingredientIds or i.ingredientName in :ingredientNames) and r.hiddenYn = 'N' " +
             "group by r.recipeId",
             nativeQuery = true)
-    Page<RecipeEntityWithRate> findRecipesOrderByFridgeIngredientCntDesc(List<Long> ingredientIds, List<String> ingredientNames, Pageable pageable);
+    Page<RecipeEntityWithRate> findRecipesOrderByFridgeIngredientCntDesc(List<Long> ingredientIds, List<String> ingredientNames, Long userId, Pageable pageable);
 }
