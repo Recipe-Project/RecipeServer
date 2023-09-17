@@ -104,8 +104,10 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public RecipeProcess findRecipeProcessByRecipe(Recipe recipe) {
-        return recipeProcessJpaRepository.findByRecipeAndCookingNo(RecipeEntity.fromModel(recipe), 1).toModel();
+    public List<RecipeProcess> findRecipeProcessesByRecipe(Recipe recipe) {
+        return recipeProcessJpaRepository.findByRecipeOrderByCookingNo(RecipeEntity.fromModel(recipe)).stream()
+                .map(RecipeProcessEntity::toModel)
+                .collect(Collectors.toList());
     }
 
     @Override

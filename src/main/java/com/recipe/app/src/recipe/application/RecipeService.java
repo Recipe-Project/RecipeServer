@@ -131,8 +131,10 @@ public class RecipeService {
                 null, null, true);
         recipe = recipeRepository.save(recipe);
 
-        RecipeProcess recipeProcess = recipeRepository.findRecipeProcessByRecipe(recipe);
-        recipeProcess = recipeProcess.update(request.getContent(), null);
+        List<RecipeProcess> existRecipeProcesses = getRecipeProcessesByRecipe(recipe);
+        recipeRepository.deleteRecipeProcesses(existRecipeProcesses);
+
+        RecipeProcess recipeProcess = RecipeProcess.from(recipe, 1, request.getContent(), null);
         recipeRepository.saveRecipeProcess(recipeProcess);
 
         recipeRepository.deleteRecipeIngredients(recipe.getRecipeIngredients());
