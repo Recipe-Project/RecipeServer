@@ -200,11 +200,9 @@ public class RecipeService {
         Map<Recipe, Integer> ingredientsMatchRateMapByRecipe = new HashMap<>();
         for (Recipe recipe : recipeIngredientsMapByRecipe.keySet()) {
             List<RecipeIngredient> recipeIngredients = recipeIngredientsMapByRecipe.get(recipe);
-            System.out.println(recipeIngredients.size());
             long ingredientsMatchCount = recipeIngredients.stream()
                     .filter(recipeIngredient -> ingredientsInFridge.contains(recipeIngredient.getIngredient()))
                     .count();
-            System.out.println(recipe.getRecipeId() +" "+ingredientsMatchCount+" "+ recipeIngredients.size()+" "+(double) ingredientsMatchCount / recipeIngredients.size() * 100);
             ingredientsMatchRateMapByRecipe.put(recipe, (int) ((double) ingredientsMatchCount / recipeIngredients.size() * 100));
         }
 
