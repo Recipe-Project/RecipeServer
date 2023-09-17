@@ -140,7 +140,7 @@ public enum BaseResponseStatus {
      */
     // users
     NOT_FOUND_USER(3010, "존재하지 않는 회원입니다."),
-    FORBIDDEN_USER(3011, "해당 회원에 접근할 수 없습니다."),
+    FORBIDDEN_USER(3011, "해당 정보에 접근할 수 없는 회원입니다."),
 
     // [POST] /users
     DUPLICATED_USER(3013, "이미 존재하는 회원입니다."),
