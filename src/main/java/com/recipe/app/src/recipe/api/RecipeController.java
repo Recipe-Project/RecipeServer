@@ -30,15 +30,24 @@ public class RecipeController {
     private final FridgeService fridgeService;
 
     @GetMapping("")
-    public BaseResponse<List<RecipeDto.RecipeResponse>> getRecipes(final Authentication authentication, @RequestParam(value = "keyword") String keyword) {
+    public BaseResponse<RecipeDto.RecipesResponse> getRecipes(@ApiIgnore final Authentication authentication,
+                                                              @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
+                                                              @RequestParam(value = "keyword") String keyword,
+                                                              @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
+                                                              @RequestParam(value = "page") int page,
+                                                              @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                                              @RequestParam(value = "size") int size,
+                                                              @ApiParam(name = "sort", type = "String", example = "조회수순(recipeViews) / 좋아요순(recipeScraps) / 최신순(createdAt) = 기본값", value = "정렬")
+                                                              @RequestParam(value = "sort") String sort) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<RecipeDto.RecipeResponse> data = recipeService.getRecipes(keyword).stream()
+        Page<Recipe> recipes = recipeService.getRecipes(keyword, page, size, sort);
+        RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(recipes.getTotalElements(), recipes.stream()
                 .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
-                .collect(Collectors.toList());
+                .collect(Collectors.toList()));
         recipeKeywordService.createSearchKeyword(keyword, user);
 
         return success(data);

@@ -9,6 +9,7 @@ import com.recipe.app.src.recipe.domain.RecipeProcess;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -33,8 +34,18 @@ public class RecipeRepositoryImpl implements RecipeRepository {
     }
 
     @Override
-    public List<Recipe> getRecipes(String keyword) {
-        return recipeJpaRepository.getRecipes(keyword).stream().map(RecipeEntity::toModel).collect(Collectors.toList());
+    public Page<Recipe> getRecipesOrderByCreatedAtDesc(String keyword, Pageable pageable) {
+        return recipeJpaRepository.getRecipesOrderByCreatedAtDesc(keyword, pageable).map(RecipeEntity::toModel);
+    }
+
+    @Override
+    public Page<Recipe> getRecipesOrderByRecipeScrapSizeDesc(String keyword, Pageable pageable) {
+        return recipeJpaRepository.getRecipesOrderByRecipeScrapSizeDesc(keyword, pageable).map(RecipeEntity::toModel);
+    }
+
+    @Override
+    public Page<Recipe> getRecipesOrderByRecipeViewSizeDesc(String keyword, Pageable pageable) {
+        return recipeJpaRepository.getRecipesOrderByRecipeViewSizeDesc(keyword, pageable).map(RecipeEntity::toModel);
     }
 
     @Override

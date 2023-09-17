@@ -14,6 +14,8 @@ import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +35,18 @@ public class RecipeService {
     private final IngredientRepository ingredientRepository;
     private final FridgeRepository fridgeRepository;
 
-    public List<Recipe> getRecipes(String keyword) {
-        return recipeRepository.getRecipes(keyword);
+    public Page<Recipe> getRecipes(String keyword, int page, int size, String sort) {
+
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Recipe> recipes;
+        if (sort.equals("recipeScraps"))
+            recipes = recipeRepository.getRecipesOrderByRecipeScrapSizeDesc(keyword, pageable);
+        else if (sort.equals("recipeViews"))
+            recipes = recipeRepository.getRecipesOrderByRecipeViewSizeDesc(keyword, pageable);
+        else
+            recipes = recipeRepository.getRecipesOrderByCreatedAtDesc(keyword, pageable);
+
+        return recipes;
     }
 
     public Recipe getRecipe(Long recipeId) {

@@ -3,6 +3,7 @@ package com.recipe.app.src.recipe.application.port;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.recipe.domain.*;
 import com.recipe.app.src.user.domain.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
@@ -13,7 +14,11 @@ import java.util.Optional;
 public interface RecipeRepository {
     Optional<Recipe> findById(Long recipeId);
 
-    List<Recipe> getRecipes(String keyword);
+    Page<Recipe> getRecipesOrderByCreatedAtDesc(String keyword, Pageable pageable);
+
+    Page<Recipe> getRecipesOrderByRecipeScrapSizeDesc(String keyword, Pageable pageable);
+
+    Page<Recipe> getRecipesOrderByRecipeViewSizeDesc(String keyword, Pageable pageable);
 
     void saveRecipeScrap(Recipe recipe, User user);
 
