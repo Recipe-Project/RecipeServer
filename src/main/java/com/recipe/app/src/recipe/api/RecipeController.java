@@ -180,6 +180,8 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(request.getTitle());
+        badWordService.checkBadWords(request.getContent());
         recipeService.createRecipe(user, request);
 
         return success();
@@ -195,6 +197,8 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        badWordService.checkBadWords(request.getTitle());
+        badWordService.checkBadWords(request.getContent());
         recipeService.updateRecipe(user, recipeId, request);
 
         return success();
