@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.util.Objects;
 
 @Getter
 public class User {
@@ -93,4 +94,16 @@ public class User {
                 .build();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof User))
+            return false;
+        User user = (User) o;
+        return userId.equals(user.getUserId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(userId);
+    }
 }
