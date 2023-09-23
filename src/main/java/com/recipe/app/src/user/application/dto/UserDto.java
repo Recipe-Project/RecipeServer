@@ -14,6 +14,18 @@ import java.util.stream.Collectors;
 
 public class UserDto {
 
+    @ApiModel(description = "로그인 토큰 정보 요청 DTO")
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    @NoArgsConstructor
+    public static class UserLoginRequest {
+        @ApiModelProperty(value = "로그인 액세스 토큰")
+        private String accessToken;
+        @ApiModelProperty(value = "FCM 토큰")
+        private String fcmToken;
+    }
+
     @ApiModel(value = "수정할 회원 정보 요청 DTO", description = "프로필 사진, 닉네임 정보")
     @Getter
     @Setter
