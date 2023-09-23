@@ -32,7 +32,7 @@ public class FridgeDto {
     @Builder
     public static class FridgesResponse {
         @Schema(description = "카테고리별 냉장고 목록")
-        private List<FridgeIngredientCategoryResponse> fridges;
+        private List<FridgeIngredientCategoryResponse> fridgeIngredientCategories;
         @Schema(description = "냉장고 바구니 갯수")
         private long fridgeBasketCount;
 
@@ -40,7 +40,7 @@ public class FridgeDto {
             Map<IngredientCategory, List<Fridge>> fridgesGroupByIngredientCategory = fridges.stream()
                     .collect(Collectors.groupingBy(f -> f.getIngredient().getIngredientCategory()));
             return FridgesResponse.builder()
-                    .fridges(fridgesGroupByIngredientCategory.keySet().stream()
+                    .fridgeIngredientCategories(fridgesGroupByIngredientCategory.keySet().stream()
                             .map(category -> FridgeIngredientCategoryResponse.from(category, fridges))
                             .collect(Collectors.toList()))
                     .fridgeBasketCount(fridgeBasketCount)
