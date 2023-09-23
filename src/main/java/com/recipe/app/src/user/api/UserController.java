@@ -45,18 +45,6 @@ public class UserController {
     private final BadWordService badWordService;
     private final JwtService jwtService;
 
-    @Value("${header.naver-token}")
-    private String naverToken;
-
-    @Value("${header.kakao-token}")
-    private String kakaoToken;
-
-    @Value("${header.google-token}")
-    private String googleToken;
-
-    @Value("${header.fcm-token}")
-    private String fcmToken;
-
     @Value("${jwt.token-header}")
     private String jwt;
 
@@ -82,14 +70,14 @@ public class UserController {
     @ApiOperation(value = "네이버 로그인 API")
     @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<UserDto.UserProfileResponse> naverLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> naverLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
-        String accessToken = request.getHeader(this.naverToken);
+        String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
         }
 
-        String fcmToken = request.getHeader(this.fcmToken);
+        String fcmToken = request.getFcmToken();
         if (!StringUtils.hasText(fcmToken)) {
             throw new EmptyFcmTokenException();
         }
@@ -110,14 +98,14 @@ public class UserController {
     @ApiOperation(value = "카카오 로그인 API")
     @ResponseBody
     @PostMapping("/kakao-login")
-    public BaseResponse<UserDto.UserProfileResponse> kakaoLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> kakaoLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
-        String accessToken = request.getHeader(this.kakaoToken);
+        String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
         }
 
-        String fcmToken = request.getHeader(this.fcmToken);
+        String fcmToken = request.getFcmToken();
         if (!StringUtils.hasText(fcmToken)) {
             throw new EmptyFcmTokenException();
         }
@@ -138,14 +126,14 @@ public class UserController {
     @ApiOperation(value = "구글 로그인 API")
     @ResponseBody
     @PostMapping("/google-login")
-    public BaseResponse<UserDto.UserProfileResponse> googleLogin(HttpServletRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserProfileResponse> googleLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
-        String accessToken = request.getHeader(this.googleToken);
+        String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
             throw new EmptyTokenException();
         }
 
-        String fcmToken = request.getHeader(this.fcmToken);
+        String fcmToken = request.getFcmToken();
         if (!StringUtils.hasText(fcmToken)) {
             throw new EmptyFcmTokenException();
         }
