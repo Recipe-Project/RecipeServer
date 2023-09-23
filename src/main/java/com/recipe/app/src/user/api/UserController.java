@@ -70,7 +70,7 @@ public class UserController {
     @ApiOperation(value = "네이버 로그인 API")
     @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<UserDto.UserProfileResponse> naverLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserSocialProfileResponse> naverLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
         String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
@@ -83,14 +83,12 @@ public class UserController {
         }
 
         User user = userService.naverLogin(accessToken, fcmToken);
-        HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserId());
-        httpHeaders.add(this.jwt, jwt);
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
         List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0 , 6).toList();
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        UserDto.UserSocialProfileResponse data = UserDto.UserSocialProfileResponse.from(user, jwt, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
@@ -98,7 +96,7 @@ public class UserController {
     @ApiOperation(value = "카카오 로그인 API")
     @ResponseBody
     @PostMapping("/kakao-login")
-    public BaseResponse<UserDto.UserProfileResponse> kakaoLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserSocialProfileResponse> kakaoLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
         String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
@@ -111,14 +109,12 @@ public class UserController {
         }
 
         User user = userService.kakaoLogin(accessToken, fcmToken);
-        HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserId());
-        httpHeaders.add(this.jwt, jwt);
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
         List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        UserDto.UserSocialProfileResponse data = UserDto.UserSocialProfileResponse.from(user, jwt, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
@@ -126,7 +122,7 @@ public class UserController {
     @ApiOperation(value = "구글 로그인 API")
     @ResponseBody
     @PostMapping("/google-login")
-    public BaseResponse<UserDto.UserProfileResponse> googleLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserSocialProfileResponse> googleLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
         String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
@@ -139,14 +135,12 @@ public class UserController {
         }
 
         User user = userService.googleLogin(accessToken, fcmToken);
-        HttpHeaders httpHeaders = new HttpHeaders();
         String jwt = jwtService.createJwt(user.getUserId());
-        httpHeaders.add(this.jwt, jwt);
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
         List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        UserDto.UserSocialProfileResponse data = UserDto.UserSocialProfileResponse.from(user, jwt, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
         return success(data);
     }
