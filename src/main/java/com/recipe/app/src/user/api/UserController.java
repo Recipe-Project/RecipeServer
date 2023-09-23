@@ -45,18 +45,6 @@ public class UserController {
     private final BadWordService badWordService;
     private final JwtService jwtService;
 
-    @Value("${header.naver-token}")
-    private String naverToken;
-
-    @Value("${header.kakao-token}")
-    private String kakaoToken;
-
-    @Value("${header.google-token}")
-    private String googleToken;
-
-    @Value("${header.fcm-token}")
-    private String fcmToken;
-
     @Value("${jwt.token-header}")
     private String jwt;
 
