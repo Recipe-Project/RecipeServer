@@ -48,18 +48,19 @@ public class UserDto {
         private String fcmToken;
     }
 
-    @Schema(description = "jwt와 회원 프로필 응답 DTO")
+    @Schema(description = "소셜 로그인 응답 DTO")
     @Getter
     @Builder
-    public static class UserSocialProfileResponse {
+    public static class UserSocialLoginResponse {
         @Schema(description = "jwt")
         private String jwt;
-        private UserProfileResponse userProfile;
+        @Schema(description = "회원 고유번호")
+        private Long userId;
 
-        public static UserSocialProfileResponse from(User user, String jwt, List<Recipe> userRecipes, long youtubeScrapCnt, long blogScrapCnt, long recipeScrapCnt) {
-            return UserSocialProfileResponse.builder()
+        public static UserSocialLoginResponse from(Long userId, String jwt) {
+            return UserSocialLoginResponse.builder()
                     .jwt(jwt)
-                    .userProfile(UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt))
+                    .userId(userId)
                     .build();
         }
     }

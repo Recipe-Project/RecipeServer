@@ -70,7 +70,7 @@ public class UserController {
     @ApiOperation(value = "네이버 로그인 API")
     @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<UserDto.UserSocialProfileResponse> naverLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserSocialLoginResponse> naverLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
         String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
@@ -84,11 +84,7 @@ public class UserController {
 
         User user = userService.naverLogin(accessToken, fcmToken);
         String jwt = jwtService.createJwt(user.getUserId());
-        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
-        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
-        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0 , 6).toList();
-        UserDto.UserSocialProfileResponse data = UserDto.UserSocialProfileResponse.from(user, jwt, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        UserDto.UserSocialLoginResponse data = UserDto.UserSocialLoginResponse.from(user.getUserId(), jwt);
 
         return success(data);
     }
@@ -96,7 +92,7 @@ public class UserController {
     @ApiOperation(value = "카카오 로그인 API")
     @ResponseBody
     @PostMapping("/kakao-login")
-    public BaseResponse<UserDto.UserSocialProfileResponse> kakaoLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserSocialLoginResponse> kakaoLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
         String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
@@ -110,11 +106,7 @@ public class UserController {
 
         User user = userService.kakaoLogin(accessToken, fcmToken);
         String jwt = jwtService.createJwt(user.getUserId());
-        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
-        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
-        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
-        UserDto.UserSocialProfileResponse data = UserDto.UserSocialProfileResponse.from(user, jwt, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        UserDto.UserSocialLoginResponse data = UserDto.UserSocialLoginResponse.from(user.getUserId(), jwt);
 
         return success(data);
     }
@@ -122,7 +114,7 @@ public class UserController {
     @ApiOperation(value = "구글 로그인 API")
     @ResponseBody
     @PostMapping("/google-login")
-    public BaseResponse<UserDto.UserSocialProfileResponse> googleLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserDto.UserSocialLoginResponse> googleLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
 
         String accessToken = request.getAccessToken();
         if (!StringUtils.hasText(accessToken)) {
@@ -136,11 +128,7 @@ public class UserController {
 
         User user = userService.googleLogin(accessToken, fcmToken);
         String jwt = jwtService.createJwt(user.getUserId());
-        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
-        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
-        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
-        UserDto.UserSocialProfileResponse data = UserDto.UserSocialProfileResponse.from(user, jwt, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        UserDto.UserSocialLoginResponse data = UserDto.UserSocialLoginResponse.from(user.getUserId(), jwt);
 
         return success(data);
     }
