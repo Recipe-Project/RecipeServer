@@ -65,6 +65,20 @@ public class UserDto {
         }
     }
 
+    @Schema(description = "자동 로그인 응답 DTO")
+    @Getter
+    @Builder
+    public static class UserLoginResponse {
+        @Schema(description = "회원 고유번호")
+        private Long userId;
+
+        public static UserLoginResponse from(Long userId) {
+            return UserLoginResponse.builder()
+                    .userId(userId)
+                    .build();
+        }
+    }
+
     @Schema(description = "회원 프로필 응답 DTO")
     @Getter
     @Builder

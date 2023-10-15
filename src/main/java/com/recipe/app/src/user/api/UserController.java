@@ -51,18 +51,14 @@ public class UserController {
     @ApiOperation(value = "자동 로그인 API")
     @ResponseBody
     @PostMapping("/auto-login")
-    public BaseResponse<UserDto.UserProfileResponse> autoLogin(@ApiIgnore final Authentication authentication) {
+    public BaseResponse<UserDto.UserLoginResponse> autoLogin(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         user = userService.autoLogin(user);
-        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
-        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
-        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        UserDto.UserLoginResponse data = UserDto.UserLoginResponse.from(user.getUserId());
 
         return success(data);
     }
