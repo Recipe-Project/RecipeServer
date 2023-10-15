@@ -65,7 +65,7 @@ public class FridgeService {
     @Transactional
     public List<Fridge> deleteFridge(User user, Long fridgeId) {
 
-        Fridge fridge = fridgeRepository.findByUserAndFridgeId(user, fridgeId).orElseThrow(NotFoundFridgeException::new);
+        Fridge fridge = getFridge(user, fridgeId);
         fridgeRepository.delete(fridge);
 
         return getFridges(user);
@@ -74,11 +74,15 @@ public class FridgeService {
     @Transactional
     public List<Fridge> updateFridge(User user, Long fridgeId, FridgeDto.FridgeRequest request) {
 
-        Fridge fridge = fridgeRepository.findByUserAndFridgeId(user, fridgeId).orElseThrow(NotFoundFridgeException::new);
+        Fridge fridge = getFridge(user, fridgeId);
         fridge = fridge.changeExpiredAtAndQuantityAndUnit(request.getExpiredAt(), request.getQuantity(), request.getUnit());
         fridgeRepository.save(fridge);
 
         return getFridges(user);
+    }
+
+    public Fridge getFridge(User user, Long fridgeId) {
+        return fridgeRepository.findByUserAndFridgeId(user, fridgeId).orElseThrow(NotFoundFridgeException::new);
     }
 
     /*
