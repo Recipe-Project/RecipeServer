@@ -61,6 +61,21 @@ public class FridgeController {
         return success(data);
     }
 
+    @ApiOperation(value = "냉장고 상세 조회 API")
+    @ResponseBody
+    @GetMapping("/{fridgeId}")
+    public BaseResponse<FridgeDto.FridgeResponse> getFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+        Fridge fridge = fridgeService.getFridge(user, fridgeId);
+        FridgeDto.FridgeResponse data = FridgeDto.FridgeResponse.from(fridge);
+
+        return success(data);
+    }
+
     @ApiOperation(value = "냉장고 삭제 API")
     @ResponseBody
     @DeleteMapping("/{fridgeId}")
