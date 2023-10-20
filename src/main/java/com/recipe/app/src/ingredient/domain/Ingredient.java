@@ -52,9 +52,10 @@ public class Ingredient {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Ingredient))
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         Ingredient ingredient = (Ingredient) o;
+
         if (ingredientId.equals(ingredient.getIngredientId()))
             return true;
 
@@ -99,7 +100,7 @@ public class Ingredient {
 
     @Override
     public int hashCode() {
-        return Objects.hash(ingredientId, ingredientName.replace(" ", ""));
+        return Objects.hash(getIngredientId(), getIngredientName().replace(" ", ""));
     }
 
     public List<String> getSimilarIngredientName() {

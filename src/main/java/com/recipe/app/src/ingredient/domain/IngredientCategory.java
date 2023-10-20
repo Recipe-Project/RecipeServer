@@ -24,14 +24,14 @@ public class IngredientCategory {
 
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof IngredientCategory))
-            return false;
-        IngredientCategory category = (IngredientCategory) o;
-        return ingredientCategoryId.equals(category.getIngredientCategoryId());
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IngredientCategory that = (IngredientCategory) o;
+        return getIngredientCategoryId().equals(that.getIngredientCategoryId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(ingredientCategoryId);
+        return Objects.hash(getIngredientCategoryId());
     }
 }

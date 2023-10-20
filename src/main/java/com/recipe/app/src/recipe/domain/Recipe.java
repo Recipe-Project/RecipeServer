@@ -87,19 +87,6 @@ public class Recipe {
                 .build();
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (!(o instanceof Recipe))
-            return false;
-        Recipe recipe = (Recipe) o;
-        return recipeId.equals(recipe.getRecipeId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(recipeId);
-    }
-
     public void addScrapUser(Long userId) {
         if (userId == null)
             return;
@@ -114,5 +101,18 @@ public class Recipe {
         this.viewUsers.add(User.builder()
                 .userId(userId)
                 .build());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Recipe recipe = (Recipe) o;
+        return getRecipeId().equals(recipe.getRecipeId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getRecipeId());
     }
 }
