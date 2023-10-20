@@ -94,16 +94,17 @@ public class User {
                 .build();
     }
 
+
     @Override
     public boolean equals(Object o) {
-        if (!(o instanceof User))
-            return false;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
-        return userId.equals(user.getUserId());
+        return getUserId().equals(user.getUserId());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(userId);
+        return Objects.hash(getUserId());
     }
 }
