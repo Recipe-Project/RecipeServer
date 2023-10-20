@@ -41,7 +41,7 @@ public class FridgeDto {
                     .collect(Collectors.groupingBy(f -> f.getIngredient().getIngredientCategory()));
             return FridgesResponse.builder()
                     .fridgeIngredientCategories(fridgesGroupByIngredientCategory.keySet().stream()
-                            .map(category -> FridgeIngredientCategoryResponse.from(category, fridges))
+                            .map(category -> FridgeIngredientCategoryResponse.from(category, fridgesGroupByIngredientCategory.get(category)))
                             .collect(Collectors.toList()))
                     .fridgeBasketCount(fridgeBasketCount)
                     .build();
