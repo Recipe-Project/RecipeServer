@@ -63,7 +63,7 @@ public class RecipeDto {
         @Schema(description = "레시피 고유 번호")
         private Long recipeId;
         @Schema(description = "레시피명")
-        private String recipeNm;
+        private String recipeName;
         @Schema(description = "소개글")
         private String introduction;
         @Schema(description = "썸네일 이미지 Url")
@@ -87,7 +87,7 @@ public class RecipeDto {
 
             return RecipeResponse.builder()
                     .recipeId(recipe.getRecipeId())
-                    .recipeNm(recipe.getRecipeNm())
+                    .recipeName(recipe.getRecipeNm())
                     .introduction(recipe.getIntroduction())
                     .imgUrl(recipe.getImgUrl())
                     .postUserName(recipe.getUser() != null ? recipe.getUser().getNickname() : null)
@@ -103,7 +103,7 @@ public class RecipeDto {
 
             return RecipeResponse.builder()
                     .recipeId(recipe.getRecipeId())
-                    .recipeNm(recipe.getRecipeNm())
+                    .recipeName(recipe.getRecipeNm())
                     .introduction(recipe.getIntroduction())
                     .imgUrl(recipe.getImgUrl())
                     .postUserName(recipe.getUser() != null ? recipe.getUser().getNickname() : null)
@@ -117,7 +117,7 @@ public class RecipeDto {
         public static RecipeResponse from(BlogRecipe recipe, User user) {
             return RecipeResponse.builder()
                     .recipeId(recipe.getBlogRecipeId())
-                    .recipeNm(recipe.getTitle())
+                    .recipeName(recipe.getTitle())
                     .introduction(recipe.getDescription())
                     .imgUrl(recipe.getBlogThumbanilImgUrl())
                     .postUserName(recipe.getBlogName())
@@ -132,7 +132,7 @@ public class RecipeDto {
         public static RecipeResponse from(YoutubeRecipe recipe, User user) {
             return RecipeResponse.builder()
                     .recipeId(recipe.getYoutubeRecipeId())
-                    .recipeNm(recipe.getTitle())
+                    .recipeName(recipe.getTitle())
                     .introduction(recipe.getDescription())
                     .imgUrl(recipe.getThumbnailImgUrl())
                     .postUserName(recipe.getChannelName())
@@ -152,7 +152,7 @@ public class RecipeDto {
         @Schema(description = "레시피 고유 번호")
         private Long recipeId;
         @Schema(description = "레시피명")
-        private String recipeNm;
+        private String recipeName;
         @Schema(description = "소개글")
         private String introduction;
         @Schema(description = "썸네일 이미지 url")
@@ -175,7 +175,7 @@ public class RecipeDto {
         public static RecipeDetailResponse from(Recipe recipe, User user, List<Fridge> fridges, List<RecipeIngredient> recipeIngredients, List<RecipeProcess> recipeProcesses) {
             return RecipeDetailResponse.builder()
                     .recipeId(recipe.getRecipeId())
-                    .recipeNm(recipe.getRecipeNm())
+                    .recipeName(recipe.getRecipeNm())
                     .introduction(recipe.getIntroduction())
                     .imgUrl(recipe.getImgUrl())
                     .cookingTime(recipe.getCookingTime())
