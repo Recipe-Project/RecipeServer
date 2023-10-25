@@ -67,7 +67,7 @@ public class RecipeDto {
         @Schema(description = "소개글")
         private String introduction;
         @Schema(description = "썸네일 이미지 Url")
-        private String imgUrl;
+        private String thumbnailImgUrl;
         @Schema(description = "게시자")
         private String postUserName;
         @Schema(description = "게시일시")
@@ -89,7 +89,7 @@ public class RecipeDto {
                     .recipeId(recipe.getRecipeId())
                     .recipeName(recipe.getRecipeNm())
                     .introduction(recipe.getIntroduction())
-                    .imgUrl(recipe.getImgUrl())
+                    .thumbnailImgUrl(recipe.getImgUrl())
                     .postUserName(recipe.getUser() != null ? recipe.getUser().getNickname() : null)
                     .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                     .isUserScrap(recipe.isScrapByUser(user))
@@ -105,7 +105,7 @@ public class RecipeDto {
                     .recipeId(recipe.getRecipeId())
                     .recipeName(recipe.getRecipeNm())
                     .introduction(recipe.getIntroduction())
-                    .imgUrl(recipe.getImgUrl())
+                    .thumbnailImgUrl(recipe.getImgUrl())
                     .postUserName(recipe.getUser() != null ? recipe.getUser().getNickname() : null)
                     .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                     .isUserScrap(recipe.isScrapByUser(user))
@@ -119,7 +119,7 @@ public class RecipeDto {
                     .recipeId(recipe.getBlogRecipeId())
                     .recipeName(recipe.getTitle())
                     .introduction(recipe.getDescription())
-                    .imgUrl(recipe.getBlogThumbanilImgUrl())
+                    .thumbnailImgUrl(recipe.getBlogThumbanilImgUrl())
                     .postUserName(recipe.getBlogName())
                     .postDate(recipe.getPublishedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                     .linkUrl(recipe.getBlogUrl())
@@ -134,7 +134,7 @@ public class RecipeDto {
                     .recipeId(recipe.getYoutubeRecipeId())
                     .recipeName(recipe.getTitle())
                     .introduction(recipe.getDescription())
-                    .imgUrl(recipe.getThumbnailImgUrl())
+                    .thumbnailImgUrl(recipe.getThumbnailImgUrl())
                     .postUserName(recipe.getChannelName())
                     .postDate(recipe.getPostDate().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                     .linkUrl("https://www.youtube.com/watch?v=" + recipe.getYoutubeId())
@@ -156,7 +156,7 @@ public class RecipeDto {
         @Schema(description = "소개글")
         private String introduction;
         @Schema(description = "썸네일 이미지 url")
-        private String imgUrl;
+        private String thumbnailImgUrl;
         @Schema(description = "조리 시간")
         private Long cookingTime;
         @Schema(description = "난이도")
@@ -177,7 +177,7 @@ public class RecipeDto {
                     .recipeId(recipe.getRecipeId())
                     .recipeName(recipe.getRecipeNm())
                     .introduction(recipe.getIntroduction())
-                    .imgUrl(recipe.getImgUrl())
+                    .thumbnailImgUrl(recipe.getImgUrl())
                     .cookingTime(recipe.getCookingTime())
                     .level(recipe.getLevelNm())
                     .recipeIngredients(recipeIngredients.stream()
