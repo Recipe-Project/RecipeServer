@@ -213,6 +213,8 @@ public enum BaseResponseStatus {
 
     BAD_WORD_CONTAIN(3081, "금칙어 설정된 단어(%s)를 포함하고 있습니다."),
 
+    NOT_FOUND_RECIPE_LEVEL(3082, "레시피 난이도 조회에 실패했습니다."),
+
     /**
      * 4000 : Database, Server 오류
      */

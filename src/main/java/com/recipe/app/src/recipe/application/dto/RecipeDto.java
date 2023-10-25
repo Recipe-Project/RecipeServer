@@ -179,7 +179,7 @@ public class RecipeDto {
                     .introduction(recipe.getIntroduction())
                     .thumbnailImgUrl(recipe.getImgUrl())
                     .cookingTime(recipe.getCookingTime())
-                    .level(recipe.getLevelNm())
+                    .level(recipe.getLevel().getName())
                     .recipeIngredients(recipeIngredients.stream()
                             .map(ri -> RecipeIngredientResponse.from(ri, fridges))
                             .collect(Collectors.toList()))

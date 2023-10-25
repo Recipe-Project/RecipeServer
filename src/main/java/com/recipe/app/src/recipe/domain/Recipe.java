@@ -7,6 +7,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Objects;
+import java.util.logging.Level;
 
 @Getter
 public class Recipe {
@@ -15,7 +16,7 @@ public class Recipe {
     private final String recipeNm;
     private final String introduction;
     private final Long cookingTime;
-    private final String levelNm;
+    private final RecipeLevel level;
     private final String imgUrl;
     private final Long quantity;
     private final Long calorie;
@@ -27,14 +28,14 @@ public class Recipe {
     private final List<User> viewUsers;
 
     @Builder
-    public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, String levelNm, String imgUrl,
+    public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, RecipeLevel level, String imgUrl,
                   Long quantity, Long calorie, User user, boolean isHidden, LocalDateTime createdAt, LocalDateTime updatedAt,
                   List<User> scrapUsers, List<User> viewUsers) {
         this.recipeId = recipeId;
         this.recipeNm = recipeNm;
         this.introduction = introduction;
         this.cookingTime = cookingTime;
-        this.levelNm = levelNm;
+        this.level = level;
         this.imgUrl = imgUrl;
         this.quantity = quantity;
         this.calorie = calorie;
@@ -46,14 +47,14 @@ public class Recipe {
         this.viewUsers = viewUsers;
     }
 
-    public static Recipe from(String recipeNm, String introduction, Long cookingTime, String levelNm,
+    public static Recipe from(String recipeNm, String introduction, Long cookingTime, String levelCd,
                               String imgUrl, Long quantity, Long calorie, User user, boolean isHidden) {
         LocalDateTime now = LocalDateTime.now();
         return Recipe.builder()
                 .recipeNm(recipeNm)
                 .introduction(introduction)
                 .cookingTime(cookingTime)
-                .levelNm(levelNm)
+                .level(RecipeLevel.findRecipeLevelByCode(levelCd))
                 .imgUrl(imgUrl)
                 .quantity(quantity)
                 .calorie(calorie)
@@ -68,7 +69,7 @@ public class Recipe {
         return scrapUsers.contains(user);
     }
 
-    public Recipe update(Long recipeId, String recipeNm, String introduction, Long cookingTime, String levelNm, String imgUrl,
+    public Recipe update(Long recipeId, String recipeNm, String introduction, Long cookingTime, String levelCd, String imgUrl,
                          Long quantity, Long calorie, boolean isHidden) {
         LocalDateTime now = LocalDateTime.now();
         return Recipe.builder()
@@ -76,7 +77,7 @@ public class Recipe {
                 .recipeNm(recipeNm)
                 .introduction(introduction)
                 .cookingTime(cookingTime)
-                .levelNm(levelNm)
+                .level(RecipeLevel.findRecipeLevelByCode(levelCd))
                 .imgUrl(imgUrl)
                 .quantity(quantity)
                 .calorie(calorie)

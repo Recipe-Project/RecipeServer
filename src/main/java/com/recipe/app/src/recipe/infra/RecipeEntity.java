@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.infra;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipe.domain.Recipe;
+import com.recipe.app.src.recipe.domain.RecipeLevel;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
@@ -35,8 +36,8 @@ public class RecipeEntity extends BaseEntity {
     @Column(name = "cookingTime")
     private Long cookingTime;
 
-    @Column(name = "levelNm", length = 2)
-    private String levelNm;
+    @Column(name = "levelCd", length = 2)
+    private String levelCd;
 
     @Column(name = "imgUrl")
     private String imgUrl;
@@ -65,7 +66,7 @@ public class RecipeEntity extends BaseEntity {
         this.recipeNm = recipeEntityWithRate.getRecipeNm();
         this.introduction = recipeEntityWithRate.getIntroduction();
         this.cookingTime = recipeEntityWithRate.getCookingTime();
-        this.levelNm = recipeEntityWithRate.getLevelNm();
+        this.levelCd = recipeEntityWithRate.getLevelNm();
         this.imgUrl = recipeEntityWithRate.getImgUrl();
         this.quantity = recipeEntityWithRate.getQuantity();
         this.calorie = recipeEntityWithRate.getCalorie();
@@ -81,7 +82,7 @@ public class RecipeEntity extends BaseEntity {
                 .recipeNm(recipeNm)
                 .introduction(introduction)
                 .cookingTime(cookingTime)
-                .levelNm(levelNm)
+                .level(RecipeLevel.findRecipeLevelByCode(levelCd))
                 .imgUrl(imgUrl)
                 .quantity(quantity)
                 .calorie(calorie)
@@ -104,7 +105,7 @@ public class RecipeEntity extends BaseEntity {
         recipeEntity.recipeNm = recipe.getRecipeNm();
         recipeEntity.introduction = recipe.getIntroduction();
         recipeEntity.cookingTime = recipe.getCookingTime();
-        recipeEntity.levelNm = recipe.getLevelNm();
+        recipeEntity.levelCd = recipe.getLevel().getName();
         recipeEntity.imgUrl = recipe.getImgUrl();
         recipeEntity.quantity = recipe.getQuantity();
         recipeEntity.calorie = recipe.getCalorie();
