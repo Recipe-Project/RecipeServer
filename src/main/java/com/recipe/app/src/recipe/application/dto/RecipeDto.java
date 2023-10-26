@@ -63,11 +63,11 @@ public class RecipeDto {
         @Schema(description = "레시피 고유 번호")
         private Long recipeId;
         @Schema(description = "레시피명")
-        private String recipeNm;
+        private String recipeName;
         @Schema(description = "소개글")
         private String introduction;
         @Schema(description = "썸네일 이미지 Url")
-        private String imgUrl;
+        private String thumbnailImgUrl;
         @Schema(description = "게시자")
         private String postUserName;
         @Schema(description = "게시일시")
@@ -87,8 +87,9 @@ public class RecipeDto {
 
             return RecipeResponse.builder()
                     .recipeId(recipe.getRecipeId())
-                    .recipeNm(recipe.getRecipeNm())
-                    .imgUrl(recipe.getImgUrl())
+                    .recipeName(recipe.getRecipeNm())
+                    .introduction(recipe.getIntroduction())
+                    .thumbnailImgUrl(recipe.getImgUrl())
                     .postUserName(recipe.getUser() != null ? recipe.getUser().getNickname() : null)
                     .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                     .isUserScrap(recipe.isScrapByUser(user))
@@ -102,8 +103,9 @@ public class RecipeDto {
 
             return RecipeResponse.builder()
                     .recipeId(recipe.getRecipeId())
-                    .recipeNm(recipe.getRecipeNm())
-                    .imgUrl(recipe.getImgUrl())
+                    .recipeName(recipe.getRecipeNm())
+                    .introduction(recipe.getIntroduction())
+                    .thumbnailImgUrl(recipe.getImgUrl())
                     .postUserName(recipe.getUser() != null ? recipe.getUser().getNickname() : null)
                     .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                     .isUserScrap(recipe.isScrapByUser(user))
@@ -115,8 +117,9 @@ public class RecipeDto {
         public static RecipeResponse from(BlogRecipe recipe, User user) {
             return RecipeResponse.builder()
                     .recipeId(recipe.getBlogRecipeId())
-                    .recipeNm(recipe.getTitle())
-                    .imgUrl(recipe.getBlogThumbanilImgUrl())
+                    .recipeName(recipe.getTitle())
+                    .introduction(recipe.getDescription())
+                    .thumbnailImgUrl(recipe.getBlogThumbanilImgUrl())
                     .postUserName(recipe.getBlogName())
                     .postDate(recipe.getPublishedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                     .linkUrl(recipe.getBlogUrl())
@@ -129,8 +132,9 @@ public class RecipeDto {
         public static RecipeResponse from(YoutubeRecipe recipe, User user) {
             return RecipeResponse.builder()
                     .recipeId(recipe.getYoutubeRecipeId())
-                    .recipeNm(recipe.getTitle())
-                    .imgUrl(recipe.getThumbnailImgUrl())
+                    .recipeName(recipe.getTitle())
+                    .introduction(recipe.getDescription())
+                    .thumbnailImgUrl(recipe.getThumbnailImgUrl())
                     .postUserName(recipe.getChannelName())
                     .postDate(recipe.getPostDate().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                     .linkUrl("https://www.youtube.com/watch?v=" + recipe.getYoutubeId())
@@ -148,11 +152,11 @@ public class RecipeDto {
         @Schema(description = "레시피 고유 번호")
         private Long recipeId;
         @Schema(description = "레시피명")
-        private String recipeNm;
+        private String recipeName;
         @Schema(description = "소개글")
         private String introduction;
         @Schema(description = "썸네일 이미지 url")
-        private String imgUrl;
+        private String thumbnailImgUrl;
         @Schema(description = "조리 시간")
         private Long cookingTime;
         @Schema(description = "난이도")
@@ -171,11 +175,11 @@ public class RecipeDto {
         public static RecipeDetailResponse from(Recipe recipe, User user, List<Fridge> fridges, List<RecipeIngredient> recipeIngredients, List<RecipeProcess> recipeProcesses) {
             return RecipeDetailResponse.builder()
                     .recipeId(recipe.getRecipeId())
-                    .recipeNm(recipe.getRecipeNm())
+                    .recipeName(recipe.getRecipeNm())
                     .introduction(recipe.getIntroduction())
-                    .imgUrl(recipe.getImgUrl())
+                    .thumbnailImgUrl(recipe.getImgUrl())
                     .cookingTime(recipe.getCookingTime())
-                    .level(recipe.getLevelNm())
+                    .level(recipe.getLevel().getName())
                     .recipeIngredients(recipeIngredients.stream()
                             .map(ri -> RecipeIngredientResponse.from(ri, fridges))
                             .collect(Collectors.toList()))
