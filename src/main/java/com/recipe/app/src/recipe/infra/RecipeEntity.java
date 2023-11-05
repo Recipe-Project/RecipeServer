@@ -66,7 +66,7 @@ public class RecipeEntity extends BaseEntity {
         this.recipeNm = recipeEntityWithRate.getRecipeNm();
         this.introduction = recipeEntityWithRate.getIntroduction();
         this.cookingTime = recipeEntityWithRate.getCookingTime();
-        this.levelCd = recipeEntityWithRate.getLevelNm();
+        this.levelCd = recipeEntityWithRate.getLevelCd();
         this.imgUrl = recipeEntityWithRate.getImgUrl();
         this.quantity = recipeEntityWithRate.getQuantity();
         this.calorie = recipeEntityWithRate.getCalorie();
@@ -74,6 +74,21 @@ public class RecipeEntity extends BaseEntity {
         this.hiddenYn = recipeEntityWithRate.getHiddenYn();
         this.setCreatedAt(recipeEntityWithRate.getCreatedAt());
         this.setUpdatedAt(recipeEntityWithRate.getUpdatedAt());
+    }
+
+    public static RecipeEntity fromModel(Recipe recipe) {
+        RecipeEntity recipeEntity = new RecipeEntity();
+        recipeEntity.recipeId = recipe.getRecipeId();
+        recipeEntity.recipeNm = recipe.getRecipeNm();
+        recipeEntity.introduction = recipe.getIntroduction();
+        recipeEntity.cookingTime = recipe.getCookingTime();
+        recipeEntity.levelCd = recipe.getLevel().getName();
+        recipeEntity.imgUrl = recipe.getImgUrl();
+        recipeEntity.quantity = recipe.getQuantity();
+        recipeEntity.calorie = recipe.getCalorie();
+        recipeEntity.user = UserEntity.fromModel(recipe.getUser());
+        recipeEntity.hiddenYn = recipe.isHidden() ? "Y" : "N";
+        return recipeEntity;
     }
 
     public Recipe toModel() {
@@ -97,20 +112,5 @@ public class RecipeEntity extends BaseEntity {
                 .createdAt(getCreatedAt())
                 .updatedAt(getUpdatedAt())
                 .build();
-    }
-
-    public static RecipeEntity fromModel(Recipe recipe) {
-        RecipeEntity recipeEntity = new RecipeEntity();
-        recipeEntity.recipeId = recipe.getRecipeId();
-        recipeEntity.recipeNm = recipe.getRecipeNm();
-        recipeEntity.introduction = recipe.getIntroduction();
-        recipeEntity.cookingTime = recipe.getCookingTime();
-        recipeEntity.levelCd = recipe.getLevel().getName();
-        recipeEntity.imgUrl = recipe.getImgUrl();
-        recipeEntity.quantity = recipe.getQuantity();
-        recipeEntity.calorie = recipe.getCalorie();
-        recipeEntity.user = UserEntity.fromModel(recipe.getUser());
-        recipeEntity.hiddenYn = recipe.isHidden() ? "Y" : "N";
-        return recipeEntity;
     }
 }

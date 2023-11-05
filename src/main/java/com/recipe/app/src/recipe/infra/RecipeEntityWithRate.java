@@ -7,7 +7,7 @@ public interface RecipeEntityWithRate {
     String getRecipeNm();
     String getIntroduction();
     Long getCookingTime();
-    String getLevelNm();
+    String getLevelCd();
     String getImgUrl();
     Long getQuantity();
     Long getCalorie();
