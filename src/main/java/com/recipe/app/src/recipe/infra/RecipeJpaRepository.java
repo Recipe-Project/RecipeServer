@@ -37,6 +37,8 @@ public interface RecipeJpaRepository extends CrudRepository<RecipeEntity, Long> 
             countQuery="select count(*) from RecipeIngredient ri " +
             "inner join Ingredient i on ri.ingredientId = i.ingredientId\n" +
             "inner join Recipe r on ri.recipeId = r.recipeId\n" +
+            "left join RecipeScrap rs on rs.recipeId = r.recipeId and rs.userId = :userId " +
+            "left join RecipeView rv on rv.recipeId = r.recipeId and rv.userId = :userId " +
             "where (ri.ingredientId in :ingredientIds or i.ingredientName in :ingredientNames) and r.hiddenYn = 'N' " +
             "group by r.recipeId",
             nativeQuery = true)
