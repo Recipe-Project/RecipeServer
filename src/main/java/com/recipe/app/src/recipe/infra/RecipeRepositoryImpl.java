@@ -1,7 +1,6 @@
 package com.recipe.app.src.recipe.infra;
 
 import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.recipe.application.port.RecipeRepository;
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeIngredient;
