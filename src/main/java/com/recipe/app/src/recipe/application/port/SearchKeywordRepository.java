@@ -1,10 +1,11 @@
 package com.recipe.app.src.recipe.application.port;
 
-import com.recipe.app.src.user.domain.User;
+import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+@Repository
 public interface SearchKeywordRepository {
     void save(String keyword, User user);
 
