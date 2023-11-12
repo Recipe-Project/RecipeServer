@@ -21,11 +21,11 @@ public class SearchKeywordController {
 
     private final SearchKeywordService recipeKeywordService;
 
-    @ApiOperation(value = "인기 검색어 Top10 목록 조회 API")
+    @ApiOperation(value = "검색어 추천 목록 조회 API")
     @GetMapping("/best-keywords")
-    public BaseResponse<List<String>> getRecipeSearchTop10BestKeywords() {
+    public BaseResponse<List<String>> getRecipeBestKeywords() {
 
-        List<String> data = recipeKeywordService.retrieveRecipesDayBestKeyword();
+        List<String> data = recipeKeywordService.retrieveRecipesBestKeyword();
 
         return success(data);
     }
