@@ -56,7 +56,6 @@ public class YoutubeRecipeController {
         RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(youtubeRecipes.getTotalElements(), youtubeRecipes.stream()
                 .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
                 .collect(Collectors.toList()));
-        recipeKeywordService.createSearchKeyword(keyword, user);
 
         return success(data);
     }

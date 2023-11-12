@@ -57,7 +57,6 @@ public class BlogRecipeController {
         RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(blogRecipes.getTotalElements(), blogRecipes.stream()
                 .map(blogRecipe -> RecipeDto.RecipeResponse.from(blogRecipe, user))
                 .collect(Collectors.toList()));
-        recipeKeywordService.createSearchKeyword(keyword, user);
 
         return success(data);
     }
