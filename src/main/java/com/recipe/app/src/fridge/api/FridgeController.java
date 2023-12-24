@@ -79,17 +79,15 @@ public class FridgeController {
     @ApiOperation(value = "냉장고 삭제 API")
     @ResponseBody
     @DeleteMapping("/{fridgeId}")
-    public BaseResponse<FridgeDto.FridgesResponse> deleteFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId) {
+    public BaseResponse<Void> deleteFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        long fridgeBasketsCnt = fridgeBasketService.countFridgeBasketByUser(user);
-        List<Fridge> fridges = fridgeService.deleteFridge(user, fridgeId);
-        FridgeDto.FridgesResponse data = FridgeDto.FridgesResponse.from(fridgeBasketsCnt, fridges);
+        fridgeService.deleteFridge(user, fridgeId);
 
-        return success(data);
+        return success();
     }
 
     @ApiOperation(value = "냉장고 수정 API")

@@ -63,12 +63,10 @@ public class FridgeService {
     }
 
     @Transactional
-    public List<Fridge> deleteFridge(User user, Long fridgeId) {
+    public void deleteFridge(User user, Long fridgeId) {
 
         Fridge fridge = getFridge(user, fridgeId);
         fridgeRepository.delete(fridge);
-
-        return getFridges(user);
     }
 
     @Transactional
