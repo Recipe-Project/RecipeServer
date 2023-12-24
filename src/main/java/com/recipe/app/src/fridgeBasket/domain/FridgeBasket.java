@@ -5,7 +5,6 @@ import com.recipe.app.src.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Getter
@@ -14,14 +13,14 @@ public class FridgeBasket {
     private final Long fridgeBasketId;
     private final User user;
     private final Ingredient ingredient;
-    private final LocalDate expiredAt;
+    private final LocalDateTime expiredAt;
     private final float quantity;
     private final String unit;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
     @Builder
-    public FridgeBasket(Long fridgeBasketId, User user, Ingredient ingredient, LocalDate expiredAt, float quantity, String unit, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public FridgeBasket(Long fridgeBasketId, User user, Ingredient ingredient, LocalDateTime expiredAt, float quantity, String unit, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.fridgeBasketId = fridgeBasketId;
         this.user = user;
         this.ingredient = ingredient;
@@ -58,7 +57,7 @@ public class FridgeBasket {
                 .build();
     }
 
-    public FridgeBasket changeExpiredAtAndQuantityAndUnit(LocalDate expiredAt, float quantity, String unit) {
+    public FridgeBasket changeExpiredAtAndQuantityAndUnit(LocalDateTime expiredAt, float quantity, String unit) {
         LocalDateTime now = LocalDateTime.now();
         return FridgeBasket.builder()
                 .fridgeBasketId(fridgeBasketId)

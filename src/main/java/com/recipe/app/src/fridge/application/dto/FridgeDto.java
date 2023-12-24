@@ -6,7 +6,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -25,6 +28,10 @@ public class FridgeDto {
         private float quantity;
         @Schema(description = "단위")
         private String unit;
+
+        public LocalDateTime getExpiredAt() {
+            return this.expiredAt.atTime(LocalTime.MIN);
+        }
     }
 
     @Schema(description = "냉장고 목록 응답 DTO")
@@ -81,7 +88,7 @@ public class FridgeDto {
         @Schema(description = "재료 아이콘 url")
         private String ingredientIconUrl;
         @Schema(description = "유통기한")
-        private String expiredAt;
+        private ZonedDateTime expiredAt;
         @Schema(description = "수량")
         private float quantity;
         @Schema(description = "단위")
@@ -94,7 +101,7 @@ public class FridgeDto {
                     .fridgeId(fridge.getFridgeId())
                     .ingredientName(fridge.getIngredient().getIngredientName())
                     .ingredientIconUrl(fridge.getIngredient().getIngredientIconUrl())
-                    .expiredAt(fridge.getExpiredAt() != null ? fridge.getExpiredAt().format(DateTimeFormatter.ofPattern("yy.MM.dd 까지")) : null)
+                    .expiredAt(fridge.getExpiredAt() != null ? fridge.getExpiredAt().atZone(ZoneId.of("Asia/Seoul")) : null)
                     .quantity(fridge.getQuantity())
                     .unit(fridge.getUnit())
                     .freshness(fridge.getFreshness().getName())
