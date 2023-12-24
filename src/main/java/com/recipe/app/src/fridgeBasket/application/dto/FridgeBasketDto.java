@@ -6,7 +6,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -49,6 +50,10 @@ public class FridgeBasketDto {
         private float quantity;
         @Schema(description = "단위")
         private String unit;
+
+        public LocalDateTime getExpiredAt() {
+            return this.expiredAt.atTime(LocalTime.MIN);
+        }
     }
 
     @Schema(description = "냉장고 바구니 목록 응답 DTO")
@@ -105,7 +110,7 @@ public class FridgeBasketDto {
         @Schema(description = "냉장고 바구니 재료 아이콘 url")
         private String ingredientIconUrl;
         @Schema(description = "냉장고 바구니 재료 유통 기한")
-        private String expiredAt;
+        private LocalDateTime expiredAt;
         @Schema(description = "냉장고 바구니 재료 수량")
         private float quantity;
         @Schema(description = "냉장고 바구니 재료 단위")
@@ -116,7 +121,7 @@ public class FridgeBasketDto {
                     .fridgeBasketId(fridgeBasket.getFridgeBasketId())
                     .ingredientName(fridgeBasket.getIngredient().getIngredientName())
                     .ingredientIconUrl(fridgeBasket.getIngredient().getIngredientIconUrl())
-                    .expiredAt(fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().format(DateTimeFormatter.ofPattern("yy.MM.dd")) : null)
+                    .expiredAt(fridgeBasket.getExpiredAt())
                     .quantity(fridgeBasket.getQuantity())
                     .unit(fridgeBasket.getUnit())
                     .build();

@@ -10,7 +10,7 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
 @EqualsAndHashCode(callSuper = false)
@@ -32,7 +32,7 @@ public class FridgeEntity extends BaseEntity {
     private IngredientEntity ingredient;
 
     @Column(name = "expiredAt")
-    private LocalDate expiredAt;
+    private LocalDateTime expiredAt;
 
     @Column(name = "quantity", nullable = false)
     private float quantity;

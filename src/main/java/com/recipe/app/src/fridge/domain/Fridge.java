@@ -16,14 +16,14 @@ public class Fridge {
     private final Long fridgeId;
     private final User user;
     private final Ingredient ingredient;
-    private final LocalDate expiredAt;
+    private final LocalDateTime expiredAt;
     private final float quantity;
     private final String unit;
     private final LocalDateTime createdAt;
     private final LocalDateTime updatedAt;
 
     @Builder
-    public Fridge(Long fridgeId, User user, Ingredient ingredient, LocalDate expiredAt, float quantity, String unit, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public Fridge(Long fridgeId, User user, Ingredient ingredient, LocalDateTime expiredAt, float quantity, String unit, LocalDateTime createdAt, LocalDateTime updatedAt) {
         this.fridgeId = fridgeId;
         this.user = user;
         this.ingredient = ingredient;
@@ -61,7 +61,7 @@ public class Fridge {
         return Freshness.FRESH;
     }
 
-    public Fridge changeExpiredAtAndQuantityAndUnit(LocalDate expiredAt, float quantity, String unit) {
+    public Fridge changeExpiredAtAndQuantityAndUnit(LocalDateTime expiredAt, float quantity, String unit) {
         LocalDateTime now = LocalDateTime.now();
         return Fridge.builder()
                 .fridgeId(fridgeId)
