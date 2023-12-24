@@ -8,6 +8,8 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -86,7 +88,7 @@ public class FridgeDto {
         @Schema(description = "재료 아이콘 url")
         private String ingredientIconUrl;
         @Schema(description = "유통기한")
-        private LocalDateTime expiredAt;
+        private ZonedDateTime expiredAt;
         @Schema(description = "수량")
         private float quantity;
         @Schema(description = "단위")
@@ -99,7 +101,7 @@ public class FridgeDto {
                     .fridgeId(fridge.getFridgeId())
                     .ingredientName(fridge.getIngredient().getIngredientName())
                     .ingredientIconUrl(fridge.getIngredient().getIngredientIconUrl())
-                    .expiredAt(fridge.getExpiredAt())
+                    .expiredAt(fridge.getExpiredAt() != null ? fridge.getExpiredAt().atZone(ZoneId.of("Asia/Seoul")) : null)
                     .quantity(fridge.getQuantity())
                     .unit(fridge.getUnit())
                     .freshness(fridge.getFreshness().getName())

@@ -8,6 +8,8 @@ import lombok.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -110,7 +112,7 @@ public class FridgeBasketDto {
         @Schema(description = "냉장고 바구니 재료 아이콘 url")
         private String ingredientIconUrl;
         @Schema(description = "냉장고 바구니 재료 유통 기한")
-        private LocalDateTime expiredAt;
+        private ZonedDateTime expiredAt;
         @Schema(description = "냉장고 바구니 재료 수량")
         private float quantity;
         @Schema(description = "냉장고 바구니 재료 단위")
@@ -121,7 +123,7 @@ public class FridgeBasketDto {
                     .fridgeBasketId(fridgeBasket.getFridgeBasketId())
                     .ingredientName(fridgeBasket.getIngredient().getIngredientName())
                     .ingredientIconUrl(fridgeBasket.getIngredient().getIngredientIconUrl())
-                    .expiredAt(fridgeBasket.getExpiredAt())
+                    .expiredAt(fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().atZone(ZoneId.of("Asia/Seoul")) : null)
                     .quantity(fridgeBasket.getQuantity())
                     .unit(fridgeBasket.getUnit())
                     .build();
