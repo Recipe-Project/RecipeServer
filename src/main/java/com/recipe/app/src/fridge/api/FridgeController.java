@@ -93,7 +93,7 @@ public class FridgeController {
     @ApiOperation(value = "냉장고 수정 API")
     @ResponseBody
     @PatchMapping("/{fridgeId}")
-    public BaseResponse<FridgeDto.FridgesResponse> patchFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId,
+    public BaseResponse<Void> patchFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId,
                                                                @ApiParam(value = "냉장고 수정 입력 정보", required = true)
                                                                @RequestBody FridgeDto.FridgeRequest request) {
 
@@ -101,11 +101,9 @@ public class FridgeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        long fridgeBasketsCnt = fridgeBasketService.countFridgeBasketByUser(user);
-        List<Fridge> fridges = fridgeService.updateFridge(user, fridgeId, request);
-        FridgeDto.FridgesResponse data = FridgeDto.FridgesResponse.from(fridgeBasketsCnt, fridges);
+        fridgeService.updateFridge(user, fridgeId, request);
 
-        return success(data);
+        return success();
     }
 
     /*
