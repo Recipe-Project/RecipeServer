@@ -1,6 +1,6 @@
 ## Issue Number
 
-이슈 번호 작성
+이슈 번호 작성 (#번호 링크)
 
 ## Summary
 
