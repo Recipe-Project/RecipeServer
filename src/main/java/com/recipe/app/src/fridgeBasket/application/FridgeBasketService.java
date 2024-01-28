@@ -67,11 +67,10 @@ public class FridgeBasketService {
     }
 
     @Transactional
-    public List<FridgeBasket> deleteFridgeBasket(User user, Long fridgeBasketId) {
+    public void deleteFridgeBasket(User user, Long fridgeBasketId) {
+
         FridgeBasket fridgeBasket = fridgeBasketRepository.findByUserAndFridgeBasketId(user, fridgeBasketId).orElseThrow(NotFoundFridgeBasketException::new);
         fridgeBasketRepository.delete(fridgeBasket);
-
-        return getFridgeBasketsByUser(user);
     }
 
     @Transactional
