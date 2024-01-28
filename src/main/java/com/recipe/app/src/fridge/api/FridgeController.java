@@ -32,17 +32,15 @@ public class FridgeController {
     @ApiOperation(value = "냉장고 채우기 API")
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<FridgeDto.FridgesResponse> postFridges(@ApiIgnore final Authentication authentication) {
+    public BaseResponse<Void> postFridges(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        long fridgeBasketsCnt = fridgeBasketService.countFridgeBasketByUser(user);
-        List<Fridge> fridges = fridgeService.createFridges(user);
-        FridgeDto.FridgesResponse data = FridgeDto.FridgesResponse.from(fridgeBasketsCnt, fridges);
+        fridgeService.createFridges(user);
 
-        return success(data);
+        return success();
     }
 
     @ApiOperation(value = "냉장고 목록 조회 API")
