@@ -117,6 +117,8 @@ public class FridgeBasketDto {
         private float quantity;
         @Schema(description = "냉장고 바구니 재료 단위")
         private String unit;
+        @Schema(description = "냉장고 바구니 신선도")
+        private String freshness;
 
         public static FridgeBasketResponse from(FridgeBasket fridgeBasket) {
             return FridgeBasketResponse.builder()
@@ -126,6 +128,7 @@ public class FridgeBasketDto {
                     .expiredAt(fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().atZone(ZoneId.of("Asia/Seoul")) : null)
                     .quantity(fridgeBasket.getQuantity())
                     .unit(fridgeBasket.getUnit())
+                    .freshness(fridgeBasket.getFreshness().getName())
                     .build();
         }
     }
