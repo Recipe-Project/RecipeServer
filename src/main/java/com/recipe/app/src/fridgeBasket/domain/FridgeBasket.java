@@ -1,11 +1,14 @@
 package com.recipe.app.src.fridgeBasket.domain;
 
+import com.recipe.app.src.fridge.domain.Freshness;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 
 @Getter
 public class FridgeBasket {
@@ -69,5 +72,19 @@ public class FridgeBasket {
                 .createdAt(getCreatedAt())
                 .updatedAt(now)
                 .build();
+    }
+
+    public Freshness getFreshness() {
+        if (this.expiredAt == null) {
+            return Freshness.FRESH;
+        }
+        long diffDay = ChronoUnit.DAYS.between(LocalDate.now(), expiredAt);
+        if (diffDay <= 0) {
+            return Freshness.DISPOSAL;
+        }
+        if (diffDay < 7) {
+            return Freshness.DANGER;
+        }
+        return Freshness.FRESH;
     }
 }
