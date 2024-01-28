@@ -25,7 +25,7 @@ public class FridgeBasketService {
     private final IngredientService ingredientService;
 
     @Transactional
-    public List<FridgeBasket> createFridgeBasketByIngredientId(User user, FridgeBasketDto.FridgeBasketIngredientIdsRequest request) {
+    public void createFridgeBasketByIngredientId(User user, FridgeBasketDto.FridgeBasketIngredientIdsRequest request) {
         List<Ingredient> ingredients = ingredientService.getIngredientsByIngredientIds(request.getIngredientIds());
         List<FridgeBasket> existFridgeBaskets = getFridgeBasketsByUser(user);
         Map<Ingredient, FridgeBasket> existIngredients = existFridgeBaskets.stream().collect(Collectors.toMap(FridgeBasket::getIngredient, v -> v));
@@ -42,12 +42,10 @@ public class FridgeBasketService {
                 .collect(Collectors.toList());
 
         fridgeBasketRepository.saveAll(fridgeBaskets);
-
-        return getFridgeBasketsByUser(user);
     }
 
     @Transactional
-    public List<FridgeBasket> createFridgeBasketWithIngredientSave(User user, FridgeBasketDto.FridgeBasketIngredientRequest request) {
+    public void createFridgeBasketWithIngredientSave(User user, FridgeBasketDto.FridgeBasketIngredientRequest request) {
 
         IngredientCategory ingredientCategory = ingredientService.getIngredientCategoryByIngredientCategoryId(request.getIngredientCategoryId());
         Ingredient ingredient = ingredientService.getIngredientByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategory(
@@ -62,16 +60,13 @@ public class FridgeBasketService {
                 .orElseGet(() -> FridgeBasket.from(user, ingredient));
 
         fridgeBasketRepository.save(fridgeBasket);
-
-        return getFridgeBasketsByUser(user);
     }
 
     @Transactional
-    public List<FridgeBasket> deleteFridgeBasket(User user, Long fridgeBasketId) {
+    public void deleteFridgeBasket(User user, Long fridgeBasketId) {
+
         FridgeBasket fridgeBasket = fridgeBasketRepository.findByUserAndFridgeBasketId(user, fridgeBasketId).orElseThrow(NotFoundFridgeBasketException::new);
         fridgeBasketRepository.delete(fridgeBasket);
-
-        return getFridgeBasketsByUser(user);
     }
 
     @Transactional

@@ -28,7 +28,7 @@ public class FridgeService {
     private final FridgeBasketService fridgeBasketService;
 
     @Transactional
-    public List<Fridge> createFridges(User user) {
+    public void createFridges(User user) {
 
         List<FridgeBasket> fridgeBaskets = fridgeBasketService.getFridgeBasketsByUser(user);
         List<Fridge> existFridges = getFridges(user);
@@ -54,8 +54,6 @@ public class FridgeService {
 
         fridgeRepository.saveAll(fridges);
         fridgeBasketService.deleteFridgeBaskets(fridgeBaskets);
-
-        return getFridges(user);
     }
 
     public List<Fridge> getFridges(User user) {

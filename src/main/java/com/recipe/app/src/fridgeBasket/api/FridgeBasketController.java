@@ -4,7 +4,6 @@ import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketDto;
-import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
@@ -32,36 +31,33 @@ public class FridgeBasketController {
     @ApiOperation(value = "재료 선택하여 냉장고 바구니 채우기 API")
     @ResponseBody
     @PostMapping("")
-    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> postFridgeBasketByIngredientId(@ApiIgnore final Authentication authentication,
-                                                                                              @ApiParam(value = "재료 선택 목록", required = true)
-                                                                                              @RequestBody FridgeBasketDto.FridgeBasketIngredientIdsRequest request) {
+    public BaseResponse<Void> postFridgeBasketByIngredientId(@ApiIgnore final Authentication authentication,
+                                                             @ApiParam(value = "재료 선택 목록", required = true) @RequestBody FridgeBasketDto.FridgeBasketIngredientIdsRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        List<FridgeBasket> fridgeBaskets = fridgeBasketService.createFridgeBasketByIngredientId(user, request);
-        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBaskets);
+        fridgeBasketService.createFridgeBasketByIngredientId(user, request);
 
-        return success(data);
+        return success();
     }
 
     @ApiOperation(value = "재료 직접 입력하여 냉장고 바구니 채우기 API")
     @ResponseBody
     @PostMapping("/direct")
-    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> postFridgeBasketWithIngredientSave(@ApiIgnore final Authentication authentication,
-                                                                                                  @ApiParam(value = "재료 직접 입력 정보", required = true)
-                                                                                                  @RequestBody FridgeBasketDto.FridgeBasketIngredientRequest request) {
+    public BaseResponse<Void> postFridgeBasketWithIngredientSave(@ApiIgnore final Authentication authentication,
+                                                                 @ApiParam(value = "재료 직접 입력 정보", required = true)
+                                                                 @RequestBody FridgeBasketDto.FridgeBasketIngredientRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         badWordService.checkBadWords(request.getIngredientName());
-        List<FridgeBasket> fridgeBaskets = fridgeBasketService.createFridgeBasketWithIngredientSave(user, request);
-        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBaskets);
+        fridgeBasketService.createFridgeBasketWithIngredientSave(user, request);
 
-        return success(data);
+        return success();
     }
 
     @ApiOperation(value = "냉장고 바구니 조회 API")
@@ -81,15 +77,15 @@ public class FridgeBasketController {
     @ApiOperation(value = "냉장고 바구니 삭제 API")
     @ResponseBody
     @DeleteMapping("/{fridgeBasketId}")
-    public BaseResponse<FridgeBasketDto.FridgeBasketsResponse> deleteFridgeBasket(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeBasketId) {
+    public BaseResponse<Void> deleteFridgeBasket(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeBasketId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        FridgeBasketDto.FridgeBasketsResponse data = FridgeBasketDto.FridgeBasketsResponse.from(fridgeBasketService.deleteFridgeBasket(user, fridgeBasketId));
+        fridgeBasketService.deleteFridgeBasket(user, fridgeBasketId);
 
-        return success(data);
+        return success();
     }
 
     @ApiOperation(value = "냉장고 바구니 수정 API")
