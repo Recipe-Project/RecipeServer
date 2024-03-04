@@ -9,13 +9,16 @@ import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.HashMap;
@@ -28,6 +31,10 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtBlacklistRepository jwtBlacklistRepository;
+    @Value("${kakao.client-id}")
+    private String clientId;
+    @Value("${kakao.redirect-uri}")
+    private String redirectURI;
 
     @Transactional
     public User autoLogin(User user) {
@@ -89,6 +96,56 @@ public class UserService {
                 userRepository.save(User.from(socialId, profileImgUrl, nickname, email, phoneNumber, fcmToken)));
     }
 
+    @Transactional(readOnly = true)
+    public String getKakaoAccessToken(String code) throws IOException, ParseException {
+
+        String apiURL = "https://kauth.kakao.com/oauth/token";
+
+        URL url = new URL(apiURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setRequestMethod("POST");
+        con.setDoOutput(true);
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+        StringBuilder sb = new StringBuilder();
+        sb.append("grant_type=authorization_code");
+        sb.append("&client_id=" + clientId);
+        sb.append("&redirect_uri=" + redirectURI);
+        sb.append("&code=" + code);
+
+        bw.write(sb.toString());
+        bw.flush();
+        bw.close();
+
+        int responseCode = con.getResponseCode();
+        InputStreamReader streamReader;
+        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+            streamReader = new InputStreamReader(con.getInputStream());
+        } else { // 에러 발생
+            streamReader = new InputStreamReader(con.getErrorStream());
+        }
+
+        BufferedReader lineReader = new BufferedReader(streamReader);
+        StringBuilder responseBody = new StringBuilder();
+
+        String line;
+        while ((line = lineReader.readLine()) != null) {
+            responseBody.append(line);
+        }
+
+        String body = responseBody.toString();
+
+        con.disconnect();
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        System.out.println(jsonObject.toJSONString());
+        String accessToken = jsonObject.get("access_token").toString();
+        return accessToken;
+    }
+
     @Transactional
     public User kakaoLogin(String accessToken, String fcmToken) throws IOException, ParseException {
 
@@ -128,6 +185,7 @@ public class UserService {
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        System.out.println(jsonObject.toJSONString());
         String socialId = "kakao_" + jsonObject.get("id").toString();
         String response = jsonObject.get("kakao_account").toString();
 
