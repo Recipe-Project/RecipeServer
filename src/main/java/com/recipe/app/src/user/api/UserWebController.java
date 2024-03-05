@@ -22,6 +22,10 @@ public class UserWebController {
     private String kakaoClientId;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectURI;
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.redirect-uri}")
+    private String naverRedirectURI;
 
     public UserWebController(UserService userService, JwtService jwtService) {
         this.userService = userService;
@@ -33,6 +37,8 @@ public class UserWebController {
 
         model.addAttribute("kakaoClientId", kakaoClientId);
         model.addAttribute("kakaoRedirectURI", kakaoRedirectURI);
+        model.addAttribute("naverClientId", naverClientId);
+        model.addAttribute("naverRedirectURI", naverRedirectURI);
 
         return "/user-login";
     }
@@ -49,6 +55,18 @@ public class UserWebController {
         String accessToken = userService.getKakaoAccessToken(code);
 
         User user = userService.kakaoLogin(accessToken, null);
+
+        model.addAttribute("jwtToken", jwtService.createJwt(user.getUserId()));
+
+        return "/user-withdrawal";
+    }
+
+    @GetMapping("/auth/naver/callback")
+    public String naverLogin(String code, String state, Model model) throws IOException, ParseException {
+
+        String accessToken = userService.getNaverAccessToken(code, state);
+
+        User user = userService.naverLogin(accessToken, null);
 
         model.addAttribute("jwtToken", jwtService.createJwt(user.getUserId()));
 

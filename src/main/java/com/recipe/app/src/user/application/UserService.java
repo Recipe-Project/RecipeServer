@@ -32,14 +32,62 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtBlacklistRepository jwtBlacklistRepository;
     @Value("${kakao.client-id}")
-    private String clientId;
+    private String kakaoClientId;
     @Value("${kakao.redirect-uri}")
-    private String redirectURI;
+    private String kakaoRedirectURI;
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.client-secret}")
+    private String naverClientSecret;
+    @Value("${kakao.redirect-uri}")
+    private String naverRedirectURI;
 
     @Transactional
     public User autoLogin(User user) {
         user = user.changeRecentLoginAt();
         return userRepository.save(user);
+    }
+
+    @Transactional(readOnly = true)
+    public String getNaverAccessToken(String code, String state) throws IOException, ParseException {
+
+        String apiURL = "https://nid.naver.com/oauth2.0/token" +
+                "?grant_type=authorization_code" +
+                "&client_id=" + naverClientId +
+                "&client_secret=" + naverClientSecret +
+                "&redirect_uri=" + naverRedirectURI +
+                "&code=" + code +
+                "&state=" + state;
+
+        URL url = new URL(apiURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setRequestMethod("GET");
+
+        int responseCode = con.getResponseCode();
+        InputStreamReader streamReader;
+        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+            streamReader = new InputStreamReader(con.getInputStream());
+        } else { // 에러 발생
+            streamReader = new InputStreamReader(con.getErrorStream());
+        }
+
+        BufferedReader lineReader = new BufferedReader(streamReader);
+        StringBuilder responseBody = new StringBuilder();
+
+        String line;
+        while ((line = lineReader.readLine()) != null) {
+            responseBody.append(line);
+        }
+
+        String body = responseBody.toString();
+        System.out.println(body);
+        con.disconnect();
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        String accessToken = jsonObject.get("access_token").toString();
+        return accessToken;
     }
 
     @Transactional
@@ -111,8 +159,8 @@ public class UserService {
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
         StringBuilder sb = new StringBuilder();
         sb.append("grant_type=authorization_code");
-        sb.append("&client_id=" + clientId);
-        sb.append("&redirect_uri=" + redirectURI);
+        sb.append("&client_id=" + kakaoClientId);
+        sb.append("&redirect_uri=" + kakaoRedirectURI);
         sb.append("&code=" + code);
 
         bw.write(sb.toString());
@@ -141,7 +189,6 @@ public class UserService {
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-        System.out.println(jsonObject.toJSONString());
         String accessToken = jsonObject.get("access_token").toString();
         return accessToken;
     }
