@@ -41,6 +41,12 @@ public class UserService {
     private String naverClientSecret;
     @Value("${kakao.redirect-uri}")
     private String naverRedirectURI;
+    @Value("${google.client-id}")
+    private String googleClientId;
+    @Value("${google.client-secret}")
+    private String googleClientSecret;
+    @Value("${google.redirect-uri}")
+    private String googleRedirectURI;
 
     @Transactional
     public User autoLogin(User user) {
@@ -81,7 +87,7 @@ public class UserService {
         }
 
         String body = responseBody.toString();
-        System.out.println(body);
+
         con.disconnect();
 
         JSONParser jsonParser = new JSONParser();
@@ -232,7 +238,7 @@ public class UserService {
 
         JSONParser jsonParser = new JSONParser();
         JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-        System.out.println(jsonObject.toJSONString());
+
         String socialId = "kakao_" + jsonObject.get("id").toString();
         String response = jsonObject.get("kakao_account").toString();
 
@@ -247,6 +253,57 @@ public class UserService {
 
         return userRepository.findBySocialId(socialId).orElseGet(() ->
                 userRepository.save(User.from(socialId, profileImgUrl, nickname, email, phoneNumber, fcmToken)));
+    }
+
+    @Transactional(readOnly = true)
+    public String getGoogleIdToken(String code) throws IOException, ParseException {
+
+        String apiURL = "https://oauth2.googleapis.com/token";
+
+        URL url = new URL(apiURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setRequestMethod("POST");
+        con.setDoOutput(true);
+
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+        StringBuilder sb = new StringBuilder();
+        sb.append("grant_type=authorization_code");
+        sb.append("&client_id=" + googleClientId);
+        sb.append("&client_secret=" + googleClientSecret);
+        sb.append("&redirect_uri=" + googleRedirectURI);
+        sb.append("&code=" + code);
+
+        bw.write(sb.toString());
+        bw.flush();
+        bw.close();
+
+        int responseCode = con.getResponseCode();
+        InputStreamReader streamReader;
+        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+            streamReader = new InputStreamReader(con.getInputStream());
+        } else { // 에러 발생
+            streamReader = new InputStreamReader(con.getErrorStream());
+        }
+
+        BufferedReader lineReader = new BufferedReader(streamReader);
+        StringBuilder responseBody = new StringBuilder();
+
+        String line;
+        while ((line = lineReader.readLine()) != null) {
+            responseBody.append(line);
+        }
+
+        String body = responseBody.toString();
+
+        System.out.println(body);
+
+        con.disconnect();
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        String idToken = jsonObject.get("id_token").toString();
+        return idToken;
     }
 
     @Transactional

@@ -44,7 +44,7 @@ public class YoutubeRecipeService {
 
     private final YoutubeRecipeRepository youtubeRecipeRepository;
 
-    @Value("${youtube.api-key}")
+    @Value("${google.api-key}")
     private String youtubeApiKey;
 
     public Page<YoutubeRecipe> getYoutubeRecipes(String keyword, int page, int size, String sort) {
