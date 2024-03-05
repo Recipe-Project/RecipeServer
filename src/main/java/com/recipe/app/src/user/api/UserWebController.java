@@ -21,9 +21,9 @@ public class UserWebController {
     private final UserService userService;
     private final JwtService jwtService;
     @Value("${kakao.client-id}")
-    private String clientId;
+    private String kakaoClientId;
     @Value("${kakao.redirect-uri}")
-    private String redirectURI;
+    private String kakaoRedirectURI;
 
     public UserWebController(UserService userService, JwtService jwtService) {
         this.userService = userService;
@@ -33,8 +33,8 @@ public class UserWebController {
     @GetMapping("/social-login")
     public String login(Model model) {
 
-        model.addAttribute("clientId", clientId);
-        model.addAttribute("redirectURI", redirectURI);
+        model.addAttribute("kakaoClientId", kakaoClientId);
+        model.addAttribute("kakaoRedirectURI", kakaoRedirectURI);
 
         return "/user-login";
     }
