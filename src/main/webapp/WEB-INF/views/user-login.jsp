@@ -18,12 +18,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <link href="../../static/css/style.css" rel="stylesheet" type="text/css">
+    <link href="/static/css/style.css" rel="stylesheet" type="text/css">
     <title>로그인</title>
 </head>
 <body>
-<div class="login">
-    <img src="../../static/img/title.png" alt="메인" width="290" height="240"/>
+<div class="content">
+    <img src="/static/img/title.png" alt="메인" width="290" height="240"/>
     <p>
         <a href="https://kauth.kakao.com/oauth/authorize?client_id=<%=kakaoClientId%>&redirect_uri=<%=kakaoRedirectURI%>&response_type=code">
             <img src="https://k.kakaocdn.net/14/dn/btroDszwNrM/I6efHub1SN5KCJqLm1Ovx1/o.jpg" width="200" height="50"
