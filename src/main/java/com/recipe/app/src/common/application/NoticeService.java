@@ -2,7 +2,7 @@ package com.recipe.app.src.common.application;
 
 import com.recipe.app.src.common.domain.Notice;
 import com.recipe.app.src.common.exception.NotFoundNoticeException;
-import com.recipe.app.src.common.mapper.NoticeRepository;
+import com.recipe.app.src.common.infra.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

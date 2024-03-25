@@ -1,4 +1,4 @@
-package com.recipe.app.src.common.mapper;
+package com.recipe.app.src.common.infra;
 
 import com.recipe.app.src.common.domain.Dialog;
 import org.springframework.data.repository.CrudRepository;
