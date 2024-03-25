@@ -33,7 +33,7 @@ public class SecurityUser implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.user.getNickname();
+        return this.user.getUserId().toString();
     }
 
     @Override

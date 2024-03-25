@@ -3,7 +3,6 @@ package com.recipe.app.src.user.application;
 import com.recipe.app.src.user.application.port.UserRepository;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.exception.NotFoundUserException;
-import com.recipe.app.src.user.infra.UserJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;

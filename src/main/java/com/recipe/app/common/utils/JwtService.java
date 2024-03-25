@@ -56,8 +56,9 @@ public class JwtService {
     }
 
     public int getUserId(String token) {
-        return Jwts.parser()
+        return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .get("userId", Integer.class);
