@@ -3,7 +3,7 @@ package com.recipe.app.src.fridge.infra;
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.ingredient.infra.IngredientEntity;
-import com.recipe.app.src.user.infra.UserEntity;
+import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -25,7 +25,7 @@ public class FridgeEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
-    private UserEntity user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredientId", nullable = false)
@@ -43,7 +43,7 @@ public class FridgeEntity extends BaseEntity {
     public static FridgeEntity fromModel(Fridge fridge) {
         FridgeEntity fridgeEntity = new FridgeEntity();
         fridgeEntity.fridgeId = fridge.getFridgeId();
-        fridgeEntity.user = UserEntity.fromModel(fridge.getUser());
+        fridgeEntity.user = User.fromModel(fridge.getUser());
         fridgeEntity.ingredient = IngredientEntity.fromModel(fridge.getIngredient());
         fridgeEntity.expiredAt = fridge.getExpiredAt();
         fridgeEntity.quantity = fridge.getQuantity();

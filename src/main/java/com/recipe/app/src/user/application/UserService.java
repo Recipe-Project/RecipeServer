@@ -1,11 +1,11 @@
 package com.recipe.app.src.user.application;
 
 import com.recipe.app.src.user.application.dto.UserDto;
-import com.recipe.app.src.user.application.port.JwtBlacklistRepository;
-import com.recipe.app.src.user.application.port.UserRepository;
+import com.recipe.app.src.user.domain.JwtBlacklist;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
-import lombok.RequiredArgsConstructor;
+import com.recipe.app.src.user.infra.JwtBlacklistRepository;
+import com.recipe.app.src.user.infra.UserRepository;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -21,16 +21,14 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class UserService {
 
-    private final UserRepository userRepository;
-    private final JwtBlacklistRepository jwtBlacklistRepository;
     @Value("${kakao.client-id}")
     private String kakaoClientId;
     @Value("${kakao.redirect-uri}")
@@ -48,9 +46,17 @@ public class UserService {
     @Value("${google.redirect-uri}")
     private String googleRedirectURI;
 
+    private final UserRepository userRepository;
+    private final JwtBlacklistRepository jwtBlacklistRepository;
+
+    public UserService(UserRepository userRepository, JwtBlacklistRepository jwtBlacklistRepository) {
+        this.userRepository = userRepository;
+        this.jwtBlacklistRepository = jwtBlacklistRepository;
+    }
+
     @Transactional
     public User autoLogin(User user) {
-        user = user.changeRecentLoginAt();
+        user.changeRecentLoginAt(LocalDateTime.now());
         return userRepository.save(user);
     }
 
@@ -145,9 +151,15 @@ public class UserService {
         String nickname = responObj.get("name").toString();
         String email = responObj.get("email") != null ? responObj.get("email").toString() : null;
         String phoneNumber = responObj.get("mobile") != null ? responObj.get("mobile").toString() : null;
-
         return userRepository.findBySocialId(socialId).orElseGet(() ->
-                userRepository.save(User.from(socialId, profileImgUrl, nickname, email, phoneNumber, fcmToken)));
+                userRepository.save(User.builder()
+                        .socialId(socialId)
+                        .profileImgUrl(profileImgUrl)
+                        .nickname(nickname)
+                        .email(email)
+                        .phoneNumber(phoneNumber)
+                        .deviceToken(fcmToken)
+                        .build()));
     }
 
     @Transactional(readOnly = true)
@@ -252,7 +264,14 @@ public class UserService {
         String nickname = profileObj.get("nickname").toString();
 
         return userRepository.findBySocialId(socialId).orElseGet(() ->
-                userRepository.save(User.from(socialId, profileImgUrl, nickname, email, phoneNumber, fcmToken)));
+                userRepository.save(User.builder()
+                        .socialId(socialId)
+                        .profileImgUrl(profileImgUrl)
+                        .nickname(nickname)
+                        .email(email)
+                        .phoneNumber(phoneNumber)
+                        .deviceToken(fcmToken)
+                        .build()));
     }
 
     @Transactional(readOnly = true)
@@ -328,12 +347,19 @@ public class UserService {
         String phoneNumber = null;
 
         return userRepository.findBySocialId(socialId).orElseGet(() ->
-                userRepository.save(User.from(socialId, profileImgUrl, nickname, email, phoneNumber, fcmToken)));
+                userRepository.save(User.builder()
+                        .socialId(socialId)
+                        .profileImgUrl(profileImgUrl)
+                        .nickname(nickname)
+                        .email(email)
+                        .phoneNumber(phoneNumber)
+                        .deviceToken(fcmToken)
+                        .build()));
     }
 
     @Transactional
     public User updateUser(User user, UserDto.UserProfileRequest request) {
-        user = user.changeProfile(request.getProfileImgUrl(), request.getNickname());
+        user.changeProfile(request.getProfileImgUrl(), request.getNickname());
         return userRepository.save(user);
     }
 
@@ -345,12 +371,12 @@ public class UserService {
 
     @Transactional
     public void registerJwtBlackList(String jwt) {
-        jwtBlacklistRepository.save(jwt);
+        jwtBlacklistRepository.save(new JwtBlacklist(jwt));
     }
 
     @Transactional
     public void updateFcmToken(UserDto.UserDeviceTokenRequest request, User user) {
-        user = user.changeDeviceToken(request.getFcmToken());
+        user.changeDeviceToken(request.getFcmToken());
         userRepository.save(user);
     }
 }

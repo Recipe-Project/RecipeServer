@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.infra;
 
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +27,7 @@ public class RecipeScrapEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private UserEntity user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "recipeId")
@@ -40,7 +39,7 @@ public class RecipeScrapEntity {
 
     public static RecipeScrapEntity create(User user, Recipe recipe) {
         RecipeScrapEntity recipeScrapEntity = new RecipeScrapEntity();
-        recipeScrapEntity.user = UserEntity.fromModel(user);
+        recipeScrapEntity.user = User.fromModel(user);
         recipeScrapEntity.recipe = RecipeEntity.fromModel(recipe);
         return recipeScrapEntity;
     }

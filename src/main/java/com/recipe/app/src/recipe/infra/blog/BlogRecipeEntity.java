@@ -2,7 +2,7 @@ package com.recipe.app.src.recipe.infra.blog;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipe.domain.BlogRecipe;
-import com.recipe.app.src.user.infra.UserEntity;
+import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -61,11 +61,9 @@ public class BlogRecipeEntity extends BaseEntity {
                 .blogName(blogName)
                 .scrapUsers(blogScraps.stream()
                         .map(BlogScrapEntity::getUser)
-                        .map(UserEntity::toModel)
                         .collect(Collectors.toList()))
                 .viewUsers(blogViews.stream()
                         .map(BlogViewEntity::getUser)
-                        .map(UserEntity::toModel)
                         .collect(Collectors.toList()))
                 .build();
     }

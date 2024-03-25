@@ -3,7 +3,6 @@ package com.recipe.app.src.recipe.infra.blog;
 import com.recipe.app.src.recipe.application.port.BlogRecipeRepository;
 import com.recipe.app.src.recipe.domain.BlogRecipe;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -43,25 +42,25 @@ public class BlogRecipeRepositoryImpl implements BlogRecipeRepository {
 
     @Override
     public void saveBlogRecipeView(BlogRecipe blogRecipe, User user) {
-        blogViewJpaRepository.findByUserAndBlogRecipe(UserEntity.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
+        blogViewJpaRepository.findByUserAndBlogRecipe(User.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
                 .orElseGet(() -> blogViewJpaRepository.save(BlogViewEntity.create(user, blogRecipe)));
     }
 
     @Override
     public void saveBlogRecipeScrap(BlogRecipe blogRecipe, User user) {
-        blogScrapJpaRepository.findByUserAndBlogRecipe(UserEntity.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
+        blogScrapJpaRepository.findByUserAndBlogRecipe(User.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
                 .orElseGet(() -> blogScrapJpaRepository.save(BlogScrapEntity.createBlogScrap(user, blogRecipe)));
     }
 
     @Override
     public void deleteBlogRecipeScrap(BlogRecipe blogRecipe, User user) {
-        blogScrapJpaRepository.findByUserAndBlogRecipe(UserEntity.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
+        blogScrapJpaRepository.findByUserAndBlogRecipe(User.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
                 .ifPresent(blogScrapJpaRepository::delete);
     }
 
     @Override
     public Page<BlogRecipe> findBlogRecipesByUser(User user, Pageable pageable) {
-        return blogScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
+        return blogScrapJpaRepository.findByUser(User.fromModel(user), pageable)
                 .map(BlogScrapEntity::getBlogRecipe)
                 .map(BlogRecipeEntity::toModel);
     }
@@ -77,7 +76,7 @@ public class BlogRecipeRepositoryImpl implements BlogRecipeRepository {
 
     @Override
     public long countBlogScrapByUser(User user) {
-        return blogScrapJpaRepository.countByUser(UserEntity.fromModel(user));
+        return blogScrapJpaRepository.countByUser(User.fromModel(user));
     }
 
     @Override

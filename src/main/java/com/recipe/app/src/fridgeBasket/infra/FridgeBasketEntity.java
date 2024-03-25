@@ -3,14 +3,13 @@ package com.recipe.app.src.fridgeBasket.infra;
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.ingredient.infra.IngredientEntity;
-import com.recipe.app.src.user.infra.UserEntity;
+import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @NoArgsConstructor(access = AccessLevel.PUBLIC)
@@ -27,7 +26,7 @@ public class FridgeBasketEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId", nullable = false)
-    private UserEntity user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredientId", nullable = false)
@@ -45,7 +44,7 @@ public class FridgeBasketEntity extends BaseEntity {
     public static FridgeBasketEntity fromModel(FridgeBasket fridgeBasket) {
         FridgeBasketEntity fridgeBasketEntity = new FridgeBasketEntity();
         fridgeBasketEntity.fridgeBasketId = fridgeBasket.getFridgeBasketId();
-        fridgeBasketEntity.user = UserEntity.fromModel(fridgeBasket.getUser());
+        fridgeBasketEntity.user = User.fromModel(fridgeBasket.getUser());
         fridgeBasketEntity.ingredient = IngredientEntity.fromModel(fridgeBasket.getIngredient());
         fridgeBasketEntity.expiredAt = fridgeBasket.getExpiredAt();
         fridgeBasketEntity.quantity = fridgeBasket.getQuantity();

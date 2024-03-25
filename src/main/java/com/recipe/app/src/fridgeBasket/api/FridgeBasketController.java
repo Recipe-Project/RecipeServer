@@ -15,8 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.List;
-
 import static com.recipe.app.common.response.BaseResponse.success;
 
 @Api(tags = {"냉장고 바구니 Controller"})

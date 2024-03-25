@@ -3,7 +3,6 @@ package com.recipe.app.src.fridge.infra;
 import com.recipe.app.src.fridge.application.port.FridgeRepository;
 import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -20,7 +19,7 @@ public class FridgeRepositoryImpl implements FridgeRepository {
 
     @Override
     public List<Fridge> findByUser(User user) {
-        return fridgeJpaRepository.findByUser(UserEntity.fromModel(user)).stream().map(FridgeEntity::toModel).collect(Collectors.toList());
+        return fridgeJpaRepository.findByUser(User.fromModel(user)).stream().map(FridgeEntity::toModel).collect(Collectors.toList());
     }
 
     @Override
@@ -32,7 +31,7 @@ public class FridgeRepositoryImpl implements FridgeRepository {
 
     @Override
     public Optional<Fridge> findByUserAndFridgeId(User user, Long fridgeId) {
-        return fridgeJpaRepository.findByUserAndFridgeId(UserEntity.fromModel(user), fridgeId).map(FridgeEntity::toModel);
+        return fridgeJpaRepository.findByUserAndFridgeId(User.fromModel(user), fridgeId).map(FridgeEntity::toModel);
     }
 
     @Override

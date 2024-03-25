@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.infra.youtube;
 
 import com.recipe.app.src.recipe.domain.YoutubeRecipe;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +27,7 @@ public class YoutubeViewEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private UserEntity user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "youtubeRecipeId")
@@ -40,7 +39,7 @@ public class YoutubeViewEntity {
 
     public static YoutubeViewEntity create(User user, YoutubeRecipe youtubeRecipe) {
         YoutubeViewEntity youtubeViewEntity = new YoutubeViewEntity();
-        youtubeViewEntity.user = UserEntity.fromModel(user);
+        youtubeViewEntity.user = User.fromModel(user);
         youtubeViewEntity.youtubeRecipe = YoutubeRecipeEntity.fromModel(youtubeRecipe);
         return youtubeViewEntity;
     }

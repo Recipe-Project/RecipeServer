@@ -3,7 +3,6 @@ package com.recipe.app.src.recipe.infra.youtube;
 import com.recipe.app.src.recipe.application.port.YoutubeRecipeRepository;
 import com.recipe.app.src.recipe.domain.YoutubeRecipe;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -45,26 +44,26 @@ public class YoutubeRecipeRepositoryImpl implements YoutubeRecipeRepository {
 
     @Override
     public void saveYoutubeRecipeView(YoutubeRecipe youtubeRecipe, User user) {
-        youtubeViewJpaRepository.findByUserAndYoutubeRecipe(UserEntity.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
+        youtubeViewJpaRepository.findByUserAndYoutubeRecipe(User.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
                 .orElseGet(() -> youtubeViewJpaRepository.save(YoutubeViewEntity.create(user, youtubeRecipe)));
     }
 
     @Override
     public void saveYoutubeRecipeScrap(YoutubeRecipe youtubeRecipe, User user) {
-        youtubeScrapJpaRepository.findByUserAndYoutubeRecipe(UserEntity.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
+        youtubeScrapJpaRepository.findByUserAndYoutubeRecipe(User.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
                 .orElseGet(() -> youtubeScrapJpaRepository.save(YoutubeScrapEntity.create(user, youtubeRecipe)));
     }
 
     @Override
     public void deleteYoutubeRecipeScrap(YoutubeRecipe youtubeRecipe, User user) {
-        youtubeScrapJpaRepository.findByUserAndYoutubeRecipe(UserEntity.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
+        youtubeScrapJpaRepository.findByUserAndYoutubeRecipe(User.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
                 .ifPresent(youtubeScrapJpaRepository::delete);
 
     }
 
     @Override
     public Page<YoutubeRecipe> findYoutubeRecipesByUser(User user, Pageable pageable) {
-        return youtubeScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
+        return youtubeScrapJpaRepository.findByUser(User.fromModel(user), pageable)
                 .map(YoutubeScrapEntity::getYoutubeRecipe)
                 .map(YoutubeRecipeEntity::toModel);
     }
@@ -80,7 +79,7 @@ public class YoutubeRecipeRepositoryImpl implements YoutubeRecipeRepository {
 
     @Override
     public long countYoutubeScrapByUser(User user) {
-        return youtubeScrapJpaRepository.countByUser(UserEntity.fromModel(user));
+        return youtubeScrapJpaRepository.countByUser(User.fromModel(user));
     }
 
     @Override

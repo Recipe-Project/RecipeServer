@@ -5,7 +5,6 @@ import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.infra.IngredientEntity;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -31,14 +30,14 @@ public class FridgeBasketRepositoryImpl implements FridgeBasketRepository {
 
     @Override
     public List<FridgeBasket> findByUser(User user) {
-        return fridgeBasketJpaRepository.findByUser(UserEntity.fromModel(user)).stream()
+        return fridgeBasketJpaRepository.findByUser(User.fromModel(user)).stream()
                 .map(FridgeBasketEntity::toModel)
                 .collect(Collectors.toList());
     }
 
     @Override
     public Optional<FridgeBasket> findByUserAndFridgeBasketId(User user, Long fridgeBasketId) {
-        return fridgeBasketJpaRepository.findByUserAndFridgeBasketId(UserEntity.fromModel(user), fridgeBasketId).map(FridgeBasketEntity::toModel);
+        return fridgeBasketJpaRepository.findByUserAndFridgeBasketId(User.fromModel(user), fridgeBasketId).map(FridgeBasketEntity::toModel);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class FridgeBasketRepositoryImpl implements FridgeBasketRepository {
 
     @Override
     public long countByUser(User user) {
-        return fridgeBasketJpaRepository.countByUser(UserEntity.fromModel(user));
+        return fridgeBasketJpaRepository.countByUser(User.fromModel(user));
     }
 
     @Override
@@ -58,7 +57,7 @@ public class FridgeBasketRepositoryImpl implements FridgeBasketRepository {
 
     @Override
     public Optional<FridgeBasket> findByIngredientAndUser(Ingredient ingredient, User user) {
-        return fridgeBasketJpaRepository.findByIngredientAndUser(IngredientEntity.fromModel(ingredient), UserEntity.fromModel(user)).map(FridgeBasketEntity::toModel);
+        return fridgeBasketJpaRepository.findByIngredientAndUser(IngredientEntity.fromModel(ingredient), User.fromModel(user)).map(FridgeBasketEntity::toModel);
     }
 
     @Override

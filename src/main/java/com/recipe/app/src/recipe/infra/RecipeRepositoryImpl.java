@@ -6,7 +6,6 @@ import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import com.recipe.app.src.recipe.domain.RecipeProcess;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -49,33 +48,33 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     @Override
     public void saveRecipeScrap(Recipe recipe, User user) {
-        recipeScrapJpaRepository.findByUserAndRecipe(UserEntity.fromModel(user), RecipeEntity.fromModel(recipe))
+        recipeScrapJpaRepository.findByUserAndRecipe(User.fromModel(user), RecipeEntity.fromModel(recipe))
                 .orElseGet(() -> recipeScrapJpaRepository.save(RecipeScrapEntity.create(user, recipe)));
     }
 
     @Override
     public void deleteRecipeScrap(Recipe recipe, User user) {
-        recipeScrapJpaRepository.findByUserAndRecipe(UserEntity.fromModel(user), RecipeEntity.fromModel(recipe))
+        recipeScrapJpaRepository.findByUserAndRecipe(User.fromModel(user), RecipeEntity.fromModel(recipe))
                 .ifPresent(recipeScrapJpaRepository::delete);
 
     }
 
     @Override
     public Page<Recipe> findScrapRecipesByUser(User user, Pageable pageable) {
-        return recipeScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
+        return recipeScrapJpaRepository.findByUser(User.fromModel(user), pageable)
                 .map(RecipeScrapEntity::getRecipe)
                 .map(RecipeEntity::toModel);
     }
 
     @Override
     public void saveRecipeView(Recipe recipe, User user) {
-        recipeViewJpaRepository.findByUserAndRecipe(UserEntity.fromModel(user), RecipeEntity.fromModel(recipe))
+        recipeViewJpaRepository.findByUserAndRecipe(User.fromModel(user), RecipeEntity.fromModel(recipe))
                 .orElseGet(() -> recipeViewJpaRepository.save(RecipeViewEntity.create(user, recipe)));
     }
 
     @Override
     public Page<Recipe> findByUser(User user, Pageable pageable) {
-        return recipeJpaRepository.findByUser(UserEntity.fromModel(user), pageable).map(RecipeEntity::toModel);
+        return recipeJpaRepository.findByUser(User.fromModel(user), pageable).map(RecipeEntity::toModel);
     }
 
     @Override
@@ -131,7 +130,7 @@ public class RecipeRepositoryImpl implements RecipeRepository {
 
     @Override
     public long countRecipeScrapByUser(User user) {
-        return recipeScrapJpaRepository.countByUser(UserEntity.fromModel(user));
+        return recipeScrapJpaRepository.countByUser(User.fromModel(user));
     }
 
     @Override

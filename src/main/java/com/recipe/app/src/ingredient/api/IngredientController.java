@@ -5,7 +5,6 @@ import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.ingredient.application.dto.IngredientDto;
 import com.recipe.app.src.user.domain.SecurityUser;
-import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;

@@ -1,7 +1,11 @@
-package com.recipe.app.src.user.infra;
+package com.recipe.app.src.user.domain;
 
-import lombok.*;
+import com.google.common.base.Preconditions;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -9,13 +13,11 @@ import javax.persistence.Id;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-@Data
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "JwtBlacklist")
-public class JwtEntity {
+public class JwtBlacklist {
     @Id
     @Column(name = "jwt", nullable = false, updatable = false)
     private String jwt;
@@ -24,13 +26,10 @@ public class JwtEntity {
     @Column(name = "createdAt", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
-    public JwtEntity(String jwt) {
-        this.jwt = jwt;
-    }
+    public JwtBlacklist(String jwt) {
 
-    public static JwtEntity fromModel(String jwt) {
-        JwtEntity jwtEntity = new JwtEntity();
-        jwtEntity.jwt = jwt;
-        return jwtEntity;
+        Preconditions.checkArgument(StringUtils.hasText(jwt), "블랙리스트에 등록할 JWT를 입력해주세요.");
+
+        this.jwt = jwt;
     }
 }

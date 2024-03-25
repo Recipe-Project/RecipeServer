@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.infra;
 
-import com.recipe.app.src.user.infra.UserEntity;
+import com.recipe.app.src.user.domain.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
@@ -25,7 +25,7 @@ public interface RecipeJpaRepository extends CrudRepository<RecipeEntity, Long> 
             "group by r.recipeId order by r.recipeViews.size desc")
     Page<RecipeEntity> getRecipesOrderByRecipeViewSizeDesc(String keyword, Pageable pageable);
 
-    Page<RecipeEntity> findByUser(UserEntity user, Pageable pageable);
+    Page<RecipeEntity> findByUser(User user, Pageable pageable);
 
     @Query(value = "select r.*, rs.userId as scrapUserId, (count(*) / (select count(*) from RecipeIngredient where recipeId = r.recipeId) * 100) as matchRate from RecipeIngredient ri " +
             "inner join Recipe r on ri.recipeId = r.recipeId " +

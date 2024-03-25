@@ -2,7 +2,7 @@ package com.recipe.app.src.recipe.infra.youtube;
 
 import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipe.domain.YoutubeRecipe;
-import com.recipe.app.src.user.infra.UserEntity;
+import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -73,11 +73,9 @@ public class YoutubeRecipeEntity extends BaseEntity {
                 .youtubeId(youtubeId)
                 .scrapUsers(youtubeScraps.stream()
                         .map(YoutubeScrapEntity::getUser)
-                        .map(UserEntity::toModel)
                         .collect(Collectors.toList()))
                 .viewUsers(youtubeViews.stream()
                         .map(YoutubeViewEntity::getUser)
-                        .map(UserEntity::toModel)
                         .collect(Collectors.toList()))
                 .build();
     }

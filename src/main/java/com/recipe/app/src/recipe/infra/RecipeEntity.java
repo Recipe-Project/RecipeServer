@@ -4,7 +4,6 @@ import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeLevel;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -50,7 +49,7 @@ public class RecipeEntity extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private UserEntity user;
+    private User user;
 
     @Column(name = "hiddenYn", nullable = false)
     private String hiddenYn = "Y";
@@ -70,7 +69,7 @@ public class RecipeEntity extends BaseEntity {
         this.imgUrl = recipeEntityWithRate.getImgUrl();
         this.quantity = recipeEntityWithRate.getQuantity();
         this.calorie = recipeEntityWithRate.getCalorie();
-        this.user = UserEntity.fromModel(User.builder().userId(recipeEntityWithRate.getUserId()).build());
+        this.user = User.builder().userId(recipeEntityWithRate.getUserId()).build();
         this.hiddenYn = recipeEntityWithRate.getHiddenYn();
         this.setCreatedAt(recipeEntityWithRate.getCreatedAt());
         this.setUpdatedAt(recipeEntityWithRate.getUpdatedAt());
@@ -86,7 +85,7 @@ public class RecipeEntity extends BaseEntity {
         recipeEntity.imgUrl = recipe.getImgUrl();
         recipeEntity.quantity = recipe.getQuantity();
         recipeEntity.calorie = recipe.getCalorie();
-        recipeEntity.user = UserEntity.fromModel(recipe.getUser());
+        recipeEntity.user = recipe.getUser();
         recipeEntity.hiddenYn = recipe.isHidden() ? "Y" : "N";
         return recipeEntity;
     }
@@ -101,13 +100,13 @@ public class RecipeEntity extends BaseEntity {
                 .imgUrl(imgUrl)
                 .quantity(quantity)
                 .calorie(calorie)
-                .user(user != null ? user.toModel() : null)
+                .user(user != null ? user : null)
                 .isHidden(hiddenYn.equals("Y"))
                 .scrapUsers(recipeScraps.stream()
-                        .map(s -> s.getUser().toModel())
+                        .map(s -> s.getUser())
                         .collect(Collectors.toList()))
                 .viewUsers(recipeViews.stream()
-                        .map(v -> v.getUser().toModel())
+                        .map(v -> v.getUser())
                         .collect(Collectors.toList()))
                 .createdAt(getCreatedAt())
                 .updatedAt(getUpdatedAt())

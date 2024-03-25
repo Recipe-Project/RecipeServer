@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.infra.blog;
 
 import com.recipe.app.src.recipe.domain.BlogRecipe;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -28,7 +27,7 @@ public class BlogScrapEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "userId")
-    private UserEntity user;
+    private User user;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "blogRecipeId")
@@ -40,7 +39,7 @@ public class BlogScrapEntity {
 
     public static BlogScrapEntity createBlogScrap(User user, BlogRecipe blogRecipe) {
         BlogScrapEntity blogScrapEntity = new BlogScrapEntity();
-        blogScrapEntity.user = UserEntity.fromModel(user);
+        blogScrapEntity.user = user;
         blogScrapEntity.blogRecipe = BlogRecipeEntity.fromModel(blogRecipe);
         return blogScrapEntity;
     }

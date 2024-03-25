@@ -4,7 +4,6 @@ import com.recipe.app.src.ingredient.application.port.IngredientRepository;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
@@ -30,7 +29,7 @@ public class IngredientRepositoryImpl implements IngredientRepository {
 
     @Override
     public Optional<Ingredient> findByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategory(User user, String ingredientName, String ingredientIconUrl, IngredientCategory ingredientCategory) {
-        return ingredientJpaRepository.findByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategoryEntity(UserEntity.fromModel(user), ingredientName, ingredientIconUrl, IngredientCategoryEntity.fromModel(ingredientCategory)).map(IngredientEntity::toModel);
+        return ingredientJpaRepository.findByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategoryEntity(User.fromModel(user), ingredientName, ingredientIconUrl, IngredientCategoryEntity.fromModel(ingredientCategory)).map(IngredientEntity::toModel);
     }
 
     @Override
