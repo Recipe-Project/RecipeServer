@@ -1,5 +1,7 @@
 package com.recipe.app.src.user.application;
 
+import com.google.common.base.Preconditions;
+import com.recipe.app.common.utils.HttpUtil;
 import com.recipe.app.src.user.application.dto.UserDto;
 import com.recipe.app.src.user.domain.JwtBlacklist;
 import com.recipe.app.src.user.domain.User;
@@ -12,15 +14,9 @@ import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
@@ -70,291 +66,117 @@ public class UserService {
                 "&redirect_uri=" + naverRedirectURI +
                 "&code=" + code +
                 "&state=" + state;
+        Map<String, String> requestHeaders = new HashMap<>();
 
-        URL url = new URL(apiURL);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
 
-        con.setRequestMethod("GET");
-
-        int responseCode = con.getResponseCode();
-        InputStreamReader streamReader;
-        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-            streamReader = new InputStreamReader(con.getInputStream());
-        } else { // 에러 발생
-            streamReader = new InputStreamReader(con.getErrorStream());
-        }
-
-        BufferedReader lineReader = new BufferedReader(streamReader);
-        StringBuilder responseBody = new StringBuilder();
-
-        String line;
-        while ((line = lineReader.readLine()) != null) {
-            responseBody.append(line);
-        }
-
-        String body = responseBody.toString();
-
-        con.disconnect();
-
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-        String accessToken = jsonObject.get("access_token").toString();
-        return accessToken;
+        return response.get("access_token").toString();
     }
 
     @Transactional
     public User naverLogin(String accessToken, String fcmToken) throws IOException, ParseException {
-        String header = "Bearer " + accessToken;
+
+        Preconditions.checkArgument(StringUtils.hasText(accessToken), "액세스 토큰을 입력해주세요.");
+
         String apiURL = "https://openapi.naver.com/v1/nid/me";
-
         Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("Authorization", header);
+        requestHeaders.put("Authorization", "Bearer " + accessToken);
 
-        URL url = new URL(apiURL);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        JSONObject jsonObject = HttpUtil.getHTTP(apiURL, requestHeaders);
 
-        con.setRequestMethod("GET");
-        for (Map.Entry<String, String> rqheader : requestHeaders.entrySet()) {
-            con.setRequestProperty(rqheader.getKey(), rqheader.getValue());
-        }
+        String resultCode = jsonObject.get("resultcode").toString();
 
-        int responseCode = con.getResponseCode();
-        InputStreamReader streamReader;
-        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-            streamReader = new InputStreamReader(con.getInputStream());
-        } else { // 에러 발생
-            streamReader = new InputStreamReader(con.getErrorStream());
-        }
-
-        BufferedReader lineReader = new BufferedReader(streamReader);
-        StringBuilder responseBody = new StringBuilder();
-
-        String line;
-        while ((line = lineReader.readLine()) != null) {
-            responseBody.append(line);
-        }
-
-        String body = responseBody.toString();
-        con.disconnect();
-
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-        String resultcode = jsonObject.get("resultcode").toString();
-
-        if (!resultcode.equals("00"))
+        if (!resultCode.equals("00"))
             throw new ForbiddenAccessException();
 
-        String response = jsonObject.get("response").toString();
-        JSONObject responObj = (JSONObject) jsonParser.parse(response);
-        String socialId = "naver_" + responObj.get("id").toString();
-        String profileImgUrl = null;
-        String nickname = responObj.get("name").toString();
-        String email = responObj.get("email") != null ? responObj.get("email").toString() : null;
-        String phoneNumber = responObj.get("mobile") != null ? responObj.get("mobile").toString() : null;
-        return userRepository.findBySocialId(socialId).orElseGet(() ->
-                userRepository.save(User.builder()
-                        .socialId(socialId)
-                        .profileImgUrl(profileImgUrl)
-                        .nickname(nickname)
-                        .email(email)
-                        .phoneNumber(phoneNumber)
-                        .deviceToken(fcmToken)
-                        .build()));
+        JSONObject response = (JSONObject) new JSONParser().parse(jsonObject.get("response").toString());
+
+        User user = User.builder()
+                .socialId("naver_" + response.get("id").toString())
+                .nickname(response.get("name").toString())
+                .email(response.get("email") != null ? response.get("email").toString() : null)
+                .phoneNumber(response.get("mobile") != null ? response.get("mobile").toString() : null)
+                .deviceToken(fcmToken)
+                .build();
+
+        return userRepository.findBySocialId(user.getSocialId())
+                .orElseGet(() -> userRepository.save(user));
     }
 
     @Transactional(readOnly = true)
     public String getKakaoAccessToken(String code) throws IOException, ParseException {
 
         String apiURL = "https://kauth.kakao.com/oauth/token";
+        String request = "grant_type=authorization_code" +
+                "&client_id=" + kakaoClientId +
+                "&redirect_uri=" + kakaoRedirectURI +
+                "&code=" + code;
 
-        URL url = new URL(apiURL);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        JSONObject response = HttpUtil.postHTTP(apiURL, request);
 
-        con.setRequestMethod("POST");
-        con.setDoOutput(true);
-        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
-
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
-        StringBuilder sb = new StringBuilder();
-        sb.append("grant_type=authorization_code");
-        sb.append("&client_id=" + kakaoClientId);
-        sb.append("&redirect_uri=" + kakaoRedirectURI);
-        sb.append("&code=" + code);
-
-        bw.write(sb.toString());
-        bw.flush();
-        bw.close();
-
-        int responseCode = con.getResponseCode();
-        InputStreamReader streamReader;
-        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-            streamReader = new InputStreamReader(con.getInputStream());
-        } else { // 에러 발생
-            streamReader = new InputStreamReader(con.getErrorStream());
-        }
-
-        BufferedReader lineReader = new BufferedReader(streamReader);
-        StringBuilder responseBody = new StringBuilder();
-
-        String line;
-        while ((line = lineReader.readLine()) != null) {
-            responseBody.append(line);
-        }
-
-        String body = responseBody.toString();
-
-        con.disconnect();
-
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-        String accessToken = jsonObject.get("access_token").toString();
-        return accessToken;
+        return response.get("access_token").toString();
     }
 
     @Transactional
     public User kakaoLogin(String accessToken, String fcmToken) throws IOException, ParseException {
 
-        String header = "Bearer " + accessToken;
+        Preconditions.checkArgument(StringUtils.hasText(accessToken), "액세스 토큰을 입력해주세요.");
+
         String apiURL = "https://kapi.kakao.com/v2/user/me";
-
         Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("Authorization", header);
+        requestHeaders.put("Authorization", "Bearer " + accessToken);
 
-        URL url = new URL(apiURL);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
-
-        con.setRequestMethod("GET");
-        for (Map.Entry<String, String> rqheader : requestHeaders.entrySet()) {
-            con.setRequestProperty(rqheader.getKey(), rqheader.getValue());
-        }
-
-        int responseCode = con.getResponseCode();
-        InputStreamReader streamReader;
-        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-            streamReader = new InputStreamReader(con.getInputStream());
-        } else { // 에러 발생
-            streamReader = new InputStreamReader(con.getErrorStream());
-        }
-
-        BufferedReader lineReader = new BufferedReader(streamReader);
-        StringBuilder responseBody = new StringBuilder();
-
-        String line;
-        while ((line = lineReader.readLine()) != null) {
-            responseBody.append(line);
-        }
-
-        String body = responseBody.toString();
-
-        con.disconnect();
+        JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
 
         JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        JSONObject kakaoAccount = (JSONObject) jsonParser.parse(response.get("kakao_account").toString());
+        JSONObject profile = (JSONObject) jsonParser.parse(kakaoAccount.get("profile").toString());
 
-        String socialId = "kakao_" + jsonObject.get("id").toString();
-        String response = jsonObject.get("kakao_account").toString();
+        User user = User.builder()
+                .socialId("kakao_" + response.get("id").toString())
+                .nickname(profile.get("nickname").toString())
+                .email(kakaoAccount.get("email") != null ? kakaoAccount.get("email").toString() : null)
+                .deviceToken(fcmToken)
+                .build();
 
-        String profileImgUrl = null;
-        String phoneNumber = null;
-
-        JSONObject responObj = (JSONObject) jsonParser.parse(response);
-        String email = responObj.get("email") != null ? responObj.get("email").toString() : null;
-        String profile = responObj.get("profile").toString();
-        JSONObject profileObj = (JSONObject) jsonParser.parse(profile);
-        String nickname = profileObj.get("nickname").toString();
-
-        return userRepository.findBySocialId(socialId).orElseGet(() ->
-                userRepository.save(User.builder()
-                        .socialId(socialId)
-                        .profileImgUrl(profileImgUrl)
-                        .nickname(nickname)
-                        .email(email)
-                        .phoneNumber(phoneNumber)
-                        .deviceToken(fcmToken)
-                        .build()));
+        return userRepository.findBySocialId(user.getSocialId())
+                .orElseGet(() -> userRepository.save(user));
     }
 
     @Transactional(readOnly = true)
     public String getGoogleIdToken(String code) throws IOException, ParseException {
 
         String apiURL = "https://oauth2.googleapis.com/token";
+        String request = "grant_type=authorization_code" +
+                "&client_id=" + googleClientId +
+                "&client_secret=" + googleClientSecret +
+                "&redirect_uri=" + googleRedirectURI +
+                "&code=" + code;
 
-        URL url = new URL(apiURL);
-        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        JSONObject response = HttpUtil.postHTTP(apiURL, request);
 
-        con.setRequestMethod("POST");
-        con.setDoOutput(true);
-
-        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
-        StringBuilder sb = new StringBuilder();
-        sb.append("grant_type=authorization_code");
-        sb.append("&client_id=" + googleClientId);
-        sb.append("&client_secret=" + googleClientSecret);
-        sb.append("&redirect_uri=" + googleRedirectURI);
-        sb.append("&code=" + code);
-
-        bw.write(sb.toString());
-        bw.flush();
-        bw.close();
-
-        int responseCode = con.getResponseCode();
-        InputStreamReader streamReader;
-        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
-            streamReader = new InputStreamReader(con.getInputStream());
-        } else { // 에러 발생
-            streamReader = new InputStreamReader(con.getErrorStream());
-        }
-
-        BufferedReader lineReader = new BufferedReader(streamReader);
-        StringBuilder responseBody = new StringBuilder();
-
-        String line;
-        while ((line = lineReader.readLine()) != null) {
-            responseBody.append(line);
-        }
-
-        String body = responseBody.toString();
-
-        System.out.println(body);
-
-        con.disconnect();
-
-        JSONParser jsonParser = new JSONParser();
-        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
-        String idToken = jsonObject.get("id_token").toString();
-        return idToken;
+        return response.get("id_token").toString();
     }
 
     @Transactional
     public User googleLogin(String idToken, String fcmToken) throws IOException, ParseException {
 
-        JSONParser jsonParser = new JSONParser();
-        String url = "https://oauth2.googleapis.com/tokeninfo";
-        url += "?id_token=" + idToken;
+        Preconditions.checkArgument(StringUtils.hasText(idToken), "ID 토큰을 입력해주세요.");
 
-        URL gUrl = new URL(url);
-        HttpURLConnection con = (HttpURLConnection) gUrl.openConnection();
+        String apiURL = "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken;
+        Map<String, String> requestHeaders = new HashMap<>();
 
-        InputStream is = con.getInputStream();
-        InputStreamReader isr = new InputStreamReader(is, "UTF-8");
-        BufferedReader in = new BufferedReader(isr);
+        JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
 
-        JSONObject jsonObj = (JSONObject) jsonParser.parse(in);
-        String socialId = "google_" + jsonObj.get("sub").toString();
-        String nickname = jsonObj.get("name").toString();
-        String email = jsonObj.get("email").toString();
-        String profileImgUrl = null;
-        String phoneNumber = null;
+        User user = User.builder()
+                .socialId("google_" + response.get("sub").toString())
+                .nickname(response.get("name").toString())
+                .email(response.get("email").toString())
+                .deviceToken(fcmToken)
+                .build();
 
-        return userRepository.findBySocialId(socialId).orElseGet(() ->
-                userRepository.save(User.builder()
-                        .socialId(socialId)
-                        .profileImgUrl(profileImgUrl)
-                        .nickname(nickname)
-                        .email(email)
-                        .phoneNumber(phoneNumber)
-                        .deviceToken(fcmToken)
-                        .build()));
+        return userRepository.findBySocialId(user.getSocialId()).orElseGet(() ->
+                userRepository.save(user));
     }
 
     @Transactional
