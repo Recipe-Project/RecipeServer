@@ -43,7 +43,6 @@ public class UserController {
     }
 
     @ApiOperation(value = "자동 로그인 API")
-    @ResponseBody
     @PostMapping("/auto-login")
     public BaseResponse<UserLoginResponse> autoLogin(@ApiIgnore final Authentication authentication) {
 
@@ -56,7 +55,6 @@ public class UserController {
     }
 
     @ApiOperation(value = "네이버 로그인 API")
-    @ResponseBody
     @PostMapping("/naver-login")
     public BaseResponse<UserSocialLoginResponse> naverLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
@@ -64,7 +62,6 @@ public class UserController {
     }
 
     @ApiOperation(value = "카카오 로그인 API")
-    @ResponseBody
     @PostMapping("/kakao-login")
     public BaseResponse<UserSocialLoginResponse> kakaoLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
@@ -72,7 +69,6 @@ public class UserController {
     }
 
     @ApiOperation(value = "구글 로그인 API")
-    @ResponseBody
     @PostMapping("/google-login")
     public BaseResponse<UserSocialLoginResponse> googleLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
@@ -80,8 +76,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "유저 프로필 조회 API")
-    @ResponseBody
-    @GetMapping("")
+    @GetMapping
     public BaseResponse<UserProfileResponse> getUser(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
@@ -93,8 +88,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "유저 프로필 수정 API")
-    @ResponseBody
-    @PatchMapping("")
+    @PatchMapping
     public BaseResponse<Void> patchUser(@ApiIgnore final Authentication authentication,
                                                                @ApiParam(value = "수정할 회원 정보", required = true)
                                                                @RequestBody UserProfileRequest request) {
@@ -109,8 +103,7 @@ public class UserController {
     }
 
     @ApiOperation(value = "회원 탈퇴 API")
-    @ResponseBody
-    @DeleteMapping("")
+    @DeleteMapping
     public BaseResponse<Void> deleteUser(HttpServletRequest request, @ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
@@ -123,7 +116,6 @@ public class UserController {
     }
 
     @ApiOperation(value = "로그아웃 API")
-    @ResponseBody
     @PostMapping("/logout")
     public BaseResponse<Void> logout(HttpServletRequest request) {
 
@@ -133,7 +125,6 @@ public class UserController {
     }
 
     @ApiOperation(value = "FCM 디바이스 토큰 수정 API")
-    @ResponseBody
     @PatchMapping("/fcm-token")
     public BaseResponse<Void> patchFcmToken(@ApiIgnore final Authentication authentication,
                                             @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
