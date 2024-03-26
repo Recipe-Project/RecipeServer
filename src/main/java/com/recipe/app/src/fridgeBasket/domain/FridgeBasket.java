@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
@@ -32,7 +31,7 @@ public class FridgeBasket extends BaseEntity {
     private Long ingredientId;
 
     @Column(name = "expiredAt")
-    private LocalDateTime expiredAt;
+    private LocalDate expiredAt;
 
     @Column(name = "quantity", nullable = false)
     private float quantity = 1;
@@ -41,7 +40,7 @@ public class FridgeBasket extends BaseEntity {
     private String unit;
 
     @Builder
-    public FridgeBasket(Long fridgeBasketId, Long userId, Long ingredientId, LocalDateTime expiredAt, float quantity, String unit, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public FridgeBasket(Long fridgeBasketId, Long userId, Long ingredientId, LocalDate expiredAt, float quantity, String unit) {
 
         Objects.requireNonNull(userId, "유저 아이디를 입력해주세요.");
         Objects.requireNonNull(ingredientId, "재료 아이디를 입력해주세요.");
@@ -59,7 +58,7 @@ public class FridgeBasket extends BaseEntity {
         this.quantity += quantity;
     }
 
-    public void updateFridgeBasket(LocalDateTime expiredAt, float quantity, String unit) {
+    public void updateFridgeBasket(LocalDate expiredAt, float quantity, String unit) {
 
         this.expiredAt = expiredAt;
         this.quantity = quantity;
