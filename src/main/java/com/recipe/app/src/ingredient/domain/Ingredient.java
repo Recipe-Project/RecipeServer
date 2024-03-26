@@ -1,60 +1,74 @@
 package com.recipe.app.src.ingredient.domain;
 
+import com.google.common.base.Preconditions;
+import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.user.domain.User;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.util.StringUtils;
 
+import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 @Getter
-public class Ingredient {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "Ingredient")
+public class Ingredient extends BaseEntity implements Comparable<Ingredient> {
+    @Id
+    @Column(name = "ingredientId", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long ingredientId;
 
-    private final Long ingredientId;
-    private final IngredientCategory ingredientCategory;
-    private final String ingredientName;
-    private final String ingredientIconUrl;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final User user;
-    private final boolean isDefault;
-    private final boolean isHidden;
+    @Column(name = "ingredientCategoryId", nullable = false)
+    private Long ingredientCategoryId;
+
+    @Column(name = "ingredientName", nullable = false, length = 64)
+    private String ingredientName;
+
+    @Column(name = "ingredientIconUrl")
+    private String ingredientIconUrl;
+
+    @Column(name = "userId")
+    private Long userId;
+
+    @Column(name = "defaultYn", length = 1)
+    private String defaultYn;
+
+    @Column(name = "hiddenYn", length = 1)
+    private String hiddenYn;
 
     @Builder
-    public Ingredient(Long ingredientId, IngredientCategory ingredientCategory, String ingredientName, String ingredientIconUrl, LocalDateTime createdAt, LocalDateTime updatedAt,
-                      User user, boolean isDefault, boolean isHidden) {
+    public Ingredient(Long ingredientId, Long ingredientCategoryId, String ingredientName, String ingredientIconUrl, Long userId, boolean isDefault, boolean isHidden) {
+
+        Objects.requireNonNull(ingredientCategoryId, "재료 카테고리 아이디를 입력해주세요.");
+        Preconditions.checkArgument(StringUtils.hasText(ingredientName), "재료명을 입력해주세요.");
+
         this.ingredientId = ingredientId;
-        this.ingredientCategory = ingredientCategory;
+        this.ingredientCategoryId = ingredientCategoryId;
         this.ingredientName = ingredientName;
         this.ingredientIconUrl = ingredientIconUrl;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.user = user;
-        this.isDefault = isDefault;
-        this.isHidden = isHidden;
+        this.userId = userId;
+        this.defaultYn = isDefault ? "Y" : "N";
+        this.hiddenYn = isHidden ? "Y" : "N";
     }
 
-    public static Ingredient from(IngredientCategory ingredientCategory, String ingredientName, String ingredientIconUrl, User user) {
-        LocalDateTime now = LocalDateTime.now();
-        return Ingredient.builder()
-                .ingredientCategory(ingredientCategory)
-                .ingredientName(ingredientName)
-                .ingredientIconUrl(ingredientIconUrl)
-                .createdAt(now)
-                .updatedAt(now)
-                .user(user)
-                .isDefault(false)
-                .isHidden(true)
-                .build();
+    @Override
+    public int compareTo(@NotNull Ingredient ingredient) {
+        return Integer.compare(this.getIngredientName().length(), ingredient.getIngredientName().length());
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Ingredient ingredient = (Ingredient) o;
+        com.recipe.app.src.ingredient.domain.Ingredient ingredient = (com.recipe.app.src.ingredient.domain.Ingredient) o;
 
         if (ingredientId.equals(ingredient.getIngredientId()))
             return true;
@@ -104,9 +118,9 @@ public class Ingredient {
     }
 
     public List<String> getSimilarIngredientName() {
-        if(ingredientName.equals("새우"))
+        if (ingredientName.equals("새우"))
             return List.of("대하");
-        if(ingredientName.equals("대하"))
+        if (ingredientName.equals("대하"))
             return List.of("새우");
         if (ingredientName.equals("계란"))
             return List.of("달걀");
@@ -148,7 +162,7 @@ public class Ingredient {
             return List.of("김칫잎");
         if (ingredientName.equals("김칫잎"))
             return List.of("김치");
-        if(ingredientName.equals("고춧가루"))
+        if (ingredientName.equals("고춧가루"))
             return List.of("고추가루");
         if (ingredientName.equals("고추가루"))
             return List.of("고춧가루");
