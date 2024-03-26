@@ -16,20 +16,23 @@ public class UserDto {
 
     @ApiModel(description = "로그인 토큰 정보 요청 DTO")
     @Getter
-    @Setter
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class UserLoginRequest {
         @ApiModelProperty(value = "로그인 액세스 토큰")
         private String accessToken;
         @ApiModelProperty(value = "FCM 토큰")
         private String fcmToken;
+
+        @Builder
+        public UserLoginRequest(String accessToken, String fcmToken) {
+
+            this.accessToken = accessToken;
+            this.fcmToken = fcmToken;
+        }
     }
 
     @ApiModel(value = "수정할 회원 정보 요청 DTO", description = "프로필 사진, 닉네임 정보")
     @Getter
-    @Setter
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class UserProfileRequest {
         @ApiModelProperty(value = "프로필 이미지")
@@ -40,8 +43,6 @@ public class UserDto {
 
     @ApiModel(value = "수정할 디바이스 토큰 요청 DTO", description = "FCM 디바이스 토큰 정보")
     @Getter
-    @Setter
-    @AllArgsConstructor
     @NoArgsConstructor
     public static class UserDeviceTokenRequest {
         @ApiModelProperty(value = "FCM 디바이스 토큰")
@@ -57,10 +58,10 @@ public class UserDto {
         @Schema(description = "회원 고유번호")
         private Long userId;
 
-        public static UserSocialLoginResponse from(Long userId, String jwt) {
+        public static UserSocialLoginResponse from(User user, String jwt) {
             return UserSocialLoginResponse.builder()
                     .jwt(jwt)
-                    .userId(userId)
+                    .userId(user.getUserId())
                     .build();
         }
     }
@@ -72,9 +73,9 @@ public class UserDto {
         @Schema(description = "회원 고유번호")
         private Long userId;
 
-        public static UserLoginResponse from(Long userId) {
+        public static UserLoginResponse from(User user) {
             return UserLoginResponse.builder()
-                    .userId(userId)
+                    .userId(user.getUserId())
                     .build();
         }
     }
@@ -124,12 +125,16 @@ public class UserDto {
 
     @Schema(description = "나만의 레시피 응답 DTO")
     @Getter
-    @AllArgsConstructor
-    @NoArgsConstructor(access = AccessLevel.PRIVATE)
     public static class UserRecipeResponse {
         @Schema(description = "레시피 고유 번호")
         private Long recipeId;
         @Schema(description = "썸네일 이미지")
         private String thumbnailImgUrl;
+
+        public UserRecipeResponse(Long recipeId, String thumbnailImgUrl) {
+
+            this.recipeId = recipeId;
+            this.thumbnailImgUrl = thumbnailImgUrl;
+        }
     }
 }

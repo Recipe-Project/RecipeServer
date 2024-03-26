@@ -2,11 +2,11 @@ package com.recipe.app.src.user.application;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.common.utils.HttpUtil;
+import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.user.application.dto.UserDto;
-import com.recipe.app.src.user.domain.JwtBlacklist;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
-import com.recipe.app.src.user.infra.JwtBlacklistRepository;
 import com.recipe.app.src.user.infra.UserRepository;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -43,17 +44,22 @@ public class UserService {
     private String googleRedirectURI;
 
     private final UserRepository userRepository;
-    private final JwtBlacklistRepository jwtBlacklistRepository;
+    private final JwtService jwtService;
+    private final BadWordService badWordService;
 
-    public UserService(UserRepository userRepository, JwtBlacklistRepository jwtBlacklistRepository) {
+    public UserService(UserRepository userRepository, JwtService jwtService, BadWordService badWordService) {
         this.userRepository = userRepository;
-        this.jwtBlacklistRepository = jwtBlacklistRepository;
+        this.jwtService = jwtService;
+        this.badWordService = badWordService;
     }
 
     @Transactional
-    public User autoLogin(User user) {
+    public UserDto.UserLoginResponse autoLogin(User user) {
+
         user.changeRecentLoginAt(LocalDateTime.now());
-        return userRepository.save(user);
+        userRepository.save(user);
+
+        return UserDto.UserLoginResponse.from(user);
     }
 
     @Transactional(readOnly = true)
@@ -74,13 +80,13 @@ public class UserService {
     }
 
     @Transactional
-    public User naverLogin(String accessToken, String fcmToken) throws IOException, ParseException {
+    public UserDto.UserSocialLoginResponse naverLogin(UserDto.UserLoginRequest request) throws IOException, ParseException {
 
-        Preconditions.checkArgument(StringUtils.hasText(accessToken), "액세스 토큰을 입력해주세요.");
+        Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
         String apiURL = "https://openapi.naver.com/v1/nid/me";
         Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("Authorization", "Bearer " + accessToken);
+        requestHeaders.put("Authorization", "Bearer " + request.getAccessToken());
 
         JSONObject jsonObject = HttpUtil.getHTTP(apiURL, requestHeaders);
 
@@ -91,16 +97,19 @@ public class UserService {
 
         JSONObject response = (JSONObject) new JSONParser().parse(jsonObject.get("response").toString());
 
-        User user = User.builder()
-                .socialId("naver_" + response.get("id").toString())
-                .nickname(response.get("name").toString())
-                .email(response.get("email") != null ? response.get("email").toString() : null)
-                .phoneNumber(response.get("mobile") != null ? response.get("mobile").toString() : null)
-                .deviceToken(fcmToken)
-                .build();
+        String socialId = "naver_" + response.get("id").toString();
+        User user = userRepository.findBySocialId(socialId)
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .socialId(socialId)
+                        .nickname(response.get("name").toString())
+                        .email(response.get("email") != null ? response.get("email").toString() : null)
+                        .phoneNumber(response.get("mobile") != null ? response.get("mobile").toString() : null)
+                        .deviceToken(request.getFcmToken())
+                        .build()));
 
-        return userRepository.findBySocialId(user.getSocialId())
-                .orElseGet(() -> userRepository.save(user));
+        String jwt = jwtService.createJwt(user.getUserId());
+
+        return UserDto.UserSocialLoginResponse.from(user, jwt);
     }
 
     @Transactional(readOnly = true)
@@ -118,13 +127,13 @@ public class UserService {
     }
 
     @Transactional
-    public User kakaoLogin(String accessToken, String fcmToken) throws IOException, ParseException {
+    public UserDto.UserSocialLoginResponse kakaoLogin(UserDto.UserLoginRequest request) throws IOException, ParseException {
 
-        Preconditions.checkArgument(StringUtils.hasText(accessToken), "액세스 토큰을 입력해주세요.");
+        Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
         String apiURL = "https://kapi.kakao.com/v2/user/me";
         Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("Authorization", "Bearer " + accessToken);
+        requestHeaders.put("Authorization", "Bearer " + request.getAccessToken());
 
         JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
 
@@ -132,15 +141,18 @@ public class UserService {
         JSONObject kakaoAccount = (JSONObject) jsonParser.parse(response.get("kakao_account").toString());
         JSONObject profile = (JSONObject) jsonParser.parse(kakaoAccount.get("profile").toString());
 
-        User user = User.builder()
-                .socialId("kakao_" + response.get("id").toString())
-                .nickname(profile.get("nickname").toString())
-                .email(kakaoAccount.get("email") != null ? kakaoAccount.get("email").toString() : null)
-                .deviceToken(fcmToken)
-                .build();
+        String socialId = "kakao_" + response.get("id").toString();
+        User user = userRepository.findBySocialId(socialId)
+                .orElseGet(() -> userRepository.save(User.builder()
+                        .socialId(socialId)
+                        .nickname(profile.get("nickname").toString())
+                        .email(kakaoAccount.get("email") != null ? kakaoAccount.get("email").toString() : null)
+                        .deviceToken(request.getFcmToken())
+                        .build()));
 
-        return userRepository.findBySocialId(user.getSocialId())
-                .orElseGet(() -> userRepository.save(user));
+        String jwt = jwtService.createJwt(user.getUserId());
+
+        return UserDto.UserSocialLoginResponse.from(user, jwt);
     }
 
     @Transactional(readOnly = true)
@@ -159,45 +171,50 @@ public class UserService {
     }
 
     @Transactional
-    public User googleLogin(String idToken, String fcmToken) throws IOException, ParseException {
+    public UserDto.UserSocialLoginResponse googleLogin(UserDto.UserLoginRequest request) throws IOException, ParseException {
 
-        Preconditions.checkArgument(StringUtils.hasText(idToken), "ID 토큰을 입력해주세요.");
+        Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        String apiURL = "https://oauth2.googleapis.com/tokeninfo?id_token=" + idToken;
+        String apiURL = "https://oauth2.googleapis.com/tokeninfo?id_token=" + request.getAccessToken();
         Map<String, String> requestHeaders = new HashMap<>();
 
         JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
 
-        User user = User.builder()
-                .socialId("google_" + response.get("sub").toString())
-                .nickname(response.get("name").toString())
-                .email(response.get("email").toString())
-                .deviceToken(fcmToken)
-                .build();
+        String socialId = "google_" + response.get("sub").toString();
+        User user = userRepository.findBySocialId(socialId).orElseGet(() ->
+                userRepository.save(User.builder()
+                        .socialId(socialId)
+                        .nickname(response.get("name").toString())
+                        .email(response.get("email").toString())
+                        .deviceToken(request.getFcmToken())
+                        .build()));
 
-        return userRepository.findBySocialId(user.getSocialId()).orElseGet(() ->
-                userRepository.save(user));
+        String jwt = jwtService.createJwt(user.getUserId());
+
+        return UserDto.UserSocialLoginResponse.from(user, jwt);
     }
 
     @Transactional
-    public User updateUser(User user, UserDto.UserProfileRequest request) {
+    public void updateUser(User user, UserDto.UserProfileRequest request) {
+
+        Preconditions.checkArgument(StringUtils.hasText(request.getNickname()), "닉네임을 입력해주세요.");
+
+        badWordService.checkBadWords(request.getNickname());
         user.changeProfile(request.getProfileImgUrl(), request.getNickname());
-        return userRepository.save(user);
+        userRepository.save(user);
     }
 
     @Transactional
-    public void deleteUser(User user, String jwt) {
+    public void deleteUser(User user, HttpServletRequest request) {
+
         userRepository.delete(user);
-        registerJwtBlackList(jwt);
+
+        jwtService.createJwtBlacklist(request);
     }
 
     @Transactional
-    public void registerJwtBlackList(String jwt) {
-        jwtBlacklistRepository.save(new JwtBlacklist(jwt));
-    }
+    public void updateFcmToken(User user, UserDto.UserDeviceTokenRequest request) {
 
-    @Transactional
-    public void updateFcmToken(UserDto.UserDeviceTokenRequest request, User user) {
         user.changeDeviceToken(request.getFcmToken());
         userRepository.save(user);
     }

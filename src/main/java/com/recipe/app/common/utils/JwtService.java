@@ -1,6 +1,7 @@
 package com.recipe.app.common.utils;
 
-import com.recipe.app.src.user.application.port.JwtBlacklistRepository;
+import com.recipe.app.src.user.domain.JwtBlacklist;
+import com.recipe.app.src.user.infra.JwtBlacklistRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
@@ -87,7 +88,9 @@ public class JwtService {
         return false;
     }
 
-    public String getTokenHeader() {
-        return this.tokenHeader;
+    public void createJwtBlacklist(HttpServletRequest request) {
+
+        String jwt = resolveToken(request);
+        jwtBlacklistRepository.save(new JwtBlacklist(jwt));
     }
 }

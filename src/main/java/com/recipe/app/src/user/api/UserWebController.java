@@ -1,8 +1,7 @@
 package com.recipe.app.src.user.api;
 
-import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.application.UserService;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.application.dto.UserDto;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -17,7 +16,6 @@ import java.io.IOException;
 public class UserWebController {
 
     private final UserService userService;
-    private final JwtService jwtService;
     @Value("${kakao.client-id}")
     private String kakaoClientId;
     @Value("${kakao.redirect-uri}")
@@ -31,9 +29,8 @@ public class UserWebController {
     @Value("${google.redirect-uri}")
     private String googleRedirectURI;
 
-    public UserWebController(UserService userService, JwtService jwtService) {
+    public UserWebController(UserService userService) {
         this.userService = userService;
-        this.jwtService = jwtService;
     }
 
     @GetMapping("/social-login")
@@ -60,9 +57,11 @@ public class UserWebController {
 
         String accessToken = userService.getKakaoAccessToken(code);
 
-        User user = userService.kakaoLogin(accessToken, null);
+        UserDto.UserSocialLoginResponse data = userService.kakaoLogin(UserDto.UserLoginRequest.builder()
+                .accessToken(accessToken)
+                .build());
 
-        model.addAttribute("jwtToken", jwtService.createJwt(user.getUserId()));
+        model.addAttribute("jwtToken", data.getJwt());
 
         return "/user-withdrawal";
     }
@@ -72,9 +71,11 @@ public class UserWebController {
 
         String accessToken = userService.getNaverAccessToken(code, state);
 
-        User user = userService.naverLogin(accessToken, null);
+        UserDto.UserSocialLoginResponse data = userService.naverLogin(UserDto.UserLoginRequest.builder()
+                .accessToken(accessToken)
+                .build());
 
-        model.addAttribute("jwtToken", jwtService.createJwt(user.getUserId()));
+        model.addAttribute("jwtToken", data.getJwt());
 
         return "/user-withdrawal";
     }
@@ -84,9 +85,11 @@ public class UserWebController {
 
         String idToken = userService.getGoogleIdToken(code);
 
-        User user = userService.googleLogin(idToken, null);
+        UserDto.UserSocialLoginResponse data = userService.googleLogin(UserDto.UserLoginRequest.builder()
+                .accessToken(idToken)
+                .build());
 
-        model.addAttribute("jwtToken", jwtService.createJwt(user.getUserId()));
+        model.addAttribute("jwtToken", data.getJwt());
 
         return "/user-withdrawal";
     }

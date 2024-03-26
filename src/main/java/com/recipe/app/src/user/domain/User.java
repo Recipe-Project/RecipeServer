@@ -65,8 +65,7 @@ public class User extends BaseEntity {
     }
 
     public void changeProfile(String profileImgUrl, String nickname) {
-        
-        Preconditions.checkArgument(StringUtils.hasText(profileImgUrl), "프로필 이미지 URL 을 입력해주세요.");
+
         Preconditions.checkArgument(StringUtils.hasText(nickname), "닉네임을 입력해주세요.");
         
         this.profileImgUrl = profileImgUrl;
