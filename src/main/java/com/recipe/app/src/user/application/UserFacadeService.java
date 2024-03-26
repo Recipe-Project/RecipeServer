@@ -7,7 +7,7 @@ import com.recipe.app.src.recipe.application.BlogRecipeService;
 import com.recipe.app.src.recipe.application.RecipeService;
 import com.recipe.app.src.recipe.application.YoutubeRecipeService;
 import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.user.application.dto.UserDto;
+import com.recipe.app.src.user.application.dto.UserProfileResponse;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,14 +39,14 @@ public class UserFacadeService {
     }
 
     @Transactional(readOnly = true)
-    public UserDto.UserProfileResponse findUserProfile(User user) {
+    public UserProfileResponse findUserProfile(User user) {
 
         long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
         List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
 
-        return UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        return UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
     }
 
     @Transactional

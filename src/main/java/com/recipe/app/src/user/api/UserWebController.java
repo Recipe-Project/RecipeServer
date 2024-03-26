@@ -1,7 +1,8 @@
 package com.recipe.app.src.user.api;
 
 import com.recipe.app.src.user.application.UserService;
-import com.recipe.app.src.user.application.dto.UserDto;
+import com.recipe.app.src.user.application.dto.UserLoginRequest;
+import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
@@ -57,7 +58,7 @@ public class UserWebController {
 
         String accessToken = userService.getKakaoAccessToken(code);
 
-        UserDto.UserSocialLoginResponse data = userService.kakaoLogin(UserDto.UserLoginRequest.builder()
+        UserSocialLoginResponse data = userService.kakaoLogin(UserLoginRequest.builder()
                 .accessToken(accessToken)
                 .build());
 
@@ -71,7 +72,7 @@ public class UserWebController {
 
         String accessToken = userService.getNaverAccessToken(code, state);
 
-        UserDto.UserSocialLoginResponse data = userService.naverLogin(UserDto.UserLoginRequest.builder()
+        UserSocialLoginResponse data = userService.naverLogin(UserLoginRequest.builder()
                 .accessToken(accessToken)
                 .build());
 
@@ -85,7 +86,7 @@ public class UserWebController {
 
         String idToken = userService.getGoogleIdToken(code);
 
-        UserDto.UserSocialLoginResponse data = userService.googleLogin(UserDto.UserLoginRequest.builder()
+        UserSocialLoginResponse data = userService.googleLogin(UserLoginRequest.builder()
                 .accessToken(idToken)
                 .build());
 

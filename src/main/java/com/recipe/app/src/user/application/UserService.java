@@ -4,7 +4,11 @@ import com.google.common.base.Preconditions;
 import com.recipe.app.common.utils.HttpUtil;
 import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.common.application.BadWordService;
-import com.recipe.app.src.user.application.dto.UserDto;
+import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
+import com.recipe.app.src.user.application.dto.UserLoginRequest;
+import com.recipe.app.src.user.application.dto.UserLoginResponse;
+import com.recipe.app.src.user.application.dto.UserProfileRequest;
+import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import com.recipe.app.src.user.infra.UserRepository;
@@ -54,12 +58,12 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto.UserLoginResponse autoLogin(User user) {
+    public UserLoginResponse autoLogin(User user) {
 
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        return UserDto.UserLoginResponse.from(user);
+        return UserLoginResponse.from(user);
     }
 
     @Transactional(readOnly = true)
@@ -80,7 +84,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto.UserSocialLoginResponse naverLogin(UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse naverLogin(UserLoginRequest request) throws IOException, ParseException {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
@@ -109,7 +113,7 @@ public class UserService {
 
         String jwt = jwtService.createJwt(user.getUserId());
 
-        return UserDto.UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, jwt);
     }
 
     @Transactional(readOnly = true)
@@ -127,7 +131,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto.UserSocialLoginResponse kakaoLogin(UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse kakaoLogin(UserLoginRequest request) throws IOException, ParseException {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
@@ -152,7 +156,7 @@ public class UserService {
 
         String jwt = jwtService.createJwt(user.getUserId());
 
-        return UserDto.UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, jwt);
     }
 
     @Transactional(readOnly = true)
@@ -171,7 +175,7 @@ public class UserService {
     }
 
     @Transactional
-    public UserDto.UserSocialLoginResponse googleLogin(UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse googleLogin(UserLoginRequest request) throws IOException, ParseException {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
@@ -191,11 +195,11 @@ public class UserService {
 
         String jwt = jwtService.createJwt(user.getUserId());
 
-        return UserDto.UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, jwt);
     }
 
     @Transactional
-    public void updateUser(User user, UserDto.UserProfileRequest request) {
+    public void updateUser(User user, UserProfileRequest request) {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getNickname()), "닉네임을 입력해주세요.");
 
@@ -213,7 +217,7 @@ public class UserService {
     }
 
     @Transactional
-    public void updateFcmToken(User user, UserDto.UserDeviceTokenRequest request) {
+    public void updateFcmToken(User user, UserDeviceTokenRequest request) {
 
         user.changeDeviceToken(request.getFcmToken());
         userRepository.save(user);

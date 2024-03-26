@@ -4,7 +4,12 @@ import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.application.UserFacadeService;
 import com.recipe.app.src.user.application.UserService;
-import com.recipe.app.src.user.application.dto.UserDto;
+import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
+import com.recipe.app.src.user.application.dto.UserLoginRequest;
+import com.recipe.app.src.user.application.dto.UserLoginResponse;
+import com.recipe.app.src.user.application.dto.UserProfileRequest;
+import com.recipe.app.src.user.application.dto.UserProfileResponse;
+import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
@@ -40,7 +45,7 @@ public class UserController {
     @ApiOperation(value = "자동 로그인 API")
     @ResponseBody
     @PostMapping("/auto-login")
-    public BaseResponse<UserDto.UserLoginResponse> autoLogin(@ApiIgnore final Authentication authentication) {
+    public BaseResponse<UserLoginResponse> autoLogin(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -53,7 +58,7 @@ public class UserController {
     @ApiOperation(value = "네이버 로그인 API")
     @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<UserDto.UserSocialLoginResponse> naverLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserSocialLoginResponse> naverLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
         return success(userService.naverLogin(request));
     }
@@ -61,7 +66,7 @@ public class UserController {
     @ApiOperation(value = "카카오 로그인 API")
     @ResponseBody
     @PostMapping("/kakao-login")
-    public BaseResponse<UserDto.UserSocialLoginResponse> kakaoLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserSocialLoginResponse> kakaoLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
         return success(userService.kakaoLogin(request));
     }
@@ -69,7 +74,7 @@ public class UserController {
     @ApiOperation(value = "구글 로그인 API")
     @ResponseBody
     @PostMapping("/google-login")
-    public BaseResponse<UserDto.UserSocialLoginResponse> googleLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserSocialLoginResponse> googleLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
         return success(userService.googleLogin(request));
     }
@@ -77,7 +82,7 @@ public class UserController {
     @ApiOperation(value = "유저 프로필 조회 API")
     @ResponseBody
     @GetMapping("")
-    public BaseResponse<UserDto.UserProfileResponse> getUser(@ApiIgnore final Authentication authentication) {
+    public BaseResponse<UserProfileResponse> getUser(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -92,7 +97,7 @@ public class UserController {
     @PatchMapping("")
     public BaseResponse<Void> patchUser(@ApiIgnore final Authentication authentication,
                                                                @ApiParam(value = "수정할 회원 정보", required = true)
-                                                               @RequestBody UserDto.UserProfileRequest request) {
+                                                               @RequestBody UserProfileRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -132,7 +137,7 @@ public class UserController {
     @PatchMapping("/fcm-token")
     public BaseResponse<Void> patchFcmToken(@ApiIgnore final Authentication authentication,
                                             @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
-                                            @RequestBody UserDto.UserDeviceTokenRequest request) {
+                                            @RequestBody UserDeviceTokenRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
