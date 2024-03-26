@@ -11,6 +11,7 @@ import com.recipe.app.src.user.application.dto.UserProfileRequest;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
+import com.recipe.app.src.user.exception.NotFoundUserException;
 import com.recipe.app.src.user.infra.UserRepository;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -27,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 @Service
-@Transactional(readOnly = true)
 public class UserService {
 
     @Value("${kakao.client-id}")
@@ -55,6 +55,11 @@ public class UserService {
         this.userRepository = userRepository;
         this.jwtService = jwtService;
         this.badWordService = badWordService;
+    }
+
+    @Transactional(readOnly = true)
+    public User findByUserId(Long userId) {
+        return userRepository.findById(userId).orElseThrow(NotFoundUserException::new);
     }
 
     @Transactional
