@@ -1,6 +1,5 @@
 package com.recipe.app.src.fridgeBasket.application.port;
 
-import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.user.domain.User;
 

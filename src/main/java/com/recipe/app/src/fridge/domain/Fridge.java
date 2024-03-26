@@ -3,8 +3,7 @@ package com.recipe.app.src.fridge.domain;
 import com.recipe.app.common.entity.BaseEntity;
 import lombok.AccessLevel;
 import lombok.Builder;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
@@ -13,9 +12,8 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "Fridge")
 public class Fridge extends BaseEntity {
