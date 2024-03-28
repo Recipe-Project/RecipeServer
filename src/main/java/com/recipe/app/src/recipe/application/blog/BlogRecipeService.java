@@ -53,6 +53,7 @@ public class BlogRecipeService {
     @Value("${naver.client-secret}")
     private String naverClientSecret;
 
+    @Transactional(readOnly = true)
     public RecipesResponse getBlogRecipes(User user, String keyword, int page, int size, String sort) throws IOException, ParseException {
 
         badWordService.checkBadWords(keyword);
@@ -82,6 +83,7 @@ public class BlogRecipeService {
                 .collect(Collectors.toList()));
     }
 
+    @Transactional(readOnly = true)
     public RecipesResponse getScrapBlogRecipes(User user, int page, int size) {
 
         Page<BlogScrap> blogScraps = blogScrapService.findByUserId(user.getUserId(), page, size);
@@ -139,7 +141,6 @@ public class BlogRecipeService {
         blogRecipeRepository.saveAll(blogRecipes);
     }
 
-    @Nullable
     private String getBlogThumbnailUrl(String blogUrl) {
 
         try {
