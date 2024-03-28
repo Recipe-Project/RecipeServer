@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.domain;
+package com.recipe.app.src.recipe.domain.keyword;
 
 import lombok.AccessLevel;
 import lombok.Getter;

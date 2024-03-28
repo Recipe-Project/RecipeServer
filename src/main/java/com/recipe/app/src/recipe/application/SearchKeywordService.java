@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application;
 
-import com.recipe.app.src.recipe.domain.SearchKeyword;
+import com.recipe.app.src.recipe.domain.keyword.SearchKeyword;
 import com.recipe.app.src.recipe.infra.keyword.SearchKeywordRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
