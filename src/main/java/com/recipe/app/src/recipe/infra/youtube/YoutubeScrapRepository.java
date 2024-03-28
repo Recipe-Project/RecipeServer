@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -13,6 +14,8 @@ public interface YoutubeScrapRepository extends JpaRepository<YoutubeScrap, Long
     Optional<YoutubeScrap> findByUserIdAndYoutubeRecipeId(Long userId, Long youtubeRecipeId);
 
     Page<YoutubeScrap> findByUserId(Long userId, Pageable pageable);
+
+    List<YoutubeScrap> findByUserId(Long userId);
 
     long countByUserId(Long userId);
 }
