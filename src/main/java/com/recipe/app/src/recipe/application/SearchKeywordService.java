@@ -1,8 +1,7 @@
 package com.recipe.app.src.recipe.application;
 
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.src.recipe.application.port.SearchKeywordRepository;
-import lombok.RequiredArgsConstructor;
+import com.recipe.app.src.recipe.domain.SearchKeyword;
+import com.recipe.app.src.recipe.infra.keyword.SearchKeywordRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -11,17 +10,23 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
-@Transactional(readOnly = true)
 public class SearchKeywordService {
 
     private final SearchKeywordRepository searchKeywordRepository;
 
-    public List<String> retrieveRecipesBestKeyword() throws BaseException {
+    public SearchKeywordService(SearchKeywordRepository searchKeywordRepository) {
+        this.searchKeywordRepository = searchKeywordRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<String> retrieveRecipesBestKeyword() {
         Random random = new Random();
-        List<String> recipeKeywords = searchKeywordRepository.findAll();
+        List<String> recipeKeywords = searchKeywordRepository.findAll().stream()
+                .map(SearchKeyword::getKeyword)
+                .collect(Collectors.toList());
 
         List<String> keywords = new ArrayList<>();
 

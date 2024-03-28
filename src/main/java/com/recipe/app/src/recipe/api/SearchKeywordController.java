@@ -15,19 +15,20 @@ import static com.recipe.app.common.response.BaseResponse.success;
 
 @Api(tags = {"검색어 Controller"})
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/recipes")
 public class SearchKeywordController {
 
-    private final SearchKeywordService recipeKeywordService;
+    private final SearchKeywordService searchKeywordService;
+
+    public SearchKeywordController(SearchKeywordService searchKeywordService) {
+        this.searchKeywordService = searchKeywordService;
+    }
 
     @ApiOperation(value = "검색어 추천 목록 조회 API")
     @GetMapping("/best-keywords")
     public BaseResponse<List<String>> getRecipeBestKeywords() {
 
-        List<String> data = recipeKeywordService.retrieveRecipesBestKeyword();
-
-        return success(data);
+        return success(searchKeywordService.retrieveRecipesBestKeyword());
     }
 
 
