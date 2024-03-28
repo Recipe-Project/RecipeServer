@@ -1,4 +1,4 @@
-package com.recipe.app.src.recipe.application;
+package com.recipe.app.src.recipe.application.keyword;
 
 import com.recipe.app.src.recipe.domain.keyword.SearchKeyword;
 import com.recipe.app.src.recipe.infra.keyword.SearchKeywordRepository;
