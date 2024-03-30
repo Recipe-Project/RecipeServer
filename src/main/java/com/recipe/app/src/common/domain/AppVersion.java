@@ -2,18 +2,17 @@ package com.recipe.app.src.common.domain;
 
 import lombok.AccessLevel;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
-@EqualsAndHashCode(callSuper = false)
-@Data
+@Getter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "AppVersion")
 public class AppVersion {
+
     @Id
     @Column(name = "idx", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
