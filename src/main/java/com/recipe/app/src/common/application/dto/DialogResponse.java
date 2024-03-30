@@ -6,13 +6,13 @@ import lombok.Getter;
 
 @Getter
 public class DialogResponse {
-    private final int idx;
+    private final Long idx;
     private final String title;
     private final String content;
     private final String link;
 
     @Builder
-    public DialogResponse(int idx, String title, String content, String link) {
+    public DialogResponse(Long idx, String title, String content, String link) {
         this.idx = idx;
         this.title = title;
         this.content = content;

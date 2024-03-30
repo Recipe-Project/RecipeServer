@@ -16,7 +16,7 @@ public class Dialog extends BaseEntity {
     @Id
     @Column(name = "idx", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idx;
+    private Long idx;
 
     @Column(name = "title", nullable = false, length = 128)
     private String title;

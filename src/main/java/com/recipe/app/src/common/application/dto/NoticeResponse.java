@@ -6,12 +6,12 @@ import lombok.Getter;
 
 @Getter
 public class NoticeResponse {
-    private final int idx;
+    private final Long idx;
     private final String title;
     private final String content;
 
     @Builder
-    public NoticeResponse(int idx, String title, String content) {
+    public NoticeResponse(Long idx, String title, String content) {
         this.idx = idx;
         this.title = title;
         this.content = content;

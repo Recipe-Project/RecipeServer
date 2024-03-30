@@ -7,6 +7,6 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface DialogRepository extends JpaRepository<Dialog, Integer> {
+public interface DialogRepository extends JpaRepository<Dialog, Long> {
     Optional<Dialog> findFirstByActiveYn(String activeYn);
 }

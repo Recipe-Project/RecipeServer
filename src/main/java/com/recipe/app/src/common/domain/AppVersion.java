@@ -16,7 +16,7 @@ public class AppVersion {
     @Id
     @Column(name = "idx", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int idx;
+    private Long idx;
 
     @Column(name = "version", nullable = false, length = 20)
     private String version;
