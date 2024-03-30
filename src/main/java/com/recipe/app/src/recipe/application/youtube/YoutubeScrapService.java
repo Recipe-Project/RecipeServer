@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -55,5 +56,11 @@ public class YoutubeScrapService {
     public Page<YoutubeScrap> findByUserId(Long userId, int page, int size) {
 
         return youtubeScrapRepository.findByUserId(userId, PageRequest.of(page, size));
+    }
+
+    @Transactional(readOnly = true)
+    public List<YoutubeScrap> findByYoutubeRecipeIds(Collection<Long> youtubeRecipeIds) {
+
+        return youtubeScrapRepository.findByYoutubeRecipeIdIn(youtubeRecipeIds);
     }
 }

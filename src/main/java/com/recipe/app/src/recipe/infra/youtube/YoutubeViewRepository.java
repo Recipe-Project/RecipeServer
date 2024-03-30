@@ -4,6 +4,7 @@ import com.recipe.app.src.recipe.domain.youtube.YoutubeView;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +14,6 @@ public interface YoutubeViewRepository extends JpaRepository<YoutubeView, Long> 
     Optional<YoutubeView> findByUserIdAndYoutubeRecipeId(Long userId, Long youtubeRecipeId);
 
     List<YoutubeView> findByUserId(Long userId);
+
+    List<YoutubeView> findByYoutubeRecipeIdIn(Collection<Long> youtubeRecipeIds);
 }
