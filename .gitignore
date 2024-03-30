@@ -10,6 +10,7 @@ nohup.out
 application.yml
 Secret.java
 recipeapp-key.json
+src/main/generated
 
 ### STS ###
 .apt_generated
