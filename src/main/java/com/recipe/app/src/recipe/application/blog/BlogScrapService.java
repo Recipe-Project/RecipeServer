@@ -8,6 +8,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -56,5 +57,11 @@ public class BlogScrapService {
     public long countBlogScrapByUser(User user) {
 
         return blogScrapRepository.countByUserId(user.getUserId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<BlogScrap> findByBlogRecipeIds(Collection<Long> blogRecipeIds) {
+
+        return blogScrapRepository.findByBlogRecipeIdIn(blogRecipeIds);
     }
 }

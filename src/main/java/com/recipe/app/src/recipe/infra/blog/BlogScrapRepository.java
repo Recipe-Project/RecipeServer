@@ -6,6 +6,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
@@ -19,4 +20,6 @@ public interface BlogScrapRepository extends JpaRepository<BlogScrap, Long> {
     List<BlogScrap> findByUserId(Long userId);
 
     long countByUserId(Long userId);
+
+    List<BlogScrap> findByBlogRecipeIdIn(Collection<Long> blogRecipeIds);
 }

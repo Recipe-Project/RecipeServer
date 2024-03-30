@@ -6,9 +6,9 @@ import com.recipe.app.src.recipe.application.dto.RecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
+import com.recipe.app.src.recipe.domain.blog.BlogView;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
 import com.recipe.app.src.user.domain.User;
-import org.jetbrains.annotations.Nullable;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -40,11 +40,13 @@ public class BlogRecipeService {
 
     private final BlogRecipeRepository blogRecipeRepository;
     private final BlogScrapService blogScrapService;
+    private final BlogViewService blogViewService;
     private final BadWordService badWordService;
 
-    public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BadWordService badWordService) {
+    public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BlogViewService blogViewService, BadWordService badWordService) {
         this.blogRecipeRepository = blogRecipeRepository;
         this.blogScrapService = blogScrapService;
+        this.blogViewService = blogViewService;
         this.badWordService = badWordService;
     }
 
@@ -58,6 +60,18 @@ public class BlogRecipeService {
 
         badWordService.checkBadWords(keyword);
 
+        Page<BlogRecipe> blogRecipes = findByKeywordSortBy(keyword, page, size, sort);
+
+        if (blogRecipes.getTotalElements() < 10) {
+            searchNaverBlogRecipes(keyword);
+            blogRecipes = findByKeywordSortBy(keyword, page, size, sort);
+        }
+
+        return getRecipes(user, blogRecipes);
+    }
+
+    private Page<BlogRecipe> findByKeywordSortBy(String keyword, int page, int size, String sort) {
+
         Pageable pageable = PageRequest.of(page, size);
         Page<BlogRecipe> blogRecipes;
         if (sort.equals("blogScraps"))
@@ -67,20 +81,7 @@ public class BlogRecipeService {
         else
             blogRecipes = blogRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByCreatedAtDesc(keyword, keyword, pageable);
 
-        if (blogRecipes.getTotalElements() < 10) {
-            searchNaverBlogRecipes(keyword);
-
-            if (sort.equals("blogScraps"))
-                blogRecipes = blogRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByBlogScrapSizeDesc(keyword, keyword, pageable);
-            else if (sort.equals("blogViews"))
-                blogRecipes = blogRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByBlogViewSizeDesc(keyword, keyword, pageable);
-            else
-                blogRecipes = blogRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByCreatedAtDesc(keyword, keyword, pageable);
-        }
-
-        return new RecipesResponse(blogRecipes.getTotalElements(), blogRecipes.stream()
-                .map(blogRecipe -> RecipeResponse.from(blogRecipe, user))
-                .collect(Collectors.toList()));
+        return blogRecipes;
     }
 
     @Transactional(readOnly = true)
@@ -90,11 +91,47 @@ public class BlogRecipeService {
         List<Long> blogRecipeIds = blogScraps.stream()
                 .map(BlogScrap::getBlogRecipeId)
                 .collect(Collectors.toList());
-        List<BlogRecipe> blogRecipes = blogRecipeRepository.findAllById(blogRecipeIds);
+        Map<Long, BlogRecipe> blogRecipeMapById = blogRecipeRepository.findAllById(blogRecipeIds).stream()
+                .collect(Collectors.toMap(BlogRecipe::getBlogRecipeId, Function.identity()));
+        Page<BlogRecipe> blogRecipes = blogScraps.map(blogScrap -> blogRecipeMapById.get(blogScrap.getBlogRecipeId()));
 
-        return new RecipesResponse(blogScraps.getTotalElements(), blogRecipes.stream()
-                .map(blogRecipe -> RecipeResponse.from(blogRecipe, user))
+        return getRecipes(user, blogRecipes);
+    }
+
+    private RecipesResponse getRecipes(User user, Page<BlogRecipe> blogRecipes) {
+
+        List<Long> blogRecipeIds = blogRecipes.stream()
+                .map(BlogRecipe::getBlogRecipeId)
+                .collect(Collectors.toList());
+        List<BlogScrap> blogScraps = blogScrapService.findByBlogRecipeIds(blogRecipeIds);
+        List<BlogView> blogViews = blogViewService.findByBlogRecipeIds(blogRecipeIds);
+
+        return new RecipesResponse(blogRecipes.getTotalElements(), blogRecipes.stream()
+                .map(blogRecipe -> {
+                    long scrapCnt = getBlogScrapCnt(blogScraps, blogRecipe.getBlogRecipeId(), user);
+                    long viewCnt = getBlogViewCnt(blogViews, blogRecipe.getBlogRecipeId(), user);
+                    boolean isUserScrap = isUserScrap(blogScraps, blogRecipe.getBlogRecipeId(), user);
+
+                    return RecipeResponse.from(blogRecipe, isUserScrap, scrapCnt, viewCnt);
+                })
                 .collect(Collectors.toList()));
+    }
+
+    private boolean isUserScrap(List<BlogScrap> blogScraps, Long blogRecipeId, User user) {
+        return blogScraps.stream()
+                .anyMatch(blogScrap -> blogScrap.getBlogRecipeId().equals(blogRecipeId) && blogScrap.getUserId().equals(user.getUserId()));
+    }
+
+    private long getBlogViewCnt(List<BlogView> blogViews, Long blogRecipeId, User user) {
+        return blogViews.stream()
+                .filter(blogView -> blogView.getBlogViewId().equals(blogRecipeId) && blogView.getUserId().equals(user.getUserId()))
+                .count();
+    }
+
+    private long getBlogScrapCnt(List<BlogScrap> blogScraps, Long blogRecipeId, User user) {
+        return blogScraps.stream()
+                .filter(blogScrap -> blogScrap.getBlogRecipeId().equals(blogRecipeId) && blogScrap.getUserId().equals(user.getUserId()))
+                .count();
     }
 
     @Transactional
