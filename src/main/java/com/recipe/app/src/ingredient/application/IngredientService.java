@@ -1,9 +1,6 @@
 package com.recipe.app.src.ingredient.application;
 
-import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
-import com.recipe.app.src.ingredient.application.dto.IngredientsResponse;
 import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.ingredient.exception.NotFoundIngredientException;
 import com.recipe.app.src.ingredient.infra.IngredientRepository;
 import com.recipe.app.src.user.domain.User;
@@ -19,29 +16,19 @@ import java.util.Optional;
 public class IngredientService {
 
     private final IngredientRepository ingredientRepository;
-    private final IngredientCategoryService ingredientCategoryService;
-    private final FridgeBasketService fridgeBasketService;
 
-    public IngredientService(IngredientRepository ingredientRepository, IngredientCategoryService ingredientCategoryService, FridgeBasketService fridgeBasketService) {
-
+    public IngredientService(IngredientRepository ingredientRepository) {
         this.ingredientRepository = ingredientRepository;
-        this.ingredientCategoryService = ingredientCategoryService;
-        this.fridgeBasketService = fridgeBasketService;
     }
 
     @Transactional(readOnly = true)
-    public IngredientsResponse findIngredientsByKeyword(User user, String keyword) {
+    public List<Ingredient> findByKeyword(String keyword) {
 
-        long fridgeBasketCount = fridgeBasketService.countByUserId(user.getUserId());
-        List<IngredientCategory> categories = ingredientCategoryService.findAll();
-        List<Ingredient> ingredients;
         if (!StringUtils.hasText(keyword)) {
-            ingredients = ingredientRepository.findDefaultIngredients();
-        } else {
-            ingredients = ingredientRepository.findDefaultIngredientsByIngredientNameContaining(keyword);
+            return ingredientRepository.findDefaultIngredients();
         }
 
-        return IngredientsResponse.from(fridgeBasketCount, categories, ingredients);
+        return ingredientRepository.findDefaultIngredientsByIngredientNameContaining(keyword);
     }
 
     @Transactional(readOnly = true)

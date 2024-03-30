@@ -1,7 +1,7 @@
 package com.recipe.app.src.ingredient.api;
 
 import com.recipe.app.common.response.BaseResponse;
-import com.recipe.app.src.ingredient.application.IngredientService;
+import com.recipe.app.src.ingredient.application.IngredientFacadeService;
 import com.recipe.app.src.ingredient.application.dto.IngredientsResponse;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
@@ -24,10 +24,10 @@ import static com.recipe.app.common.response.BaseResponse.success;
 @RequestMapping("/ingredients")
 public class IngredientController {
 
-    private final IngredientService ingredientService;
+    private final IngredientFacadeService ingredientFacadeService;
 
-    public IngredientController(IngredientService ingredientService) {
-        this.ingredientService = ingredientService;
+    public IngredientController(IngredientFacadeService ingredientFacadeService) {
+        this.ingredientFacadeService = ingredientFacadeService;
     }
 
     @ApiOperation(value = "재료 목록 조회 API")
@@ -41,6 +41,6 @@ public class IngredientController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(ingredientService.findIngredientsByKeyword(user, keyword));
+        return success(ingredientFacadeService.findIngredientsByKeyword(user, keyword));
     }
 }
