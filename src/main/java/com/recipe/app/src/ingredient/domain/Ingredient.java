@@ -2,25 +2,24 @@ package com.recipe.app.src.ingredient.domain;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.common.entity.BaseEntity;
-import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
-import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "Ingredient")
-public class Ingredient extends BaseEntity implements Comparable<Ingredient> {
+public class Ingredient extends BaseEntity {
     @Id
     @Column(name = "ingredientId", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -57,64 +56,6 @@ public class Ingredient extends BaseEntity implements Comparable<Ingredient> {
         this.userId = userId;
         this.defaultYn = isDefault ? "Y" : "N";
         this.hiddenYn = isHidden ? "Y" : "N";
-    }
-
-    @Override
-    public int compareTo(@NotNull Ingredient ingredient) {
-        return Integer.compare(this.getIngredientName().length(), ingredient.getIngredientName().length());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        com.recipe.app.src.ingredient.domain.Ingredient ingredient = (com.recipe.app.src.ingredient.domain.Ingredient) o;
-
-        if (ingredientId.equals(ingredient.getIngredientId()))
-            return true;
-
-        if ((ingredientName.equals("새우") && ingredient.getIngredientName().equals("대하"))
-                || (ingredientName.equals("대하") && ingredient.getIngredientName().equals("새우"))
-                || (ingredientName.equals("계란") && ingredient.getIngredientName().equals("달걀"))
-                || (ingredientName.equals("달걀") && ingredient.getIngredientName().equals("계란"))
-                || (ingredientName.equals("소고기") && ingredient.getIngredientName().equals("쇠고기"))
-                || (ingredientName.equals("쇠고기") && ingredient.getIngredientName().equals("소고기"))
-                || (ingredientName.equals("후추") && ingredient.getIngredientName().equals("후춧가루"))
-                || (ingredientName.equals("후춧가루") && ingredient.getIngredientName().equals("후추"))
-                || (ingredientName.equals("간마늘") && ingredient.getIngredientName().equals("다진마늘"))
-                || (ingredientName.equals("다진마늘") && ingredient.getIngredientName().equals("간마늘"))
-                || (ingredientName.equals("새싹채소") && ingredient.getIngredientName().equals("어린잎채소"))
-                || (ingredientName.equals("어린잎채소") && ingredient.getIngredientName().equals("새싹채소"))
-                || (ingredientName.equals("새싹채소") && ingredient.getIngredientName().equals("무순"))
-                || (ingredientName.equals("무순") && ingredient.getIngredientName().equals("새싹채소"))
-                || (ingredientName.contains("조개") && ingredient.getIngredientName().contains("조개"))
-                || (ingredientName.equals("조개") && ingredient.getIngredientName().equals("조갯살"))
-                || (ingredientName.equals("조갯살") && ingredient.getIngredientName().equals("조개"))
-                || (ingredientName.equals("조개") && ingredient.getIngredientName().equals("바지락"))
-                || (ingredientName.equals("바지락") && ingredient.getIngredientName().equals("조개"))
-                || (ingredientName.equals("케찹") && ingredient.getIngredientName().equals("케첩"))
-                || (ingredientName.equals("케첩") && ingredient.getIngredientName().equals("케찹"))
-                || (ingredientName.equals("소면") && ingredient.getIngredientName().equals("국수"))
-                || (ingredientName.equals("국수") && ingredient.getIngredientName().equals("소면"))
-                || (ingredientName.equals("김치") && ingredient.getIngredientName().equals("김칫잎"))
-                || (ingredientName.equals("김칫잎") && ingredient.getIngredientName().equals("김치"))
-                || (ingredientName.equals("고춧가루") && ingredient.getIngredientName().equals("고추가루"))
-                || (ingredientName.equals("고추가루") && ingredient.getIngredientName().equals("고춧가루"))
-                || (ingredientName.equals("올리브유") && ingredient.getIngredientName().equals("올리브오일"))
-                || (ingredientName.equals("올리브오일") && ingredient.getIngredientName().equals("올리브유"))
-                || (ingredientName.equals("파스타") && ingredient.getIngredientName().equals("스파게티"))
-                || (ingredientName.equals("스파게티") && ingredient.getIngredientName().equals("파스타"))
-                || (ingredientName.equals("포도씨유") && ingredient.getIngredientName().equals("식용유"))
-                || (ingredientName.equals("식용유") && ingredient.getIngredientName().equals("포도씨유"))) {
-            return true;
-        }
-
-        return ingredientName.replace(" ", "").equals(ingredient.getIngredientName().replace(" ", ""));
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getIngredientId(), getIngredientName().replace(" ", ""));
     }
 
     public List<String> getSimilarIngredientName() {
@@ -179,5 +120,45 @@ public class Ingredient extends BaseEntity implements Comparable<Ingredient> {
         if (ingredientName.equals("식용유"))
             return List.of("포도씨유");
         return new ArrayList<>();
+    }
+
+    public boolean existInIngredients(Collection<Ingredient> ingredients) {
+
+        List<String> ingredientNames = ingredients.stream()
+                .map(Ingredient::getIngredientName)
+                .collect(Collectors.toList());
+
+        return (ingredientName.equals("새우") && ingredientNames.contains("대하"))
+                || (ingredientName.equals("대하") && ingredientNames.contains("새우"))
+                || (ingredientName.equals("계란") && ingredientNames.contains("달걀"))
+                || (ingredientName.equals("달걀") && ingredientNames.contains("계란"))
+                || (ingredientName.equals("소고기") && ingredientNames.contains("쇠고기"))
+                || (ingredientName.equals("쇠고기") && ingredientNames.contains("소고기"))
+                || (ingredientName.equals("후추") && ingredientNames.contains("후춧가루"))
+                || (ingredientName.equals("후춧가루") && ingredientNames.contains("후추"))
+                || (ingredientName.equals("간마늘") && ingredientNames.contains("다진마늘"))
+                || (ingredientName.equals("다진마늘") && ingredientNames.contains("간마늘"))
+                || (ingredientName.equals("새싹채소") && ingredientNames.contains("어린잎채소"))
+                || (ingredientName.equals("어린잎채소") && ingredientNames.contains("새싹채소"))
+                || (ingredientName.equals("새싹채소") && ingredientNames.contains("무순"))
+                || (ingredientName.equals("무순") && ingredientNames.contains("새싹채소"))
+                || (ingredientName.equals("조개") && ingredientNames.contains("조갯살"))
+                || (ingredientName.equals("조갯살") && ingredientNames.contains("조개"))
+                || (ingredientName.equals("조개") && ingredientNames.contains("바지락"))
+                || (ingredientName.equals("바지락") && ingredientNames.contains("조개"))
+                || (ingredientName.equals("케찹") && ingredientNames.contains("케첩"))
+                || (ingredientName.equals("케첩") && ingredientNames.contains("케찹"))
+                || (ingredientName.equals("소면") && ingredientNames.contains("국수"))
+                || (ingredientName.equals("국수") && ingredientNames.contains("소면"))
+                || (ingredientName.equals("김치") && ingredientNames.contains("김칫잎"))
+                || (ingredientName.equals("김칫잎") && ingredientNames.contains("김치"))
+                || (ingredientName.equals("고춧가루") && ingredientNames.contains("고추가루"))
+                || (ingredientName.equals("고추가루") && ingredientNames.contains("고춧가루"))
+                || (ingredientName.equals("올리브유") && ingredientNames.contains("올리브오일"))
+                || (ingredientName.equals("올리브오일") && ingredientNames.contains("올리브유"))
+                || (ingredientName.equals("파스타") && ingredientNames.contains("스파게티"))
+                || (ingredientName.equals("스파게티") && ingredientNames.contains("파스타"))
+                || (ingredientName.equals("포도씨유") && ingredientNames.contains("식용유"))
+                || (ingredientName.equals("식용유") && ingredientNames.contains("포도씨유"));
     }
 }
