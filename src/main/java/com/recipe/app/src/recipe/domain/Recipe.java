@@ -1,35 +1,61 @@
 package com.recipe.app.src.recipe.domain;
 
-import com.recipe.app.src.user.domain.User;
+import com.google.common.base.Preconditions;
+import com.recipe.app.common.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import javax.persistence.*;
 import java.util.Objects;
 
 @Getter
-public class Recipe {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "Recipe")
+public class Recipe extends BaseEntity {
 
-    private final Long recipeId;
-    private final String recipeNm;
-    private final String introduction;
-    private final Long cookingTime;
-    private final RecipeLevel level;
-    private final String imgUrl;
-    private final Long quantity;
-    private final Long calorie;
-    private final User user;
-    private final boolean isHidden;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final List<User> scrapUsers;
-    private final List<User> viewUsers;
+    @Id
+    @Column(name = "recipeId", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long recipeId;
+
+    @Column(name = "recipeNm", nullable = false, length = 45)
+    private String recipeNm;
+
+    @Column(name = "introduction", length = 200)
+    private String introduction;
+
+    @Column(name = "cookingTime")
+    private Long cookingTime;
+
+    @Column(name = "level", length = 2)
+    private RecipeLevel level;
+
+    @Column(name = "imgUrl")
+    private String imgUrl;
+
+    @Column(name = "quantity")
+    private Long quantity;
+
+    @Column(name = "calorie")
+    private Long calorie;
+
+    @Column(name = "userId", nullable = false)
+    private Long userId;
+
+    @Column(name = "hiddenYn", nullable = false)
+    private String hiddenYn = "Y";
 
     @Builder
-    public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, RecipeLevel level, String imgUrl,
-                  Long quantity, Long calorie, User user, boolean isHidden, LocalDateTime createdAt, LocalDateTime updatedAt,
-                  List<User> scrapUsers, List<User> viewUsers) {
+    public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, RecipeLevel level,
+                  String imgUrl, Long quantity, Long calorie, Long userId, boolean isHidden) {
+
+        Preconditions.checkArgument(StringUtils.hasText(recipeNm), "레시피명을 입력해주세요.");
+        Objects.requireNonNull(userId, "유저 아이디를 입력해주세요.");
+
         this.recipeId = recipeId;
         this.recipeNm = recipeNm;
         this.introduction = introduction;
@@ -38,81 +64,31 @@ public class Recipe {
         this.imgUrl = imgUrl;
         this.quantity = quantity;
         this.calorie = calorie;
-        this.user = user;
-        this.isHidden = isHidden;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-        this.scrapUsers = scrapUsers;
-        this.viewUsers = viewUsers;
+        this.userId = userId;
+        this.hiddenYn = isHidden ? "Y" : "N";
     }
 
-    public static Recipe from(String recipeNm, String introduction, Long cookingTime, String levelCd,
-                              String imgUrl, Long quantity, Long calorie, User user, boolean isHidden) {
-        LocalDateTime now = LocalDateTime.now();
-        return Recipe.builder()
-                .recipeNm(recipeNm)
-                .introduction(introduction)
-                .cookingTime(cookingTime)
-                .level(RecipeLevel.findRecipeLevelByCode(levelCd))
-                .imgUrl(imgUrl)
-                .quantity(quantity)
-                .calorie(calorie)
-                .user(user)
-                .isHidden(isHidden)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
+    public Recipe(RecipeWithRate recipeWithRate) {
+        this.recipeId = recipeWithRate.getRecipeId();
+        this.recipeNm = recipeWithRate.getRecipeNm();
+        this.introduction = recipeWithRate.getIntroduction();
+        this.cookingTime = recipeWithRate.getCookingTime();
+        this.level = recipeWithRate.getLevel();
+        this.imgUrl = recipeWithRate.getImgUrl();
+        this.quantity = recipeWithRate.getQuantity();
+        this.calorie = recipeWithRate.getCalorie();
+        this.userId = recipeWithRate.getUserId();
+        this.hiddenYn = recipeWithRate.getHiddenYn();
+        this.setCreatedAt(recipeWithRate.getCreatedAt());
+        this.setUpdatedAt(recipeWithRate.getUpdatedAt());
     }
 
-    public boolean isScrapByUser(User user) {
-        return scrapUsers.contains(user);
+    public void updateRecipe(String recipeNm, String imgUrl) {
+        this.recipeNm = recipeNm;
+        this.imgUrl = imgUrl;
     }
 
-    public Recipe update(Long recipeId, String recipeNm, String introduction, Long cookingTime, String levelCd, String imgUrl,
-                         Long quantity, Long calorie, boolean isHidden) {
-        LocalDateTime now = LocalDateTime.now();
-        return Recipe.builder()
-                .recipeId(recipeId)
-                .recipeNm(recipeNm)
-                .introduction(introduction)
-                .cookingTime(cookingTime)
-                .level(RecipeLevel.findRecipeLevelByCode(levelCd))
-                .imgUrl(imgUrl)
-                .quantity(quantity)
-                .calorie(calorie)
-                .user(user)
-                .isHidden(isHidden)
-                .createdAt(createdAt)
-                .updatedAt(now)
-                .build();
-    }
-
-    public void addScrapUser(Long userId) {
-        if (userId == null)
-            return;
-        this.scrapUsers.add(User.builder()
-                .userId(userId)
-                .build());
-    }
-
-    public void addViewUser(Long userId) {
-        if (userId == null)
-            return;
-        this.viewUsers.add(User.builder()
-                .userId(userId)
-                .build());
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Recipe recipe = (Recipe) o;
-        return getRecipeId().equals(recipe.getRecipeId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getRecipeId());
+    public boolean isHidden() {
+        return hiddenYn.equals("Y");
     }
 }

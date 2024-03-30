@@ -1,21 +1,37 @@
-package com.recipe.app.src.recipe.infra;
+package com.recipe.app.src.recipe.domain;
+
+import com.recipe.app.src.recipe.domain.RecipeLevel;
 
 import java.time.LocalDateTime;
 
-public interface RecipeEntityWithRate {
+public interface RecipeWithRate {
     Long getRecipeId();
+
     String getRecipeNm();
+
     String getIntroduction();
+
     Long getCookingTime();
-    String getLevelCd();
+
+    RecipeLevel getLevel();
+
     String getImgUrl();
+
     Long getQuantity();
+
     Long getCalorie();
+
     String getHiddenYn();
+
     Long getUserId();
+
     Double getMatchRate();
+
     LocalDateTime getCreatedAt();
+
     LocalDateTime getUpdatedAt();
+
     Long getScrapUserId();
+
     Long getViewUserId();
 }

@@ -1,47 +1,43 @@
 package com.recipe.app.src.recipe.domain;
 
-import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.common.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
-public class RecipeIngredient {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "RecipeIngredient")
+public class RecipeIngredient extends BaseEntity {
 
-    private final Long recipeIngredientId;
-    private final Recipe recipe;
-    private final Ingredient ingredient;
-    private final String capacity;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    @Id
+    @Column(name = "recipeIngredientId", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long recipeIngredientId;
+
+    @Column(name = "recipeId", nullable = false)
+    private Long recipeId;
+
+    @Column(name = "capacity", nullable = false)
+    private Long ingredientId;
+
+    @Column(name = "capacity")
+    private String capacity;
 
     @Builder
-    public RecipeIngredient(Long recipeIngredientId, Recipe recipe, Ingredient ingredient, String capacity,
-                            LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public RecipeIngredient(Long recipeIngredientId, Long recipeId, Long ingredientId, String capacity) {
+
+        Objects.requireNonNull(recipeId, "레시피 아이디를 입력해주세요.");
+        Objects.requireNonNull(ingredientId, "재료 아이디를 입력해주세요.");
+
         this.recipeIngredientId = recipeIngredientId;
-        this.recipe = recipe;
-        this.ingredient = ingredient;
+        this.recipeId = recipeId;
+        this.ingredientId = ingredientId;
         this.capacity = capacity;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public static RecipeIngredient from(Recipe recipe, Ingredient ingredient, String capacity) {
-        LocalDateTime now = LocalDateTime.now();
-        return RecipeIngredient.builder()
-                .recipe(recipe)
-                .ingredient(ingredient)
-                .capacity(capacity)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-    }
-
-    public boolean isInFridges(List<Fridge> fridges) {
-        return fridges.stream()
-                .anyMatch(f -> f.getIngredient().equals(ingredient));
     }
 }
