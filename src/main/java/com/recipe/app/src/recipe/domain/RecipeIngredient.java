@@ -23,7 +23,7 @@ public class RecipeIngredient extends BaseEntity {
     @Column(name = "recipeId", nullable = false)
     private Long recipeId;
 
-    @Column(name = "capacity", nullable = false)
+    @Column(name = "ingredientId", nullable = false)
     private Long ingredientId;
 
     @Column(name = "capacity")
