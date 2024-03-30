@@ -4,6 +4,7 @@ import com.recipe.app.src.common.application.dto.DialogResponse;
 import com.recipe.app.src.common.exception.NotFoundNoticeException;
 import com.recipe.app.src.common.infra.DialogRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class DialogService {
@@ -13,6 +14,7 @@ public class DialogService {
         this.dialogRepository = dialogRepository;
     }
 
+    @Transactional(readOnly = true)
     public DialogResponse findDialog() {
 
         return DialogResponse.from(dialogRepository.findFirstByActiveYn("Y")

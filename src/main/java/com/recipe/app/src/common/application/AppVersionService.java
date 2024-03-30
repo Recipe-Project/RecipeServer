@@ -13,7 +13,7 @@ public class AppVersionService {
         this.appVersionRepository = appVersionRepository;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public AppVersionResponse findAppVersion() {
 
         return new AppVersionResponse(appVersionRepository.findFirstAppVersionOrderByIdx());
