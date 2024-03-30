@@ -1,15 +1,12 @@
 package com.recipe.app.src.user.application.dto;
 
-import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.user.domain.LoginProvider;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Schema(description = "회원 프로필 응답 DTO")
 @Getter
@@ -34,7 +31,7 @@ public class UserProfileResponse {
     @Schema(description = "나만의 레시피 전체 등록 수")
     private final int userRecipeTotalSize;
     @Schema(description = "나만의 레시피 목록")
-    private List<UserRecipeResponse> userRecipes = new ArrayList<>();
+    private final List<UserRecipeResponse> userRecipes;
 
     @Builder
     public UserProfileResponse(Long userId, String profileImgUrl, String nickname, String email, LoginProvider loginProvider, long youtubeScrapCnt, long blogScrapCnt, long recipeScrapCnt, int userRecipeTotalSize, List<UserRecipeResponse> userRecipes) {
@@ -52,7 +49,7 @@ public class UserProfileResponse {
     }
 
 
-    public static UserProfileResponse from(User user, List<Recipe> userRecipes, long youtubeScrapCnt, long blogScrapCnt, long recipeScrapCnt) {
+    public static UserProfileResponse from(User user, List<UserRecipeResponse> userRecipes, long youtubeScrapCnt, long blogScrapCnt, long recipeScrapCnt) {
 
         return UserProfileResponse.builder()
                 .userId(user.getUserId())
@@ -64,9 +61,7 @@ public class UserProfileResponse {
                 .blogScrapCnt(blogScrapCnt)
                 .recipeScrapCnt(recipeScrapCnt)
                 .userRecipeTotalSize(userRecipes.size())
-                .userRecipes(userRecipes.stream()
-                        .map(r -> new UserRecipeResponse(r.getRecipeId(), r.getImgUrl()))
-                        .collect(Collectors.toList()))
+                .userRecipes(userRecipes)
                 .build();
     }
 }
