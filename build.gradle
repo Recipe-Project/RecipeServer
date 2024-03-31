@@ -67,9 +67,6 @@ dependencies {
 //    //HeaderRequestInterceptor
 //    compile group: 'org.springframework', name: 'spring-web', version: '4.1.9.RELEASE'
 
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
-    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
-
     compile group: 'com.google.api-client', name: 'google-api-client', version: '1.25.0'
     compile group: 'com.google.apis', name: 'google-api-services-youtube', version: 'v3-rev212-1.25.0'
     compile("com.google.oauth-client:google-oauth-client-jetty:1.25.0") {
@@ -77,6 +74,9 @@ dependencies {
     }
     compile group: 'com.google.http-client', name: 'google-http-client-jackson2', version: '1.25.0'
     compile group: 'com.google.collections', name: 'google-collections', version: '1.0'
+
+    // Swagger
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
 
     // queryDSL 설정
     implementation "com.querydsl:querydsl-jpa"
