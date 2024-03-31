@@ -21,4 +21,6 @@ public interface YoutubeScrapRepository extends JpaRepository<YoutubeScrap, Long
     long countByUserId(Long userId);
 
     List<YoutubeScrap> findByYoutubeRecipeIdIn(Collection<Long> youtubeRecipeIds);
+
+    long countByYoutubeRecipeId(Long youtubeRecipeId);
 }

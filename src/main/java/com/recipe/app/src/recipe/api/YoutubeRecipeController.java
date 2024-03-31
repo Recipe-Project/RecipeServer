@@ -39,8 +39,8 @@ public class YoutubeRecipeController {
     public BaseResponse<RecipesResponse> getYoutubeRecipes(@ApiIgnore final Authentication authentication,
                                                            @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                                            @RequestParam(value = "keyword") String keyword,
-                                                           @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
-                                                           @RequestParam(value = "page") int page,
+                                                           @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 유튜브 레시피 아이디")
+                                                           @RequestParam(value = "startAfter") Long startAfter,
                                                            @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                            @RequestParam(value = "size") int size,
                                                            @ApiParam(name = "sort", type = "String", example = "조회수순(youtubeViews) / 좋아요순(youtubeScraps) / 최신순(newest) = 기본값", value = "정렬")
@@ -51,7 +51,7 @@ public class YoutubeRecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(youtubeRecipeService.getYoutubeRecipes(user, keyword, page, size, sort));
+        return success(youtubeRecipeService.getYoutubeRecipes(user, keyword, startAfter, size, sort));
     }
 
     @ApiOperation(value = "유튜브 레시피 상세 조회 API")
@@ -70,8 +70,8 @@ public class YoutubeRecipeController {
     @ApiOperation(value = "유튜브 레시피 스크랩 목록 조회 API")
     @GetMapping("/scraps")
     public BaseResponse<RecipesResponse> getScrapYoutubeRecipes(@ApiIgnore final Authentication authentication,
-                                                                @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
-                                                                @RequestParam(value = "page") int page,
+                                                                @ApiParam(name = "startAfter", type = "int", example = "0", value = "마지막 조회 유튜브 레시피 아이디")
+                                                                @RequestParam(value = "startAfter") Long startAfter,
                                                                 @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                                 @RequestParam(value = "size") int size) {
 
@@ -80,7 +80,7 @@ public class YoutubeRecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(youtubeRecipeService.getScrapYoutubeRecipes(user, page, size));
+        return success(youtubeRecipeService.getScrapYoutubeRecipes(user, startAfter, size));
     }
 
     @ApiOperation(value = "유튜브 레시피 스크랩 생성 API")

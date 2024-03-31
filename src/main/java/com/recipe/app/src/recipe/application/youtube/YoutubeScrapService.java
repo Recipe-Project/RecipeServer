@@ -63,4 +63,10 @@ public class YoutubeScrapService {
 
         return youtubeScrapRepository.findByYoutubeRecipeIdIn(youtubeRecipeIds);
     }
+
+    @Transactional(readOnly = true)
+    public long countByYoutubeRecipeId(Long youtubeRecipeId) {
+
+        return youtubeScrapRepository.countByYoutubeRecipeId(youtubeRecipeId);
+    }
 }

@@ -16,4 +16,6 @@ public interface YoutubeViewRepository extends JpaRepository<YoutubeView, Long> 
     List<YoutubeView> findByUserId(Long userId);
 
     List<YoutubeView> findByYoutubeRecipeIdIn(Collection<Long> youtubeRecipeIds);
+
+    long countByYoutubeRecipeId(Long youtubeRecipeId);
 }

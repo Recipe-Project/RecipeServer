@@ -42,4 +42,10 @@ public class YoutubeViewService {
 
         return youtubeViewRepository.findByYoutubeRecipeIdIn(youtubeRecipeIds);
     }
+
+    @Transactional(readOnly = true)
+    public long countByYoutubeRecipeId(Long youtubeRecipeId) {
+
+        return youtubeViewRepository.countByYoutubeRecipeId(youtubeRecipeId);
+    }
 }

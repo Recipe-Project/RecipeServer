@@ -15,6 +15,7 @@ import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeView;
+import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeRecipeRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Value;
@@ -59,49 +60,47 @@ public class YoutubeRecipeService {
     private String youtubeApiKey;
 
     @Transactional(readOnly = true)
-    public RecipesResponse getYoutubeRecipes(User user, String keyword, int page, int size, String sort) throws IOException {
+    public RecipesResponse getYoutubeRecipes(User user, String keyword, Long lastYoutubeRecipeId, int size, String sort) throws IOException {
 
         badWordService.checkBadWords(keyword);
 
-        Page<YoutubeRecipe> youtubeRecipes = findByKeywordSortBy(keyword, page, size, sort);
+        long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
 
-        if (youtubeRecipes.getTotalElements() < 10) {
+        if (totalCnt < 10) {
             searchYoutube(keyword);
-            youtubeRecipes = findByKeywordSortBy(keyword, page, size, sort);
+            totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
         }
+        List<YoutubeRecipe> youtubeRecipes = findByKeywordSortBy(keyword, lastYoutubeRecipeId, size, sort);
 
-        return getRecipes(user, youtubeRecipes);
+        return getRecipes(user, totalCnt, youtubeRecipes);
     }
 
-    private Page<YoutubeRecipe> findByKeywordSortBy(String keyword, int page, int size, String sort) {
+    private List<YoutubeRecipe> findByKeywordSortBy(String keyword, Long lastYoutubeRecipeId, int size, String sort) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<YoutubeRecipe> youtubeRecipes;
-        if (sort.equals("youtubeScraps"))
-            youtubeRecipes = youtubeRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByYoutubeScrapSizeDesc(keyword, keyword, pageable);
-        else if (sort.equals("youtubeViews"))
-            youtubeRecipes = youtubeRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByYoutubeViewSizeDesc(keyword, keyword, pageable);
-        else
-            youtubeRecipes = youtubeRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByCreatedAtDesc(keyword, keyword, pageable);
-
-        return youtubeRecipes;
+        if (sort.equals("youtubeScraps")) {
+            long youtubeScrapCnt = youtubeScrapService.countByYoutubeRecipeId(lastYoutubeRecipeId);
+            return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(keyword, lastYoutubeRecipeId, youtubeScrapCnt, size);
+        } else if (sort.equals("youtubeViews")) {
+            long youtubeViewCnt = youtubeViewService.countByYoutubeRecipeId(lastYoutubeRecipeId);
+            return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(keyword, lastYoutubeRecipeId, youtubeViewCnt, size);
+        } else {
+            YoutubeRecipe youtubeRecipe = youtubeRecipeRepository.findById(lastYoutubeRecipeId).orElseThrow(() -> {
+                throw new NotFoundRecipeException();
+            });
+            return youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(keyword, lastYoutubeRecipeId, youtubeRecipe.getPostDate(), size);
+        }
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getScrapYoutubeRecipes(User user, int page, int size) {
+    public RecipesResponse getScrapYoutubeRecipes(User user, Long lastYoutubeRecipeId, int size) {
 
-        Page<YoutubeScrap> youtubeScraps = youtubeScrapService.findByUserId(user.getUserId(), page, size);
-        List<Long> youtubeRecipeIds = youtubeScraps.stream()
-                .map(YoutubeScrap::getYoutubeRecipeId)
-                .collect(Collectors.toList());
-        Map<Long, YoutubeRecipe> youtubeRecipeMapById = youtubeRecipeRepository.findAllById(youtubeRecipeIds).stream()
-                .collect(Collectors.toMap(YoutubeRecipe::getYoutubeRecipeId, Function.identity()));
-        Page<YoutubeRecipe> youtubeRecipes = youtubeScraps.map(youtubeScrap -> youtubeRecipeMapById.get(youtubeScrap.getYoutubeRecipeId()));
+        long totalCnt = youtubeScrapService.countYoutubeScrapByUser(user);
+        List<YoutubeRecipe> youtubeRecipes = youtubeRecipeRepository.findUserScrapYoutubeRecipesLimit(user.getUserId(), lastYoutubeRecipeId, size);
 
-        return getRecipes(user, youtubeRecipes);
+        return getRecipes(user, totalCnt, youtubeRecipes);
     }
 
-    private RecipesResponse getRecipes(User user, Page<YoutubeRecipe> youtubeRecipes) {
+    private RecipesResponse getRecipes(User user, long totalCnt, List<YoutubeRecipe> youtubeRecipes) {
 
         List<Long> youtubeRecipeIds = youtubeRecipes.stream()
                 .map(YoutubeRecipe::getYoutubeRecipeId)
@@ -109,7 +108,7 @@ public class YoutubeRecipeService {
         List<YoutubeScrap> youtubeScraps = youtubeScrapService.findByYoutubeRecipeIds(youtubeRecipeIds);
         List<YoutubeView> youtubeViews = youtubeViewService.findByYoutubeRecipeIds(youtubeRecipeIds);
 
-        return new RecipesResponse(youtubeRecipes.getTotalElements(), youtubeRecipes.stream()
+        return new RecipesResponse(totalCnt, youtubeRecipes.stream()
                 .map((youtubeRecipe) -> {
                     long scrapCnt = getYoutubeScrapCnt(youtubeScraps, youtubeRecipe.getYoutubeRecipeId(), user);
                     long viewCnt = getYoutubeViewCnt(youtubeViews, youtubeRecipe.getYoutubeRecipeId(), user);
