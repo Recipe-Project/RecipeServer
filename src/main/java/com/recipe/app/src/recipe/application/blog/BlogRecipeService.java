@@ -73,22 +73,19 @@ public class BlogRecipeService {
 
     private List<BlogRecipe> findByKeywordSortBy(String keyword, Long lastBlogRecipeId, int size, String sort) {
 
-        List<BlogRecipe> blogRecipes;
         if (sort.equals("blogScraps")) {
-            Long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
-            blogRecipes = blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(keyword, lastBlogRecipeId, lastBlogScrapCnt, size);
+            long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
+            return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(keyword, lastBlogRecipeId, lastBlogScrapCnt, size);
         } else if (sort.equals("blogViews")) {
-            Long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
-            blogRecipes = blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(keyword, lastBlogRecipeId, lastBlogViewCnt, size);
+            long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
+            return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(keyword, lastBlogRecipeId, lastBlogViewCnt, size);
         } else {
             BlogRecipe blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElseThrow(()
                     -> {
                 throw new NotFoundRecipeException();
             });
-            blogRecipes = blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(keyword, lastBlogRecipeId, blogRecipe.getPublishedAt(), size);
+            return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(keyword, lastBlogRecipeId, blogRecipe.getPublishedAt(), size);
         }
-
-        return blogRecipes;
     }
 
     @Transactional(readOnly = true)
