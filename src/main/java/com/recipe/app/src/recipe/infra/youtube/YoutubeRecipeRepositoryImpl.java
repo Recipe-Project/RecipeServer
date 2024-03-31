@@ -5,6 +5,7 @@ import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeRecipe.youtubeRecipe;
@@ -81,15 +82,16 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
     }
 
     @Override
-    public List<YoutubeRecipe> findUserScrapYoutubeRecipesLimit(Long userId, Long lastYoutubeRecipeId, int size) {
+    public List<YoutubeRecipe> findUserScrapYoutubeRecipesLimit(Long userId, Long lastYoutubeRecipeId, LocalDateTime scrapCreatedAt, int size) {
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .join(youtubeScrap).on(youtubeScrap.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId), youtubeScrap.userId.eq(userId))
                 .where(
                         youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)
+                                .or(youtubeScrap.createdAt.loe(scrapCreatedAt))
                 )
-                .orderBy(youtubeRecipe.youtubeRecipeId.desc())
+                .orderBy(youtubeScrap.createdAt.desc(), youtubeRecipe.youtubeRecipeId.desc())
                 .limit(size)
                 .fetch();
     }

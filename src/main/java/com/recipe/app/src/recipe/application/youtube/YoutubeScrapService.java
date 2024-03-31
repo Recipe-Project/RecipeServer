@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.application.youtube;
 
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
+import com.recipe.app.src.recipe.exception.NotFoundScrapException;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeScrapRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.data.domain.Page;
@@ -68,5 +69,13 @@ public class YoutubeScrapService {
     public long countByYoutubeRecipeId(Long youtubeRecipeId) {
 
         return youtubeScrapRepository.countByYoutubeRecipeId(youtubeRecipeId);
+    }
+
+    @Transactional(readOnly = true)
+    public YoutubeScrap findByUserIdAndYoutubeRecipeId(Long userId, Long youtubeRecipeId) {
+
+        return youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId).orElseThrow(() -> {
+            throw new NotFoundScrapException();
+        });
     }
 }

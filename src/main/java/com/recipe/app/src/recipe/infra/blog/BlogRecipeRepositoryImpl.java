@@ -5,6 +5,7 @@ import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.recipe.app.src.recipe.domain.blog.QBlogRecipe.blogRecipe;
@@ -81,15 +82,16 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
     }
 
     @Override
-    public List<BlogRecipe> findUserScrapBlogRecipesLimit(Long userId, Long lastBlogRecipeId, int size) {
+    public List<BlogRecipe> findUserScrapBlogRecipesLimit(Long userId, Long lastBlogRecipeId, LocalDateTime scrapCreatedAt, int size) {
 
         return queryFactory
                 .selectFrom(blogRecipe)
                 .join(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId), blogScrap.userId.eq(userId))
                 .where(
-                        blogRecipe.blogRecipeId.lt(lastBlogRecipeId)
+                        blogScrap.createdAt.loe(scrapCreatedAt)
+                                .or(blogRecipe.blogRecipeId.lt(lastBlogRecipeId))
                 )
-                .orderBy(blogRecipe.blogRecipeId.desc())
+                .orderBy(blogScrap.createdAt.desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
     }

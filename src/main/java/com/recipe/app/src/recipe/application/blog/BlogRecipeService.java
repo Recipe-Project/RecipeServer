@@ -92,7 +92,8 @@ public class BlogRecipeService {
     public RecipesResponse getScrapBlogRecipes(User user, Long lastBlogRecipeId, int size) {
 
         long totalCnt = blogScrapService.countBlogScrapByUser(user);
-        List<BlogRecipe> blogRecipes = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.getUserId(), lastBlogRecipeId, size);
+        BlogScrap blogScrap = blogScrapService.findByUserIdAndBlogRecipeId(user.getUserId(), lastBlogRecipeId);
+        List<BlogRecipe> blogRecipes = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.getUserId(), lastBlogRecipeId, blogScrap.getCreatedAt(), size);
 
         return getRecipes(user, totalCnt, blogRecipes);
     }

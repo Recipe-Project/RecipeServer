@@ -95,7 +95,8 @@ public class YoutubeRecipeService {
     public RecipesResponse getScrapYoutubeRecipes(User user, Long lastYoutubeRecipeId, int size) {
 
         long totalCnt = youtubeScrapService.countYoutubeScrapByUser(user);
-        List<YoutubeRecipe> youtubeRecipes = youtubeRecipeRepository.findUserScrapYoutubeRecipesLimit(user.getUserId(), lastYoutubeRecipeId, size);
+        YoutubeScrap youtubeScrap = youtubeScrapService.findByUserIdAndYoutubeRecipeId(user.getUserId(), lastYoutubeRecipeId);
+        List<YoutubeRecipe> youtubeRecipes = youtubeRecipeRepository.findUserScrapYoutubeRecipesLimit(user.getUserId(), lastYoutubeRecipeId, youtubeScrap.getCreatedAt(), size);
 
         return getRecipes(user, totalCnt, youtubeRecipes);
     }

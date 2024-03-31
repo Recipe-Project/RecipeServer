@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.application.blog;
 
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
+import com.recipe.app.src.recipe.exception.NotFoundScrapException;
 import com.recipe.app.src.recipe.infra.blog.BlogScrapRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
@@ -60,5 +61,13 @@ public class BlogScrapService {
     public long countByBlogRecipeId(Long blogRecipeId) {
 
         return blogScrapRepository.countByBlogRecipeId(blogRecipeId);
+    }
+
+    @Transactional(readOnly = true)
+    public BlogScrap findByUserIdAndBlogRecipeId(Long userId, Long blogRecipeId) {
+
+        return blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId).orElseThrow(() -> {
+            throw new NotFoundScrapException();
+        });
     }
 }

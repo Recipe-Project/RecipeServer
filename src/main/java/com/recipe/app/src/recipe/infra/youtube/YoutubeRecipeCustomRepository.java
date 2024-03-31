@@ -3,6 +3,7 @@ package com.recipe.app.src.recipe.infra.youtube;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface YoutubeRecipeCustomRepository {
@@ -15,5 +16,5 @@ public interface YoutubeRecipeCustomRepository {
 
     List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeViewCntDesc(String keyword, Long lastYoutubeRecipeId, long youtubeViewCnt, int size);
 
-    List<YoutubeRecipe> findUserScrapYoutubeRecipesLimit(Long userId, Long lastYoutubeRecipeId, int size);
+    List<YoutubeRecipe> findUserScrapYoutubeRecipesLimit(Long userId, Long lastYoutubeRecipeId, LocalDateTime scrapCreatedAt, int size);
 }

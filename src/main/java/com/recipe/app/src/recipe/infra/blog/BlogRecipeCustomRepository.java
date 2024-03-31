@@ -3,6 +3,7 @@ package com.recipe.app.src.recipe.infra.blog;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public interface BlogRecipeCustomRepository {
@@ -15,5 +16,5 @@ public interface BlogRecipeCustomRepository {
 
     List<BlogRecipe> findByKeywordLimitOrderByBlogViewCntDesc(String keyword, Long lastBlogRecipeId, long lastBlogViewCnt, int size);
 
-    List<BlogRecipe> findUserScrapBlogRecipesLimit(Long userId, Long lastBlogRecipeId, int size);
+    List<BlogRecipe> findUserScrapBlogRecipesLimit(Long userId, Long lastBlogRecipeId, LocalDateTime scrapCreatedAt, int size);
 }
