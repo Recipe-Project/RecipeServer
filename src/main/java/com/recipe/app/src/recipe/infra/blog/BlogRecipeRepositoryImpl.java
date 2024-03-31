@@ -38,10 +38,10 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .where(
                         blogRecipe.title.contains(keyword)
                                 .or(blogRecipe.description.contains(keyword)),
-                        blogRecipe.blogRecipeId.gt(lastBlogRecipeId)
+                        blogRecipe.blogRecipeId.lt(lastBlogRecipeId)
                                 .or(blogRecipe.publishedAt.loe(lastBlogRecipePublishedAt))
                 )
-                .orderBy(blogRecipe.publishedAt.desc(), blogRecipe.blogRecipeId.asc())
+                .orderBy(blogRecipe.publishedAt.desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
     }
@@ -55,10 +55,10 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .where(
                         blogRecipe.title.contains(keyword)
                                 .or(blogRecipe.description.contains(keyword)),
-                        blogRecipe.blogRecipeId.gt(lastBlogRecipeId)
+                        blogRecipe.blogRecipeId.lt(lastBlogRecipeId)
                                 .or(blogScrap.count().loe(lastBlogScrapCnt))
                 )
-                .orderBy(blogScrap.count().desc(), blogRecipe.blogRecipeId.asc())
+                .orderBy(blogScrap.count().desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
     }
@@ -72,10 +72,10 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .where(
                         blogRecipe.title.contains(keyword)
                                 .or(blogRecipe.description.contains(keyword)),
-                        blogRecipe.blogRecipeId.gt(lastBlogRecipeId)
+                        blogRecipe.blogRecipeId.lt(lastBlogRecipeId)
                                 .or(blogView.count().loe(lastBlogViewCnt))
                 )
-                .orderBy(blogView.count().desc(), blogRecipe.blogRecipeId.asc())
+                .orderBy(blogView.count().desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
     }
