@@ -16,6 +16,6 @@ public class AppVersionService {
     @Transactional(readOnly = true)
     public AppVersionResponse findAppVersion() {
 
-        return new AppVersionResponse(appVersionRepository.findFirstAppVersionOrderByIdx());
+        return new AppVersionResponse(appVersionRepository.findRecentAppVersion());
     }
 }
