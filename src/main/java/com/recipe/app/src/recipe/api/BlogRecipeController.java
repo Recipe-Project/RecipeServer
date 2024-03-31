@@ -71,7 +71,7 @@ public class BlogRecipeController {
     @ApiOperation(value = "블로그 레시피 스크랩 목록 조회 API")
     @GetMapping("/scraps")
     public BaseResponse<RecipesResponse> getScrapBlogRecipes(@ApiIgnore final Authentication authentication,
-                                                             @ApiParam(name = "startAfter", type = "long", example = "0", value = "페이지")
+                                                             @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 블로그 레시피 아이디")
                                                              @RequestParam(value = "startAfter") Long startAfter,
                                                              @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                              @RequestParam(value = "size") int size) {
