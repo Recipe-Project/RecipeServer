@@ -40,8 +40,8 @@ public class BlogRecipeController {
     public BaseResponse<RecipesResponse> getBlogRecipes(@ApiIgnore final Authentication authentication,
                                                         @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                                         @RequestParam(value = "keyword") String keyword,
-                                                        @ApiParam(name = "lastBlogRecipeId", type = "long", example = "0", value = "마지막 조회 블로그 레시피 아이디")
-                                                        @RequestParam(value = "lastBlogRecipeId") Long lastBlogRecipeId,
+                                                        @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 블로그 레시피 아이디")
+                                                        @RequestParam(value = "startAfter") Long startAfter,
                                                         @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                         @RequestParam(value = "size") int size,
                                                         @ApiParam(name = "sort", type = "String", example = "조회수순(blogViews) / 좋아요순(blogScraps) / 최신순(newest) = 기본값", value = "정렬")
@@ -52,7 +52,7 @@ public class BlogRecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(blogRecipeService.getBlogRecipes(user, keyword, lastBlogRecipeId, size, sort));
+        return success(blogRecipeService.getBlogRecipes(user, keyword, startAfter, size, sort));
     }
 
     @ApiOperation(value = "블로그 레시피 상세 조회 API", notes = "블로그 레시피 상세 조회 시 조회수 올리기 위한 API")
@@ -71,8 +71,8 @@ public class BlogRecipeController {
     @ApiOperation(value = "블로그 레시피 스크랩 목록 조회 API")
     @GetMapping("/scraps")
     public BaseResponse<RecipesResponse> getScrapBlogRecipes(@ApiIgnore final Authentication authentication,
-                                                             @ApiParam(name = "lastBlogRecipeId", type = "long", example = "0", value = "페이지")
-                                                             @RequestParam(value = "lastBlogRecipeId") Long lastBlogRecipeId,
+                                                             @ApiParam(name = "startAfter", type = "long", example = "0", value = "페이지")
+                                                             @RequestParam(value = "startAfter") Long startAfter,
                                                              @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                              @RequestParam(value = "size") int size) {
 
@@ -81,7 +81,7 @@ public class BlogRecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(blogRecipeService.getScrapBlogRecipes(user, lastBlogRecipeId, size));
+        return success(blogRecipeService.getScrapBlogRecipes(user, startAfter, size));
     }
 
     @ApiOperation(value = "블로그 레시피 스크랩 생성 API")
