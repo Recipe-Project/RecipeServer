@@ -7,6 +7,7 @@ import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
 import com.recipe.app.src.recipe.domain.blog.BlogView;
+import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
 import com.recipe.app.src.user.domain.User;
 import org.json.simple.JSONArray;
@@ -18,8 +19,6 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,49 +55,52 @@ public class BlogRecipeService {
     private String naverClientSecret;
 
     @Transactional(readOnly = true)
-    public RecipesResponse getBlogRecipes(User user, String keyword, int page, int size, String sort) throws IOException, ParseException {
+    public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) throws IOException, ParseException {
 
         badWordService.checkBadWords(keyword);
 
-        Page<BlogRecipe> blogRecipes = findByKeywordSortBy(keyword, page, size, sort);
+        long totalCnt = blogRecipeRepository.countByKeyword(keyword);
 
-        if (blogRecipes.getTotalElements() < 10) {
+        if (totalCnt < 10) {
             searchNaverBlogRecipes(keyword);
-            blogRecipes = findByKeywordSortBy(keyword, page, size, sort);
+            totalCnt = blogRecipeRepository.countByKeyword(keyword);
         }
 
-        return getRecipes(user, blogRecipes);
+        List<BlogRecipe> blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);
+
+        return getRecipes(user, totalCnt, blogRecipes);
     }
 
-    private Page<BlogRecipe> findByKeywordSortBy(String keyword, int page, int size, String sort) {
+    private List<BlogRecipe> findByKeywordSortBy(String keyword, Long lastBlogRecipeId, int size, String sort) {
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<BlogRecipe> blogRecipes;
-        if (sort.equals("blogScraps"))
-            blogRecipes = blogRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByBlogScrapSizeDesc(keyword, keyword, pageable);
-        else if (sort.equals("blogViews"))
-            blogRecipes = blogRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByBlogViewSizeDesc(keyword, keyword, pageable);
-        else
-            blogRecipes = blogRecipeRepository.findByTitleContainingOrDescriptionContainingOrderByCreatedAtDesc(keyword, keyword, pageable);
+        List<BlogRecipe> blogRecipes;
+        if (sort.equals("blogScraps")) {
+            Long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
+            blogRecipes = blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(keyword, lastBlogRecipeId, lastBlogScrapCnt, size);
+        } else if (sort.equals("blogViews")) {
+            Long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
+            blogRecipes = blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(keyword, lastBlogRecipeId, lastBlogViewCnt, size);
+        } else {
+            BlogRecipe blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElseThrow(()
+                    -> {
+                throw new NotFoundRecipeException();
+            });
+            blogRecipes = blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(keyword, lastBlogRecipeId, blogRecipe.getPublishedAt(), size);
+        }
 
         return blogRecipes;
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getScrapBlogRecipes(User user, int page, int size) {
+    public RecipesResponse getScrapBlogRecipes(User user, Long lastBlogRecipeId, int size) {
 
-        Page<BlogScrap> blogScraps = blogScrapService.findByUserId(user.getUserId(), page, size);
-        List<Long> blogRecipeIds = blogScraps.stream()
-                .map(BlogScrap::getBlogRecipeId)
-                .collect(Collectors.toList());
-        Map<Long, BlogRecipe> blogRecipeMapById = blogRecipeRepository.findAllById(blogRecipeIds).stream()
-                .collect(Collectors.toMap(BlogRecipe::getBlogRecipeId, Function.identity()));
-        Page<BlogRecipe> blogRecipes = blogScraps.map(blogScrap -> blogRecipeMapById.get(blogScrap.getBlogRecipeId()));
+        long totalCnt = blogScrapService.countBlogScrapByUser(user);
+        List<BlogRecipe> blogRecipes = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.getUserId(), lastBlogRecipeId, size);
 
-        return getRecipes(user, blogRecipes);
+        return getRecipes(user, totalCnt, blogRecipes);
     }
 
-    private RecipesResponse getRecipes(User user, Page<BlogRecipe> blogRecipes) {
+    private RecipesResponse getRecipes(User user, long totalCnt, List<BlogRecipe> blogRecipes) {
 
         List<Long> blogRecipeIds = blogRecipes.stream()
                 .map(BlogRecipe::getBlogRecipeId)
@@ -106,7 +108,7 @@ public class BlogRecipeService {
         List<BlogScrap> blogScraps = blogScrapService.findByBlogRecipeIds(blogRecipeIds);
         List<BlogView> blogViews = blogViewService.findByBlogRecipeIds(blogRecipeIds);
 
-        return new RecipesResponse(blogRecipes.getTotalElements(), blogRecipes.stream()
+        return new RecipesResponse(totalCnt, blogRecipes.stream()
                 .map(blogRecipe -> {
                     long scrapCnt = getBlogScrapCnt(blogScraps, blogRecipe.getBlogRecipeId(), user);
                     long viewCnt = getBlogViewCnt(blogViews, blogRecipe.getBlogRecipeId(), user);

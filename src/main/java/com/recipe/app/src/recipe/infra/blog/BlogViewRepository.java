@@ -16,4 +16,6 @@ public interface BlogViewRepository extends JpaRepository<BlogView, Long> {
     List<BlogView> findByUserId(Long userId);
 
     List<BlogView> findByBlogRecipeIdIn(Collection<Long> blogRecipeIds);
+
+    long countByBlogRecipeId(Long blogRecipeId);
 }

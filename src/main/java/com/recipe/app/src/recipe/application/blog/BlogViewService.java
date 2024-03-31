@@ -43,4 +43,10 @@ public class BlogViewService {
 
         return blogViewRepository.findByBlogRecipeIdIn(blogRecipeIds);
     }
+
+    @Transactional(readOnly = true)
+    public Long countByBlogRecipeId(Long blogRecipeId) {
+
+        return blogViewRepository.countByBlogRecipeId(blogRecipeId);
+    }
 }
