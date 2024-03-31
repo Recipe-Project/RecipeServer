@@ -28,7 +28,7 @@ public class IngredientService {
             return ingredientRepository.findDefaultIngredients();
         }
 
-        return ingredientRepository.findDefaultIngredientsByIngredientNameContaining(keyword);
+        return ingredientRepository.findDefaultIngredientsByKeyword(keyword);
     }
 
     @Transactional(readOnly = true)
