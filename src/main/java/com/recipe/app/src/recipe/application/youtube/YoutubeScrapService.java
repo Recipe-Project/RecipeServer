@@ -4,8 +4,6 @@ import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
 import com.recipe.app.src.recipe.exception.NotFoundScrapException;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeScrapRepository;
 import com.recipe.app.src.user.domain.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,12 +49,6 @@ public class YoutubeScrapService {
     public long countYoutubeScrapByUser(User user) {
 
         return youtubeScrapRepository.countByUserId(user.getUserId());
-    }
-
-    @Transactional(readOnly = true)
-    public Page<YoutubeScrap> findByUserId(Long userId, int page, int size) {
-
-        return youtubeScrapRepository.findByUserId(userId, PageRequest.of(page, size));
     }
 
     @Transactional(readOnly = true)
