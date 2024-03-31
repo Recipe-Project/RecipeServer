@@ -1,7 +1,5 @@
 package com.recipe.app.src.recipe.domain;
 
-import com.recipe.app.src.recipe.domain.RecipeLevel;
-
 import java.time.LocalDateTime;
 
 public interface RecipeWithRate {
@@ -30,8 +28,4 @@ public interface RecipeWithRate {
     LocalDateTime getCreatedAt();
 
     LocalDateTime getUpdatedAt();
-
-    Long getScrapUserId();
-
-    Long getViewUserId();
 }

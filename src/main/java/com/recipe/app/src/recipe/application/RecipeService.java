@@ -61,20 +61,26 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getRecipesByKeyword(User user, String keyword, int page, int size, String sort) {
+    public RecipesResponse getRecipesByKeyword(User user, String keyword, Long lastRecipeId, int size, String sort) {
 
         badWordService.checkBadWords(keyword);
 
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Recipe> recipes;
-        if (sort.equals("recipeScraps"))
-            recipes = recipeRepository.getRecipesOrderByRecipeScrapSizeDesc(keyword, pageable);
-        else if (sort.equals("recipeViews"))
-            recipes = recipeRepository.getRecipesOrderByRecipeViewSizeDesc(keyword, pageable);
-        else
-            recipes = recipeRepository.getRecipesOrderByCreatedAtDesc(keyword, pageable);
+        long totalCnt = recipeRepository.countByKeyword(keyword);
+        List<Recipe> recipes;
+        if (sort.equals("recipeScraps")) {
+            long recipeScrapCnt = recipeScrapService.countByRecipeId(lastRecipeId);
+            recipes = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(keyword, lastRecipeId, recipeScrapCnt, size);
+        } else if (sort.equals("recipeViews")) {
+            long recipeViewCnt = recipeViewService.countByRecipeId(lastRecipeId);
+            recipes = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(keyword, lastRecipeId, recipeViewCnt, size);
+        } else {
+            Recipe recipe = recipeRepository.findById(lastRecipeId).orElseThrow(() -> {
+                throw new NotFoundRecipeException();
+            });
+            recipes = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, recipe.getCreatedAt(), size);
+        }
 
-        return getRecipes(user, recipes);
+        return getRecipes(user, totalCnt, recipes);
     }
 
     @Transactional(readOnly = true)
@@ -98,31 +104,28 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getScrapRecipes(User user, int page, int size) {
+    public RecipesResponse getScrapRecipes(User user, Long lastRecipeId, int size) {
 
-        Page<RecipeScrap> recipeScraps = recipeScrapService.findByUserId(user.getUserId(), page, size);
-        List<Long> recipeIds = recipeScraps.stream()
-                .map(RecipeScrap::getRecipeId)
-                .collect(Collectors.toList());
-        Map<Long, Recipe> recipeMapById = recipeRepository.findAllById(recipeIds).stream()
-                .collect(Collectors.toMap(Recipe::getRecipeId, Function.identity()));
-        Page<Recipe> recipes = recipeScraps.map(recipeScrap -> recipeMapById.get(recipeScrap.getRecipeId()));
+        long totalCnt = recipeScrapService.countByUserId(user.getUserId());
+        RecipeScrap recipeScrap = recipeScrapService.findByUserIdAndRecipeId(user.getUserId(), lastRecipeId);
+        List<Recipe> recipes = recipeRepository.findUserScrapRecipesLimit(user.getUserId(), lastRecipeId, recipeScrap.getCreatedAt(), size);
 
-        return getRecipes(user, recipes);
+        return getRecipes(user, totalCnt, recipes);
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getRecipesByUser(User user, int page, int size) {
+    public RecipesResponse getRecipesByUser(User user, Long lastRecipeId, int size) {
 
-        Page<Recipe> recipes = recipeRepository.findByUserId(user.getUserId(), PageRequest.of(page, size));
+        long totalCnt = recipeRepository.countByUserId(user.getUserId());
+        List<Recipe> recipes = recipeRepository.findLimitByUserId(user.getUserId(), lastRecipeId, size);
 
-        return getRecipes(user, recipes);
+        return getRecipes(user, totalCnt, recipes);
     }
 
     @Transactional(readOnly = true)
-    public List<UserRecipeResponse> getUserRecipesByUser(User user, int page, int size) {
+    public List<UserRecipeResponse> getUserRecipesByUser(User user, Long lastRecipeId, int size) {
 
-        Page<Recipe> recipes = recipeRepository.findByUserId(user.getUserId(), PageRequest.of(page, size));
+        List<Recipe> recipes = recipeRepository.findLimitByUserId(user.getUserId(), lastRecipeId, size);
 
         return recipes.stream()
                 .map(r -> new UserRecipeResponse(r.getRecipeId(), r.getImgUrl()))
@@ -192,7 +195,7 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public RecommendedRecipesResponse findRecommendedRecipesByUserFridge(User user, int page, int size) {
+    public RecommendedRecipesResponse findRecommendedRecipesByUserFridge(User user, Long lastRecipeId, int size) {
 
         List<Ingredient> ingredientsInFridge = fridgeService.findIngredientsInUserFridge(user);
         List<Long> ingredientIds = ingredientsInFridge.stream()
@@ -203,12 +206,16 @@ public class RecipeService {
                 .map(Object::toString)
                 .collect(Collectors.toList());
 
-        Page<RecipeWithRate> recipes = recipeRepository.findRecipesOrderByFridgeIngredientCntDesc(ingredientIds, ingredientNames, user.getUserId(), PageRequest.of(page, size));
-        List<Long> recipeIds = recipes.map(RecipeWithRate::getRecipeId).toList();
+        long totalCnt = recipeRepository.countRecipesWithRate(ingredientIds, ingredientNames);
+        long matchRate = recipeRepository.countRecipeRate(ingredientIds, ingredientNames, lastRecipeId);
+        List<RecipeWithRate> recipes = recipeRepository.findRecipesWithRateLimitOrderByFridgeIngredientCntDesc(ingredientIds, ingredientNames, lastRecipeId, matchRate, size);
+        List<Long> recipeIds = recipes.stream()
+                .map(RecipeWithRate::getRecipeId)
+                .collect(Collectors.toList());
         List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipeIds);
         List<RecipeView> recipeViews = recipeViewService.findByRecipeIds(recipeIds);
 
-        return new RecommendedRecipesResponse(recipes.getTotalElements(), recipes.stream()
+        return new RecommendedRecipesResponse(totalCnt, recipes.stream()
                 .map((recipe) -> {
                     long scrapCnt = getRecipeScrapCnt(recipeScraps, recipe.getRecipeId(), user);
                     long viewCnt = getRecipeViewCnt(recipeViews, recipe.getRecipeId(), user);
@@ -238,7 +245,7 @@ public class RecipeService {
         recipeRepository.deleteAll(recipes);
     }
 
-    private RecipesResponse getRecipes(User user, Page<Recipe> recipes) {
+    private RecipesResponse getRecipes(User user, long totalCnt, List<Recipe> recipes) {
 
         List<Long> recipePostUserIds = recipes.stream()
                 .map(Recipe::getUserId)
@@ -253,7 +260,7 @@ public class RecipeService {
         List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipeIds);
         List<RecipeView> recipeViews = recipeViewService.findByRecipeIds(recipeIds);
 
-        return new RecipesResponse(recipes.getTotalElements(), recipes.stream()
+        return new RecipesResponse(totalCnt, recipes.stream()
                 .map((recipe) -> {
                     long scrapCnt = getRecipeScrapCnt(recipeScraps, recipe.getRecipeId(), user);
                     long viewCnt = getRecipeViewCnt(recipeViews, recipe.getRecipeId(), user);

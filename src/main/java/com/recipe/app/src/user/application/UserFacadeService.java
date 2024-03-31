@@ -50,7 +50,7 @@ public class UserFacadeService {
         long youtubeScrapCnt = youtubeScrapService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogScrapService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<UserRecipeResponse> userRecipes = recipeService.getUserRecipesByUser(user, 0, 6);
+        List<UserRecipeResponse> userRecipes = recipeService.getUserRecipesByUser(user, 0L, 6);
 
         return UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
     }

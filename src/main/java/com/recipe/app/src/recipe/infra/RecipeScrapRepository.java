@@ -22,4 +22,6 @@ public interface RecipeScrapRepository extends JpaRepository<RecipeScrap, Long> 
     List<RecipeScrap> findByRecipeId(Long recipeId);
 
     List<RecipeScrap> findByRecipeIdIn(Collection<Long> recipeIds);
+
+    long countByRecipeId(Long recipeId);
 }

@@ -47,4 +47,10 @@ public class RecipeViewService {
 
         return recipeViewRepository.findByRecipeIdIn(recipeIds);
     }
+
+    @Transactional(readOnly = true)
+    public long countByRecipeId(Long recipeId) {
+
+        return recipeViewRepository.countByRecipeId(recipeId);
+    }
 }

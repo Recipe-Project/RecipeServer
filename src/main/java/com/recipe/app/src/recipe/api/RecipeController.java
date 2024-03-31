@@ -40,8 +40,8 @@ public class RecipeController {
     public BaseResponse<RecipesResponse> getRecipes(@ApiIgnore final Authentication authentication,
                                                     @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                                     @RequestParam(value = "keyword") String keyword,
-                                                    @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
-                                                    @RequestParam(value = "page") int page,
+                                                    @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
+                                                    @RequestParam(value = "startAfter") Long startAfter,
                                                     @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                     @RequestParam(value = "size") int size,
                                                     @ApiParam(name = "sort", type = "String", example = "조회수순(recipeViews) / 좋아요순(recipeScraps) / 최신순(newest) = 기본값", value = "정렬")
@@ -52,7 +52,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(recipeService.getRecipesByKeyword(user, keyword, page, size, sort));
+        return success(recipeService.getRecipesByKeyword(user, keyword, startAfter, size, sort));
     }
 
     @ApiOperation(value = "레시피 상세 조회 API")
@@ -97,8 +97,8 @@ public class RecipeController {
     @ApiOperation(value = "레시피 스크랩 목록 조회 API")
     @GetMapping("/scraps")
     public BaseResponse<RecipesResponse> getScrapRecipes(@ApiIgnore final Authentication authentication,
-                                                         @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
-                                                         @RequestParam(value = "page") int page,
+                                                         @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
+                                                         @RequestParam(value = "startAfter") Long startAfter,
                                                          @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                          @RequestParam(value = "size") int size) {
 
@@ -107,30 +107,30 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(recipeService.getScrapRecipes(user, page, size));
+        return success(recipeService.getScrapRecipes(user, startAfter, size));
     }
 
     @ApiOperation(value = "냉장고 파먹기 레시피 목록 조회 API")
     @GetMapping("/fridges-recommendation")
     public BaseResponse<RecommendedRecipesResponse> getFridgesRecipes(@ApiIgnore final Authentication authentication,
-                                                                      @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
-                                                           @RequestParam(value = "page") int page,
+                                                                      @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
+                                                                      @RequestParam(value = "startAfter") Long startAfter,
                                                                       @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
-                                                           @RequestParam(value = "size") int size) {
+                                                                      @RequestParam(value = "size") int size) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(recipeService.findRecommendedRecipesByUserFridge(user, page, size));
+        return success(recipeService.findRecommendedRecipesByUserFridge(user, startAfter, size));
     }
 
     @ApiOperation(value = "등록한 레시피 목록 조회 API")
     @GetMapping("/users")
     public BaseResponse<RecipesResponse> getUserRecipes(@ApiIgnore final Authentication authentication,
-                                                        @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
-                                                        @RequestParam(value = "page") int page,
+                                                        @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
+                                                        @RequestParam(value = "startAfter") Long startAfter,
                                                         @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                         @RequestParam(value = "size") int size) {
 
@@ -139,7 +139,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(recipeService.getRecipesByUser(user, page, size));
+        return success(recipeService.getRecipesByUser(user, startAfter, size));
     }
 
     @ApiOperation(value = "레시피 등록 API")

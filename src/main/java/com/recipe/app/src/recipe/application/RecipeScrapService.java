@@ -1,10 +1,9 @@
 package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.recipe.domain.RecipeScrap;
+import com.recipe.app.src.recipe.exception.NotFoundScrapException;
 import com.recipe.app.src.recipe.infra.RecipeScrapRepository;
 import com.recipe.app.src.user.domain.User;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,12 +47,6 @@ public class RecipeScrapService {
     }
 
     @Transactional(readOnly = true)
-    public Page<RecipeScrap> findByUserId(Long userId, int page, int size) {
-
-        return recipeScrapRepository.findByUserId(userId, PageRequest.of(page, size));
-    }
-
-    @Transactional(readOnly = true)
     public long countByUserId(Long userId) {
 
         return recipeScrapRepository.countByUserId(userId);
@@ -69,5 +62,19 @@ public class RecipeScrapService {
     public List<RecipeScrap> findByRecipeIds(Collection<Long> recipeIds) {
 
         return recipeScrapRepository.findByRecipeIdIn(recipeIds);
+    }
+
+    @Transactional(readOnly = true)
+    public long countByRecipeId(Long recipeId) {
+
+        return recipeScrapRepository.countByRecipeId(recipeId);
+    }
+
+    @Transactional(readOnly = true)
+    public RecipeScrap findByUserIdAndRecipeId(Long userId, Long recipeId) {
+
+        return recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId).orElseThrow(() -> {
+            throw new NotFoundScrapException();
+        });
     }
 }
