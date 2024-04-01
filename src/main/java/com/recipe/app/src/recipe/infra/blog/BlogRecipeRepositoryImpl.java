@@ -53,7 +53,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
 
         return queryFactory
                 .selectFrom(blogRecipe)
-                .join(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId))
+                .leftJoin(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId))
                 .where(
                         blogRecipe.title.contains(keyword)
                                 .or(blogRecipe.description.contains(keyword))
@@ -72,7 +72,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
 
         return queryFactory
                 .selectFrom(blogRecipe)
-                .join(blogView).on(blogRecipe.blogRecipeId.eq(blogView.blogRecipeId))
+                .leftJoin(blogView).on(blogRecipe.blogRecipeId.eq(blogView.blogRecipeId))
                 .where(
                         blogRecipe.title.contains(keyword)
                                 .or(blogRecipe.description.contains(keyword))

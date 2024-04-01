@@ -201,10 +201,6 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                 BlogScrap.builder()
                         .userId(users.get(1).userId)
                         .blogRecipeId(blogRecipes.get(1).blogRecipeId)
-                        .build(),
-                BlogScrap.builder()
-                        .userId(users.get(0).userId)
-                        .blogRecipeId(blogRecipes.get(0).blogRecipeId)
                         .build()
         ]
         blogScrapRepository.saveAll(blogScraps);
@@ -277,10 +273,6 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                 BlogView.builder()
                         .userId(users.get(1).userId)
                         .blogRecipeId(blogRecipes.get(3).blogRecipeId)
-                        .build(),
-                BlogView.builder()
-                        .userId(users.get(0).userId)
-                        .blogRecipeId(blogRecipes.get(1).blogRecipeId)
                         .build(),
                 BlogView.builder()
                         .userId(users.get(0).userId)
