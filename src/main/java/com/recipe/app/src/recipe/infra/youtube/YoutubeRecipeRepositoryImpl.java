@@ -39,8 +39,9 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
                 .where(
                         youtubeRecipe.title.contains(keyword)
                                 .or(youtubeRecipe.description.contains(keyword)),
-                        youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)
-                                .or(youtubeRecipe.postDate.loe(lastYoutubeRecipePostDate))
+                        youtubeRecipe.postDate.lt(lastYoutubeRecipePostDate)
+                                .or(youtubeRecipe.postDate.eq(lastYoutubeRecipePostDate)
+                                        .and(youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)))
                 )
                 .orderBy(youtubeRecipe.postDate.desc(), youtubeRecipe.youtubeRecipeId.desc())
                 .limit(size)
@@ -52,13 +53,15 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
-                .join(youtubeScrap).on(youtubeScrap.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId))
+                .leftJoin(youtubeScrap).on(youtubeScrap.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId))
                 .where(
                         youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword)),
-                        youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)
-                                .or(youtubeScrap.count().loe(youtubeScrapCnt))
+                                .or(youtubeRecipe.description.contains(keyword))
                 )
+                .groupBy(youtubeRecipe.youtubeRecipeId)
+                .having(youtubeScrap.count().lt(youtubeScrapCnt)
+                        .or(youtubeScrap.count().eq(youtubeScrapCnt)
+                                .and(youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId))))
                 .orderBy(youtubeScrap.count().desc(), youtubeRecipe.youtubeRecipeId.desc())
                 .limit(size)
                 .fetch();
@@ -69,13 +72,15 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
-                .join(youtubeView).on(youtubeView.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId))
+                .leftJoin(youtubeView).on(youtubeView.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId))
                 .where(
                         youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword)),
-                        youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)
-                                .or(youtubeView.count().loe(youtubeViewCnt))
+                                .or(youtubeRecipe.description.contains(keyword))
                 )
+                .groupBy(youtubeRecipe.youtubeRecipeId)
+                .having(youtubeView.count().lt(youtubeViewCnt)
+                        .or(youtubeView.count().eq(youtubeViewCnt)
+                                .and(youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId))))
                 .orderBy(youtubeView.count().desc(), youtubeRecipe.youtubeRecipeId.desc())
                 .limit(size)
                 .fetch();
@@ -88,8 +93,9 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
                 .selectFrom(youtubeRecipe)
                 .join(youtubeScrap).on(youtubeScrap.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId), youtubeScrap.userId.eq(userId))
                 .where(
-                        youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)
-                                .or(youtubeScrap.createdAt.loe(scrapCreatedAt))
+                        youtubeScrap.createdAt.lt(scrapCreatedAt)
+                                .or(youtubeScrap.createdAt.eq(scrapCreatedAt)
+                                        .and(youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)))
                 )
                 .orderBy(youtubeScrap.createdAt.desc(), youtubeRecipe.youtubeRecipeId.desc())
                 .limit(size)
