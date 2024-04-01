@@ -22,9 +22,7 @@ public class IngredientRepositoryImpl extends BaseRepositoryImpl implements Ingr
                 .selectFrom(ingredient)
                 .where(
                         ingredient.userId.isNull(),
-                        ingredient.ingredientName.contains(keyword),
-                        ingredient.defaultYn.eq("Y"),
-                        ingredient.hiddenYn.eq("N")
+                        ingredient.ingredientName.contains(keyword)
                 )
                 .fetch();
     }
@@ -35,9 +33,7 @@ public class IngredientRepositoryImpl extends BaseRepositoryImpl implements Ingr
         return queryFactory
                 .selectFrom(ingredient)
                 .where(
-                        ingredient.userId.isNull(),
-                        ingredient.defaultYn.eq("Y"),
-                        ingredient.hiddenYn.eq("N")
+                        ingredient.userId.isNull()
                 )
                 .fetch();
     }

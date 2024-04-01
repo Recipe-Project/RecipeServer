@@ -55,8 +55,6 @@ public class RecipeIngredientService {
                                 .ingredientName(recipeIngredient.getIngredientName())
                                 .ingredientIconUrl(recipeIngredient.getIngredientIconUrl())
                                 .userId(user.getUserId())
-                                .isDefault(false)
-                                .isHidden(true)
                                 .build(),
                         RecipeIngredientRequest::getCapacity));
         ingredientService.createIngredients(capacityMapByIngredient.keySet());

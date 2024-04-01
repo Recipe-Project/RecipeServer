@@ -37,14 +37,8 @@ public class Ingredient extends BaseEntity {
     @Column(name = "userId")
     private Long userId;
 
-    @Column(name = "defaultYn", length = 1)
-    private String defaultYn;
-
-    @Column(name = "hiddenYn", length = 1)
-    private String hiddenYn;
-
     @Builder
-    public Ingredient(Long ingredientId, Long ingredientCategoryId, String ingredientName, String ingredientIconUrl, Long userId, boolean isDefault, boolean isHidden) {
+    public Ingredient(Long ingredientId, Long ingredientCategoryId, String ingredientName, String ingredientIconUrl, Long userId) {
 
         Objects.requireNonNull(ingredientCategoryId, "재료 카테고리 아이디를 입력해주세요.");
         Preconditions.checkArgument(StringUtils.hasText(ingredientName), "재료명을 입력해주세요.");
@@ -54,8 +48,6 @@ public class Ingredient extends BaseEntity {
         this.ingredientName = ingredientName;
         this.ingredientIconUrl = ingredientIconUrl;
         this.userId = userId;
-        this.defaultYn = isDefault ? "Y" : "N";
-        this.hiddenYn = isHidden ? "Y" : "N";
     }
 
     public List<String> getSimilarIngredientName() {
