@@ -18,4 +18,6 @@ public interface RecipeViewRepository extends JpaRepository<RecipeView, Long> {
     List<RecipeView> findByRecipeIdIn(Collection<Long> recipeIds);
 
     long countByRecipeId(Long recipeId);
+
+    List<RecipeView> findByUserId(Long userId);
 }

@@ -53,4 +53,12 @@ public class RecipeViewService {
 
         return recipeViewRepository.countByRecipeId(recipeId);
     }
+
+    @Transactional
+    public void deleteAllByUser(User user) {
+
+        List<RecipeView> recipeViews = recipeViewRepository.findByUserId(user.getUserId());
+
+        recipeViewRepository.deleteAll(recipeViews);
+    }
 }

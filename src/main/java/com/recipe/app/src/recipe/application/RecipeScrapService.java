@@ -77,4 +77,12 @@ public class RecipeScrapService {
             throw new NotFoundScrapException();
         });
     }
+
+    @Transactional
+    public void deleteAllByUser(User user) {
+
+        List<RecipeScrap> recipeScraps = recipeScrapRepository.findByUserId(user.getUserId());
+
+        recipeScrapRepository.deleteAll(recipeScraps);
+    }
 }
