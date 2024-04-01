@@ -118,6 +118,9 @@ public class UserService {
                         .deviceToken(request.getFcmToken())
                         .build()));
 
+        user.changeRecentLoginAt(LocalDateTime.now());
+        userRepository.save(user);
+
         String jwt = jwtService.createJwt(user.getUserId());
 
         return UserSocialLoginResponse.from(user, jwt);
@@ -161,6 +164,9 @@ public class UserService {
                         .deviceToken(request.getFcmToken())
                         .build()));
 
+        user.changeRecentLoginAt(LocalDateTime.now());
+        userRepository.save(user);
+
         String jwt = jwtService.createJwt(user.getUserId());
 
         return UserSocialLoginResponse.from(user, jwt);
@@ -199,6 +205,9 @@ public class UserService {
                         .email(response.get("email").toString())
                         .deviceToken(request.getFcmToken())
                         .build()));
+
+        user.changeRecentLoginAt(LocalDateTime.now());
+        userRepository.save(user);
 
         String jwt = jwtService.createJwt(user.getUserId());
 
