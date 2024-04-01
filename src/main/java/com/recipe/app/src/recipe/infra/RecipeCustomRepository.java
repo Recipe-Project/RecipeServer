@@ -1,9 +1,9 @@
 package com.recipe.app.src.recipe.infra;
 
 import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.RecipeWithRate;
 
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 public interface RecipeCustomRepository {
@@ -20,9 +20,5 @@ public interface RecipeCustomRepository {
 
     List<Recipe> findLimitByUserId(Long userId, Long lastRecipeId, int size);
 
-    Long countRecipesWithRate(List<Long> ingredientIds, List<String> ingredientNames);
-
-    Long countRecipeRate(List<Long> ingredientIds, List<String> ingredientNames, Long recipeId);
-
-    List<RecipeWithRate> findRecipesWithRateLimitOrderByFridgeIngredientCntDesc(List<Long> ingredientIds, List<String> ingredientNames, Long lastRecipeId, Long matchRate, int size);
+    List<Recipe> findRecipesInFridge(Collection<Long> ingredientIds, Collection<String> ingredientNames);
 }

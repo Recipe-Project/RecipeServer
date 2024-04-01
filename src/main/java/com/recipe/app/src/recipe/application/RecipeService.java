@@ -3,6 +3,7 @@ package com.recipe.app.src.recipe.application;
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.fridge.application.FridgeService;
+import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeIngredientResponse;
@@ -13,22 +14,21 @@ import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse;
 import com.recipe.app.src.recipe.domain.Recipe;
+import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
 import com.recipe.app.src.recipe.domain.RecipeView;
-import com.recipe.app.src.recipe.domain.RecipeWithRate;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.RecipeRepository;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserRecipeResponse;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenUserException;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -47,9 +47,11 @@ public class RecipeService {
     private final FridgeService fridgeService;
     private final UserService userService;
     private final BadWordService badWordService;
+    private final IngredientService ingredientService;
 
     public RecipeService(RecipeRepository recipeRepository, RecipeIngredientService recipeIngredientService, RecipeProcessService recipeProcessService,
-                         RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, FridgeService fridgeService, UserService userService, BadWordService badWordService) {
+                         RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, FridgeService fridgeService,
+                         UserService userService, BadWordService badWordService, IngredientService ingredientService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientService = recipeIngredientService;
         this.recipeProcessService = recipeProcessService;
@@ -58,6 +60,7 @@ public class RecipeService {
         this.fridgeService = fridgeService;
         this.userService = userService;
         this.badWordService = badWordService;
+        this.ingredientService = ingredientService;
     }
 
     @Transactional(readOnly = true)
@@ -198,32 +201,61 @@ public class RecipeService {
     public RecommendedRecipesResponse findRecommendedRecipesByUserFridge(User user, Long lastRecipeId, int size) {
 
         List<Ingredient> ingredientsInFridge = fridgeService.findIngredientsInUserFridge(user);
-        List<Long> ingredientIds = ingredientsInFridge.stream()
+        List<Long> ingredientIdsInFridge = ingredientsInFridge.stream()
                 .map(Ingredient::getIngredientId)
                 .collect(Collectors.toList());
-        List<String> ingredientNames = ingredientsInFridge.stream()
+        List<String> ingredientNamesInFridge = ingredientsInFridge.stream()
                 .flatMap(ingredient -> Stream.of(ingredient.getIngredientName(), ingredient.getSimilarIngredientName()))
                 .map(Object::toString)
                 .collect(Collectors.toList());
 
-        long totalCnt = recipeRepository.countRecipesWithRate(ingredientIds, ingredientNames);
-        long matchRate = recipeRepository.countRecipeRate(ingredientIds, ingredientNames, lastRecipeId);
-        List<RecipeWithRate> recipes = recipeRepository.findRecipesWithRateLimitOrderByFridgeIngredientCntDesc(ingredientIds, ingredientNames, lastRecipeId, matchRate, size);
+        List<Recipe> recipes = recipeRepository.findRecipesInFridge(ingredientIdsInFridge, ingredientNamesInFridge);
         List<Long> recipeIds = recipes.stream()
-                .map(RecipeWithRate::getRecipeId)
+                .map(Recipe::getRecipeId)
                 .collect(Collectors.toList());
+
+        Map<Long, Long> matchRateMapByRecipeId = getMatchRateMapByRecipeId(recipeIds, ingredientIdsInFridge, ingredientNamesInFridge);
+
         List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipeIds);
         List<RecipeView> recipeViews = recipeViewService.findByRecipeIds(recipeIds);
 
-        return new RecommendedRecipesResponse(totalCnt, recipes.stream()
+        return new RecommendedRecipesResponse(recipes.size(), recipes.stream()
                 .map((recipe) -> {
                     long scrapCnt = getRecipeScrapCnt(recipeScraps, recipe.getRecipeId(), user);
                     long viewCnt = getRecipeViewCnt(recipeViews, recipe.getRecipeId(), user);
                     boolean isUserScrap = isUserScrap(recipeScraps, recipe.getRecipeId(), user);
 
-                    return RecommendedRecipeResponse.from(recipe, user, recipe.getMatchRate().intValue(), isUserScrap, scrapCnt, viewCnt);
+                    return RecommendedRecipeResponse.from(recipe, user, matchRateMapByRecipeId.get(recipe.getRecipeId()).intValue(), isUserScrap, scrapCnt, viewCnt);
                 })
+                .sorted(Comparator.comparing(RecommendedRecipeResponse::getIngredientsMatchRate).thenComparing(RecommendedRecipeResponse::getRecipeId).reversed())
+                .filter(recommendedRecipe -> recommendedRecipe.getRecipeId() < lastRecipeId)
+                .limit(size)
                 .collect(Collectors.toList()));
+    }
+
+    private Map<Long, Long> getMatchRateMapByRecipeId(List<Long> recipeIds, List<Long> ingredientIdsInFridge, List<String> ingredientNamesInFridge) {
+
+        List<RecipeIngredient> recipeIngredients = recipeIngredientService.findByRecipeIds(recipeIds);
+        Map<Long, List<Long>> ingredientIdsMapByRecipeId = recipeIngredients.stream()
+                .collect(Collectors.groupingBy(RecipeIngredient::getRecipeId, Collectors.mapping(RecipeIngredient::getIngredientId, Collectors.toList())));
+        List<Long> ingredientIds = recipeIngredients.stream()
+                .map(RecipeIngredient::getIngredientId)
+                .collect(Collectors.toList());
+        Map<Long, Ingredient> ingredientMapById = ingredientService.findByIngredientIds(ingredientIds).stream()
+                .collect(Collectors.toMap(Ingredient::getIngredientId, Function.identity()));
+
+        return ingredientIdsMapByRecipeId.keySet().stream()
+                .collect(Collectors.toMap(Function.identity(), recipeId -> {
+                    List<Long> ingredientIdsInRecipe = ingredientIdsMapByRecipeId.get(recipeId);
+                    long recipeIngredientCnt = ingredientIdsInRecipe.size();
+                    long recipeIngredientInFridgeCnt = ingredientIdsInRecipe.stream()
+                            .map(ingredientMapById::get)
+                            .filter(ingredient -> ingredientIdsInFridge.contains(ingredient.getIngredientId())
+                                    || ingredientNamesInFridge.contains(ingredient.getIngredientName()))
+                            .count();
+
+                    return recipeIngredientInFridgeCnt / recipeIngredientCnt * 100;
+                }));
     }
 
     @Transactional(readOnly = true)

@@ -1,7 +1,6 @@
 package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.RecipeWithRate;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -53,7 +52,7 @@ public class RecommendedRecipeResponse {
         this.ingredientsMatchRate = ingredientsMatchRate;
     }
 
-    public static RecommendedRecipeResponse from(RecipeWithRate recipe, User recipePostUser, int ingredientsMatchRate, boolean isScrapByUser, long scrapCnt, long viewCnt) {
+    public static RecommendedRecipeResponse from(Recipe recipe, User recipePostUser, int ingredientsMatchRate, boolean isScrapByUser, long scrapCnt, long viewCnt) {
 
         return RecommendedRecipeResponse.builder()
                 .recipeId(recipe.getRecipeId())

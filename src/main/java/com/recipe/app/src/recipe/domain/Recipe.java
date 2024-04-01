@@ -43,7 +43,7 @@ public class Recipe extends BaseEntity {
     @Column(name = "calorie")
     private Long calorie;
 
-    @Column(name = "userId", nullable = false)
+    @Column(name = "userId")
     private Long userId;
 
     @Column(name = "hiddenYn", nullable = false)
@@ -66,21 +66,6 @@ public class Recipe extends BaseEntity {
         this.calorie = calorie;
         this.userId = userId;
         this.hiddenYn = isHidden ? "Y" : "N";
-    }
-
-    public Recipe(RecipeWithRate recipeWithRate) {
-        this.recipeId = recipeWithRate.getRecipeId();
-        this.recipeNm = recipeWithRate.getRecipeNm();
-        this.introduction = recipeWithRate.getIntroduction();
-        this.cookingTime = recipeWithRate.getCookingTime();
-        this.level = recipeWithRate.getLevel();
-        this.imgUrl = recipeWithRate.getImgUrl();
-        this.quantity = recipeWithRate.getQuantity();
-        this.calorie = recipeWithRate.getCalorie();
-        this.userId = recipeWithRate.getUserId();
-        this.hiddenYn = recipeWithRate.getHiddenYn();
-        this.setCreatedAt(recipeWithRate.getCreatedAt());
-        this.setUpdatedAt(recipeWithRate.getUpdatedAt());
     }
 
     public void updateRecipe(String recipeNm, String imgUrl) {

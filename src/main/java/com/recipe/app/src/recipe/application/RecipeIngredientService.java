@@ -109,7 +109,8 @@ public class RecipeIngredientService {
         return recipeIngredientRepository.findByRecipeId(recipeId);
     }
 
-    private List<RecipeIngredient> findByRecipeIds(Collection<Long> recipeIds) {
+    @Transactional(readOnly = true)
+    public List<RecipeIngredient> findByRecipeIds(Collection<Long> recipeIds) {
 
         return recipeIngredientRepository.findByRecipeIdIn(recipeIds);
     }

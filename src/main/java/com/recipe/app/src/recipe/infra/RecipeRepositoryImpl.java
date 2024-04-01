@@ -1,14 +1,11 @@
 package com.recipe.app.src.recipe.infra;
 
-import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.NumberExpression;
-import com.querydsl.jpa.JPAExpressions;
 import com.recipe.app.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.RecipeWithRate;
 
 import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
 
 import static com.recipe.app.src.ingredient.domain.QIngredient.ingredient;
@@ -25,19 +22,17 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
     @Override
     public Long countByKeyword(String keyword) {
-        return queryFactory
-                .select(recipe.count())
+        return (long) queryFactory
+                .select(recipe.recipeId, recipe.recipeNm, recipe.introduction)
                 .from(recipe)
-                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
-                .join(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId))
-                .where(
-                        recipe.recipeNm.contains(keyword)
-                                .or(recipe.introduction.contains(keyword))
-                                .or(ingredient.ingredientName.contains(keyword)),
-                        recipe.hiddenYn.eq("N")
-                )
+                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
+                .where(recipe.hiddenYn.eq("N"))
                 .groupBy(recipe.recipeId)
-                .fetchOne();
+                .having(recipe.recipeNm.contains(keyword)
+                        .or(recipe.introduction.contains(keyword))
+                        .or(ingredient.count().gt(0)))
+                .fetch().size();
     }
 
     @Override
@@ -45,18 +40,19 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
-                .join(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId))
+                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
                 .where(
-                        recipe.recipeNm.contains(keyword)
-                                .or(recipe.introduction.contains(keyword))
-                                .or(ingredient.ingredientName.contains(keyword)),
-                        recipe.recipeId.lt(lastRecipeId)
-                                .or(recipe.createdAt.loe(createdAt)),
+                        recipe.createdAt.lt(createdAt)
+                                .or(recipe.createdAt.eq(createdAt)
+                                        .and(recipe.recipeId.lt(lastRecipeId))),
                         recipe.hiddenYn.eq("N")
                 )
                 .groupBy(recipe.recipeId)
-                .orderBy(recipe.createdAt.desc(), ingredient.count().desc(), recipe.recipeId.desc())
+                .having(recipe.recipeNm.contains(keyword)
+                        .or(recipe.introduction.contains(keyword))
+                        .or(ingredient.count().gt(0)))
+                .orderBy(recipe.createdAt.desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
     }
@@ -66,19 +62,18 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
-                .join(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId))
-                .join(recipeScrap).on(recipeScrap.recipeId.eq(recipe.recipeId))
-                .where(
-                        recipe.recipeNm.contains(keyword)
-                                .or(recipe.introduction.contains(keyword))
-                                .or(ingredient.ingredientName.contains(keyword)),
-                        recipe.recipeId.lt(lastRecipeId)
-                                .or(recipeScrap.count().loe(recipeScrapCnt)),
-                        recipe.hiddenYn.eq("N")
-                )
+                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
+                .leftJoin(recipeScrap).on(recipeScrap.recipeId.eq(recipe.recipeId))
+                .where(recipe.hiddenYn.eq("N"))
                 .groupBy(recipe.recipeId)
-                .orderBy(recipeScrap.count().desc(), ingredient.count().desc(), recipe.recipeId.desc())
+                .having(recipe.recipeNm.contains(keyword)
+                                .or(recipe.introduction.contains(keyword))
+                                .or(ingredient.count().gt(0)),
+                        recipeScrap.count().lt(recipeScrapCnt)
+                                .or(recipeScrap.count().eq(recipeScrapCnt)
+                                        .and(recipe.recipeId.lt(lastRecipeId))))
+                .orderBy(recipeScrap.count().desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
     }
@@ -88,19 +83,18 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
-                .join(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId))
-                .join(recipeView).on(recipeView.recipeId.eq(recipe.recipeId))
-                .where(
-                        recipe.recipeNm.contains(keyword)
-                                .or(recipe.introduction.contains(keyword))
-                                .or(ingredient.ingredientName.contains(keyword)),
-                        recipe.recipeId.lt(lastRecipeId)
-                                .or(recipeView.count().loe(recipeViewCnt)),
-                        recipe.hiddenYn.eq("N")
-                )
+                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
+                .leftJoin(recipeView).on(recipeView.recipeId.eq(recipe.recipeId))
+                .where(recipe.hiddenYn.eq("N"))
                 .groupBy(recipe.recipeId)
-                .orderBy(recipeView.count().desc(), ingredient.count().desc(), recipe.recipeId.desc())
+                .having(recipe.recipeNm.contains(keyword)
+                                .or(recipe.introduction.contains(keyword))
+                                .or(ingredient.count().gt(0)),
+                        recipeView.count().lt(recipeViewCnt)
+                                .or(recipeView.count().eq(recipeViewCnt)
+                                        .and(recipe.recipeId.lt(lastRecipeId))))
+                .orderBy(recipeView.count().desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
     }
@@ -111,8 +105,9 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .selectFrom(recipe)
                 .join(recipeScrap).on(recipe.recipeId.eq(recipeScrap.recipeId), recipeScrap.userId.eq(userId))
                 .where(
-                        recipe.recipeId.lt(lastRecipeId)
-                                .or(recipeScrap.createdAt.loe(scrapCreatedAt)),
+                        recipeScrap.createdAt.lt(scrapCreatedAt)
+                                .or(recipeScrap.createdAt.eq(scrapCreatedAt)
+                                        .and(recipe.recipeId.lt(lastRecipeId))),
                         recipe.hiddenYn.eq("N")
                 )
                 .orderBy(recipeScrap.createdAt.desc(), recipe.recipeId.desc())
@@ -135,11 +130,10 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     }
 
     @Override
-    public Long countRecipesWithRate(List<Long> ingredientIds, List<String> ingredientNames) {
+    public List<Recipe> findRecipesInFridge(Collection<Long> ingredientIds, Collection<String> ingredientNames) {
 
         return queryFactory
-                .select(recipe.count())
-                .from(recipe)
+                .selectFrom(recipe)
                 .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
                 .join(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId))
                 .where(
@@ -148,55 +142,6 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                         recipe.hiddenYn.eq("N")
                 )
                 .groupBy(recipe.recipeId)
-                .fetchOne();
-    }
-
-    @Override
-    public Long countRecipeRate(List<Long> ingredientIds, List<String> ingredientNames, Long recipeId) {
-
-        return queryFactory
-                .select(getMatchRatePath())
-                .from(recipe)
-                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
-                .join(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId))
-                .where(
-                        recipe.recipeId.eq(recipeId),
-                        ingredient.ingredientId.in(ingredientIds)
-                                .or(ingredient.ingredientName.in(ingredientNames)),
-                        recipe.hiddenYn.eq("N")
-                )
-                .fetchOne();
-    }
-
-    @Override
-    public List<RecipeWithRate> findRecipesWithRateLimitOrderByFridgeIngredientCntDesc(List<Long> ingredientIds, List<String> ingredientNames, Long lastRecipeId, Long matchRate, int size) {
-
-        NumberExpression<Long> matchRatePath = getMatchRatePath();
-
-        return queryFactory
-                .select(Projections.fields(RecipeWithRate.class, recipe, matchRatePath.as("matchRate")))
-                .from(recipe)
-                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
-                .join(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId))
-                .where(
-                        ingredient.ingredientId.in(ingredientIds)
-                                .or(ingredient.ingredientName.in(ingredientNames)),
-                        recipe.recipeId.lt(lastRecipeId)
-                                .or(matchRatePath.loe(matchRate)),
-                        recipe.hiddenYn.eq("N")
-                )
-                .groupBy(recipe.recipeId)
-                .orderBy(matchRatePath.desc(), recipe.recipeId.desc())
-                .limit(size)
                 .fetch();
-
-    }
-
-    private NumberExpression<Long> getMatchRatePath() {
-
-        return recipeIngredient.count().divide(JPAExpressions.select(recipeIngredient.count())
-                .from(recipeIngredient)
-                .where(recipeIngredient.recipeId.eq(recipe.recipeId))
-        );
     }
 }
