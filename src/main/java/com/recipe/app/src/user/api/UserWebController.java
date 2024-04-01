@@ -29,6 +29,8 @@ public class UserWebController {
     private String googleClientId;
     @Value("${google.redirect-uri}")
     private String googleRedirectURI;
+    @Value("${withdrawal.uri}")
+    private String withdrawalURI;
 
     public UserWebController(UserService userService) {
         this.userService = userService;
@@ -48,7 +50,9 @@ public class UserWebController {
     }
 
     @GetMapping("/withdrawal")
-    public String withdraw() {
+    public String withdraw(Model model) {
+
+        model.addAttribute("withdrawalURI", withdrawalURI);
 
         return "/user-withdrawal-success";
     }
