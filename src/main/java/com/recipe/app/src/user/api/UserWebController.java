@@ -52,8 +52,6 @@ public class UserWebController {
     @GetMapping("/withdrawal")
     public String withdraw(Model model) {
 
-        model.addAttribute("withdrawalURI", withdrawalURI);
-
         return "/user-withdrawal-success";
     }
 
@@ -67,6 +65,7 @@ public class UserWebController {
                 .build());
 
         model.addAttribute("jwtToken", data.getJwt());
+        model.addAttribute("withdrawalURI", withdrawalURI);
 
         return "/user-withdrawal";
     }
@@ -81,6 +80,7 @@ public class UserWebController {
                 .build());
 
         model.addAttribute("jwtToken", data.getJwt());
+        model.addAttribute("withdrawalURI", withdrawalURI);
 
         return "/user-withdrawal";
     }
@@ -95,6 +95,7 @@ public class UserWebController {
                 .build());
 
         model.addAttribute("jwtToken", data.getJwt());
+        model.addAttribute("withdrawalURI", withdrawalURI);
 
         return "/user-withdrawal";
     }
