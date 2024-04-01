@@ -39,8 +39,9 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .where(
                         blogRecipe.title.contains(keyword)
                                 .or(blogRecipe.description.contains(keyword)),
-                        blogRecipe.blogRecipeId.lt(lastBlogRecipeId)
-                                .or(blogRecipe.publishedAt.loe(lastBlogRecipePublishedAt))
+                        blogRecipe.publishedAt.lt(lastBlogRecipePublishedAt)
+                                .or(blogRecipe.publishedAt.eq(lastBlogRecipePublishedAt)
+                                        .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId)))
                 )
                 .orderBy(blogRecipe.publishedAt.desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
@@ -55,10 +56,12 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .join(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId))
                 .where(
                         blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword)),
-                        blogRecipe.blogRecipeId.lt(lastBlogRecipeId)
-                                .or(blogScrap.count().loe(lastBlogScrapCnt))
+                                .or(blogRecipe.description.contains(keyword))
                 )
+                .groupBy(blogRecipe.blogRecipeId)
+                .having(blogScrap.count().lt(lastBlogScrapCnt)
+                        .or(blogScrap.count().eq(lastBlogScrapCnt)
+                                .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId))))
                 .orderBy(blogScrap.count().desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
@@ -72,10 +75,12 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .join(blogView).on(blogRecipe.blogRecipeId.eq(blogView.blogRecipeId))
                 .where(
                         blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword)),
-                        blogRecipe.blogRecipeId.lt(lastBlogRecipeId)
-                                .or(blogView.count().loe(lastBlogViewCnt))
+                                .or(blogRecipe.description.contains(keyword))
                 )
+                .groupBy(blogRecipe.blogRecipeId)
+                .having(blogView.count().lt(lastBlogViewCnt)
+                        .or(blogView.count().eq(lastBlogViewCnt)
+                                .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId))))
                 .orderBy(blogView.count().desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
@@ -88,8 +93,9 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .selectFrom(blogRecipe)
                 .join(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId), blogScrap.userId.eq(userId))
                 .where(
-                        blogScrap.createdAt.loe(scrapCreatedAt)
-                                .or(blogRecipe.blogRecipeId.lt(lastBlogRecipeId))
+                        blogScrap.createdAt.lt(scrapCreatedAt)
+                                .or(blogScrap.createdAt.eq(scrapCreatedAt)
+                                        .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId)))
                 )
                 .orderBy(blogScrap.createdAt.desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
