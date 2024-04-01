@@ -1,7 +1,5 @@
 package com.recipe.app.src.recipe.domain.youtube;
 
-import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
-import com.recipe.app.src.user.domain.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;

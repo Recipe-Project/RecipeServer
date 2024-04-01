@@ -177,4 +177,37 @@ public class YoutubeRecipeService {
                     .collect(Collectors.toList()));
         }
     }
+
+    @Transactional
+    public void createYoutubeScrap(User user, Long youtubeRecipeId) {
+
+        YoutubeRecipe youtubeRecipe = youtubeRecipeRepository.findById(youtubeRecipeId).orElseThrow(() -> {
+            throw new NotFoundRecipeException();
+        });
+        youtubeRecipe.plusScrapCnt();
+        youtubeRecipeRepository.save(youtubeRecipe);
+        youtubeScrapService.createYoutubeScrap(user, youtubeRecipeId);
+    }
+
+    @Transactional
+    public void deleteYoutubeScrap(User user, Long youtubeRecipeId) {
+
+        YoutubeRecipe youtubeRecipe = youtubeRecipeRepository.findById(youtubeRecipeId).orElseThrow(() -> {
+            throw new NotFoundRecipeException();
+        });
+        youtubeRecipe.minusScrapCnt();
+        youtubeRecipeRepository.save(youtubeRecipe);
+        youtubeScrapService.deleteYoutubeScrap(user, youtubeRecipeId);
+    }
+
+    @Transactional
+    public void createYoutubeView(User user, Long youtubeRecipeId) {
+
+        YoutubeRecipe youtubeRecipe = youtubeRecipeRepository.findById(youtubeRecipeId).orElseThrow(() -> {
+            throw new NotFoundRecipeException();
+        });
+        youtubeRecipe.plusViewCnt();
+        youtubeRecipeRepository.save(youtubeRecipe);
+        youtubeViewService.createYoutubeView(user, youtubeRecipeId);
+    }
 }

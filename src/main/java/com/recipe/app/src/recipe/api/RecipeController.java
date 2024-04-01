@@ -1,9 +1,7 @@
 package com.recipe.app.src.recipe.api;
 
 import com.recipe.app.common.response.BaseResponse;
-import com.recipe.app.src.recipe.application.RecipeScrapService;
 import com.recipe.app.src.recipe.application.RecipeService;
-import com.recipe.app.src.recipe.application.RecipeViewService;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeRequest;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
@@ -26,13 +24,9 @@ import static com.recipe.app.common.response.BaseResponse.success;
 public class RecipeController {
 
     private final RecipeService recipeService;
-    private final RecipeScrapService recipeScrapService;
-    private final RecipeViewService recipeViewService;
 
-    public RecipeController(RecipeService recipeService, RecipeScrapService recipeScrapService, RecipeViewService recipeViewService) {
+    public RecipeController(RecipeService recipeService) {
         this.recipeService = recipeService;
-        this.recipeScrapService = recipeScrapService;
-        this.recipeViewService = recipeViewService;
     }
 
     @ApiOperation(value = "레시피 목록 조회 API")
@@ -63,7 +57,7 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        recipeViewService.createRecipeView(user, recipeId);
+        recipeService.createRecipeView(user, recipeId);
 
         return success(recipeService.getRecipe(user, recipeId));
     }
@@ -76,7 +70,7 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        recipeScrapService.createRecipeScrap(user, recipeId);
+        recipeService.createRecipeScrap(user, recipeId);
 
         return success();
     }
@@ -89,7 +83,7 @@ public class RecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        recipeScrapService.deleteRecipeScrap(user, recipeId);
+        recipeService.deleteRecipeScrap(user, recipeId);
 
         return success();
     }

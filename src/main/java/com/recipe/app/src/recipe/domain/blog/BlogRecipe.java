@@ -41,6 +41,12 @@ public class BlogRecipe extends BaseEntity {
     @Column(name = "blogName", nullable = false, length = 45)
     private String blogName;
 
+    @Column(name = "scrapCnt", nullable = false)
+    private int scrapCnt;
+
+    @Column(name = "viewCnt", nullable = false)
+    private int viewCnt;
+
     @Builder
     public BlogRecipe(Long blogRecipeId, String blogUrl, String blogThumbnailImgUrl, String title, String description, LocalDate publishedAt, String blogName) {
 
@@ -57,5 +63,17 @@ public class BlogRecipe extends BaseEntity {
         this.description = description;
         this.publishedAt = publishedAt;
         this.blogName = blogName;
+    }
+
+    public void plusScrapCnt() {
+        this.scrapCnt++;
+    }
+
+    public void minusScrapCnt() {
+        this.scrapCnt--;
+    }
+
+    public void plusViewCnt() {
+        this.viewCnt++;
     }
 }

@@ -49,6 +49,12 @@ public class Recipe extends BaseEntity {
     @Column(name = "hiddenYn", nullable = false)
     private String hiddenYn = "Y";
 
+    @Column(name = "scrapCnt", nullable = false)
+    private int scrapCnt;
+
+    @Column(name = "viewCnt", nullable = false)
+    private int viewCnt;
+
     @Builder
     public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, RecipeLevel level,
                   String imgUrl, Long quantity, Long calorie, Long userId, boolean isHidden) {
@@ -75,5 +81,17 @@ public class Recipe extends BaseEntity {
 
     public boolean isHidden() {
         return hiddenYn.equals("Y");
+    }
+
+    public void plusScrapCnt() {
+        this.scrapCnt++;
+    }
+
+    public void minusScrapCnt() {
+        this.scrapCnt--;
+    }
+
+    public void plusViewCnt() {
+        this.viewCnt++;
     }
 }

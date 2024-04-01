@@ -23,7 +23,6 @@ import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserRecipeResponse;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenUserException;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -320,5 +319,39 @@ public class RecipeService {
                 .count();
     }
 
+    @Transactional
+    public void createRecipeScrap(User user, Long recipeId) {
+
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> {
+                    throw new NotFoundRecipeException();
+                });
+        recipe.plusScrapCnt();
+        recipeRepository.save(recipe);
+        recipeScrapService.createRecipeScrap(user, recipeId);
+    }
+
+    @Transactional
+    public void deleteRecipeScrap(User user, Long recipeId) {
+
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> {
+                    throw new NotFoundRecipeException();
+                });
+        recipe.minusScrapCnt();
+        recipeRepository.save(recipe);
+        recipeScrapService.deleteRecipeScrap(user, recipeId);
+    }
+
+    @Transactional
+    public void createRecipeView(User user, Long recipeId) {
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> {
+                    throw new NotFoundRecipeException();
+                });
+        recipe.plusViewCnt();
+        recipeRepository.save(recipe);
+        recipeViewService.createRecipeView(user, recipeId);
+    }
 }
 

@@ -3,8 +3,6 @@ package com.recipe.app.src.recipe.api;
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.application.youtube.YoutubeRecipeService;
-import com.recipe.app.src.recipe.application.youtube.YoutubeScrapService;
-import com.recipe.app.src.recipe.application.youtube.YoutubeViewService;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
@@ -25,13 +23,9 @@ import static com.recipe.app.common.response.BaseResponse.success;
 public class YoutubeRecipeController {
 
     private final YoutubeRecipeService youtubeRecipeService;
-    private final YoutubeScrapService youtubeScrapService;
-    private final YoutubeViewService youtubeViewService;
 
-    public YoutubeRecipeController(YoutubeRecipeService youtubeRecipeService, YoutubeScrapService youtubeScrapService, YoutubeViewService youtubeViewService) {
+    public YoutubeRecipeController(YoutubeRecipeService youtubeRecipeService) {
         this.youtubeRecipeService = youtubeRecipeService;
-        this.youtubeScrapService = youtubeScrapService;
-        this.youtubeViewService = youtubeViewService;
     }
 
     @ApiOperation(value = "유튜브 레시피 목록 조회 API")
@@ -62,7 +56,7 @@ public class YoutubeRecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        youtubeViewService.createYoutubeView(user, youtubeRecipeId);
+        youtubeRecipeService.createYoutubeView(user, youtubeRecipeId);
 
         return success();
     }
@@ -91,7 +85,7 @@ public class YoutubeRecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        youtubeScrapService.createYoutubeScrap(user, youtubeRecipeId);
+        youtubeRecipeService.createYoutubeScrap(user, youtubeRecipeId);
 
         return success();
     }
@@ -104,7 +98,7 @@ public class YoutubeRecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        youtubeScrapService.deleteYoutubeScrap(user, youtubeRecipeId);
+        youtubeRecipeService.deleteYoutubeScrap(user, youtubeRecipeId);
 
         return success();
     }

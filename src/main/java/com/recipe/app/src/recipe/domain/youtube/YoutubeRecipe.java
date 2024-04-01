@@ -10,10 +10,7 @@ import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -44,6 +41,12 @@ public class YoutubeRecipe extends BaseEntity {
     @Column(name = "youtubeId", nullable = false, length = 16)
     private String youtubeId;
 
+    @Column(name = "scrapCnt", nullable = false)
+    private int scrapCnt;
+
+    @Column(name = "viewCnt", nullable = false)
+    private int viewCnt;
+
     @Builder
     public YoutubeRecipe(Long youtubeRecipeId, String title, String description, String thumbnailImgUrl, LocalDate postDate, String channelName, String youtubeId) {
 
@@ -60,5 +63,17 @@ public class YoutubeRecipe extends BaseEntity {
         this.postDate = postDate;
         this.channelName = channelName;
         this.youtubeId = youtubeId;
+    }
+
+    public void plusScrapCnt() {
+        this.scrapCnt++;
+    }
+
+    public void minusScrapCnt() {
+        this.scrapCnt--;
+    }
+
+    public void plusViewCnt() {
+        this.viewCnt++;
     }
 }

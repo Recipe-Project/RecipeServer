@@ -220,4 +220,37 @@ public class BlogRecipeService {
             return null;
         }
     }
+
+    @Transactional
+    public void createBlogScrap(User user, Long blogRecipeId) {
+
+        BlogRecipe blogRecipe = blogRecipeRepository.findById(blogRecipeId).orElseThrow(() -> {
+            throw new NotFoundRecipeException();
+        });
+        blogRecipe.plusScrapCnt();
+        blogRecipeRepository.save(blogRecipe);
+        blogScrapService.createBlogScrap(user, blogRecipeId);
+    }
+
+    @Transactional
+    public void deleteBlogScrap(User user, Long blogRecipeId) {
+
+        BlogRecipe blogRecipe = blogRecipeRepository.findById(blogRecipeId).orElseThrow(() -> {
+            throw new NotFoundRecipeException();
+        });
+        blogRecipe.minusScrapCnt();
+        blogRecipeRepository.save(blogRecipe);
+        blogScrapService.deleteBlogScrap(user, blogRecipeId);
+    }
+
+    @Transactional
+    public void createBlogView(User user, Long blogRecipeId) {
+
+        BlogRecipe blogRecipe = blogRecipeRepository.findById(blogRecipeId).orElseThrow(() -> {
+            throw new NotFoundRecipeException();
+        });
+        blogRecipe.plusViewCnt();
+        blogRecipeRepository.save(blogRecipe);
+        blogViewService.createBlogView(user, blogRecipeId);
+    }
 }

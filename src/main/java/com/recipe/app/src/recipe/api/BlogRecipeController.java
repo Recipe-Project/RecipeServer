@@ -2,8 +2,6 @@ package com.recipe.app.src.recipe.api;
 
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.recipe.application.blog.BlogRecipeService;
-import com.recipe.app.src.recipe.application.blog.BlogScrapService;
-import com.recipe.app.src.recipe.application.blog.BlogViewService;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
@@ -26,13 +24,9 @@ import static com.recipe.app.common.response.BaseResponse.success;
 public class BlogRecipeController {
 
     private final BlogRecipeService blogRecipeService;
-    private final BlogViewService blogViewService;
-    private final BlogScrapService blogScrapService;
 
-    public BlogRecipeController(BlogRecipeService blogRecipeService, BlogViewService blogViewService, BlogScrapService blogScrapService) {
+    public BlogRecipeController(BlogRecipeService blogRecipeService) {
         this.blogRecipeService = blogRecipeService;
-        this.blogViewService = blogViewService;
-        this.blogScrapService = blogScrapService;
     }
 
     @ApiOperation(value = "블로그 레시피 목록 조회 API")
@@ -63,7 +57,7 @@ public class BlogRecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        blogViewService.createBlogView(user, blogRecipeId);
+        blogRecipeService.createBlogView(user, blogRecipeId);
 
         return success();
     }
@@ -92,7 +86,7 @@ public class BlogRecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        blogScrapService.createBlogScrap(user, blogRecipeId);
+        blogRecipeService.createBlogScrap(user, blogRecipeId);
 
         return success();
     }
@@ -105,7 +99,7 @@ public class BlogRecipeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        blogScrapService.deleteBlogScrap(user, blogRecipeId);
+        blogRecipeService.deleteBlogScrap(user, blogRecipeId);
 
         return success();
     }
