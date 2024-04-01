@@ -6,16 +6,18 @@ import com.recipe.app.src.recipe.domain.youtube.YoutubeView
 import com.recipe.app.src.user.domain.User
 import com.recipe.app.src.user.infra.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.data.redis.AutoConfigureDataRedis
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.test.context.ActiveProfiles
+import org.springframework.test.context.TestPropertySource
 import spock.lang.Specification
 
 import java.time.LocalDate
 
+@ActiveProfiles("test")
 @DataJpaTest
-@AutoConfigureDataRedis
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@TestPropertySource("classpath:application-test.yml")
 class YoutubeRecipeCustomRepositoryTest extends Specification {
 
     @Autowired
@@ -26,12 +28,6 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
     YoutubeScrapRepository youtubeScrapRepository;
     @Autowired
     YoutubeViewRepository youtubeViewRepository;
-
-    void setup() {
-        youtubeScrapRepository.deleteAllInBatch();
-        youtubeViewRepository.deleteAllInBatch();
-        youtubeRecipeRepository.deleteAllInBatch();
-    }
 
     def "검색어로 유튜브 레시피 갯수 조회"() {
 
