@@ -17,7 +17,7 @@ import java.time.LocalDate
 @ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource("classpath:application-test.yml")
+@TestPropertySource(locations = "classpath:application-test.yml", properties = "spring.profiles.active=test")
 class YoutubeRecipeCustomRepositoryTest extends Specification {
 
     @Autowired
