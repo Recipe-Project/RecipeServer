@@ -12,7 +12,7 @@ import spock.lang.Specification
 @ActiveProfiles("test")
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-@TestPropertySource(locations = "classpath:application-test.yml", properties = "spring.profiles.active=test")
+@TestPropertySource(locations = "classpath:application-test.yml")
 class IngredientCustomRepositoryTest extends Specification {
 
     @Autowired

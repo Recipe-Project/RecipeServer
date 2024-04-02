@@ -22,7 +22,7 @@ jobs:
       - name: Copy application.yml
         env:
           APPLICATION_YML_FILE: ${{ secrets.TEST_APPLICATION_YML }}
-        run: echo $APPLICATION_YML_FILE | base64 --decode > src/main/resources/application.yml
+        run: echo $APPLICATION_YML_FILE | base64 --decode > src/main/resources/application-test.yml
 
       # recipeapp-key.json 파일 복사
       - name: Copy recipeapp-key.json
