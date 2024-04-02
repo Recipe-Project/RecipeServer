@@ -1,169 +1,147 @@
 package com.recipe.app.src.recipe.infra;
 
-import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.recipe.application.port.RecipeRepository;
+import com.recipe.app.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.RecipeIngredient;
-import com.recipe.app.src.recipe.domain.RecipeProcess;
-import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
 
+import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-@Repository
-@RequiredArgsConstructor
-public class RecipeRepositoryImpl implements RecipeRepository {
+import static com.recipe.app.src.ingredient.domain.QIngredient.ingredient;
+import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
+import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
+import static com.recipe.app.src.recipe.domain.QRecipeScrap.recipeScrap;
+import static com.recipe.app.src.recipe.domain.QRecipeView.recipeView;
 
-    private final RecipeJpaRepository recipeJpaRepository;
-    private final RecipeProcessJpaRepository recipeProcessJpaRepository;
-    private final RecipeIngredientJpaRepository recipeIngredientJpaRepository;
-    private final RecipeScrapJpaRepository recipeScrapJpaRepository;
-    private final RecipeViewJpaRepository recipeViewJpaRepository;
+public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCustomRepository {
 
-    @Override
-    public Optional<Recipe> findById(Long recipeId) {
-        return recipeJpaRepository.findById(recipeId).map(RecipeEntity::toModel);
+    public RecipeRepositoryImpl(EntityManager em) {
+        super(em);
     }
 
     @Override
-    public Page<Recipe> getRecipesOrderByCreatedAtDesc(String keyword, Pageable pageable) {
-        return recipeJpaRepository.getRecipesOrderByCreatedAtDesc(keyword, pageable).map(RecipeEntity::toModel);
+    public Long countByKeyword(String keyword) {
+        return (long) queryFactory
+                .select(recipe.recipeId, recipe.recipeNm, recipe.introduction)
+                .from(recipe)
+                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
+                .where(recipe.hiddenYn.eq("N"))
+                .groupBy(recipe.recipeId)
+                .having(recipe.recipeNm.contains(keyword)
+                        .or(recipe.introduction.contains(keyword))
+                        .or(ingredient.count().gt(0)))
+                .fetch().size();
     }
 
     @Override
-    public Page<Recipe> getRecipesOrderByRecipeScrapSizeDesc(String keyword, Pageable pageable) {
-        return recipeJpaRepository.getRecipesOrderByRecipeScrapSizeDesc(keyword, pageable).map(RecipeEntity::toModel);
+    public List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(String keyword, Long lastRecipeId, LocalDateTime createdAt, int size) {
+
+        return queryFactory
+                .selectFrom(recipe)
+                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
+                .where(
+                        recipe.createdAt.lt(createdAt)
+                                .or(recipe.createdAt.eq(createdAt)
+                                        .and(recipe.recipeId.lt(lastRecipeId))),
+                        recipe.hiddenYn.eq("N")
+                )
+                .groupBy(recipe.recipeId)
+                .having(recipe.recipeNm.contains(keyword)
+                        .or(recipe.introduction.contains(keyword))
+                        .or(ingredient.count().gt(0)))
+                .orderBy(recipe.createdAt.desc(), recipe.recipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public Page<Recipe> getRecipesOrderByRecipeViewSizeDesc(String keyword, Pageable pageable) {
-        return recipeJpaRepository.getRecipesOrderByRecipeViewSizeDesc(keyword, pageable).map(RecipeEntity::toModel);
+    public List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(String keyword, Long lastRecipeId, long recipeScrapCnt, int size) {
+
+        return queryFactory
+                .selectFrom(recipe)
+                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
+                .leftJoin(recipeScrap).on(recipeScrap.recipeId.eq(recipe.recipeId))
+                .where(recipe.hiddenYn.eq("N"))
+                .groupBy(recipe.recipeId)
+                .having(recipe.recipeNm.contains(keyword)
+                                .or(recipe.introduction.contains(keyword))
+                                .or(ingredient.count().gt(0)),
+                        recipeScrap.count().lt(recipeScrapCnt)
+                                .or(recipeScrap.count().eq(recipeScrapCnt)
+                                        .and(recipe.recipeId.lt(lastRecipeId))))
+                .orderBy(recipeScrap.count().desc(), recipe.recipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public void saveRecipeScrap(Recipe recipe, User user) {
-        recipeScrapJpaRepository.findByUserAndRecipe(UserEntity.fromModel(user), RecipeEntity.fromModel(recipe))
-                .orElseGet(() -> recipeScrapJpaRepository.save(RecipeScrapEntity.create(user, recipe)));
+    public List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(String keyword, Long lastRecipeId, long recipeViewCnt, int size) {
+
+        return queryFactory
+                .selectFrom(recipe)
+                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
+                .leftJoin(recipeView).on(recipeView.recipeId.eq(recipe.recipeId))
+                .where(recipe.hiddenYn.eq("N"))
+                .groupBy(recipe.recipeId)
+                .having(recipe.recipeNm.contains(keyword)
+                                .or(recipe.introduction.contains(keyword))
+                                .or(ingredient.count().gt(0)),
+                        recipeView.count().lt(recipeViewCnt)
+                                .or(recipeView.count().eq(recipeViewCnt)
+                                        .and(recipe.recipeId.lt(lastRecipeId))))
+                .orderBy(recipeView.count().desc(), recipe.recipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public void deleteRecipeScrap(Recipe recipe, User user) {
-        recipeScrapJpaRepository.findByUserAndRecipe(UserEntity.fromModel(user), RecipeEntity.fromModel(recipe))
-                .ifPresent(recipeScrapJpaRepository::delete);
-
+    public List<Recipe> findUserScrapRecipesLimit(Long userId, Long lastRecipeId, LocalDateTime scrapCreatedAt, int size) {
+        return queryFactory
+                .selectFrom(recipe)
+                .join(recipeScrap).on(recipe.recipeId.eq(recipeScrap.recipeId), recipeScrap.userId.eq(userId))
+                .where(
+                        recipeScrap.createdAt.lt(scrapCreatedAt)
+                                .or(recipeScrap.createdAt.eq(scrapCreatedAt)
+                                        .and(recipe.recipeId.lt(lastRecipeId))),
+                        recipe.hiddenYn.eq("N")
+                )
+                .orderBy(recipeScrap.createdAt.desc(), recipe.recipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public Page<Recipe> findScrapRecipesByUser(User user, Pageable pageable) {
-        return recipeScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
-                .map(RecipeScrapEntity::getRecipe)
-                .map(RecipeEntity::toModel);
+    public List<Recipe> findLimitByUserId(Long userId, Long lastRecipeId, int size) {
+
+        return queryFactory
+                .selectFrom(recipe)
+                .where(
+                        recipe.userId.eq(userId),
+                        recipe.recipeId.lt(lastRecipeId)
+                )
+                .orderBy(recipe.recipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public void saveRecipeView(Recipe recipe, User user) {
-        recipeViewJpaRepository.findByUserAndRecipe(UserEntity.fromModel(user), RecipeEntity.fromModel(recipe))
-                .orElseGet(() -> recipeViewJpaRepository.save(RecipeViewEntity.create(user, recipe)));
-    }
+    public List<Recipe> findRecipesInFridge(Collection<Long> ingredientIds, Collection<String> ingredientNames) {
 
-    @Override
-    public Page<Recipe> findByUser(User user, Pageable pageable) {
-        return recipeJpaRepository.findByUser(UserEntity.fromModel(user), pageable).map(RecipeEntity::toModel);
-    }
-
-    @Override
-    public void delete(Recipe recipe) {
-        recipeJpaRepository.delete(RecipeEntity.fromModel(recipe));
-    }
-
-    @Override
-    public Recipe save(Recipe recipe) {
-        return recipeJpaRepository.save(RecipeEntity.fromModel(recipe)).toModel();
-    }
-
-    @Override
-    public void saveRecipeProcess(RecipeProcess recipeProcess) {
-        recipeProcessJpaRepository.save(RecipeProcessEntity.fromModel(recipeProcess)).toModel();
-    }
-
-    @Override
-    public void saveRecipeIngredients(List<RecipeIngredient> recipeIngredients) {
-        StreamSupport.stream(recipeIngredientJpaRepository.saveAll(recipeIngredients.stream()
-                        .map(RecipeIngredientEntity::fromModel)
-                        .collect(Collectors.toList())).spliterator(), false)
-                .map(RecipeIngredientEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public List<RecipeProcess> findRecipeProcessesByRecipe(Recipe recipe) {
-        return recipeProcessJpaRepository.findByRecipeOrderByCookingNo(RecipeEntity.fromModel(recipe)).stream()
-                .map(RecipeProcessEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteRecipeIngredients(List<RecipeIngredient> recipeIngredients) {
-        recipeIngredientJpaRepository.deleteAll(recipeIngredients.stream()
-                .map(RecipeIngredientEntity::fromModel)
-                .collect(Collectors.toList()));
-    }
-
-    @Override
-    public Page<Recipe> findRecipesOrderByFridgeIngredientCntDesc(List<Ingredient> ingredients, List<String> ingredientNames, User user, Pageable pageable) {
-        return recipeJpaRepository.findRecipesOrderByFridgeIngredientCntDesc(ingredients.stream()
-                        .map(Ingredient::getIngredientId)
-                        .collect(Collectors.toList()), ingredientNames, user.getUserId(), pageable)
-                .map(recipeEntityWithRate -> {
-                    Recipe recipe = new RecipeEntity(recipeEntityWithRate).toModel();
-                    recipe.addScrapUser(recipeEntityWithRate.getScrapUserId());
-                    recipe.addViewUser(recipeEntityWithRate.getViewUserId());
-                    return recipe;
-                });
-    }
-
-    @Override
-    public long countRecipeScrapByUser(User user) {
-        return recipeScrapJpaRepository.countByUser(UserEntity.fromModel(user));
-    }
-
-    @Override
-    public List<RecipeIngredient> findRecipeIngredientsByRecipe(Recipe recipe) {
-        return recipeIngredientJpaRepository.findByRecipe(RecipeEntity.fromModel(recipe)).stream()
-                .map(RecipeIngredientEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteRecipeProcesses(List<RecipeProcess> recipeProcesses) {
-        recipeProcessJpaRepository.deleteAll(recipeProcesses.stream()
-                .map(RecipeProcessEntity::fromModel)
-                .collect(Collectors.toList()));
-    }
-
-    @Override
-    public List<RecipeIngredient> findRecipeIngredientsByRecipeIn(List<Recipe> recipes) {
-        return recipeIngredientJpaRepository.findByRecipeIn(recipes.stream()
-                        .map(RecipeEntity::fromModel)
-                        .collect(Collectors.toList())).stream()
-                .map(RecipeIngredientEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public void deleteRecipeScrapsByRecipe(Recipe recipe) {
-        recipeScrapJpaRepository.deleteAll(recipeScrapJpaRepository.findByRecipe(RecipeEntity.fromModel(recipe)));
-    }
-
-    @Override
-    public void deleteRecipeViewsByRecipe(Recipe recipe) {
-        recipeViewJpaRepository.deleteAll(recipeViewJpaRepository.findByRecipe(RecipeEntity.fromModel(recipe)));
+        return queryFactory
+                .selectFrom(recipe)
+                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .join(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId))
+                .where(
+                        ingredient.ingredientId.in(ingredientIds)
+                                .or(ingredient.ingredientName.in(ingredientNames)),
+                        recipe.hiddenYn.eq("N")
+                )
+                .groupBy(recipe.recipeId)
+                .fetch();
     }
 }

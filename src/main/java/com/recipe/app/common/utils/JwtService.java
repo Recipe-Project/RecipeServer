@@ -1,17 +1,14 @@
 package com.recipe.app.common.utils;
 
-import com.recipe.app.src.user.application.port.JwtBlacklistRepository;
+import com.recipe.app.src.user.domain.JwtBlacklist;
+import com.recipe.app.src.user.infra.JwtBlacklistRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
-import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.spec.SecretKeySpec;
@@ -21,10 +18,8 @@ import java.util.Base64;
 import java.util.Date;
 
 @Service
-@RequiredArgsConstructor
 public class JwtService {
 
-    private final UserDetailsService userDetailsService;
     private final JwtBlacklistRepository jwtBlacklistRepository;
     private final Logger logger = LoggerFactory.getLogger(JwtService.class);
     @Value("${jwt.secret}")
@@ -33,6 +28,10 @@ public class JwtService {
     private String tokenHeader;
     @Value("${jwt.token-validity-in-ms}")
     private long tokenValidMillisecond;
+
+    public JwtService(JwtBlacklistRepository jwtBlacklistRepository) {
+        this.jwtBlacklistRepository = jwtBlacklistRepository;
+    }
 
     public String createJwt(Long userId) {
         Date now = new Date();
@@ -56,18 +55,15 @@ public class JwtService {
     }
 
     public int getUserId(String token) {
-        return Jwts.parser()
+        return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
+                .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .get("userId", Integer.class);
     }
 
-    public Authentication getAuthentication(String token) {
-        UserDetails userDetails = userDetailsService.loadUserByUsername(String.valueOf(getUserId(token)));
-        return new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-    }
-
+    @Transactional(readOnly = true)
     public boolean validateToken(String token) {
         try {
             logger.debug(this.secretKey);
@@ -86,7 +82,10 @@ public class JwtService {
         return false;
     }
 
-    public String getTokenHeader() {
-        return this.tokenHeader;
+    @Transactional
+    public void createJwtBlacklist(HttpServletRequest request) {
+
+        String jwt = resolveToken(request);
+        jwtBlacklistRepository.save(new JwtBlacklist(jwt));
     }
 }

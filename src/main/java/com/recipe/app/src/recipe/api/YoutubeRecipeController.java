@@ -1,120 +1,104 @@
 package com.recipe.app.src.recipe.api;
 
 import com.recipe.app.common.response.BaseResponse;
-import com.recipe.app.src.common.application.BadWordService;
-import com.recipe.app.src.recipe.application.SearchKeywordService;
-import com.recipe.app.src.recipe.application.YoutubeRecipeService;
-import com.recipe.app.src.recipe.application.dto.RecipeDto;
-import com.recipe.app.src.recipe.domain.YoutubeRecipe;
+import com.recipe.app.src.recipe.application.dto.RecipesResponse;
+import com.recipe.app.src.recipe.application.youtube.YoutubeRecipeService;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import java.util.stream.Collectors;
+import java.io.IOException;
 
 import static com.recipe.app.common.response.BaseResponse.success;
 
 @Api(tags = {"유튜브 레시피 Controller"})
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/recipes/youtube")
 public class YoutubeRecipeController {
 
     private final YoutubeRecipeService youtubeRecipeService;
-    private final SearchKeywordService recipeKeywordService;
-    private final BadWordService badWordService;
+
+    public YoutubeRecipeController(YoutubeRecipeService youtubeRecipeService) {
+        this.youtubeRecipeService = youtubeRecipeService;
+    }
 
     @ApiOperation(value = "유튜브 레시피 목록 조회 API")
-    @GetMapping("")
-    public BaseResponse<RecipeDto.RecipesResponse> getYoutubeRecipes(@ApiIgnore final Authentication authentication,
-                                                                     @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
-                                                                     @RequestParam(value = "keyword") String keyword,
-                                                                     @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
-                                                                     @RequestParam(value = "page") int page,
-                                                                     @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
-                                                                     @RequestParam(value = "size") int size,
-                                                                     @ApiParam(name = "sort", type = "String", example = "조회수순(youtubeViews) / 좋아요순(youtubeScraps) / 최신순(createdAt) = 기본값", value = "정렬")
-                                                                     @RequestParam(value = "sort") String sort) {
+    @GetMapping
+    public BaseResponse<RecipesResponse> getYoutubeRecipes(@ApiIgnore final Authentication authentication,
+                                                           @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
+                                                           @RequestParam(value = "keyword") String keyword,
+                                                           @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 유튜브 레시피 아이디")
+                                                           @RequestParam(value = "startAfter") Long startAfter,
+                                                           @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                                           @RequestParam(value = "size") int size,
+                                                           @ApiParam(name = "sort", type = "String", example = "조회수순(youtubeViews) / 좋아요순(youtubeScraps) / 최신순(newest) = 기본값", value = "정렬")
+                                                           @RequestParam(value = "sort") String sort) throws IOException {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        badWordService.checkBadWords(keyword);
-        Page<YoutubeRecipe> youtubeRecipes = youtubeRecipeService.getYoutubeRecipes(keyword, page, size, sort);
-        if (youtubeRecipes.getTotalElements() < 10)
-            youtubeRecipes = youtubeRecipeService.searchYoutubes(keyword, page, size, sort);
 
-        RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(youtubeRecipes.getTotalElements(), youtubeRecipes.stream()
-                .map((recipe) -> RecipeDto.RecipeResponse.from(recipe, user))
-                .collect(Collectors.toList()));
-
-        return success(data);
+        return success(youtubeRecipeService.getYoutubeRecipes(user, keyword, startAfter, size, sort));
     }
 
     @ApiOperation(value = "유튜브 레시피 상세 조회 API")
-    @GetMapping("/{youtubeRecipeId}")
-    public BaseResponse<Void> getYoutubeRecipe(@ApiIgnore final Authentication authentication, @PathVariable Long youtubeRecipeId) {
+    @PostMapping("/{youtubeRecipeId}/views")
+    public BaseResponse<Void> postYoutubeRecipeView(@ApiIgnore final Authentication authentication, @PathVariable Long youtubeRecipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        youtubeRecipeService.createYoutubeView(youtubeRecipeId, user);
+        youtubeRecipeService.createYoutubeView(user, youtubeRecipeId);
 
         return success();
     }
 
     @ApiOperation(value = "유튜브 레시피 스크랩 목록 조회 API")
-    @GetMapping("/scrap")
-    public BaseResponse<RecipeDto.RecipesResponse> getScrapYoutubeRecipes(@ApiIgnore final Authentication authentication,
-                                                                          @ApiParam(name = "page", type = "int", example = "0", value = "페이지")
-                                                                          @RequestParam(value = "page") int page,
-                                                                          @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
-                                                                          @RequestParam(value = "size") int size) {
+    @GetMapping("/scraps")
+    public BaseResponse<RecipesResponse> getScrapYoutubeRecipes(@ApiIgnore final Authentication authentication,
+                                                                @ApiParam(name = "startAfter", type = "int", example = "0", value = "마지막 조회 유튜브 레시피 아이디")
+                                                                @RequestParam(value = "startAfter") Long startAfter,
+                                                                @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                                                @RequestParam(value = "size") int size) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        Page<YoutubeRecipe> youtubeRecipes = youtubeRecipeService.getScrapYoutubeRecipes(user, page, size);
-        RecipeDto.RecipesResponse data = new RecipeDto.RecipesResponse(youtubeRecipes.getTotalElements(), youtubeRecipes.stream()
-                .map((youtubeRecipe) -> RecipeDto.RecipeResponse.from(youtubeRecipe, user))
-                .collect(Collectors.toList()));
 
-        return success(data);
+        return success(youtubeRecipeService.getScrapYoutubeRecipes(user, startAfter, size));
     }
 
     @ApiOperation(value = "유튜브 레시피 스크랩 생성 API")
-    @PostMapping("/{youtubeRecipeId}/scrap")
+    @PostMapping("/{youtubeRecipeId}/scraps")
     public BaseResponse<Void> postYoutubeRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable Long youtubeRecipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        youtubeRecipeService.createYoutubeScrap(youtubeRecipeId, user);
+        youtubeRecipeService.createYoutubeScrap(user, youtubeRecipeId);
 
         return success();
     }
 
     @ApiOperation(value = "유튜브 레시피 스크랩 삭제 API")
-    @DeleteMapping("/{youtubeRecipeId}/scrap")
+    @DeleteMapping("/{youtubeRecipeId}/scraps")
     public BaseResponse<Void> deleteYoutubeRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable Long youtubeRecipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        youtubeRecipeService.deleteYoutubeScrap(youtubeRecipeId, user);
+        youtubeRecipeService.deleteYoutubeScrap(user, youtubeRecipeId);
 
         return success();
     }

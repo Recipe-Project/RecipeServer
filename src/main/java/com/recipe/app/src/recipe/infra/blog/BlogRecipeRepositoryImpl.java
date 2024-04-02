@@ -1,89 +1,104 @@
 package com.recipe.app.src.recipe.infra.blog;
 
-import com.recipe.app.src.recipe.application.port.BlogRecipeRepository;
-import com.recipe.app.src.recipe.domain.BlogRecipe;
-import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
+import com.recipe.app.common.infra.BaseRepositoryImpl;
+import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 
+import javax.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-@Repository
-@RequiredArgsConstructor
-public class BlogRecipeRepositoryImpl implements BlogRecipeRepository {
-    private final BlogRecipeJpaRepository blogRecipeJpaRepository;
-    private final BlogScrapJpaRepository blogScrapJpaRepository;
-    private final BlogViewJpaRepository blogViewJpaRepository;
+import static com.recipe.app.src.recipe.domain.blog.QBlogRecipe.blogRecipe;
+import static com.recipe.app.src.recipe.domain.blog.QBlogScrap.blogScrap;
+import static com.recipe.app.src.recipe.domain.blog.QBlogView.blogView;
 
-    @Override
-    public Page<BlogRecipe> getBlogRecipesOrderByCreatedAtDesc(String keyword, Pageable pageable) {
-        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByCreatedAtDesc(keyword, keyword, pageable).map(BlogRecipeEntity::toModel);
+public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements BlogRecipeCustomRepository {
+
+    public BlogRecipeRepositoryImpl(EntityManager em) {
+        super(em);
     }
 
     @Override
-    public Page<BlogRecipe> getBlogRecipesOrderByBlogScrapSizeDesc(String keyword, Pageable pageable) {
-        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByBlogScrapSizeDesc(keyword, keyword, pageable).map(BlogRecipeEntity::toModel);
+    public Long countByKeyword(String keyword) {
+
+        return queryFactory
+                .select(blogRecipe.count())
+                .from(blogRecipe)
+                .where(
+                        blogRecipe.title.contains(keyword)
+                                .or(blogRecipe.description.contains(keyword))
+                )
+                .fetchOne();
     }
 
     @Override
-    public Page<BlogRecipe> getBlogRecipesOrderByBlogViewSizeDesc(String keyword, Pageable pageable) {
-        return blogRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByBlogViewSizeDesc(keyword, keyword, pageable).map(BlogRecipeEntity::toModel);
+    public List<BlogRecipe> findByKeywordLimitOrderByPublishedAtDesc(String keyword, Long lastBlogRecipeId, LocalDate lastBlogRecipePublishedAt, int size) {
+
+        return queryFactory
+                .selectFrom(blogRecipe)
+                .where(
+                        blogRecipe.title.contains(keyword)
+                                .or(blogRecipe.description.contains(keyword)),
+                        blogRecipe.publishedAt.lt(lastBlogRecipePublishedAt)
+                                .or(blogRecipe.publishedAt.eq(lastBlogRecipePublishedAt)
+                                        .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId)))
+                )
+                .orderBy(blogRecipe.publishedAt.desc(), blogRecipe.blogRecipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public Optional<BlogRecipe> getBlogRecipe(Long blogRecipeId) {
-        return blogRecipeJpaRepository.findById(blogRecipeId).map(BlogRecipeEntity::toModel);
+    public List<BlogRecipe> findByKeywordLimitOrderByBlogScrapCntDesc(String keyword, Long lastBlogRecipeId, long lastBlogScrapCnt, int size) {
+
+        return queryFactory
+                .selectFrom(blogRecipe)
+                .leftJoin(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId))
+                .where(
+                        blogRecipe.title.contains(keyword)
+                                .or(blogRecipe.description.contains(keyword))
+                )
+                .groupBy(blogRecipe.blogRecipeId)
+                .having(blogScrap.count().lt(lastBlogScrapCnt)
+                        .or(blogScrap.count().eq(lastBlogScrapCnt)
+                                .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId))))
+                .orderBy(blogScrap.count().desc(), blogRecipe.blogRecipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public void saveBlogRecipeView(BlogRecipe blogRecipe, User user) {
-        blogViewJpaRepository.findByUserAndBlogRecipe(UserEntity.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
-                .orElseGet(() -> blogViewJpaRepository.save(BlogViewEntity.create(user, blogRecipe)));
+    public List<BlogRecipe> findByKeywordLimitOrderByBlogViewCntDesc(String keyword, Long lastBlogRecipeId, long lastBlogViewCnt, int size) {
+
+        return queryFactory
+                .selectFrom(blogRecipe)
+                .leftJoin(blogView).on(blogRecipe.blogRecipeId.eq(blogView.blogRecipeId))
+                .where(
+                        blogRecipe.title.contains(keyword)
+                                .or(blogRecipe.description.contains(keyword))
+                )
+                .groupBy(blogRecipe.blogRecipeId)
+                .having(blogView.count().lt(lastBlogViewCnt)
+                        .or(blogView.count().eq(lastBlogViewCnt)
+                                .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId))))
+                .orderBy(blogView.count().desc(), blogRecipe.blogRecipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public void saveBlogRecipeScrap(BlogRecipe blogRecipe, User user) {
-        blogScrapJpaRepository.findByUserAndBlogRecipe(UserEntity.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
-                .orElseGet(() -> blogScrapJpaRepository.save(BlogScrapEntity.createBlogScrap(user, blogRecipe)));
-    }
+    public List<BlogRecipe> findUserScrapBlogRecipesLimit(Long userId, Long lastBlogRecipeId, LocalDateTime scrapCreatedAt, int size) {
 
-    @Override
-    public void deleteBlogRecipeScrap(BlogRecipe blogRecipe, User user) {
-        blogScrapJpaRepository.findByUserAndBlogRecipe(UserEntity.fromModel(user), BlogRecipeEntity.fromModel(blogRecipe))
-                .ifPresent(blogScrapJpaRepository::delete);
-    }
-
-    @Override
-    public Page<BlogRecipe> findBlogRecipesByUser(User user, Pageable pageable) {
-        return blogScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
-                .map(BlogScrapEntity::getBlogRecipe)
-                .map(BlogRecipeEntity::toModel);
-    }
-
-    @Override
-    public List<BlogRecipe> saveBlogRecipes(List<BlogRecipe> blogs) {
-        return StreamSupport.stream(blogRecipeJpaRepository.saveAll(blogs.stream()
-                        .map(BlogRecipeEntity::fromModel)
-                        .collect(Collectors.toList())).spliterator(), false)
-                .map(BlogRecipeEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public long countBlogScrapByUser(User user) {
-        return blogScrapJpaRepository.countByUser(UserEntity.fromModel(user));
-    }
-
-    @Override
-    public List<BlogRecipe> findBlogRecipesByBlogUrlIn(List<String> blogUrls) {
-        return blogRecipeJpaRepository.findByBlogUrlIn(blogUrls).stream()
-                .map(BlogRecipeEntity::toModel)
-                .collect(Collectors.toList());
+        return queryFactory
+                .selectFrom(blogRecipe)
+                .join(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId), blogScrap.userId.eq(userId))
+                .where(
+                        blogScrap.createdAt.lt(scrapCreatedAt)
+                                .or(blogScrap.createdAt.eq(scrapCreatedAt)
+                                        .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId)))
+                )
+                .orderBy(blogScrap.createdAt.desc(), blogRecipe.blogRecipeId.desc())
+                .limit(size)
+                .fetch();
     }
 }

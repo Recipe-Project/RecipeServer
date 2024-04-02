@@ -1,92 +1,104 @@
 package com.recipe.app.src.recipe.infra.youtube;
 
-import com.recipe.app.src.recipe.application.port.YoutubeRecipeRepository;
-import com.recipe.app.src.recipe.domain.YoutubeRecipe;
-import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
-import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Repository;
+import com.recipe.app.common.infra.BaseRepositoryImpl;
+import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 
+import javax.persistence.EntityManager;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-import java.util.stream.StreamSupport;
 
-@Repository
-@RequiredArgsConstructor
-public class YoutubeRecipeRepositoryImpl implements YoutubeRecipeRepository {
+import static com.recipe.app.src.recipe.domain.youtube.QYoutubeRecipe.youtubeRecipe;
+import static com.recipe.app.src.recipe.domain.youtube.QYoutubeScrap.youtubeScrap;
+import static com.recipe.app.src.recipe.domain.youtube.QYoutubeView.youtubeView;
 
-    private final YoutubeRecipeJpaRepository youtubeRecipeJpaRepository;
-    private final YoutubeScrapJpaRepository youtubeScrapJpaRepository;
-    private final YoutubeViewJpaRepository youtubeViewJpaRepository;
+public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements YoutubeRecipeCustomRepository {
 
-
-    @Override
-    public Page<YoutubeRecipe> getYoutubeRecipesOrderByCreatedAtDesc(String keyword, Pageable pageable) {
-        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByCreatedAtDesc(keyword, keyword, pageable).map(YoutubeRecipeEntity::toModel);
+    public YoutubeRecipeRepositoryImpl(EntityManager em) {
+        super(em);
     }
 
     @Override
-    public Page<YoutubeRecipe> getYoutubeRecipesOrderByYoutubeScrapSizeDesc(String keyword, Pageable pageable) {
-        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByYoutubeScrapSizeDesc(keyword, keyword, pageable).map(YoutubeRecipeEntity::toModel);
+    public Long countByKeyword(String keyword) {
+
+        return queryFactory
+                .select(youtubeRecipe.count())
+                .from(youtubeRecipe)
+                .where(
+                        youtubeRecipe.title.contains(keyword)
+                                .or(youtubeRecipe.description.contains(keyword))
+                )
+                .fetchOne();
     }
 
     @Override
-    public Page<YoutubeRecipe> getYoutubeRecipesOrderByYoutubeViewSizeDesc(String keyword, Pageable pageable) {
-        return youtubeRecipeJpaRepository.findByTitleContainingOrDescriptionContainingOrderByYoutubeViewSizeDesc(keyword, keyword, pageable).map(YoutubeRecipeEntity::toModel);
+    public List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(String keyword, Long lastYoutubeRecipeId, LocalDate lastYoutubeRecipePostDate, int size) {
+
+        return queryFactory
+                .selectFrom(youtubeRecipe)
+                .where(
+                        youtubeRecipe.title.contains(keyword)
+                                .or(youtubeRecipe.description.contains(keyword)),
+                        youtubeRecipe.postDate.lt(lastYoutubeRecipePostDate)
+                                .or(youtubeRecipe.postDate.eq(lastYoutubeRecipePostDate)
+                                        .and(youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)))
+                )
+                .orderBy(youtubeRecipe.postDate.desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public Optional<YoutubeRecipe> getYoutubeRecipe(Long youtubeRecipeId) {
-        return youtubeRecipeJpaRepository.findById(youtubeRecipeId).map(YoutubeRecipeEntity::toModel);
+    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeScrapCntDesc(String keyword, Long lastYoutubeRecipeId, long youtubeScrapCnt, int size) {
+
+        return queryFactory
+                .selectFrom(youtubeRecipe)
+                .leftJoin(youtubeScrap).on(youtubeScrap.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId))
+                .where(
+                        youtubeRecipe.title.contains(keyword)
+                                .or(youtubeRecipe.description.contains(keyword))
+                )
+                .groupBy(youtubeRecipe.youtubeRecipeId)
+                .having(youtubeScrap.count().lt(youtubeScrapCnt)
+                        .or(youtubeScrap.count().eq(youtubeScrapCnt)
+                                .and(youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId))))
+                .orderBy(youtubeScrap.count().desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public void saveYoutubeRecipeView(YoutubeRecipe youtubeRecipe, User user) {
-        youtubeViewJpaRepository.findByUserAndYoutubeRecipe(UserEntity.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
-                .orElseGet(() -> youtubeViewJpaRepository.save(YoutubeViewEntity.create(user, youtubeRecipe)));
+    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeViewCntDesc(String keyword, Long lastYoutubeRecipeId, long youtubeViewCnt, int size) {
+
+        return queryFactory
+                .selectFrom(youtubeRecipe)
+                .leftJoin(youtubeView).on(youtubeView.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId))
+                .where(
+                        youtubeRecipe.title.contains(keyword)
+                                .or(youtubeRecipe.description.contains(keyword))
+                )
+                .groupBy(youtubeRecipe.youtubeRecipeId)
+                .having(youtubeView.count().lt(youtubeViewCnt)
+                        .or(youtubeView.count().eq(youtubeViewCnt)
+                                .and(youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId))))
+                .orderBy(youtubeView.count().desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .limit(size)
+                .fetch();
     }
 
     @Override
-    public void saveYoutubeRecipeScrap(YoutubeRecipe youtubeRecipe, User user) {
-        youtubeScrapJpaRepository.findByUserAndYoutubeRecipe(UserEntity.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
-                .orElseGet(() -> youtubeScrapJpaRepository.save(YoutubeScrapEntity.create(user, youtubeRecipe)));
-    }
+    public List<YoutubeRecipe> findUserScrapYoutubeRecipesLimit(Long userId, Long lastYoutubeRecipeId, LocalDateTime scrapCreatedAt, int size) {
 
-    @Override
-    public void deleteYoutubeRecipeScrap(YoutubeRecipe youtubeRecipe, User user) {
-        youtubeScrapJpaRepository.findByUserAndYoutubeRecipe(UserEntity.fromModel(user), YoutubeRecipeEntity.fromModel(youtubeRecipe))
-                .ifPresent(youtubeScrapJpaRepository::delete);
-
-    }
-
-    @Override
-    public Page<YoutubeRecipe> findYoutubeRecipesByUser(User user, Pageable pageable) {
-        return youtubeScrapJpaRepository.findByUser(UserEntity.fromModel(user), pageable)
-                .map(YoutubeScrapEntity::getYoutubeRecipe)
-                .map(YoutubeRecipeEntity::toModel);
-    }
-
-    @Override
-    public List<YoutubeRecipe> saveYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes) {
-        return StreamSupport.stream(youtubeRecipeJpaRepository.saveAll(youtubeRecipes.stream()
-                        .map(YoutubeRecipeEntity::fromModel)
-                        .collect(Collectors.toList())).spliterator(), false)
-                .map(YoutubeRecipeEntity::toModel)
-                .collect(Collectors.toList());
-    }
-
-    @Override
-    public long countYoutubeScrapByUser(User user) {
-        return youtubeScrapJpaRepository.countByUser(UserEntity.fromModel(user));
-    }
-
-    @Override
-    public List<YoutubeRecipe> findYoutubeRecipesByYoutubeIdIn(List<String> youtubeIds) {
-        return youtubeRecipeJpaRepository.findByYoutubeIdIn(youtubeIds).stream()
-                .map(YoutubeRecipeEntity::toModel)
-                .collect(Collectors.toList());
+        return queryFactory
+                .selectFrom(youtubeRecipe)
+                .join(youtubeScrap).on(youtubeScrap.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId), youtubeScrap.userId.eq(userId))
+                .where(
+                        youtubeScrap.createdAt.lt(scrapCreatedAt)
+                                .or(youtubeScrap.createdAt.eq(scrapCreatedAt)
+                                        .and(youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId)))
+                )
+                .orderBy(youtubeScrap.createdAt.desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .limit(size)
+                .fetch();
     }
 }

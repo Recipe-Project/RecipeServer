@@ -1,45 +1,40 @@
 package com.recipe.app.src.ingredient.infra;
 
-import com.recipe.app.src.ingredient.application.port.IngredientRepository;
+import com.recipe.app.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.ingredient.domain.IngredientCategory;
-import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.infra.UserEntity;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Repository;
+import com.recipe.app.src.ingredient.domain.QIngredient;
 
+import javax.persistence.EntityManager;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-@Repository
-@RequiredArgsConstructor
-public class IngredientRepositoryImpl implements IngredientRepository {
+import static com.recipe.app.src.ingredient.domain.QIngredient.ingredient;
 
-    private final IngredientJpaRepository ingredientJpaRepository;
+public class IngredientRepositoryImpl extends BaseRepositoryImpl implements IngredientCustomRepository {
+
+    public IngredientRepositoryImpl(EntityManager em) {
+        super(em);
+    }
+
+    @Override
+    public List<Ingredient> findDefaultIngredientsByKeyword(String keyword) {
+
+        return queryFactory
+                .selectFrom(ingredient)
+                .where(
+                        ingredient.userId.isNull(),
+                        ingredient.ingredientName.contains(keyword)
+                )
+                .fetch();
+    }
 
     @Override
     public List<Ingredient> findDefaultIngredients() {
-        return ingredientJpaRepository.findDefaultIngredients().stream().map(IngredientEntity::toModel).collect(Collectors.toList());
-    }
 
-    @Override
-    public List<Ingredient> findByIngredientIdIn(List<Long> ingredientIds) {
-        return ingredientJpaRepository.findByIngredientIdIn(ingredientIds).stream().map(IngredientEntity::toModel).collect(Collectors.toList());
-    }
-
-    @Override
-    public Optional<Ingredient> findByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategory(User user, String ingredientName, String ingredientIconUrl, IngredientCategory ingredientCategory) {
-        return ingredientJpaRepository.findByUserAndIngredientNameAndIngredientIconUrlAndIngredientCategoryEntity(UserEntity.fromModel(user), ingredientName, ingredientIconUrl, IngredientCategoryEntity.fromModel(ingredientCategory)).map(IngredientEntity::toModel);
-    }
-
-    @Override
-    public Ingredient save(Ingredient ingredient) {
-        return ingredientJpaRepository.save(IngredientEntity.fromModel(ingredient)).toModel();
-    }
-
-    @Override
-    public List<Ingredient> findDefaultIngredientsByIngredientNameContaining(String keyword) {
-        return ingredientJpaRepository.findDefaultIngredientsByIngredientNameContaining(keyword).stream().map(IngredientEntity::toModel).collect(Collectors.toList());
+        return queryFactory
+                .selectFrom(ingredient)
+                .where(
+                        ingredient.userId.isNull()
+                )
+                .fetch();
     }
 }

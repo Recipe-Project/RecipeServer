@@ -4,8 +4,11 @@ import com.recipe.app.common.utils.JwtService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.GenericFilterBean;
 
@@ -21,6 +24,7 @@ public class JwtFilter extends GenericFilterBean {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtFilter.class);
     private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
 
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -30,7 +34,8 @@ public class JwtFilter extends GenericFilterBean {
         if (!StringUtils.hasText(token)) {
             logger.info("필수 토큰이 없습니다., uri: {}", requestURI);
         } else if (jwtService.validateToken(token)) {
-            Authentication authentication = jwtService.getAuthentication(token);
+            UserDetails userDetails = userDetailsService.loadUserByUsername(String.valueOf(jwtService.getUserId(token)));
+            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
             SecurityContextHolder.getContext().setAuthentication(authentication);
             logger.info("Security context에 인증 정보를 저장했습니다, uri: {}", requestURI);
         } else {

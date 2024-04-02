@@ -2,216 +2,139 @@ package com.recipe.app.src.user.api;
 
 import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.common.utils.JwtService;
-import com.recipe.app.src.common.application.BadWordService;
-import com.recipe.app.src.recipe.application.BlogRecipeService;
-import com.recipe.app.src.recipe.application.RecipeService;
-import com.recipe.app.src.recipe.application.YoutubeRecipeService;
-import com.recipe.app.src.recipe.domain.Recipe;
+import com.recipe.app.src.user.application.UserFacadeService;
 import com.recipe.app.src.user.application.UserService;
-import com.recipe.app.src.user.application.dto.UserDto;
+import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
+import com.recipe.app.src.user.application.dto.UserLoginRequest;
+import com.recipe.app.src.user.application.dto.UserLoginResponse;
+import com.recipe.app.src.user.application.dto.UserProfileRequest;
+import com.recipe.app.src.user.application.dto.UserProfileResponse;
+import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.exception.EmptyFcmTokenException;
-import com.recipe.app.src.user.exception.EmptyTokenException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
-import java.util.List;
 
 import static com.recipe.app.common.response.BaseResponse.success;
 
 @Api(tags = {"유저 Controller"})
 @RestController
-@RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
 
     private final UserService userService;
-    private final RecipeService recipeService;
-    private final YoutubeRecipeService youtubeRecipeService;
-    private final BlogRecipeService blogRecipeService;
-    private final BadWordService badWordService;
     private final JwtService jwtService;
+    private final UserFacadeService userFacadeService;
 
-    @Value("${jwt.token-header}")
-    private String jwt;
+    public UserController(UserService userService, JwtService jwtService, UserFacadeService userFacadeService) {
+
+        this.userService = userService;
+        this.jwtService = jwtService;
+        this.userFacadeService = userFacadeService;
+    }
 
     @ApiOperation(value = "자동 로그인 API")
-    @ResponseBody
     @PostMapping("/auto-login")
-    public BaseResponse<UserDto.UserLoginResponse> autoLogin(@ApiIgnore final Authentication authentication) {
+    public BaseResponse<UserLoginResponse> autoLogin(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        user = userService.autoLogin(user);
-        UserDto.UserLoginResponse data = UserDto.UserLoginResponse.from(user.getUserId());
 
-        return success(data);
+        return success(userService.autoLogin(user));
     }
 
     @ApiOperation(value = "네이버 로그인 API")
-    @ResponseBody
     @PostMapping("/naver-login")
-    public BaseResponse<UserDto.UserSocialLoginResponse> naverLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserSocialLoginResponse> naverLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
-        String accessToken = request.getAccessToken();
-        if (!StringUtils.hasText(accessToken)) {
-            throw new EmptyTokenException();
-        }
-
-        String fcmToken = request.getFcmToken();
-        if (!StringUtils.hasText(fcmToken)) {
-            throw new EmptyFcmTokenException();
-        }
-
-        User user = userService.naverLogin(accessToken, fcmToken);
-        String jwt = jwtService.createJwt(user.getUserId());
-        UserDto.UserSocialLoginResponse data = UserDto.UserSocialLoginResponse.from(user.getUserId(), jwt);
-
-        return success(data);
+        return success(userService.naverLogin(request));
     }
 
     @ApiOperation(value = "카카오 로그인 API")
-    @ResponseBody
     @PostMapping("/kakao-login")
-    public BaseResponse<UserDto.UserSocialLoginResponse> kakaoLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserSocialLoginResponse> kakaoLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
-        String accessToken = request.getAccessToken();
-        if (!StringUtils.hasText(accessToken)) {
-            throw new EmptyTokenException();
-        }
-
-        String fcmToken = request.getFcmToken();
-        if (!StringUtils.hasText(fcmToken)) {
-            throw new EmptyFcmTokenException();
-        }
-
-        User user = userService.kakaoLogin(accessToken, fcmToken);
-        String jwt = jwtService.createJwt(user.getUserId());
-        UserDto.UserSocialLoginResponse data = UserDto.UserSocialLoginResponse.from(user.getUserId(), jwt);
-
-        return success(data);
+        return success(userService.kakaoLogin(request));
     }
 
     @ApiOperation(value = "구글 로그인 API")
-    @ResponseBody
     @PostMapping("/google-login")
-    public BaseResponse<UserDto.UserSocialLoginResponse> googleLogin(@RequestBody UserDto.UserLoginRequest request) throws IOException, ParseException {
+    public BaseResponse<UserSocialLoginResponse> googleLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
 
-        String accessToken = request.getAccessToken();
-        if (!StringUtils.hasText(accessToken)) {
-            throw new EmptyTokenException();
-        }
-
-        String fcmToken = request.getFcmToken();
-        if (!StringUtils.hasText(fcmToken)) {
-            throw new EmptyFcmTokenException();
-        }
-
-        User user = userService.googleLogin(accessToken, fcmToken);
-        String jwt = jwtService.createJwt(user.getUserId());
-        UserDto.UserSocialLoginResponse data = UserDto.UserSocialLoginResponse.from(user.getUserId(), jwt);
-
-        return success(data);
+        return success(userService.googleLogin(request));
     }
 
     @ApiOperation(value = "유저 프로필 조회 API")
-    @ResponseBody
-    @GetMapping("")
-    public BaseResponse<UserDto.UserProfileResponse> getUser(@ApiIgnore final Authentication authentication) {
+    @GetMapping
+    public BaseResponse<UserProfileResponse> getUser(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
-        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
-        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
 
-        return success(data);
+        return success(userFacadeService.findUserProfile(user));
     }
 
     @ApiOperation(value = "유저 프로필 수정 API")
-    @ResponseBody
-    @PatchMapping("")
-    public BaseResponse<UserDto.UserProfileResponse> patchUser(@ApiIgnore final Authentication authentication,
+    @PatchMapping
+    public BaseResponse<Void> patchUser(@ApiIgnore final Authentication authentication,
                                                                @ApiParam(value = "수정할 회원 정보", required = true)
-                                                               @RequestBody UserDto.UserProfileRequest request) {
+                                                               @RequestBody UserProfileRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        badWordService.checkBadWords(request.getNickname());
-        user = userService.updateUser(user, request);
-        long youtubeScrapCnt = youtubeRecipeService.countYoutubeScrapByUser(user);
-        long blogScrapCnt = blogRecipeService.countBlogScrapByUser(user);
-        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<Recipe> userRecipes = recipeService.getRecipesByUser(user, 0, 6).toList();
-        UserDto.UserProfileResponse data = UserDto.UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
+        userService.updateUser(user, request);
 
-        return success(data);
+        return success();
     }
 
     @ApiOperation(value = "회원 탈퇴 API")
-    @ResponseBody
-    @DeleteMapping("")
+    @DeleteMapping
     public BaseResponse<Void> deleteUser(HttpServletRequest request, @ApiIgnore final Authentication authentication) {
 
-        String jwt = jwtService.resolveToken(request);
-
-        if (authentication == null || !StringUtils.hasText(jwt))
+        if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-
-        userService.deleteUser(user, jwt);
+        userFacadeService.deleteUser(user, request);
 
         return success();
     }
 
     @ApiOperation(value = "로그아웃 API")
-    @ResponseBody
     @PostMapping("/logout")
     public BaseResponse<Void> logout(HttpServletRequest request) {
-        String jwt = jwtService.resolveToken(request);
 
-        if (!StringUtils.hasText(jwt))
-            throw new UserTokenNotExistException();
-
-        userService.registerJwtBlackList(jwt);
+        jwtService.createJwtBlacklist(request);
 
         return success();
     }
 
     @ApiOperation(value = "FCM 디바이스 토큰 수정 API")
-    @ResponseBody
     @PatchMapping("/fcm-token")
     public BaseResponse<Void> patchFcmToken(@ApiIgnore final Authentication authentication,
                                             @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
-                                            @RequestBody UserDto.UserDeviceTokenRequest request) {
+                                            @RequestBody UserDeviceTokenRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        userService.updateFcmToken(request, user);
+        userService.updateFcmToken(user, request);
 
         return success();
     }

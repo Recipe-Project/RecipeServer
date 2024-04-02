@@ -5,7 +5,7 @@ public enum Freshness {
     DANGER("위험"),
     DISPOSAL("폐기");
 
-    private String name;
+    private final String name;
 
     Freshness(String name) {
         this.name = name;

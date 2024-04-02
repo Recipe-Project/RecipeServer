@@ -8,8 +8,10 @@ build/
 nohup.out
 /logs/*
 application.yml
+application-test.yml
 Secret.java
 recipeapp-key.json
+src/main/generated
 
 ### STS ###
 .apt_generated

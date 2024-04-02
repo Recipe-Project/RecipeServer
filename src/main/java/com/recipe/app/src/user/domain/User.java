@@ -1,27 +1,59 @@
 package com.recipe.app.src.user.domain;
 
+import com.google.common.base.Preconditions;
+import com.recipe.app.common.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
-public class User {
-    private final Long userId;
-    private final String socialId;
-    private final String profileImgUrl;
-    private final String nickname;
-    private final String email;
-    private final String phoneNumber;
-    private final String deviceToken;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
-    private final LocalDateTime recentLoginAt;
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "UserInfo")
+public class User extends BaseEntity {
+    @Id
+    @Column(name = "userId", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId;
+
+    @Column(name = "socialId", nullable = false, length = 32)
+    private String socialId;
+
+    @Column(name = "profileImgUrl")
+    private String profileImgUrl;
+
+    @Column(name = "nickname", nullable = false, length = 45)
+    private String nickname;
+
+    @Column(name = "email", length = 64)
+    private String email;
+
+    @Column(name = "phoneNumber", length = 16)
+    private String phoneNumber;
+
+    @Column(name = "deviceToken", length = 500)
+    private String deviceToken;
+
+    @Column(name = "recentLoginAt")
+    private LocalDateTime recentLoginAt;
 
     @Builder
-    public User(Long userId, String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken,
-                LocalDateTime createdAt, LocalDateTime updatedAt, LocalDateTime recentLoginAt) {
+    public User(Long userId, String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken, LocalDateTime recentLoginAt) {
+
+        Preconditions.checkArgument(StringUtils.hasText(socialId), "소셜 로그인 ID 값을 입력해주세요.");
+        Preconditions.checkArgument(StringUtils.hasText(nickname), "닉네임을 입력해주세요.");
+        
         this.userId = userId;
         this.socialId = socialId;
         this.profileImgUrl = profileImgUrl;
@@ -29,82 +61,28 @@ public class User {
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.deviceToken = deviceToken;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
         this.recentLoginAt = recentLoginAt;
     }
 
-    public static User from(String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken) {
-        LocalDateTime now = LocalDateTime.now();
-        return User.builder()
-                .socialId(socialId)
-                .profileImgUrl(profileImgUrl)
-                .nickname(nickname)
-                .email(email)
-                .phoneNumber(phoneNumber)
-                .deviceToken(deviceToken)
-                .createdAt(now)
-                .updatedAt(now)
-                .recentLoginAt(now)
-                .build();
+    public void changeProfile(String profileImgUrl, String nickname) {
+
+        Preconditions.checkArgument(StringUtils.hasText(nickname), "닉네임을 입력해주세요.");
+        
+        this.profileImgUrl = profileImgUrl;
+        this.nickname = nickname;
     }
 
-    public User changeProfile(String profileImgUrl, String nickname) {
-        return User.builder()
-                .userId(userId)
-                .socialId(socialId)
-                .profileImgUrl(profileImgUrl)
-                .nickname(nickname)
-                .email(email)
-                .phoneNumber(phoneNumber)
-                .deviceToken(deviceToken)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .recentLoginAt(recentLoginAt)
-                .build();
+    public void changeRecentLoginAt(LocalDateTime recentLoginAt) {
+
+        Objects.requireNonNull(recentLoginAt, "최근 로그인 시간을 입력해주세요.");
+        
+        this.recentLoginAt = recentLoginAt;
     }
 
-    public User changeRecentLoginAt() {
-        return User.builder()
-                .userId(userId)
-                .socialId(socialId)
-                .profileImgUrl(profileImgUrl)
-                .nickname(nickname)
-                .email(email)
-                .phoneNumber(phoneNumber)
-                .deviceToken(deviceToken)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .recentLoginAt(LocalDateTime.now())
-                .build();
-    }
+    public void changeDeviceToken(String deviceToken) {
 
-    public User changeDeviceToken(String fcmToken) {
-        return User.builder()
-                .userId(userId)
-                .socialId(socialId)
-                .profileImgUrl(profileImgUrl)
-                .nickname(nickname)
-                .email(email)
-                .phoneNumber(phoneNumber)
-                .deviceToken(fcmToken)
-                .createdAt(createdAt)
-                .updatedAt(updatedAt)
-                .recentLoginAt(recentLoginAt)
-                .build();
-    }
+        Preconditions.checkArgument(StringUtils.hasText(deviceToken), "FCM 토큰을 입력해주세요.");
 
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        User user = (User) o;
-        return getUserId().equals(user.getUserId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getUserId());
+        this.deviceToken = deviceToken;
     }
 }

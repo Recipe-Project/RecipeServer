@@ -1,80 +1,72 @@
 package com.recipe.app.src.fridgeBasket.domain;
 
+import com.recipe.app.common.entity.BaseEntity;
 import com.recipe.app.src.fridge.domain.Freshness;
-import com.recipe.app.src.ingredient.domain.Ingredient;
-import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.fridge.domain.Fridge;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
+import javax.persistence.*;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 
 @Getter
-public class FridgeBasket {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "FridgeBasket")
+public class FridgeBasket extends BaseEntity {
 
-    private final Long fridgeBasketId;
-    private final User user;
-    private final Ingredient ingredient;
-    private final LocalDateTime expiredAt;
-    private final float quantity;
-    private final String unit;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    @Id
+    @Column(name = "fridgeBasketId", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long fridgeBasketId;
+
+    @Column(name = "userId", nullable = false)
+    private Long userId;
+
+    @Column(name = "ingredientId", nullable = false)
+    private Long ingredientId;
+
+    @Column(name = "expiredAt")
+    private LocalDate expiredAt;
+
+    @Column(name = "quantity", nullable = false)
+    private float quantity = 1;
+
+    @Column(name = "unit")
+    private String unit;
 
     @Builder
-    public FridgeBasket(Long fridgeBasketId, User user, Ingredient ingredient, LocalDateTime expiredAt, float quantity, String unit, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public FridgeBasket(Long fridgeBasketId, Long userId, Long ingredientId, LocalDate expiredAt, float quantity, String unit) {
+
+        Objects.requireNonNull(userId, "유저 아이디를 입력해주세요.");
+        Objects.requireNonNull(ingredientId, "재료 아이디를 입력해주세요.");
+
         this.fridgeBasketId = fridgeBasketId;
-        this.user = user;
-        this.ingredient = ingredient;
+        this.userId = userId;
+        this.ingredientId = ingredientId;
         this.expiredAt = expiredAt;
         this.quantity = quantity;
         this.unit = unit;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
     }
 
-    public static FridgeBasket from(User user, Ingredient ingredient) {
-        LocalDateTime now = LocalDateTime.now();
-        return FridgeBasket.builder()
-                .user(user)
-                .ingredient(ingredient)
-                .quantity(1)
-                .unit("00")
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
+    public void plusQuantity(float quantity) {
+
+        this.quantity += quantity;
     }
 
-    public FridgeBasket plusQuantity(float quantity) {
-        LocalDateTime now = LocalDateTime.now();
-        return FridgeBasket.builder()
-                .fridgeBasketId(fridgeBasketId)
-                .user(user)
-                .ingredient(ingredient)
-                .expiredAt(expiredAt)
-                .quantity(this.quantity + quantity)
-                .unit(unit)
-                .createdAt(getCreatedAt())
-                .updatedAt(now)
-                .build();
-    }
+    public void updateFridgeBasket(LocalDate expiredAt, float quantity, String unit) {
 
-    public FridgeBasket changeExpiredAtAndQuantityAndUnit(LocalDateTime expiredAt, float quantity, String unit) {
-        LocalDateTime now = LocalDateTime.now();
-        return FridgeBasket.builder()
-                .fridgeBasketId(fridgeBasketId)
-                .user(user)
-                .ingredient(ingredient)
-                .expiredAt(expiredAt)
-                .quantity(quantity)
-                .unit(unit)
-                .createdAt(getCreatedAt())
-                .updatedAt(now)
-                .build();
+        this.expiredAt = expiredAt;
+        this.quantity = quantity;
+        this.unit = unit;
     }
 
     public Freshness getFreshness() {
+
         if (this.expiredAt == null) {
             return Freshness.FRESH;
         }
@@ -86,5 +78,15 @@ public class FridgeBasket {
             return Freshness.DANGER;
         }
         return Freshness.FRESH;
+    }
+
+    public Fridge toFridge() {
+        return Fridge.builder()
+                .userId(userId)
+                .ingredientId(ingredientId)
+                .expiredAt(expiredAt)
+                .quantity(quantity)
+                .unit(unit)
+                .build();
     }
 }

@@ -1,37 +1,35 @@
 package com.recipe.app.src.ingredient.domain;
 
+import com.google.common.base.Preconditions;
+import com.recipe.app.common.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.Objects;
+import javax.persistence.*;
 
 @Getter
-public class IngredientCategory {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "IngredientCategory")
+public class IngredientCategory extends BaseEntity {
 
-    private final Long ingredientCategoryId;
-    private final String ingredientCategoryName;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    @Id
+    @Column(name = "ingredientCategoryId", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long ingredientCategoryId;
+
+    @Column(name = "ingredientCategoryName", nullable = false, length = 10)
+    private String ingredientCategoryName;
 
     @Builder
-    public IngredientCategory(Long ingredientCategoryId, String ingredientCategoryName, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public IngredientCategory(Long ingredientCategoryId, String ingredientCategoryName) {
+
+        Preconditions.checkArgument(StringUtils.hasText(ingredientCategoryName), "재료 카테고리명을 입력해주세요.");
+
         this.ingredientCategoryId = ingredientCategoryId;
         this.ingredientCategoryName = ingredientCategoryName;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        IngredientCategory that = (IngredientCategory) o;
-        return getIngredientCategoryId().equals(that.getIngredientCategoryId());
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(getIngredientCategoryId());
     }
 }

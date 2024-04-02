@@ -1,54 +1,50 @@
 package com.recipe.app.src.recipe.domain;
 
+import com.google.common.base.Preconditions;
+import com.recipe.app.common.entity.BaseEntity;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
+import javax.persistence.*;
+import java.util.Objects;
 
 @Getter
-public class RecipeProcess {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Entity
+@Table(name = "RecipeProcess")
+public class RecipeProcess extends BaseEntity {
 
-    private final Long recipeProcessId;
-    private final Recipe recipe;
-    private final int cookingNo;
-    private final String cookingDescription;
-    private final String recipeProcessImgUrl;
-    private final LocalDateTime createdAt;
-    private final LocalDateTime updatedAt;
+    @Id
+    @Column(name = "recipeProcessId", nullable = false, updatable = false)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long recipeProcessId;
+
+    @Column(name = "recipeId", nullable = false)
+    private Long recipeId;
+
+    @Column(name = "cookingNo", nullable = false)
+    private Integer cookingNo;
+
+    @Column(name = "cookingDescription", nullable = false)
+    private String cookingDescription;
+
+    @Column(name = "recipeProcessImgUrl")
+    private String recipeProcessImgUrl;
 
     @Builder
-    public RecipeProcess(Long recipeProcessId, Recipe recipe, int cookingNo, String cookingDescription,
-                         String recipeProcessImgUrl, LocalDateTime createdAt, LocalDateTime updatedAt) {
+    public RecipeProcess(Long recipeProcessId, Long recipeId, Integer cookingNo, String cookingDescription, String recipeProcessImgUrl) {
+
+        Objects.requireNonNull(recipeId, "레시피 아이디를 입력해주세요.");
+        Objects.requireNonNull(cookingNo, "레시피 요리 순서를 입력해주세요.");
+        Preconditions.checkArgument(StringUtils.hasText(cookingDescription), "레시피 요리 과정 설명을 입력해주세요.");
+
         this.recipeProcessId = recipeProcessId;
-        this.recipe = recipe;
+        this.recipeId = recipeId;
         this.cookingNo = cookingNo;
         this.cookingDescription = cookingDescription;
         this.recipeProcessImgUrl = recipeProcessImgUrl;
-        this.createdAt = createdAt;
-        this.updatedAt = updatedAt;
-    }
-
-    public static RecipeProcess from(Recipe recipe, int cookingNo, String cookingDescription, String recipeProcessImgUrl) {
-        LocalDateTime now = LocalDateTime.now();
-        return RecipeProcess.builder()
-                .recipe(recipe)
-                .cookingNo(cookingNo)
-                .cookingDescription(cookingDescription)
-                .recipeProcessImgUrl(recipeProcessImgUrl)
-                .createdAt(now)
-                .updatedAt(now)
-                .build();
-    }
-
-    public RecipeProcess update(String cookingDescription, String recipeProcessImgUrl) {
-        LocalDateTime now = LocalDateTime.now();
-        return RecipeProcess.builder()
-                .recipe(recipe)
-                .cookingNo(cookingNo)
-                .cookingDescription(cookingDescription)
-                .recipeProcessImgUrl(recipeProcessImgUrl)
-                .createdAt(createdAt)
-                .updatedAt(now)
-                .build();
     }
 }
