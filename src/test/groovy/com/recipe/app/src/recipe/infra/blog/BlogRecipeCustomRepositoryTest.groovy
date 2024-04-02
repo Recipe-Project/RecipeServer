@@ -336,11 +336,11 @@ class BlogRecipeCustomRepositoryTest extends Specification {
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()
                         .userId(user.userId)
-                        .blogRecipeId(blogRecipes.get(3).blogRecipeId)
+                        .blogRecipeId(blogRecipes.get(0).blogRecipeId)
                         .build(),
                 BlogScrap.builder()
                         .userId(user.userId)
-                        .blogRecipeId(blogRecipes.get(0).blogRecipeId)
+                        .blogRecipeId(blogRecipes.get(3).blogRecipeId)
                         .build(),
         ]
         blogScrapRepository.saveAll(blogScraps);

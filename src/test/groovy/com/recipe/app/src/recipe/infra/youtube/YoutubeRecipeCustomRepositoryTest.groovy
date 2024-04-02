@@ -340,7 +340,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         List<YoutubeScrap> youtubeScraps = [
                 YoutubeScrap.builder()
                         .userId(user.userId)
-                        .youtubeRecipeId(youtubeRecipes.get(3).youtubeRecipeId)
+                        .youtubeRecipeId(youtubeRecipes.get(0).youtubeRecipeId)
                         .build(),
                 YoutubeScrap.builder()
                         .userId(user.userId)
@@ -348,7 +348,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 YoutubeScrap.builder()
                         .userId(user.userId)
-                        .youtubeRecipeId(youtubeRecipes.get(0).youtubeRecipeId)
+                        .youtubeRecipeId(youtubeRecipes.get(3).youtubeRecipeId)
                         .build(),
         ]
         youtubeScrapRepository.saveAll(youtubeScraps);
