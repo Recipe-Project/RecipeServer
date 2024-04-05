@@ -90,6 +90,8 @@ dependencies {
     testImplementation 'org.spockframework.spock:spock-core:spock-2.3'
     testImplementation 'org.spockframework.spock:spock-spring:spock-2.3'
 
+    // redis
+    implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 }
 
 test {
