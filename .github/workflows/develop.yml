@@ -83,6 +83,10 @@ jobs:
     - name: Copy appspec
       run: cp appspec.yml ./deploy/
 
+    # docker-compose.yml Copy
+    - name: Copy docker-compose
+      run: cp docker-compose.yml ./deploy/
+
     # 쉘스크립트 deploy 폴더로 복사
     - name: Copy shell
       run: |
