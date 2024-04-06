@@ -1,8 +1,6 @@
 package com.recipe.app.src.fridge.application.dto;
 
 import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketIngredientCategoryResponse;
-import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketsResponse;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -32,7 +30,7 @@ public class FridgesResponse {
     public static FridgesResponse from(long fridgeBasketCount, List<Fridge> fridges, List<IngredientCategory> categories, List<Ingredient> ingredients) {
 
         Map<Long, List<Ingredient>> ingredientsMapByCategoryId = ingredients.stream()
-                .collect(Collectors.groupingBy(Ingredient::getIngredientId));
+                .collect(Collectors.groupingBy(Ingredient::getIngredientCategoryId));
 
         Map<Long, Ingredient> ingredientMapById = ingredients.stream()
                 .collect(Collectors.toMap(Ingredient::getIngredientId, Function.identity()));
