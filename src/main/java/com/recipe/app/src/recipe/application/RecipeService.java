@@ -259,7 +259,7 @@ public class RecipeService {
                                     || ingredientNamesInFridge.contains(ingredient.getIngredientName()))
                             .count();
 
-                    return recipeIngredientInFridgeCnt / recipeIngredientCnt * 100;
+                    return (long) ((double) recipeIngredientInFridgeCnt / recipeIngredientCnt * 100);
                 }));
     }
 
