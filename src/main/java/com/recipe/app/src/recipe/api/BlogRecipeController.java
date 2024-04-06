@@ -35,7 +35,7 @@ public class BlogRecipeController {
                                                         @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                                         @RequestParam(value = "keyword") String keyword,
                                                         @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 블로그 레시피 아이디")
-                                                        @RequestParam(value = "startAfter") Long startAfter,
+                                                        @RequestParam(value = "startAfter", required = false) Long startAfter,
                                                         @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                         @RequestParam(value = "size") int size,
                                                         @ApiParam(name = "sort", type = "String", example = "조회수순(blogViews) / 좋아요순(blogScraps) / 최신순(newest) = 기본값", value = "정렬")
@@ -66,7 +66,7 @@ public class BlogRecipeController {
     @GetMapping("/scraps")
     public BaseResponse<RecipesResponse> getScrapBlogRecipes(@ApiIgnore final Authentication authentication,
                                                              @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 블로그 레시피 아이디")
-                                                             @RequestParam(value = "startAfter") Long startAfter,
+                                                             @RequestParam(value = "startAfter", required = false) Long startAfter,
                                                              @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                              @RequestParam(value = "size") int size) {
 

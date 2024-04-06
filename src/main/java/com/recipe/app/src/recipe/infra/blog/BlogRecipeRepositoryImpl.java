@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import static com.recipe.app.common.utils.QueryUtils.*;
 import static com.recipe.app.src.recipe.domain.blog.QBlogRecipe.blogRecipe;
 import static com.recipe.app.src.recipe.domain.blog.QBlogScrap.blogScrap;
 import static com.recipe.app.src.recipe.domain.blog.QBlogView.blogView;
@@ -39,9 +40,10 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .where(
                         blogRecipe.title.contains(keyword)
                                 .or(blogRecipe.description.contains(keyword)),
-                        blogRecipe.publishedAt.lt(lastBlogRecipePublishedAt)
-                                .or(blogRecipe.publishedAt.eq(lastBlogRecipePublishedAt)
-                                        .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId)))
+                        ifIdIsNotNullAndGreaterThanZero((blogRecipeId, publishedAt) -> blogRecipe.publishedAt.lt(publishedAt)
+                                        .or(blogRecipe.publishedAt.eq(publishedAt)
+                                                .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
+                                lastBlogRecipeId, lastBlogRecipePublishedAt)
                 )
                 .orderBy(blogRecipe.publishedAt.desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
@@ -59,9 +61,10 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                                 .or(blogRecipe.description.contains(keyword))
                 )
                 .groupBy(blogRecipe.blogRecipeId)
-                .having(blogScrap.count().lt(lastBlogScrapCnt)
-                        .or(blogScrap.count().eq(lastBlogScrapCnt)
-                                .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId))))
+                .having(ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogScrapCnt) -> blogScrap.count().lt(blogScrapCnt)
+                                .or(blogScrap.count().eq(blogScrapCnt)
+                                        .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
+                        lastBlogRecipeId, lastBlogScrapCnt))
                 .orderBy(blogScrap.count().desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
@@ -78,24 +81,26 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                                 .or(blogRecipe.description.contains(keyword))
                 )
                 .groupBy(blogRecipe.blogRecipeId)
-                .having(blogView.count().lt(lastBlogViewCnt)
-                        .or(blogView.count().eq(lastBlogViewCnt)
-                                .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId))))
+                .having(ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogViewCnt) -> blogView.count().lt(blogViewCnt)
+                                .or(blogView.count().eq(blogViewCnt)
+                                        .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
+                        lastBlogRecipeId, lastBlogViewCnt))
                 .orderBy(blogView.count().desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<BlogRecipe> findUserScrapBlogRecipesLimit(Long userId, Long lastBlogRecipeId, LocalDateTime scrapCreatedAt, int size) {
+    public List<BlogRecipe> findUserScrapBlogRecipesLimit(Long userId, Long lastBlogRecipeId, LocalDateTime lastScrapCreatedAt, int size) {
 
         return queryFactory
                 .selectFrom(blogRecipe)
                 .join(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId), blogScrap.userId.eq(userId))
                 .where(
-                        blogScrap.createdAt.lt(scrapCreatedAt)
-                                .or(blogScrap.createdAt.eq(scrapCreatedAt)
-                                        .and(blogRecipe.blogRecipeId.lt(lastBlogRecipeId)))
+                        ifIdIsNotNullAndGreaterThanZero((blogRecipeId, scrapCreatedAt) -> blogScrap.createdAt.lt(scrapCreatedAt)
+                                        .or(blogScrap.createdAt.eq(scrapCreatedAt)
+                                                .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
+                                lastBlogRecipeId, lastScrapCreatedAt)
                 )
                 .orderBy(blogScrap.createdAt.desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)

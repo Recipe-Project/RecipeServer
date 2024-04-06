@@ -84,10 +84,13 @@ public class YoutubeRecipeService {
             long youtubeViewCnt = youtubeViewService.countByYoutubeRecipeId(lastYoutubeRecipeId);
             return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(keyword, lastYoutubeRecipeId, youtubeViewCnt, size);
         } else {
-            YoutubeRecipe youtubeRecipe = youtubeRecipeRepository.findById(lastYoutubeRecipeId).orElseThrow(() -> {
-                throw new NotFoundRecipeException();
-            });
-            return youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(keyword, lastYoutubeRecipeId, youtubeRecipe.getPostDate(), size);
+            YoutubeRecipe youtubeRecipe = null;
+            if (lastYoutubeRecipeId != null && lastYoutubeRecipeId > 0) {
+                youtubeRecipe = youtubeRecipeRepository.findById(lastYoutubeRecipeId).orElseThrow(() -> {
+                    throw new NotFoundRecipeException();
+                });
+            }
+            return youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(keyword, lastYoutubeRecipeId, youtubeRecipe != null ? youtubeRecipe.getPostDate() : null, size);
         }
     }
 
@@ -95,8 +98,11 @@ public class YoutubeRecipeService {
     public RecipesResponse getScrapYoutubeRecipes(User user, Long lastYoutubeRecipeId, int size) {
 
         long totalCnt = youtubeScrapService.countYoutubeScrapByUser(user);
-        YoutubeScrap youtubeScrap = youtubeScrapService.findByUserIdAndYoutubeRecipeId(user.getUserId(), lastYoutubeRecipeId);
-        List<YoutubeRecipe> youtubeRecipes = youtubeRecipeRepository.findUserScrapYoutubeRecipesLimit(user.getUserId(), lastYoutubeRecipeId, youtubeScrap.getCreatedAt(), size);
+        YoutubeScrap youtubeScrap = null;
+        if (lastYoutubeRecipeId != null && lastYoutubeRecipeId > 0) {
+            youtubeScrap = youtubeScrapService.findByUserIdAndYoutubeRecipeId(user.getUserId(), lastYoutubeRecipeId);
+        }
+        List<YoutubeRecipe> youtubeRecipes = youtubeRecipeRepository.findUserScrapYoutubeRecipesLimit(user.getUserId(), lastYoutubeRecipeId, youtubeScrap != null ? youtubeScrap.getCreatedAt() : null, size);
 
         return getRecipes(user, totalCnt, youtubeRecipes);
     }
