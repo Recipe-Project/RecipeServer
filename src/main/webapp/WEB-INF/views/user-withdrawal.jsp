@@ -6,6 +6,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <link href="/static/css/style.css" rel="stylesheet" type="text/css">
     <title>탈퇴하기</title>
 </head>
