@@ -75,7 +75,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                         ifIdIsNotNullAndGreaterThanZero((recipeId, recipeScrapCnt) -> recipeScrap.count().lt(recipeScrapCnt)
                                         .or(recipeScrap.count().eq(recipeScrapCnt)
                                                 .and(recipe.recipeId.lt(recipeId))),
-                                lastRecipeScrapCnt, lastRecipeScrapCnt))
+                                lastRecipeId, lastRecipeScrapCnt))
                 .orderBy(recipeScrap.count().desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
