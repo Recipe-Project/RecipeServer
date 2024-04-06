@@ -81,7 +81,7 @@ public class BlogRecipeService {
             return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(keyword, lastBlogRecipeId, lastBlogViewCnt, size);
         } else {
             BlogRecipe blogRecipe = null;
-            if (lastBlogRecipeId > 0) {
+            if (lastBlogRecipeId != null && lastBlogRecipeId > 0) {
                 blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElseThrow(()
                         -> {
                     throw new NotFoundRecipeException();
@@ -96,7 +96,7 @@ public class BlogRecipeService {
 
         long totalCnt = blogScrapService.countBlogScrapByUser(user);
         BlogScrap blogScrap = null;
-        if (lastBlogRecipeId > 0) {
+        if (lastBlogRecipeId != null && lastBlogRecipeId > 0) {
             blogScrap = blogScrapService.findByUserIdAndBlogRecipeId(user.getUserId(), lastBlogRecipeId);
         }
         List<BlogRecipe> blogRecipes = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.getUserId(), lastBlogRecipeId, blogScrap != null ? blogScrap.getCreatedAt() : null, size);
