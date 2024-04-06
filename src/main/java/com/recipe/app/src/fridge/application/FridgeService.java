@@ -67,7 +67,8 @@ public class FridgeService {
     }
 
     private void checkFridgeUnitMatch(FridgeBasket fridgeBasket, Fridge fridge, Ingredient ingredient) {
-        if (!fridge.getUnit().equals(fridgeBasket.getUnit()))
+        if ((fridge.getUnit() == null && fridgeBasket.getUnit() != null)
+                || (fridge.getUnit() != null && !fridge.getUnit().equals(fridgeBasket.getUnit())))
             throw new FridgeSaveUnitNotMatchException(ingredient.getIngredientName());
     }
 
