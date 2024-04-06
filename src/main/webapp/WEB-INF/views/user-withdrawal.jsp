@@ -6,11 +6,12 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
     <link href="/static/css/style.css" rel="stylesheet" type="text/css">
     <title>탈퇴하기</title>
 </head>
 <body>
-<script src="http://code.jquery.com/jquery-latest.js"></script>
+<script src="https://code.jquery.com/jquery-latest.js"></script>
 <script type="text/javascript">
     function withdraw() {
         $.ajax({
