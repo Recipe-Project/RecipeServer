@@ -43,8 +43,9 @@ public class FridgesResponse {
                 .fridgeBasketCount(fridgeBasketCount)
                 .fridgeIngredientCategories(categories.stream()
                         .map(category -> FridgeIngredientCategoryResponse.from(category,
-                                ingredientsMapByCategoryId.get(category.getIngredientCategoryId()),
-                                fridgesMapByCategoryId.get(category.getIngredientCategoryId())))
+                                ingredientsMapByCategoryId.getOrDefault(category.getIngredientCategoryId(), List.of()),
+                                fridgesMapByCategoryId.getOrDefault(category.getIngredientCategoryId(), List.of()))
+                        )
                         .collect(Collectors.toList()))
                 .build();
     }
