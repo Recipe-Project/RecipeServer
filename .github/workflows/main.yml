@@ -63,6 +63,30 @@ jobs:
           KEYSTORE_FILE: ${{ secrets.PRODUCT_KEYSTORE }}
         run: echo $KEYSTORE_FILE | base64 --decode -i > keystore.p12
 
+      - name: Get Github action IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      - name: Setting environment variables
+        run: |
+          echo "AWS_DEFAULT_REGION=ap-northeast-2" >> $GITHUB_ENV
+          echo "AWS_SG_NAME=launch-wizard-1" >> $GITHUB_ENV
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Add Github Actions IP to Security group
+        run: |
+          aws ec2 authorize-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-2
+
       # 빌드 파일 권한 수정
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -70,6 +94,14 @@ jobs:
       # gradle 빌드
       - name: Build with Gradle
         run: ./gradlew clean build
+
+      - name: Remove Github Actions IP from security group
+        run: |
+          aws ec2 revoke-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-northeast-2
 
       # 전송할 파일을 담을 디렉토리 생성
       - name: Make Directory for deliver
