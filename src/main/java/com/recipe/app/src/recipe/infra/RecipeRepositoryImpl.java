@@ -8,6 +8,7 @@ import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 
+import static com.recipe.app.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
 import static com.recipe.app.src.ingredient.domain.QIngredient.ingredient;
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
 import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
@@ -36,16 +37,17 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(String keyword, Long lastRecipeId, LocalDateTime createdAt, int size) {
+    public List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(String keyword, Long lastRecipeId, LocalDateTime lastCreatedAt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
                 .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
                 .leftJoin(ingredient).on(ingredient.ingredientId.eq(recipeIngredient.ingredientId), ingredient.ingredientName.contains(keyword))
                 .where(
-                        recipe.createdAt.lt(createdAt)
-                                .or(recipe.createdAt.eq(createdAt)
-                                        .and(recipe.recipeId.lt(lastRecipeId))),
+                        ifIdIsNotNullAndGreaterThanZero((recipeId, createdAt) -> recipe.createdAt.lt(createdAt)
+                                        .or(recipe.createdAt.eq(createdAt)
+                                                .and(recipe.recipeId.lt(recipeId))),
+                                lastRecipeId, lastCreatedAt),
                         recipe.hiddenYn.eq("N")
                 )
                 .groupBy(recipe.recipeId)
@@ -58,7 +60,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(String keyword, Long lastRecipeId, long recipeScrapCnt, int size) {
+    public List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(String keyword, Long lastRecipeId, long lastRecipeScrapCnt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
@@ -70,16 +72,17 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .having(recipe.recipeNm.contains(keyword)
                                 .or(recipe.introduction.contains(keyword))
                                 .or(ingredient.count().gt(0)),
-                        recipeScrap.count().lt(recipeScrapCnt)
-                                .or(recipeScrap.count().eq(recipeScrapCnt)
-                                        .and(recipe.recipeId.lt(lastRecipeId))))
+                        ifIdIsNotNullAndGreaterThanZero((recipeId, recipeScrapCnt) -> recipeScrap.count().lt(recipeScrapCnt)
+                                        .or(recipeScrap.count().eq(recipeScrapCnt)
+                                                .and(recipe.recipeId.lt(recipeId))),
+                                lastRecipeScrapCnt, lastRecipeScrapCnt))
                 .orderBy(recipeScrap.count().desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(String keyword, Long lastRecipeId, long recipeViewCnt, int size) {
+    public List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(String keyword, Long lastRecipeId, long lastRecipeViewCnt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
@@ -91,23 +94,25 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .having(recipe.recipeNm.contains(keyword)
                                 .or(recipe.introduction.contains(keyword))
                                 .or(ingredient.count().gt(0)),
-                        recipeView.count().lt(recipeViewCnt)
-                                .or(recipeView.count().eq(recipeViewCnt)
-                                        .and(recipe.recipeId.lt(lastRecipeId))))
+                        ifIdIsNotNullAndGreaterThanZero((recipeId, recipeViewCnt) -> recipeView.count().lt(recipeViewCnt)
+                                        .or(recipeView.count().eq(recipeViewCnt)
+                                                .and(recipe.recipeId.lt(recipeId))),
+                                lastRecipeId, lastRecipeViewCnt))
                 .orderBy(recipeView.count().desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<Recipe> findUserScrapRecipesLimit(Long userId, Long lastRecipeId, LocalDateTime scrapCreatedAt, int size) {
+    public List<Recipe> findUserScrapRecipesLimit(Long userId, Long lastRecipeId, LocalDateTime lastScrapCreatedAt, int size) {
         return queryFactory
                 .selectFrom(recipe)
                 .join(recipeScrap).on(recipe.recipeId.eq(recipeScrap.recipeId), recipeScrap.userId.eq(userId))
                 .where(
-                        recipeScrap.createdAt.lt(scrapCreatedAt)
-                                .or(recipeScrap.createdAt.eq(scrapCreatedAt)
-                                        .and(recipe.recipeId.lt(lastRecipeId))),
+                        ifIdIsNotNullAndGreaterThanZero((recipeId, scrapCreatedAt) -> recipeScrap.createdAt.lt(scrapCreatedAt)
+                                        .or(recipeScrap.createdAt.eq(scrapCreatedAt)
+                                                .and(recipe.recipeId.lt(recipeId))),
+                                lastRecipeId, lastScrapCreatedAt),
                         recipe.hiddenYn.eq("N")
                 )
                 .orderBy(recipeScrap.createdAt.desc(), recipe.recipeId.desc())
@@ -122,7 +127,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .selectFrom(recipe)
                 .where(
                         recipe.userId.eq(userId),
-                        recipe.recipeId.lt(lastRecipeId)
+                        ifIdIsNotNullAndGreaterThanZero(recipe.recipeId::lt, lastRecipeId)
                 )
                 .orderBy(recipe.recipeId.desc())
                 .limit(size)

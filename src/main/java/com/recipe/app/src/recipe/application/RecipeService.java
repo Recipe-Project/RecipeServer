@@ -76,10 +76,13 @@ public class RecipeService {
             long recipeViewCnt = recipeViewService.countByRecipeId(lastRecipeId);
             recipes = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(keyword, lastRecipeId, recipeViewCnt, size);
         } else {
-            Recipe recipe = recipeRepository.findById(lastRecipeId).orElseThrow(() -> {
-                throw new NotFoundRecipeException();
-            });
-            recipes = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, recipe.getCreatedAt(), size);
+            Recipe recipe = null;
+            if (lastRecipeId != null && lastRecipeId > 0) {
+                recipe = recipeRepository.findById(lastRecipeId).orElseThrow(() -> {
+                    throw new NotFoundRecipeException();
+                });
+            }
+            recipes = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, recipe != null ? recipe.getCreatedAt() : null, size);
         }
 
         return getRecipes(user, totalCnt, recipes);
@@ -109,8 +112,11 @@ public class RecipeService {
     public RecipesResponse getScrapRecipes(User user, Long lastRecipeId, int size) {
 
         long totalCnt = recipeScrapService.countByUserId(user.getUserId());
-        RecipeScrap recipeScrap = recipeScrapService.findByUserIdAndRecipeId(user.getUserId(), lastRecipeId);
-        List<Recipe> recipes = recipeRepository.findUserScrapRecipesLimit(user.getUserId(), lastRecipeId, recipeScrap.getCreatedAt(), size);
+        RecipeScrap recipeScrap = null;
+        if (lastRecipeId != null && lastRecipeId > 0) {
+            recipeScrap = recipeScrapService.findByUserIdAndRecipeId(user.getUserId(), lastRecipeId);
+        }
+        List<Recipe> recipes = recipeRepository.findUserScrapRecipesLimit(user.getUserId(), lastRecipeId, recipeScrap != null ? recipeScrap.getCreatedAt() : null, size);
 
         return getRecipes(user, totalCnt, recipes);
     }
@@ -227,7 +233,7 @@ public class RecipeService {
                     return RecommendedRecipeResponse.from(recipe, user, matchRateMapByRecipeId.get(recipe.getRecipeId()).intValue(), isUserScrap, scrapCnt, viewCnt);
                 })
                 .sorted(Comparator.comparing(RecommendedRecipeResponse::getIngredientsMatchRate).thenComparing(RecommendedRecipeResponse::getRecipeId).reversed())
-                .filter(recommendedRecipe -> recommendedRecipe.getRecipeId() < lastRecipeId)
+                .filter(recommendedRecipe -> lastRecipeId == null || lastRecipeId <= 0 || recommendedRecipe.getRecipeId() < lastRecipeId)
                 .limit(size)
                 .collect(Collectors.toList()));
     }

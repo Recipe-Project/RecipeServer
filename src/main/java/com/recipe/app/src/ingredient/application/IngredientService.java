@@ -34,13 +34,7 @@ public class IngredientService {
     @Transactional(readOnly = true)
     public List<Ingredient> findByIngredientIds(Collection<Long> ingredientIds) {
 
-        List<Ingredient> ingredients = ingredientRepository.findByIngredientIdIn(ingredientIds);
-
-        if (ingredients.size() != ingredientIds.size()) {
-            throw new NotFoundIngredientException();
-        }
-
-        return ingredients;
+        return ingredientRepository.findByIngredientIdIn(ingredientIds);
     }
 
     @Transactional(readOnly = true)

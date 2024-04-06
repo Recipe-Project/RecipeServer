@@ -35,7 +35,7 @@ public class RecipeController {
                                                     @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                                     @RequestParam(value = "keyword") String keyword,
                                                     @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                    @RequestParam(value = "startAfter") Long startAfter,
+                                                    @RequestParam(value = "startAfter", required = false) Long startAfter,
                                                     @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                     @RequestParam(value = "size") int size,
                                                     @ApiParam(name = "sort", type = "String", example = "조회수순(recipeViews) / 좋아요순(recipeScraps) / 최신순(newest) = 기본값", value = "정렬")
@@ -92,7 +92,7 @@ public class RecipeController {
     @GetMapping("/scraps")
     public BaseResponse<RecipesResponse> getScrapRecipes(@ApiIgnore final Authentication authentication,
                                                          @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                         @RequestParam(value = "startAfter") Long startAfter,
+                                                         @RequestParam(value = "startAfter", required = false) Long startAfter,
                                                          @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                          @RequestParam(value = "size") int size) {
 
@@ -108,7 +108,7 @@ public class RecipeController {
     @GetMapping("/fridges-recommendation")
     public BaseResponse<RecommendedRecipesResponse> getFridgesRecipes(@ApiIgnore final Authentication authentication,
                                                                       @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                                      @RequestParam(value = "startAfter") Long startAfter,
+                                                                      @RequestParam(value = "startAfter", required = false) Long startAfter,
                                                                       @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                                       @RequestParam(value = "size") int size) {
 
@@ -124,7 +124,7 @@ public class RecipeController {
     @GetMapping("/users")
     public BaseResponse<RecipesResponse> getUserRecipes(@ApiIgnore final Authentication authentication,
                                                         @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                        @RequestParam(value = "startAfter") Long startAfter,
+                                                        @RequestParam(value = "startAfter", required = false) Long startAfter,
                                                         @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                         @RequestParam(value = "size") int size) {
 
