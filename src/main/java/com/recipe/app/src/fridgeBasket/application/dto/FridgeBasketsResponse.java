@@ -31,7 +31,7 @@ public class FridgeBasketsResponse {
     public static FridgeBasketsResponse from(List<FridgeBasket> fridgeBaskets, List<IngredientCategory> categories, List<Ingredient> ingredients) {
 
         Map<Long, List<Ingredient>> ingredientsMapByCategoryId = ingredients.stream()
-                .collect(Collectors.groupingBy(Ingredient::getIngredientId));
+                .collect(Collectors.groupingBy(Ingredient::getIngredientCategoryId));
 
         Map<Long, Ingredient> ingredientMapById = ingredients.stream()
                 .collect(Collectors.toMap(Ingredient::getIngredientId, Function.identity()));
