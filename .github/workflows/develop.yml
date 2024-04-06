@@ -34,7 +34,13 @@ jobs:
       env:
         APPLICATION_YML_FILE: ${{ secrets.DEV_APPLICATION_YML }}
       run: echo $APPLICATION_YML_FILE | base64 --decode > src/main/resources/application.yml
-      
+
+    # application-test.yml 파일 복사
+    - name: Copy application-test.yml
+      env:
+         APPLICATION_YML_FILE: ${{ secrets.TEST_APPLICATION_YML }}
+      run: echo $APPLICATION_YML_FILE | base64 --decode > src/main/resources/application-test.yml
+
     # recipeapp-key.json 파일 복사
     - name: Copy recipeapp-key.json
       env:
@@ -76,6 +82,10 @@ jobs:
     # appspec.yml Copy
     - name: Copy appspec
       run: cp appspec.yml ./deploy/
+
+    # docker-compose.yml Copy
+    - name: Copy docker-compose
+      run: cp docker-compose.yml ./deploy/
 
     # 쉘스크립트 deploy 폴더로 복사
     - name: Copy shell
