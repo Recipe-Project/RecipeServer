@@ -80,11 +80,14 @@ public class BlogRecipeService {
             long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
             return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(keyword, lastBlogRecipeId, lastBlogViewCnt, size);
         } else {
-            BlogRecipe blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElseThrow(()
-                    -> {
-                throw new NotFoundRecipeException();
-            });
-            return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(keyword, lastBlogRecipeId, blogRecipe.getPublishedAt(), size);
+            BlogRecipe blogRecipe = null;
+            if (lastBlogRecipeId > 0) {
+                blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElseThrow(()
+                        -> {
+                    throw new NotFoundRecipeException();
+                });
+            }
+            return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(keyword, lastBlogRecipeId, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
         }
     }
 
@@ -92,8 +95,11 @@ public class BlogRecipeService {
     public RecipesResponse getScrapBlogRecipes(User user, Long lastBlogRecipeId, int size) {
 
         long totalCnt = blogScrapService.countBlogScrapByUser(user);
-        BlogScrap blogScrap = blogScrapService.findByUserIdAndBlogRecipeId(user.getUserId(), lastBlogRecipeId);
-        List<BlogRecipe> blogRecipes = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.getUserId(), lastBlogRecipeId, blogScrap.getCreatedAt(), size);
+        BlogScrap blogScrap = null;
+        if (lastBlogRecipeId > 0) {
+            blogScrap = blogScrapService.findByUserIdAndBlogRecipeId(user.getUserId(), lastBlogRecipeId);
+        }
+        List<BlogRecipe> blogRecipes = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.getUserId(), lastBlogRecipeId, blogScrap != null ? blogScrap.getCreatedAt() : null, size);
 
         return getRecipes(user, totalCnt, blogRecipes);
     }
