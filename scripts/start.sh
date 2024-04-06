@@ -32,8 +32,12 @@ then
   sudo chmod +x /usr/local/bin/docker-compose
 fi
 
-echo "start docker-compose up"
-sudo docker-compose -f $PROJECT_ROOT/deploy/docker-compose.yml up --build -d
+# docker 구동
+DOCKER_PID=$(pgrep -f $PROJECT_ROOT/deploy/docker-compose.yml)
+if [ -z $CURRENT_PID ]; then
+  echo "start docker-compose up"
+  sudo docker-compose -f $PROJECT_ROOT/deploy/docker-compose.yml up --build -d
+fi
 
 # build 파일 복사
 echo "$TIME_NOW > $JAR_FILE 파일 복사" >> $DEPLOY_LOG
