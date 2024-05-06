@@ -38,9 +38,9 @@ public class IngredientService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Ingredient> findByUserIdAndIngredientNameAndIngredientIconUrlAndIngredientCategoryId(Long userId, String ingredientName, String ingredientIconUrl, Long ingredientCategoryId) {
+    public Optional<Ingredient> findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(Long userId, String ingredientName, Long ingredientIconId, Long ingredientCategoryId) {
 
-        return ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconUrlAndIngredientCategoryId(userId, ingredientName, ingredientIconUrl, ingredientCategoryId);
+        return ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(userId, ingredientName, ingredientIconId, ingredientCategoryId);
     }
 
     @Transactional

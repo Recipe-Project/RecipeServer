@@ -53,7 +53,7 @@ public class RecipeIngredientService {
                 .collect(Collectors.toMap(recipeIngredient -> Ingredient.builder()
                                 .ingredientCategoryId(recipeIngredient.getIngredientCategoryId())
                                 .ingredientName(recipeIngredient.getIngredientName())
-                                .ingredientIconUrl(recipeIngredient.getIngredientIconUrl())
+                                .ingredientIconId(recipeIngredient.getIngredientIconId())
                                 .userId(user.getUserId())
                                 .build(),
                         RecipeIngredientRequest::getCapacity));

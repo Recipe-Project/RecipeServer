@@ -32,17 +32,17 @@ class IngredientCustomRepositoryTest extends Specification {
                 Ingredient.builder()
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("사과")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
                 Ingredient.builder()
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("체리")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
                 Ingredient.builder()
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("블루베리")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
         ]
         ingredientRepository.saveAll(ingredients);
@@ -66,17 +66,17 @@ class IngredientCustomRepositoryTest extends Specification {
                 Ingredient.builder()
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("사과")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
                 Ingredient.builder()
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("포도")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
                 Ingredient.builder()
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("귤")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
         ]
         ingredientRepository.saveAll(ingredients);

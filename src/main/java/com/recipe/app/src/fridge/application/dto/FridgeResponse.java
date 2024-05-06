@@ -1,6 +1,5 @@
 package com.recipe.app.src.fridge.application.dto;
 
-import com.recipe.app.src.fridge.domain.Freshness;
 import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -19,8 +18,8 @@ public class FridgeResponse {
     private final Long fridgeId;
     @Schema(description = "재료명")
     private final String ingredientName;
-    @Schema(description = "재료 아이콘 url")
-    private final String ingredientIconUrl;
+    @Schema(description = "재료 아이콘 고유 번호")
+    private final Long ingredientIconId;
     @Schema(description = "유통기한")
     private final ZonedDateTime expiredAt;
     @Schema(description = "수량")
@@ -31,11 +30,11 @@ public class FridgeResponse {
     private final String freshness;
 
     @Builder
-    public FridgeResponse(Long fridgeId, String ingredientName, String ingredientIconUrl, ZonedDateTime expiredAt, float quantity, String unit, String freshness) {
+    public FridgeResponse(Long fridgeId, String ingredientName, Long ingredientIconId, ZonedDateTime expiredAt, float quantity, String unit, String freshness) {
 
         this.fridgeId = fridgeId;
         this.ingredientName = ingredientName;
-        this.ingredientIconUrl = ingredientIconUrl;
+        this.ingredientIconId = ingredientIconId;
         this.expiredAt = expiredAt;
         this.quantity = quantity;
         this.unit = unit;
@@ -46,7 +45,7 @@ public class FridgeResponse {
         return FridgeResponse.builder()
                 .fridgeId(fridge.getFridgeId())
                 .ingredientName(ingredient.getIngredientName())
-                .ingredientIconUrl(ingredient.getIngredientIconUrl())
+                .ingredientIconId(ingredient.getIngredientIconId())
                 .expiredAt(fridge.getExpiredAt() != null ? fridge.getExpiredAt().atTime(LocalTime.MIN).atZone(ZoneId.of("Asia/Seoul")) : null)
                 .quantity(fridge.getQuantity())
                 .unit(fridge.getUnit())

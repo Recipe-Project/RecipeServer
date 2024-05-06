@@ -12,8 +12,8 @@ public class FridgeBasketIngredientRequest {
 
     @Schema(description = "재료명")
     private String ingredientName;
-    @Schema(description = "재료 아이콘 url")
-    private String ingredientIconUrl;
+    @Schema(description = "재료 아이콘 고유 번호")
+    private Long ingredientIconId;
     @Schema(description = "재료 카테고리 고유 번호")
     private Long ingredientCategoryId;
 }
