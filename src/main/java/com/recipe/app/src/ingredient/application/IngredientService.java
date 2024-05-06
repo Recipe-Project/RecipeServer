@@ -22,13 +22,13 @@ public class IngredientService {
     }
 
     @Transactional(readOnly = true)
-    public List<Ingredient> findByKeyword(String keyword) {
+    public List<Ingredient> findByKeyword(Long userId, String keyword) {
 
         if (!StringUtils.hasText(keyword)) {
-            return ingredientRepository.findDefaultIngredients();
+            return ingredientRepository.findDefaultIngredients(userId);
         }
 
-        return ingredientRepository.findDefaultIngredientsByKeyword(keyword);
+        return ingredientRepository.findDefaultIngredientsByKeyword(userId, keyword);
     }
 
     @Transactional(readOnly = true)

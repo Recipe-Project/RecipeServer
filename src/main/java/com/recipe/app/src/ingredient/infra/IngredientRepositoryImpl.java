@@ -15,24 +15,30 @@ public class IngredientRepositoryImpl extends BaseRepositoryImpl implements Ingr
     }
 
     @Override
-    public List<Ingredient> findDefaultIngredientsByKeyword(String keyword) {
+    public List<Ingredient> findDefaultIngredientsByKeyword(Long userId, String keyword) {
 
         return queryFactory
                 .selectFrom(ingredient)
                 .where(
-                        ingredient.userId.isNull(),
+                        (ingredient.ingredientCategoryId.ne(7L)
+                                .and(ingredient.userId.isNull().or(ingredient.userId.eq(userId))))
+                                .or(ingredient.ingredientCategoryId.eq(7L)
+                                        .and(ingredient.userId.eq(userId))),
                         ingredient.ingredientName.contains(keyword)
                 )
                 .fetch();
     }
 
     @Override
-    public List<Ingredient> findDefaultIngredients() {
+    public List<Ingredient> findDefaultIngredients(Long userId) {
 
         return queryFactory
                 .selectFrom(ingredient)
                 .where(
-                        ingredient.userId.isNull()
+                        (ingredient.ingredientCategoryId.ne(7L)
+                                .and(ingredient.userId.isNull().or(ingredient.userId.eq(userId))))
+                                .or(ingredient.ingredientCategoryId.eq(7L)
+                                        .and(ingredient.userId.eq(userId)))
                 )
                 .fetch();
     }

@@ -46,6 +46,8 @@ public class UserController {
     @PostMapping("/auto-login")
     public BaseResponse<UserLoginResponse> autoLogin(@ApiIgnore final Authentication authentication) {
 
+        System.out.println(jwtService.createJwt(18L));
+
         if (authentication == null)
             throw new UserTokenNotExistException();
 

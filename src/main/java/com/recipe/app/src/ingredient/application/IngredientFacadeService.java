@@ -29,7 +29,7 @@ public class IngredientFacadeService {
 
         long fridgeBasketCount = fridgeBasketService.countByUserId(user.getUserId());
         List<IngredientCategory> categories = ingredientCategoryService.findAll();
-        List<Ingredient> ingredients = ingredientService.findByKeyword(keyword);
+        List<Ingredient> ingredients = ingredientService.findByKeyword(user.getUserId(), keyword);
 
         return IngredientsResponse.from(fridgeBasketCount, categories, ingredients);
     }
