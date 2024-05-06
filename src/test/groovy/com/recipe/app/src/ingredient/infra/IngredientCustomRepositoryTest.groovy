@@ -30,25 +30,28 @@ class IngredientCustomRepositoryTest extends Specification {
 
         List<Ingredient> ingredients = [
                 Ingredient.builder()
+                        .userId(1L)
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("사과")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
                 Ingredient.builder()
+                        .userId(1L)
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("체리")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
                 Ingredient.builder()
+                        .userId(1L)
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("블루베리")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
         ]
         ingredientRepository.saveAll(ingredients);
 
         when:
-        List<Ingredient> response = ingredientRepository.findDefaultIngredientsByKeyword("리");
+        List<Ingredient> response = ingredientRepository.findDefaultIngredientsByKeyword(1L, "리");
 
         then:
         response.size() == 2
@@ -64,25 +67,28 @@ class IngredientCustomRepositoryTest extends Specification {
 
         List<Ingredient> ingredients = [
                 Ingredient.builder()
+                        .userId(1L)
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("사과")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
                 Ingredient.builder()
+                        .userId(1L)
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("포도")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
                 Ingredient.builder()
+                        .userId(1L)
                         .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
                         .ingredientName("귤")
-                        .ingredientIconUrl("http://img.jpg")
+                        .ingredientIconId(10000)
                         .build(),
         ]
         ingredientRepository.saveAll(ingredients);
 
         when:
-        List<Ingredient> response = ingredientRepository.findDefaultIngredients();
+        List<Ingredient> response = ingredientRepository.findDefaultIngredients(1L);
 
         then:
         response.size() == 3

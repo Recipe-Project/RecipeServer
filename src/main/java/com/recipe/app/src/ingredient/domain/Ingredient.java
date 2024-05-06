@@ -31,14 +31,14 @@ public class Ingredient extends BaseEntity {
     @Column(name = "ingredientName", nullable = false, length = 64)
     private String ingredientName;
 
-    @Column(name = "ingredientIconUrl")
-    private String ingredientIconUrl;
+    @Column(name = "ingredientIconId")
+    private Long ingredientIconId;
 
     @Column(name = "userId")
     private Long userId;
 
     @Builder
-    public Ingredient(Long ingredientId, Long ingredientCategoryId, String ingredientName, String ingredientIconUrl, Long userId) {
+    public Ingredient(Long ingredientId, Long ingredientCategoryId, String ingredientName, Long ingredientIconId, Long userId) {
 
         Objects.requireNonNull(ingredientCategoryId, "재료 카테고리 아이디를 입력해주세요.");
         Preconditions.checkArgument(StringUtils.hasText(ingredientName), "재료명을 입력해주세요.");
@@ -46,7 +46,7 @@ public class Ingredient extends BaseEntity {
         this.ingredientId = ingredientId;
         this.ingredientCategoryId = ingredientCategoryId;
         this.ingredientName = ingredientName;
-        this.ingredientIconUrl = ingredientIconUrl;
+        this.ingredientIconId = ingredientIconId;
         this.userId = userId;
     }
 

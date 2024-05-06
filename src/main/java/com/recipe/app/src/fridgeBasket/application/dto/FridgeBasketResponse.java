@@ -1,6 +1,5 @@
 package com.recipe.app.src.fridgeBasket.application.dto;
 
-import com.recipe.app.src.fridge.domain.Freshness;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -20,7 +19,7 @@ public class FridgeBasketResponse {
     @Schema(description = "냉장고 바구니 재료명")
     private final String ingredientName;
     @Schema(description = "냉장고 바구니 재료 아이콘 url")
-    private final String ingredientIconUrl;
+    private final Long ingredientIconId;
     @Schema(description = "냉장고 바구니 재료 유통 기한")
     private final ZonedDateTime expiredAt;
     @Schema(description = "냉장고 바구니 재료 수량")
@@ -31,11 +30,11 @@ public class FridgeBasketResponse {
     private final String freshness;
 
     @Builder
-    public FridgeBasketResponse(Long fridgeBasketId, String ingredientName, String ingredientIconUrl, ZonedDateTime expiredAt, float quantity, String unit, String freshness) {
+    public FridgeBasketResponse(Long fridgeBasketId, String ingredientName, Long ingredientIconId, ZonedDateTime expiredAt, float quantity, String unit, String freshness) {
 
         this.fridgeBasketId = fridgeBasketId;
         this.ingredientName = ingredientName;
-        this.ingredientIconUrl = ingredientIconUrl;
+        this.ingredientIconId = ingredientIconId;
         this.expiredAt = expiredAt;
         this.quantity = quantity;
         this.unit = unit;
@@ -46,7 +45,7 @@ public class FridgeBasketResponse {
         return FridgeBasketResponse.builder()
                 .fridgeBasketId(fridgeBasket.getFridgeBasketId())
                 .ingredientName(ingredient.getIngredientName())
-                .ingredientIconUrl(ingredient.getIngredientIconUrl())
+                .ingredientIconId(ingredient.getIngredientIconId())
                 .expiredAt(fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().atTime(LocalTime.MIN).atZone(ZoneId.of("Asia/Seoul")) : null)
                 .quantity(fridgeBasket.getQuantity())
                 .unit(fridgeBasket.getUnit())

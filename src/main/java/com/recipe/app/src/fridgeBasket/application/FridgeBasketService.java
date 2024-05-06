@@ -75,15 +75,15 @@ public class FridgeBasketService {
         badWordService.checkBadWords(request.getIngredientName());
 
         IngredientCategory ingredientCategory = ingredientCategoryService.findById(request.getIngredientCategoryId());
-        Ingredient ingredient = ingredientService.findByUserIdAndIngredientNameAndIngredientIconUrlAndIngredientCategoryId(
+        Ingredient ingredient = ingredientService.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(
                         user.getUserId(),
                         request.getIngredientName(),
-                        request.getIngredientIconUrl(),
+                        request.getIngredientIconId(),
                         ingredientCategory.getIngredientCategoryId())
                 .orElseGet(() -> Ingredient.builder()
                         .userId(user.getUserId())
                         .ingredientName(request.getIngredientName())
-                        .ingredientIconUrl(request.getIngredientIconUrl())
+                        .ingredientIconId(request.getIngredientIconId())
                         .ingredientCategoryId(ingredientCategory.getIngredientCategoryId())
                         .build());
         ingredientService.createIngredient(ingredient);

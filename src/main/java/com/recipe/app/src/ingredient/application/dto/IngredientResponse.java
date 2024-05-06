@@ -13,15 +13,15 @@ public class IngredientResponse {
     private final Long ingredientId;
     @Schema(description = "재료명")
     private final String ingredientName;
-    @Schema(description = "재료 아이콘 url")
-    private final String ingredientIconUrl;
+    @Schema(description = "재료 아이콘 아이디")
+    private final Long ingredientIconId;
 
     @Builder
-    public IngredientResponse(Long ingredientId, String ingredientName, String ingredientIconUrl) {
+    public IngredientResponse(Long ingredientId, String ingredientName, Long ingredientIconId) {
 
         this.ingredientId = ingredientId;
         this.ingredientName = ingredientName;
-        this.ingredientIconUrl = ingredientIconUrl;
+        this.ingredientIconId = ingredientIconId;
     }
 
     public static IngredientResponse from(Ingredient ingredient) {
@@ -29,7 +29,7 @@ public class IngredientResponse {
         return IngredientResponse.builder()
                 .ingredientId(ingredient.getIngredientId())
                 .ingredientName(ingredient.getIngredientName())
-                .ingredientIconUrl(ingredient.getIngredientIconUrl())
+                .ingredientIconId(ingredient.getIngredientIconId())
                 .build();
     }
 }

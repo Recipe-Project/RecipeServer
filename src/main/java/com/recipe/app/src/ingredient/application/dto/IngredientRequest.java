@@ -1,14 +1,13 @@
-package com.recipe.app.src.fridgeBasket.application.dto;
+package com.recipe.app.src.ingredient.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
-import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
-@Schema(description = "재료 직접 입력 요청 DTO")
+@Schema(description = "재료 추가 요청 DTO")
 @Getter
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class FridgeBasketIngredientRequest {
+@NoArgsConstructor
+public class IngredientRequest {
 
     @Schema(description = "재료명")
     private String ingredientName;

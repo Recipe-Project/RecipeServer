@@ -1,6 +1,8 @@
 package com.recipe.app.src.ingredient.application;
 
+import com.recipe.app.src.ingredient.application.dto.IngredientRequest;
 import com.recipe.app.src.ingredient.domain.Ingredient;
+import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.ingredient.exception.NotFoundIngredientException;
 import com.recipe.app.src.ingredient.infra.IngredientRepository;
 import com.recipe.app.src.user.domain.User;
@@ -15,20 +17,22 @@ import java.util.Optional;
 @Service
 public class IngredientService {
 
+    private final IngredientCategoryService ingredientCategoryService;
     private final IngredientRepository ingredientRepository;
 
-    public IngredientService(IngredientRepository ingredientRepository) {
+    public IngredientService(IngredientRepository ingredientRepository, IngredientCategoryService ingredientCategoryService) {
         this.ingredientRepository = ingredientRepository;
+        this.ingredientCategoryService = ingredientCategoryService;
     }
 
     @Transactional(readOnly = true)
-    public List<Ingredient> findByKeyword(String keyword) {
+    public List<Ingredient> findByKeyword(Long userId, String keyword) {
 
         if (!StringUtils.hasText(keyword)) {
-            return ingredientRepository.findDefaultIngredients();
+            return ingredientRepository.findDefaultIngredients(userId);
         }
 
-        return ingredientRepository.findDefaultIngredientsByKeyword(keyword);
+        return ingredientRepository.findDefaultIngredientsByKeyword(userId, keyword);
     }
 
     @Transactional(readOnly = true)
@@ -38,13 +42,32 @@ public class IngredientService {
     }
 
     @Transactional(readOnly = true)
-    public Optional<Ingredient> findByUserIdAndIngredientNameAndIngredientIconUrlAndIngredientCategoryId(Long userId, String ingredientName, String ingredientIconUrl, Long ingredientCategoryId) {
+    public Optional<Ingredient> findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(Long userId, String ingredientName, Long ingredientIconId, Long ingredientCategoryId) {
 
-        return ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconUrlAndIngredientCategoryId(userId, ingredientName, ingredientIconUrl, ingredientCategoryId);
+        return ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(userId, ingredientName, ingredientIconId, ingredientCategoryId);
     }
 
     @Transactional
     public void createIngredient(Ingredient ingredient) {
+        ingredientRepository.save(ingredient);
+    }
+
+    @Transactional
+    public void createIngredient(Long userId, IngredientRequest request) {
+
+        IngredientCategory ingredientCategory = ingredientCategoryService.findById(request.getIngredientCategoryId());
+        Ingredient ingredient = ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(
+                        userId,
+                        request.getIngredientName(),
+                        request.getIngredientIconId(),
+                        ingredientCategory.getIngredientCategoryId())
+                .orElseGet(() -> Ingredient.builder()
+                        .userId(userId)
+                        .ingredientName(request.getIngredientName())
+                        .ingredientIconId(request.getIngredientIconId())
+                        .ingredientCategoryId(ingredientCategory.getIngredientCategoryId())
+                        .build());
+
         ingredientRepository.save(ingredient);
     }
 
