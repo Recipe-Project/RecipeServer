@@ -217,8 +217,6 @@ public class UserService {
     @Transactional
     public void updateUser(User user, UserProfileRequest request) {
 
-        Preconditions.checkArgument(StringUtils.hasText(request.getNickname()), "닉네임을 입력해주세요.");
-
         badWordService.checkBadWords(request.getNickname());
         user.changeProfile(request.getProfileImgUrl(), request.getNickname());
         userRepository.save(user);
