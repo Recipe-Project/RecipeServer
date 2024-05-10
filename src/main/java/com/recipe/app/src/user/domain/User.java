@@ -49,14 +49,14 @@ public class User extends BaseEntity {
     private LocalDateTime recentLoginAt;
 
     @Builder
-    public User(Long userId, String socialId, String profileImgUrl, String nickname, String email, String phoneNumber, String deviceToken, LocalDateTime recentLoginAt) {
+    public User(Long userId, String socialId, String nickname, String email, String phoneNumber, String deviceToken, LocalDateTime recentLoginAt) {
 
         Preconditions.checkArgument(StringUtils.hasText(socialId), "소셜 로그인 ID 값을 입력해주세요.");
         Preconditions.checkArgument(StringUtils.hasText(nickname), "닉네임을 입력해주세요.");
 
         this.userId = userId;
         this.socialId = socialId;
-        this.profileImgUrl = profileImgUrl;
+        this.profileImgUrl = ProfileImage.getInitProfileImgUrl();
         this.nickname = nickname;
         this.email = email;
         this.phoneNumber = phoneNumber;
