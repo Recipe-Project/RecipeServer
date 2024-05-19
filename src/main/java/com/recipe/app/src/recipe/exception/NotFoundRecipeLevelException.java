@@ -1,10 +1,8 @@
 package com.recipe.app.src.recipe.exception;
 
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.common.response.BaseResponseStatus;
+public class NotFoundRecipeLevelException extends RuntimeException {
 
-public class NotFoundRecipeLevelException extends BaseException {
     public NotFoundRecipeLevelException() {
-        super(BaseResponseStatus.NOT_FOUND_RECIPE_LEVEL);
+        super("레시피 난이도 조회에 실패했습니다.");
     }
 }

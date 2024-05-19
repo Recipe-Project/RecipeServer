@@ -1,10 +1,8 @@
 package com.recipe.app.src.recipe.exception;
 
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.common.response.BaseResponseStatus;
+public class NotFoundRecipeException extends RuntimeException {
 
-public class NotFoundRecipeException extends BaseException {
     public NotFoundRecipeException() {
-        super(BaseResponseStatus.NOT_FOUND_RECIPE_INFO);
+        super("레시피 정보를 찾지 못하였습니다.");
     }
 }

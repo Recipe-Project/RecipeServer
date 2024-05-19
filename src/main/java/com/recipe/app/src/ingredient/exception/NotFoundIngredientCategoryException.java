@@ -1,10 +1,8 @@
 package com.recipe.app.src.ingredient.exception;
 
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.common.response.BaseResponseStatus;
+public class NotFoundIngredientCategoryException extends RuntimeException {
 
-public class NotFoundIngredientCategoryException extends BaseException {
     public NotFoundIngredientCategoryException() {
-        super(BaseResponseStatus.NOT_FOUND_INGREDIENT_CATEGORY);
+        super("재료 카테고리인덱스를 찾을 수 없습니다.");
     }
 }

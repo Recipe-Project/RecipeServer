@@ -1,10 +1,8 @@
 package com.recipe.app.src.user.exception;
 
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.common.response.BaseResponseStatus;
+public class NotFoundUserException extends RuntimeException {
 
-public class NotFoundUserException extends BaseException {
     public NotFoundUserException() {
-        super(BaseResponseStatus.NOT_FOUND_USER);
+        super("존재하지 않는 회원입니다.");
     }
 }
