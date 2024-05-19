@@ -1,13 +1,10 @@
 package com.recipe.app.src.common.api;
 
-import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.common.application.dto.DialogResponse;
 import com.recipe.app.src.common.application.DialogService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import static com.recipe.app.common.response.BaseResponse.success;
 
 @RestController
 @RequestMapping("/dialog")
@@ -20,8 +17,8 @@ public class DialogController {
     }
 
     @GetMapping("")
-    public BaseResponse<DialogResponse> getDialog() {
+    public DialogResponse getDialog() {
 
-        return success(dialogService.findDialog());
+        return dialogService.findDialog();
     }
 }
