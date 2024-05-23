@@ -28,6 +28,10 @@ public class UserWebController {
     private String naverClientId;
     @Value("${naver.redirect-uri}")
     private String naverRedirectURI;
+    @Value("${google.client-id}")
+    private String googleClientId;
+    @Value("${google.redirect-uri}")
+    private String googleRedirectURI;
 
     public UserWebController(UserService userService, JwtService jwtService) {
         this.userService = userService;
@@ -41,6 +45,8 @@ public class UserWebController {
         model.addAttribute("kakaoRedirectURI", kakaoRedirectURI);
         model.addAttribute("naverClientId", naverClientId);
         model.addAttribute("naverRedirectURI", naverRedirectURI);
+        model.addAttribute("googleClientId", googleClientId);
+        model.addAttribute("googleRedirectURI", googleRedirectURI);
 
         return "/user-login";
     }
@@ -69,6 +75,18 @@ public class UserWebController {
         String accessToken = userService.getNaverAccessToken(code, state);
 
         PostUserRes postUserRes = userService.naverLogin(accessToken, null);
+
+        model.addAttribute("jwtToken", jwtService.createJwt(postUserRes.getUserIdx()));
+
+        return "/user-withdrawal";
+    }
+
+    @GetMapping("/auth/google/callback")
+    public String googleLogin(String code, Model model) throws IOException, ParseException, BaseException {
+
+        String idToken = userService.getGoogleIdToken(code);
+
+        PostUserRes postUserRes = userService.googleLogin(idToken, null);
 
         model.addAttribute("jwtToken", jwtService.createJwt(postUserRes.getUserIdx()));
 
