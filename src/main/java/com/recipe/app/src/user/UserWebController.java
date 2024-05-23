@@ -64,6 +64,7 @@ public class UserWebController {
 
         PostUserRes postUserRes = userService.kakaoLogin(accessToken, null);
 
+        model.addAttribute("userId", postUserRes.getUserIdx());
         model.addAttribute("jwtToken", jwtService.createJwt(postUserRes.getUserIdx()));
 
         return "/user-withdrawal";
@@ -76,6 +77,7 @@ public class UserWebController {
 
         PostUserRes postUserRes = userService.naverLogin(accessToken, null);
 
+        model.addAttribute("userId", postUserRes.getUserIdx());
         model.addAttribute("jwtToken", jwtService.createJwt(postUserRes.getUserIdx()));
 
         return "/user-withdrawal";
@@ -88,6 +90,7 @@ public class UserWebController {
 
         PostUserRes postUserRes = userService.googleLogin(idToken, null);
 
+        model.addAttribute("userId", postUserRes.getUserIdx());
         model.addAttribute("jwtToken", jwtService.createJwt(postUserRes.getUserIdx()));
 
         return "/user-withdrawal";

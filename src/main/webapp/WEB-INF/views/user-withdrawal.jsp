@@ -1,5 +1,6 @@
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
+    String userId = (String) request.getAttribute("userId");
     String jwtToken = (String) request.getAttribute("jwtToken");
 %>
 <!DOCTYPE html>
@@ -14,7 +15,7 @@
     function withdraw() {
         $.ajax({
             method: 'DELETE',
-            url: 'https://recipestorage2024.shop:9090/users',
+            url: 'https://recipestorage2024.shop:9090/users/<%=userId%>',
             headers: {
                 "X-ACCESS-TOKEN": "<%=jwtToken%>"
             }
