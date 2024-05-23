@@ -105,4 +105,10 @@ public class IngredientService {
 
         ingredientRepository.delete(ingredient);
     }
+
+    @Transactional(readOnly = true)
+    public List<Ingredient> findByUserId(Long userId) {
+
+        return ingredientRepository.findByUserId(userId);
+    }
 }

@@ -45,6 +45,16 @@ public class IngredientFacadeService {
     }
 
     @Transactional(readOnly = true)
+    public IngredientsResponse findMyIngredients(User user) {
+
+        long fridgeBasketCount = fridgeBasketService.countByUserId(user.getUserId());
+        List<IngredientCategory> categories = ingredientCategoryService.findAll();
+        List<Ingredient> ingredients = ingredientService.findByUserId(user.getUserId());
+
+        return IngredientsResponse.from(fridgeBasketCount, categories, ingredients);
+    }
+
+    @Transactional(readOnly = true)
     public void checkIngredientIsUsed(User user, Long ingredientId) {
 
         if (fridgeBasketService.hasIngredient(ingredientId)) {

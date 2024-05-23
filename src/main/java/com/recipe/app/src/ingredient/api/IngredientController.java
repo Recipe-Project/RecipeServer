@@ -49,6 +49,18 @@ public class IngredientController {
         return ingredientFacadeService.findIngredientsByKeyword(user, keyword);
     }
 
+    @ApiOperation(value = "나만의 재료 목록 조회 API")
+    @GetMapping("/my")
+    public IngredientsResponse getMyIngredients(@ApiIgnore final Authentication authentication) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+
+        return ingredientFacadeService.findMyIngredients(user);
+    }
+
     @ApiOperation(value = "나만의 재료 등록 API")
     @PostMapping("")
     public void postIngredient(@ApiIgnore final Authentication authentication,
