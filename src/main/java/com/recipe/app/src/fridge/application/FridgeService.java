@@ -159,6 +159,12 @@ public class FridgeService {
         return ingredientService.findByIngredientIds(ingredientIds);
     }
 
+    @Transactional(readOnly = true)
+    public boolean hasIngredient(Long ingredientId) {
+
+        return fridgeRepository.existsByIngredientId(ingredientId);
+    }
+
      /*
 
     public List<ShelfLifeUser> retreiveShelfLifeUserList() throws BaseException {

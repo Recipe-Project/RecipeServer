@@ -15,4 +15,6 @@ public interface FridgeBasketRepository extends JpaRepository<FridgeBasket, Long
     long countByUserId(Long userId);
 
     Optional<FridgeBasket> findByIngredientIdAndUserId(Long ingredientId, Long userId);
+
+    boolean existsByIngredientId(Long ingredientId);
 }

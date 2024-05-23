@@ -114,4 +114,10 @@ public class RecipeIngredientService {
 
         return recipeIngredientRepository.findByRecipeIdIn(recipeIds);
     }
+
+    @Transactional(readOnly = true)
+    public boolean hasIngredient(Long ingredientId) {
+
+        return recipeIngredientRepository.existsByIngredientId(ingredientId);
+    }
 }

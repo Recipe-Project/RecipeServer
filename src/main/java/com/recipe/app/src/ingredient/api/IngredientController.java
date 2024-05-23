@@ -72,6 +72,7 @@ public class IngredientController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
+        ingredientFacadeService.checkIngredientIsUsed(user, ingredientId);
         ingredientService.deleteIngredient(user, ingredientId);
     }
 }
