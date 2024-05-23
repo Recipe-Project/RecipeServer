@@ -21,7 +21,7 @@ public class DialogResponse {
 
     public static DialogResponse from(Dialog dialog) {
         return DialogResponse.builder()
-                .idx(dialog.getIdx())
+                .idx(dialog.getDialogId())
                 .title(dialog.getTitle())
                 .content(dialog.getContent())
                 .link(dialog.getLink())
