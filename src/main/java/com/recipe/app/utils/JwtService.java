@@ -1,12 +1,11 @@
 package com.recipe.app.utils;
 
 import com.recipe.app.config.BaseException;
-import com.recipe.app.config.secret.Secret;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jws;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -18,6 +17,10 @@ import static com.recipe.app.config.BaseResponseStatus.*;
 
 @Service
 public class JwtService {
+
+    @Value("${jwt.secret}")
+    public String secretKey;
+
     /**
      * JWT 생성
      * @param userId
@@ -28,7 +31,7 @@ public class JwtService {
         return Jwts.builder()
                 .claim("userId", userId)
                 .setIssuedAt(now)
-                .signWith(SignatureAlgorithm.HS256, Secret.JWT_SECRET_KEY)
+                .signWith(SignatureAlgorithm.HS256, secretKey)
                 .compact();
     }
 
@@ -57,7 +60,7 @@ public class JwtService {
         Jws<Claims> claims;
         try {
             claims = Jwts.parser()
-                    .setSigningKey(Secret.JWT_SECRET_KEY)
+                    .setSigningKey(secretKey)
                     .parseClaimsJws(accessToken);
         } catch (Exception ignored) {
             throw new BaseException(INVALID_JWT);
