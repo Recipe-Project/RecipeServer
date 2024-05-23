@@ -1,4 +1,4 @@
-package com.recipe.app.src.user.api;
+package com.recipe.app.src.user;
 
 import com.recipe.app.config.BaseException;
 import com.recipe.app.src.user.UserService;
@@ -24,6 +24,10 @@ public class UserWebController {
     private String kakaoClientId;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectURI;
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.redirect-uri}")
+    private String naverRedirectURI;
 
     public UserWebController(UserService userService, JwtService jwtService) {
         this.userService = userService;
@@ -35,6 +39,8 @@ public class UserWebController {
 
         model.addAttribute("kakaoClientId", kakaoClientId);
         model.addAttribute("kakaoRedirectURI", kakaoRedirectURI);
+        model.addAttribute("naverClientId", naverClientId);
+        model.addAttribute("naverRedirectURI", naverRedirectURI);
 
         return "/user-login";
     }
@@ -51,6 +57,18 @@ public class UserWebController {
         String accessToken = userService.getKakaoAccessToken(code);
 
         PostUserRes postUserRes = userService.kakaoLogin(accessToken, null);
+
+        model.addAttribute("jwtToken", jwtService.createJwt(postUserRes.getUserIdx()));
+
+        return "/user-withdrawal";
+    }
+
+    @GetMapping("/auth/naver/callback")
+    public String naverLogin(String code, String state, Model model) throws IOException, ParseException, BaseException {
+
+        String accessToken = userService.getNaverAccessToken(code, state);
+
+        PostUserRes postUserRes = userService.naverLogin(accessToken, null);
 
         model.addAttribute("jwtToken", jwtService.createJwt(postUserRes.getUserIdx()));
 
