@@ -12,4 +12,6 @@ public interface FridgeRepository extends JpaRepository<Fridge, Long> {
     List<Fridge> findByUserId(Long userId);
 
     Optional<Fridge> findByUserIdAndFridgeId(Long userId, Long fridgeId);
+
+    boolean existsByIngredientId(Long ingredientId);
 }

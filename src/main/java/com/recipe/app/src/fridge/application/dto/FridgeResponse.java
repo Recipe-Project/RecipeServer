@@ -1,5 +1,6 @@
 package com.recipe.app.src.fridge.application.dto;
 
+import com.recipe.app.src.fridge.domain.Freshness;
 import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,10 +28,10 @@ public class FridgeResponse {
     @Schema(description = "단위")
     private final String unit;
     @Schema(description = "신선도")
-    private final String freshness;
+    private final Freshness freshness;
 
     @Builder
-    public FridgeResponse(Long fridgeId, String ingredientName, Long ingredientIconId, ZonedDateTime expiredAt, float quantity, String unit, String freshness) {
+    public FridgeResponse(Long fridgeId, String ingredientName, Long ingredientIconId, ZonedDateTime expiredAt, float quantity, String unit, Freshness freshness) {
 
         this.fridgeId = fridgeId;
         this.ingredientName = ingredientName;
@@ -49,7 +50,7 @@ public class FridgeResponse {
                 .expiredAt(fridge.getExpiredAt() != null ? fridge.getExpiredAt().atTime(LocalTime.MIN).atZone(ZoneId.of("Asia/Seoul")) : null)
                 .quantity(fridge.getQuantity())
                 .unit(fridge.getUnit())
-                .freshness(fridge.getFreshness().getName())
+                .freshness(fridge.getFreshness())
                 .build();
     }
 }

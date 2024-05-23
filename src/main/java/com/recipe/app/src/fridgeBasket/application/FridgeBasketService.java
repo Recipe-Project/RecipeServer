@@ -160,4 +160,10 @@ public class FridgeBasketService {
 
         return fridgeBasketRepository.findByUserId(userId);
     }
+
+    @Transactional(readOnly = true)
+    public boolean hasIngredient(Long ingredientId) {
+
+        return fridgeBasketRepository.existsByIngredientId(ingredientId);
+    }
 }

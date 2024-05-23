@@ -1,5 +1,6 @@
 package com.recipe.app.src.fridgeBasket.application.dto;
 
+import com.recipe.app.src.fridge.domain.Freshness;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -27,10 +28,10 @@ public class FridgeBasketResponse {
     @Schema(description = "냉장고 바구니 재료 단위")
     private final String unit;
     @Schema(description = "냉장고 바구니 신선도")
-    private final String freshness;
+    private final Freshness freshness;
 
     @Builder
-    public FridgeBasketResponse(Long fridgeBasketId, String ingredientName, Long ingredientIconId, ZonedDateTime expiredAt, float quantity, String unit, String freshness) {
+    public FridgeBasketResponse(Long fridgeBasketId, String ingredientName, Long ingredientIconId, ZonedDateTime expiredAt, float quantity, String unit, Freshness freshness) {
 
         this.fridgeBasketId = fridgeBasketId;
         this.ingredientName = ingredientName;
@@ -49,7 +50,7 @@ public class FridgeBasketResponse {
                 .expiredAt(fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().atTime(LocalTime.MIN).atZone(ZoneId.of("Asia/Seoul")) : null)
                 .quantity(fridgeBasket.getQuantity())
                 .unit(fridgeBasket.getUnit())
-                .freshness(fridgeBasket.getFreshness().getName())
+                .freshness(fridgeBasket.getFreshness())
                 .build();
     }
 }

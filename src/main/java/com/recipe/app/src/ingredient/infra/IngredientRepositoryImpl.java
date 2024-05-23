@@ -26,6 +26,7 @@ public class IngredientRepositoryImpl extends BaseRepositoryImpl implements Ingr
                                         .and(ingredient.userId.eq(userId))),
                         ingredient.ingredientName.contains(keyword)
                 )
+                .orderBy(ingredient.ingredientId.asc())
                 .fetch();
     }
 
@@ -40,6 +41,7 @@ public class IngredientRepositoryImpl extends BaseRepositoryImpl implements Ingr
                                 .or(ingredient.ingredientCategoryId.eq(7L)
                                         .and(ingredient.userId.eq(userId)))
                 )
+                .orderBy(ingredient.ingredientId.asc())
                 .fetch();
     }
 }

@@ -12,7 +12,9 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.lang.Nullable;
 import org.springframework.security.core.Authentication;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -47,7 +49,19 @@ public class IngredientController {
         return ingredientFacadeService.findIngredientsByKeyword(user, keyword);
     }
 
-    @ApiOperation(value = "재료 등록 API")
+    @ApiOperation(value = "나만의 재료 목록 조회 API")
+    @GetMapping("/my")
+    public IngredientsResponse getMyIngredients(@ApiIgnore final Authentication authentication) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+
+        return ingredientFacadeService.findMyIngredients(user);
+    }
+
+    @ApiOperation(value = "나만의 재료 등록 API")
     @PostMapping("")
     public void postIngredient(@ApiIgnore final Authentication authentication,
                                @ApiParam(value = "재료 추가 정보", required = true)
@@ -59,5 +73,18 @@ public class IngredientController {
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
         ingredientService.createIngredient(user.getUserId(), request);
+    }
+
+    @ApiOperation(value = "나만의 재료 삭제 API")
+    @DeleteMapping("/{ingredientId}")
+    public void deleteIngredient(@ApiIgnore final Authentication authentication, @PathVariable Long ingredientId) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+
+        ingredientFacadeService.checkIngredientIsUsed(user, ingredientId);
+        ingredientService.deleteIngredient(user, ingredientId);
     }
 }
