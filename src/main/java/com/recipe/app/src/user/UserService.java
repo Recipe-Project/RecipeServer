@@ -8,14 +8,18 @@ import com.recipe.app.src.user.models.User;
 import com.recipe.app.utils.JwtService;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -29,6 +33,22 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserProvider userProvider;
     private final JwtService jwtService;
+    @Value("${kakao.client-id}")
+    private String kakaoClientId;
+    @Value("${kakao.redirect-uri}")
+    private String kakaoRedirectURI;
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.client-secret}")
+    private String naverClientSecret;
+    @Value("${kakao.redirect-uri}")
+    private String naverRedirectURI;
+    @Value("${google.client-id}")
+    private String googleClientId;
+    @Value("${google.client-secret}")
+    private String googleClientSecret;
+    @Value("${google.redirect-uri}")
+    private String googleRedirectURI;
 
     @Autowired
     public UserService(UserRepository userRepository, UserProvider userProvider, JwtService jwtService) {
@@ -412,4 +432,146 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
+    public String getKakaoAccessToken(String code) throws IOException, ParseException {
+
+        String apiURL = "https://kauth.kakao.com/oauth/token";
+
+        URL url = new URL(apiURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setRequestMethod("POST");
+        con.setDoOutput(true);
+        con.setRequestProperty("Content-Type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+        StringBuilder sb = new StringBuilder();
+        sb.append("grant_type=authorization_code");
+        sb.append("&client_id=" + kakaoClientId);
+        sb.append("&redirect_uri=" + kakaoRedirectURI);
+        sb.append("&code=" + code);
+
+        bw.write(sb.toString());
+        bw.flush();
+        bw.close();
+
+        int responseCode = con.getResponseCode();
+        InputStreamReader streamReader;
+        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+            streamReader = new InputStreamReader(con.getInputStream());
+        } else { // 에러 발생
+            streamReader = new InputStreamReader(con.getErrorStream());
+        }
+
+        BufferedReader lineReader = new BufferedReader(streamReader);
+        StringBuilder responseBody = new StringBuilder();
+
+        String line;
+        while ((line = lineReader.readLine()) != null) {
+            responseBody.append(line);
+        }
+
+        String body = responseBody.toString();
+
+        con.disconnect();
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        System.out.println(jsonObject.toJSONString());
+        String accessToken = jsonObject.get("access_token").toString();
+        return accessToken;
+    }
+
+    @Transactional(readOnly = true)
+    public String getNaverAccessToken(String code, String state) throws IOException, ParseException {
+
+        String apiURL = "https://nid.naver.com/oauth2.0/token" +
+                "?grant_type=authorization_code" +
+                "&client_id=" + naverClientId +
+                "&client_secret=" + naverClientSecret +
+                "&redirect_uri=" + naverRedirectURI +
+                "&code=" + code +
+                "&state=" + state;
+
+        URL url = new URL(apiURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setRequestMethod("GET");
+
+        int responseCode = con.getResponseCode();
+        InputStreamReader streamReader;
+        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+            streamReader = new InputStreamReader(con.getInputStream());
+        } else { // 에러 발생
+            streamReader = new InputStreamReader(con.getErrorStream());
+        }
+
+        BufferedReader lineReader = new BufferedReader(streamReader);
+        StringBuilder responseBody = new StringBuilder();
+
+        String line;
+        while ((line = lineReader.readLine()) != null) {
+            responseBody.append(line);
+        }
+
+        String body = responseBody.toString();
+        System.out.println(body);
+        con.disconnect();
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        String accessToken = jsonObject.get("access_token").toString();
+        return accessToken;
+    }
+
+    @Transactional(readOnly = true)
+    public String getGoogleIdToken(String code) throws IOException, ParseException {
+
+        String apiURL = "https://oauth2.googleapis.com/token";
+
+        URL url = new URL(apiURL);
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+        con.setRequestMethod("POST");
+        con.setDoOutput(true);
+
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(con.getOutputStream()));
+        StringBuilder sb = new StringBuilder();
+        sb.append("grant_type=authorization_code");
+        sb.append("&client_id=" + googleClientId);
+        sb.append("&client_secret=" + googleClientSecret);
+        sb.append("&redirect_uri=" + googleRedirectURI);
+        sb.append("&code=" + code);
+
+        bw.write(sb.toString());
+        bw.flush();
+        bw.close();
+
+        int responseCode = con.getResponseCode();
+        InputStreamReader streamReader;
+        if (responseCode == HttpURLConnection.HTTP_OK) { // 정상 호출
+            streamReader = new InputStreamReader(con.getInputStream());
+        } else { // 에러 발생
+            streamReader = new InputStreamReader(con.getErrorStream());
+        }
+
+        BufferedReader lineReader = new BufferedReader(streamReader);
+        StringBuilder responseBody = new StringBuilder();
+
+        String line;
+        while ((line = lineReader.readLine()) != null) {
+            responseBody.append(line);
+        }
+
+        String body = responseBody.toString();
+
+        System.out.println(body);
+
+        con.disconnect();
+
+        JSONParser jsonParser = new JSONParser();
+        JSONObject jsonObject = (JSONObject) jsonParser.parse(body);
+        String idToken = jsonObject.get("id_token").toString();
+        return idToken;
+    }
 }

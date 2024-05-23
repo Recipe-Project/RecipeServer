@@ -1,0 +1,17 @@
+.content {
+    margin: auto;
+    display: block;
+    text-align: center;
+    margin-top: 100px;
+}
+
+button {
+    width: 328px;
+    height: 50px;
+    padding: 14px 16px 14px 20px;
+    border-radius: 12px;
+    background-color: #4bd2b0;
+    border: none;
+    color: white;
+    font-weight: bold;
+}

@@ -23,6 +23,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
@@ -36,8 +37,6 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.recipe.app.config.BaseResponseStatus.*;
-import static com.recipe.app.config.secret.Secret.NAVER_CLIENT_ID;
-import static com.recipe.app.config.secret.Secret.NAVER_CLINET_SECRET;
 
 @Service
 public class RecipeInfoProvider {
@@ -48,10 +47,13 @@ public class RecipeInfoProvider {
     private final ScrapPublicRepository scrapPublicRepository;
     private final UserProvider userProvider;
     private final RecipeInfoRepository recipeInfoRepository;
-    private final JwtService jwtService;
+    @Value("${naver.client-id}")
+    private String naverClientId;
+    @Value("${naver.client-secret}")
+    private String naverClientSecret;
 
     @Autowired
-    public RecipeInfoProvider(IngredientRepository ingredientRepository, RecipeKeywordRepository recipeKeywordRepository, FridgeRepository fridgeRepository, ScrapBlogRepository scrapBlogRepository, ScrapPublicRepository scrapPublicRepository, UserProvider userProvider, RecipeInfoRepository recipeInfoRepository, JwtService jwtService) {
+    public RecipeInfoProvider(IngredientRepository ingredientRepository, RecipeKeywordRepository recipeKeywordRepository, FridgeRepository fridgeRepository, ScrapBlogRepository scrapBlogRepository, ScrapPublicRepository scrapPublicRepository, UserProvider userProvider, RecipeInfoRepository recipeInfoRepository) {
         this.ingredientRepository = ingredientRepository;
         this.recipeKeywordRepository = recipeKeywordRepository;
         this.fridgeRepository = fridgeRepository;
@@ -59,7 +61,6 @@ public class RecipeInfoProvider {
         this.scrapPublicRepository = scrapPublicRepository;
         this.userProvider = userProvider;
         this.recipeInfoRepository = recipeInfoRepository;
-        this.jwtService = jwtService;
     }
 
     /**
@@ -471,8 +472,8 @@ public class RecipeInfoProvider {
         String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&query="+text+"&display="+display+"&start="+start;
 
         Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("X-Naver-Client-Id", NAVER_CLIENT_ID);
-        requestHeaders.put("X-Naver-Client-Secret", NAVER_CLINET_SECRET);
+        requestHeaders.put("X-Naver-Client-Id", naverClientId);
+        requestHeaders.put("X-Naver-Client-Secret", naverClientSecret);
 
         HttpURLConnection con;
         try {
