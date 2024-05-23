@@ -1,11 +1,8 @@
 package com.recipe.app.src.fridge.exception;
 
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.common.response.BaseResponseStatus;
-
-public class FridgeSaveUnitNotMatchException extends BaseException {
+public class FridgeSaveUnitNotMatchException extends RuntimeException {
 
     public FridgeSaveUnitNotMatchException(String ingredientName) {
-        super(BaseResponseStatus.FRIDGE_SAVE_UNIT_NOT_MATCH, ingredientName);
+        super(String.format("냉장고에 존재하는 재료(%s)의 단위와 냉장고 바구니의 재료 단위가 일치하지 않습니다", ingredientName));
     }
 }

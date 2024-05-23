@@ -1,10 +1,8 @@
 package com.recipe.app.src.common.exception;
 
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.common.response.BaseResponseStatus;
+public class NotFoundNoticeException extends RuntimeException {
 
-public class NotFoundNoticeException extends BaseException {
     public NotFoundNoticeException() {
-        super(BaseResponseStatus.NOT_FOUND_NOTICE);
+        super("공지가 존재하지 않습니다.");
     }
 }

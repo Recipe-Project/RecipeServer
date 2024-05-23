@@ -1,6 +1,5 @@
 package com.recipe.app.src.fridge.api;
 
-import com.recipe.app.common.response.BaseResponse;
 import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.fridge.application.dto.FridgeRequest;
 import com.recipe.app.src.fridge.application.dto.FridgeResponse;
@@ -15,8 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import static com.recipe.app.common.response.BaseResponse.success;
-
 @Api(tags = {"냉장고 Controller"})
 @RestController
 @RequestMapping("/fridges")
@@ -30,57 +27,55 @@ public class FridgeController {
 
     @ApiOperation(value = "냉장고 채우기 API")
     @PostMapping
-    public BaseResponse<Void> postFridges(@ApiIgnore final Authentication authentication) {
+    public void postFridges(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeService.createFridges(user);
 
-        return success();
+        fridgeService.createFridges(user);
     }
 
     @ApiOperation(value = "냉장고 목록 조회 API")
     @GetMapping
-    public BaseResponse<FridgesResponse> getFridges(@ApiIgnore final Authentication authentication) {
+    public FridgesResponse getFridges(@ApiIgnore final Authentication authentication) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(fridgeService.getFridges(user));
+        return fridgeService.getFridges(user);
     }
 
     @ApiOperation(value = "냉장고 상세 조회 API")
     @GetMapping("/{fridgeId}")
-    public BaseResponse<FridgeResponse> getFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId) {
+    public FridgeResponse getFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return success(fridgeService.getFridge(user, fridgeId));
+        return fridgeService.getFridge(user, fridgeId);
     }
 
     @ApiOperation(value = "냉장고 삭제 API")
     @DeleteMapping("/{fridgeId}")
-    public BaseResponse<Void> deleteFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId) {
+    public void deleteFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeService.deleteFridge(user, fridgeId);
 
-        return success();
+        fridgeService.deleteFridge(user, fridgeId);
     }
 
     @ApiOperation(value = "냉장고 수정 API")
     @PatchMapping("/{fridgeId}")
-    public BaseResponse<Void> patchFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId,
+    public void patchFridge(@ApiIgnore final Authentication authentication, @PathVariable Long fridgeId,
                                           @ApiParam(value = "냉장고 수정 입력 정보", required = true)
                                           @RequestBody FridgeRequest request) {
 
@@ -88,9 +83,8 @@ public class FridgeController {
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-        fridgeService.updateFridge(user, fridgeId, request);
 
-        return success();
+        fridgeService.updateFridge(user, fridgeId, request);
     }
 
     /*

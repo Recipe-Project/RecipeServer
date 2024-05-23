@@ -1,11 +1,8 @@
 package com.recipe.app.src.fridge.exception;
 
-import com.recipe.app.common.exception.BaseException;
-import com.recipe.app.common.response.BaseResponseStatus;
-
-public class NotFoundFridgeException extends BaseException {
+public class NotFoundFridgeException extends RuntimeException {
 
     public NotFoundFridgeException() {
-        super(BaseResponseStatus.NOT_FOUND_FRIDGE);
+        super("냉장고 조회에 실패했습니다.");
     }
 }
