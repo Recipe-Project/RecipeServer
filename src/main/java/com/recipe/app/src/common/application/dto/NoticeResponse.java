@@ -20,7 +20,7 @@ public class NoticeResponse {
     public static NoticeResponse from(Notice notice) {
 
         return NoticeResponse.builder()
-                .idx(notice.getIdx())
+                .idx(notice.getNoticeId())
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .build();
