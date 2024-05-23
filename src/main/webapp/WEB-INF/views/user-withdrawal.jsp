@@ -14,13 +14,13 @@
     function withdraw() {
         $.ajax({
             method: 'DELETE',
-            url: 'http://localhost:19090/users',
+            url: 'https://recipestorage2024.shop:9090/users',
             headers: {
                 "X-ACCESS-TOKEN": "<%=jwtToken%>"
             }
         })
 
-        window.location.href='http://localhost:19090/users/withdrawal'
+        window.location.href='https://recipestorage2024.shop:9090/users/withdrawal'
     }
 </script>
 
