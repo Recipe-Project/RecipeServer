@@ -6,13 +6,13 @@ import lombok.Getter;
 
 @Getter
 public class NoticeResponse {
-    private final Long idx;
+    private final Long noticeId;
     private final String title;
     private final String content;
 
     @Builder
-    public NoticeResponse(Long idx, String title, String content) {
-        this.idx = idx;
+    public NoticeResponse(Long noticeId, String title, String content) {
+        this.noticeId = noticeId;
         this.title = title;
         this.content = content;
     }
@@ -20,7 +20,7 @@ public class NoticeResponse {
     public static NoticeResponse from(Notice notice) {
 
         return NoticeResponse.builder()
-                .idx(notice.getNoticeId())
+                .noticeId(notice.getNoticeId())
                 .title(notice.getTitle())
                 .content(notice.getContent())
                 .build();
