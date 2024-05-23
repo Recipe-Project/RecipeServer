@@ -6,14 +6,14 @@ import lombok.Getter;
 
 @Getter
 public class DialogResponse {
-    private final Long idx;
+    private final Long dialogId;
     private final String title;
     private final String content;
     private final String link;
 
     @Builder
-    public DialogResponse(Long idx, String title, String content, String link) {
-        this.idx = idx;
+    public DialogResponse(Long dialogId, String title, String content, String link) {
+        this.dialogId = dialogId;
         this.title = title;
         this.content = content;
         this.link = link;
@@ -21,7 +21,7 @@ public class DialogResponse {
 
     public static DialogResponse from(Dialog dialog) {
         return DialogResponse.builder()
-                .idx(dialog.getIdx())
+                .dialogId(dialog.getDialogId())
                 .title(dialog.getTitle())
                 .content(dialog.getContent())
                 .link(dialog.getLink())

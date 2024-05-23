@@ -14,9 +14,9 @@ import javax.persistence.*;
 public class Dialog extends BaseEntity {
 
     @Id
-    @Column(name = "idx", nullable = false, updatable = false)
+    @Column(name = "dialogId", nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long idx;
+    private Long dialogId;
 
     @Column(name = "title", nullable = false, length = 128)
     private String title;
