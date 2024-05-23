@@ -6,6 +6,7 @@ import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.ingredient.exception.NotFoundIngredientException;
 import com.recipe.app.src.ingredient.infra.IngredientRepository;
 import com.recipe.app.src.user.domain.User;
+import com.recipe.app.src.user.exception.ForbiddenUserException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -89,5 +90,19 @@ public class IngredientService {
         return ingredientRepository.findById(ingredientId).orElseThrow(() -> {
             throw new NotFoundIngredientException();
         });
+    }
+
+    @Transactional
+    public void deleteIngredient(User user, Long ingredientId) {
+
+        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
+            throw new NotFoundIngredientException();
+        });
+
+        if (!user.getUserId().equals(ingredient.getUserId())) {
+            throw new ForbiddenUserException();
+        }
+
+        ingredientRepository.delete(ingredient);
     }
 }
