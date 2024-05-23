@@ -72,10 +72,10 @@ public class FridgeBasket extends BaseEntity {
         }
         long diffDay = ChronoUnit.DAYS.between(LocalDate.now(), expiredAt);
         if (diffDay <= 0) {
-            return Freshness.DISPOSAL;
+            return Freshness.SPOILED;
         }
         if (diffDay < 7) {
-            return Freshness.DANGER;
+            return Freshness.RISKY;
         }
         return Freshness.FRESH;
     }
