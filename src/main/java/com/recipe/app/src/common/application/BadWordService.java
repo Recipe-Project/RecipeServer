@@ -7,7 +7,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BadWordService {
@@ -21,11 +20,12 @@ public class BadWordService {
     @Transactional(readOnly = true)
     public void checkBadWords(String keyword) {
 
-        List<String> badWords = badWordRepository.findByWordContaining(keyword).stream()
-                .map(BadWord::getWord)
-                .collect(Collectors.toList());
+        List<BadWord> badWords = badWordRepository.findAll();
 
-        if (badWords.size() > 0)
-            throw new BadWordException(badWords.toString());
+        for (BadWord badWord : badWords) {
+            if (keyword.contains(badWord.getWord())) {
+                throw new BadWordException(badWord.getWord());
+            }
+        }
     }
 }
