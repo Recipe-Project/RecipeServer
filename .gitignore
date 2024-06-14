@@ -7,7 +7,7 @@ build/
 
 nohup.out
 /logs/*
-application.yml
+application*.yml
 application-test.yml
 Secret.java
 recipeapp-key.json
