@@ -20,5 +20,5 @@ public interface RecipeCustomRepository {
 
     List<Recipe> findLimitByUserId(Long userId, Long lastRecipeId, int size);
 
-    List<Recipe> findRecipesInFridge(Collection<Long> ingredientIds, Collection<String> ingredientNames);
+    List<Recipe> findRecipesInFridge(Collection<String> ingredientNames);
 }
