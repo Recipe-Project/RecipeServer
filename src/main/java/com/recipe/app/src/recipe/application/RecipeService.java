@@ -170,7 +170,7 @@ public class RecipeService {
 
         recipeRepository.save(recipe);
         recipeProcessService.createRecipeProcesses(recipe.getRecipeId(), request.getContent());
-        recipeIngredientService.createRecipeIngredients(user, recipe.getRecipeId(), request.getIngredients());
+        recipeIngredientService.createRecipeIngredients(recipe.getRecipeId(), request.getIngredients());
     }
 
     @Transactional
@@ -192,7 +192,7 @@ public class RecipeService {
         recipeProcessService.createRecipeProcesses(recipeId, request.getContent());
 
         recipeIngredientService.deleteAllByRecipeId(recipeId);
-        recipeIngredientService.createRecipeIngredients(user, recipeId, request.getIngredients());
+        recipeIngredientService.createRecipeIngredients(recipeId, request.getIngredients());
     }
 
     private Recipe getRecipeByUserIdAndRecipeId(User user, Long recipeId) {
@@ -214,7 +214,7 @@ public class RecipeService {
                 .map(Object::toString)
                 .collect(Collectors.toList());
 
-        List<Recipe> recipes = recipeRepository.findRecipesInFridge(ingredientIdsInFridge, ingredientNamesInFridge);
+        List<Recipe> recipes = recipeRepository.findRecipesInFridge(ingredientNamesInFridge);
         List<Long> recipeIds = recipes.stream()
                 .map(Recipe::getRecipeId)
                 .collect(Collectors.toList());
@@ -241,22 +241,15 @@ public class RecipeService {
     private Map<Long, Long> getMatchRateMapByRecipeId(List<Long> recipeIds, List<Long> ingredientIdsInFridge, List<String> ingredientNamesInFridge) {
 
         List<RecipeIngredient> recipeIngredients = recipeIngredientService.findByRecipeIds(recipeIds);
-        Map<Long, List<Long>> ingredientIdsMapByRecipeId = recipeIngredients.stream()
-                .collect(Collectors.groupingBy(RecipeIngredient::getRecipeId, Collectors.mapping(RecipeIngredient::getIngredientId, Collectors.toList())));
-        List<Long> ingredientIds = recipeIngredients.stream()
-                .map(RecipeIngredient::getIngredientId)
-                .collect(Collectors.toList());
-        Map<Long, Ingredient> ingredientMapById = ingredientService.findByIngredientIds(ingredientIds).stream()
-                .collect(Collectors.toMap(Ingredient::getIngredientId, Function.identity()));
+        Map<Long, List<String>> ingredientNamesMapByRecipeId = recipeIngredients.stream()
+                .collect(Collectors.groupingBy(RecipeIngredient::getRecipeId, Collectors.mapping(RecipeIngredient::getIngredientName, Collectors.toList())));
 
-        return ingredientIdsMapByRecipeId.keySet().stream()
+        return ingredientNamesMapByRecipeId.keySet().stream()
                 .collect(Collectors.toMap(Function.identity(), recipeId -> {
-                    List<Long> ingredientIdsInRecipe = ingredientIdsMapByRecipeId.get(recipeId);
-                    long recipeIngredientCnt = ingredientIdsInRecipe.size();
-                    long recipeIngredientInFridgeCnt = ingredientIdsInRecipe.stream()
-                            .map(ingredientMapById::get)
-                            .filter(ingredient -> ingredientIdsInFridge.contains(ingredient.getIngredientId())
-                                    || ingredientNamesInFridge.contains(ingredient.getIngredientName()))
+                    List<String> ingredientNamesInRecipe = ingredientNamesMapByRecipeId.get(recipeId);
+                    long recipeIngredientCnt = ingredientNamesInRecipe.size();
+                    long recipeIngredientInFridgeCnt = ingredientNamesInRecipe.stream()
+                            .filter(ingredientNamesInFridge::contains)
                             .count();
 
                     return (long) ((double) recipeIngredientInFridgeCnt / recipeIngredientCnt * 100);

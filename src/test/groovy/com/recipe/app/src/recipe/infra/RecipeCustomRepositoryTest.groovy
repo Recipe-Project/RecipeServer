@@ -1,9 +1,5 @@
 package com.recipe.app.src.recipe.infra
 
-import com.recipe.app.src.ingredient.domain.Ingredient
-import com.recipe.app.src.ingredient.domain.IngredientCategory
-import com.recipe.app.src.ingredient.infra.IngredientCategoryRepository
-import com.recipe.app.src.ingredient.infra.IngredientRepository
 import com.recipe.app.src.recipe.domain.Recipe
 import com.recipe.app.src.recipe.domain.RecipeIngredient
 import com.recipe.app.src.recipe.domain.RecipeLevel
@@ -27,10 +23,6 @@ class RecipeCustomRepositoryTest extends Specification {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    IngredientCategoryRepository ingredientCategoryRepository;
-    @Autowired
-    IngredientRepository ingredientRepository;
-    @Autowired
     RecipeIngredientRepository recipeIngredientRepository;
     @Autowired
     RecipeRepository recipeRepository;
@@ -40,7 +32,6 @@ class RecipeCustomRepositoryTest extends Specification {
     RecipeViewRepository recipeViewRepository;
 
     private List<User> users;
-    private List<Ingredient> ingredients;
 
     void setup() {
         users = [
@@ -54,30 +45,6 @@ class RecipeCustomRepositoryTest extends Specification {
                         .build(),
         ]
         userRepository.saveAll(users);
-
-        IngredientCategory ingredientCategory = IngredientCategory.builder()
-                .ingredientCategoryName("카테고리")
-                .build();
-        ingredientCategoryRepository.save(ingredientCategory);
-
-        ingredients = [
-                Ingredient.builder()
-                        .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
-                        .ingredientName("테스트")
-                        .userId(users.get(0).userId)
-                        .build(),
-                Ingredient.builder()
-                        .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
-                        .ingredientName("재료1")
-                        .userId(users.get(0).userId)
-                        .build(),
-                Ingredient.builder()
-                        .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
-                        .ingredientName("재료2")
-                        .userId(users.get(0).userId)
-                        .build(),
-        ]
-        ingredientRepository.saveAll(ingredients);
     }
 
     def "검색어로 레시피 갯수 조회"() {
@@ -110,16 +77,16 @@ class RecipeCustomRepositoryTest extends Specification {
 
         List<RecipeIngredient> recipeIngredients = [
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(0).recipeId)
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(1).recipeId)
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(2).recipeId)
+                        .ingredientName("테스트")
                         .build(),
         ]
         recipeIngredientRepository.saveAll(recipeIngredients);
@@ -161,16 +128,16 @@ class RecipeCustomRepositoryTest extends Specification {
 
         List<RecipeIngredient> recipeIngredients = [
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(0).recipeId)
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(1).recipeId)
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(2).recipeId)
+                        .ingredientName("테스트")
                         .build(),
         ]
         recipeIngredientRepository.saveAll(recipeIngredients);
@@ -216,16 +183,16 @@ class RecipeCustomRepositoryTest extends Specification {
 
         List<RecipeIngredient> recipeIngredients = [
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(0).recipeId)
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(1).recipeId)
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(2).recipeId)
+                        .ingredientName("테스트")
                         .build(),
         ]
         recipeIngredientRepository.saveAll(recipeIngredients);
@@ -289,16 +256,16 @@ class RecipeCustomRepositoryTest extends Specification {
 
         List<RecipeIngredient> recipeIngredients = [
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(0).recipeId)
+                .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(1).recipeId)
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(2).recipeId)
+                        .ingredientName("테스트")
                         .build(),
         ]
         recipeIngredientRepository.saveAll(recipeIngredients);
@@ -448,34 +415,22 @@ class RecipeCustomRepositoryTest extends Specification {
 
         List<RecipeIngredient> recipeIngredients = [
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(0).recipeId)
+                        .ingredientName("테스트")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(1).ingredientId)
-                        .recipeId(recipes.get(0).recipeId)
-                        .build(),
-                RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(2).ingredientId)
-                        .recipeId(recipes.get(0).recipeId)
-                        .build(),
-                RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(2).ingredientId)
                         .recipeId(recipes.get(1).recipeId)
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(0).ingredientId)
                         .recipeId(recipes.get(2).recipeId)
-                        .build(),
-                RecipeIngredient.builder()
-                        .ingredientId(ingredients.get(2).ingredientId)
-                        .recipeId(recipes.get(2).recipeId)
+                        .ingredientName("테스트")
                         .build(),
         ]
         recipeIngredientRepository.saveAll(recipeIngredients);
 
         when:
-        List<Recipe> response = recipeRepository.findRecipesInFridge([ingredients.get(1).ingredientId], ["테스트"]);
+        List<Recipe> response = recipeRepository.findRecipesInFridge(["테스트"]);
 
         then:
         response.size() == 2

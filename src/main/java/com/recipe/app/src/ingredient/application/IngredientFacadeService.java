@@ -5,9 +5,6 @@ import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.ingredient.application.dto.IngredientsResponse;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
-import com.recipe.app.src.ingredient.exception.IngredientUsedInFridgeBasketException;
-import com.recipe.app.src.ingredient.exception.IngredientUsedInFridgeException;
-import com.recipe.app.src.ingredient.exception.IngredientUsedInRecipeException;
 import com.recipe.app.src.recipe.application.RecipeIngredientService;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
@@ -49,24 +46,16 @@ public class IngredientFacadeService {
 
         long fridgeBasketCount = fridgeBasketService.countByUserId(user.getUserId());
         List<IngredientCategory> categories = ingredientCategoryService.findAll();
-        List<Ingredient> ingredients = ingredientService.findByUserId(user.getUserId());
+        List<Ingredient> ingredients = ingredientService.findByUserIdOrderByCreatedAtDesc(user.getUserId());
 
         return IngredientsResponse.from(fridgeBasketCount, categories, ingredients);
     }
 
     @Transactional(readOnly = true)
-    public void checkIngredientIsUsed(User user, Long ingredientId) {
+    public void deleteMyIngredient(User user, Long ingredientId) {
 
-        if (fridgeBasketService.hasIngredient(ingredientId)) {
-            throw new IngredientUsedInFridgeBasketException();
-        }
-
-        if (fridgeService.hasIngredient(ingredientId)) {
-            throw new IngredientUsedInFridgeException();
-        }
-
-        if (recipeIngredientService.hasIngredient(ingredientId)) {
-            throw new IngredientUsedInRecipeException();
-        }
+        fridgeService.deleteByUserIdAndIngredientId(user.getUserId(), ingredientId);
+        fridgeBasketService.deleteByUserIdAndIngredientId(user.getUserId(), ingredientId);
+        ingredientService.deleteIngredient(user, ingredientId);
     }
 }

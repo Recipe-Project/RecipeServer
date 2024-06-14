@@ -22,6 +22,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Service
 public class FridgeService {
@@ -134,19 +135,19 @@ public class FridgeService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isInFridge(Long userId, Ingredient ingredient) {
+    public boolean isInFridge(Long userId, String ingredientName) {
 
         List<Fridge> fridges = fridgeRepository.findByUserId(userId);
         List<Long> ingredientIds = fridges.stream()
                 .map(Fridge::getIngredientId)
                 .collect(Collectors.toList());
         List<Ingredient> ingredients = ingredientService.findByIngredientIds(ingredientIds);
-        List<String> ingredientNames = ingredients.stream()
-                .map(Ingredient::getIngredientName)
+        List<String> ingredientNamesInFridge = ingredients.stream()
+                .flatMap(ingredient -> Stream.of(ingredient.getIngredientName(), ingredient.getSimilarIngredientName()))
+                .map(Object::toString)
                 .collect(Collectors.toList());
 
-        return ingredientNames.contains(ingredient.getIngredientName())
-                || ingredient.existInIngredients(ingredients);
+        return ingredientNamesInFridge.contains(ingredientName);
     }
 
     @Transactional(readOnly = true)
@@ -159,10 +160,11 @@ public class FridgeService {
         return ingredientService.findByIngredientIds(ingredientIds);
     }
 
-    @Transactional(readOnly = true)
-    public boolean hasIngredient(Long ingredientId) {
+    @Transactional
+    public void deleteByUserIdAndIngredientId(Long userId, Long ingredientId) {
 
-        return fridgeRepository.existsByIngredientId(ingredientId);
+        fridgeRepository.findByUserIdAndIngredientId(userId, ingredientId)
+                .ifPresent(fridgeRepository::delete);
     }
 
      /*

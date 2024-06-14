@@ -1,5 +1,6 @@
 package com.recipe.app.src.ingredient.application;
 
+import com.recipe.app.src.ingredient.application.dto.IngredientCreateResponse;
 import com.recipe.app.src.ingredient.application.dto.IngredientRequest;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
@@ -54,7 +55,7 @@ public class IngredientService {
     }
 
     @Transactional
-    public void createIngredient(Long userId, IngredientRequest request) {
+    public IngredientCreateResponse createIngredient(Long userId, IngredientRequest request) {
 
         IngredientCategory ingredientCategory = ingredientCategoryService.findById(request.getIngredientCategoryId());
         Ingredient ingredient = ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(
@@ -70,6 +71,8 @@ public class IngredientService {
                         .build());
 
         ingredientRepository.save(ingredient);
+
+        return new IngredientCreateResponse(ingredient.getIngredientId());
     }
 
     @Transactional
@@ -107,8 +110,8 @@ public class IngredientService {
     }
 
     @Transactional(readOnly = true)
-    public List<Ingredient> findByUserId(Long userId) {
+    public List<Ingredient> findByUserIdOrderByCreatedAtDesc(Long userId) {
 
-        return ingredientRepository.findByUserId(userId);
+        return ingredientRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 }

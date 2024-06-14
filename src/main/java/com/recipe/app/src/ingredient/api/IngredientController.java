@@ -2,6 +2,7 @@ package com.recipe.app.src.ingredient.api;
 
 import com.recipe.app.src.ingredient.application.IngredientFacadeService;
 import com.recipe.app.src.ingredient.application.IngredientService;
+import com.recipe.app.src.ingredient.application.dto.IngredientCreateResponse;
 import com.recipe.app.src.ingredient.application.dto.IngredientRequest;
 import com.recipe.app.src.ingredient.application.dto.IngredientsResponse;
 import com.recipe.app.src.user.domain.SecurityUser;
@@ -63,8 +64,8 @@ public class IngredientController {
 
     @ApiOperation(value = "나만의 재료 등록 API")
     @PostMapping("")
-    public void postIngredient(@ApiIgnore final Authentication authentication,
-                               @ApiParam(value = "재료 추가 정보", required = true)
+    public IngredientCreateResponse postIngredient(@ApiIgnore final Authentication authentication,
+                                                   @ApiParam(value = "재료 추가 정보", required = true)
                                @RequestBody IngredientRequest request) {
 
         if (authentication == null)
@@ -72,7 +73,7 @@ public class IngredientController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        ingredientService.createIngredient(user.getUserId(), request);
+        return ingredientService.createIngredient(user.getUserId(), request);
     }
 
     @ApiOperation(value = "나만의 재료 삭제 API")
@@ -84,7 +85,6 @@ public class IngredientController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        ingredientFacadeService.checkIngredientIsUsed(user, ingredientId);
-        ingredientService.deleteIngredient(user, ingredientId);
+        ingredientFacadeService.deleteMyIngredient(user, ingredientId);
     }
 }
