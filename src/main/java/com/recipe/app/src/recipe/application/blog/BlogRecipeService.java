@@ -54,7 +54,7 @@ public class BlogRecipeService {
     @Value("${naver.client-secret}")
     private String naverClientSecret;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) throws IOException, ParseException {
 
         badWordService.checkBadWords(keyword);

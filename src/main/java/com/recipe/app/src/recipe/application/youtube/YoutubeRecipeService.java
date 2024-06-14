@@ -59,7 +59,7 @@ public class YoutubeRecipeService {
     @Value("${google.api-key}")
     private String youtubeApiKey;
 
-    @Transactional(readOnly = true)
+    @Transactional
     public RecipesResponse getYoutubeRecipes(User user, String keyword, Long lastYoutubeRecipeId, int size, String sort) throws IOException {
 
         badWordService.checkBadWords(keyword);
