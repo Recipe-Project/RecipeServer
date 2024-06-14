@@ -159,10 +159,11 @@ public class FridgeService {
         return ingredientService.findByIngredientIds(ingredientIds);
     }
 
-    @Transactional(readOnly = true)
-    public boolean hasIngredient(Long ingredientId) {
+    @Transactional
+    public void deleteByUserIdAndIngredientId(Long userId, Long ingredientId) {
 
-        return fridgeRepository.existsByIngredientId(ingredientId);
+        fridgeRepository.findByUserIdAndIngredientId(userId, ingredientId)
+                .ifPresent(fridgeRepository::delete);
     }
 
      /*
