@@ -107,8 +107,8 @@ public class IngredientService {
     }
 
     @Transactional(readOnly = true)
-    public List<Ingredient> findByUserId(Long userId) {
+    public List<Ingredient> findByUserIdOrderByCreatedAtDesc(Long userId) {
 
-        return ingredientRepository.findByUserId(userId);
+        return ingredientRepository.findByUserIdOrderByCreatedAtDesc(userId);
     }
 }
