@@ -1,13 +1,11 @@
 package com.recipe.app.src.recipe.application.blog;
 
-import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogView;
 import com.recipe.app.src.recipe.infra.blog.BlogViewRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -36,12 +34,6 @@ public class BlogViewService {
 
         List<BlogView> blogViews = blogViewRepository.findByUserId(user.getUserId());
         blogViewRepository.deleteAll(blogViews);
-    }
-
-    @Transactional(readOnly = true)
-    public List<BlogView> findByBlogRecipeIds(Collection<Long> blogRecipeIds) {
-
-        return blogViewRepository.findByBlogRecipeIdIn(blogRecipeIds);
     }
 
     @Transactional(readOnly = true)
