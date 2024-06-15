@@ -11,7 +11,6 @@ import java.util.List;
 import static com.recipe.app.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeRecipe.youtubeRecipe;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeScrap.youtubeScrap;
-import static com.recipe.app.src.recipe.domain.youtube.QYoutubeView.youtubeView;
 
 public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements YoutubeRecipeCustomRepository {
 
@@ -55,17 +54,15 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
-                .leftJoin(youtubeScrap).on(youtubeScrap.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId))
                 .where(
                         youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword))
+                                .or(youtubeRecipe.description.contains(keyword)),
+                        ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeScrapCnt) -> youtubeRecipe.scrapCnt.lt(youtubeScrapCnt)
+                                        .or(youtubeRecipe.scrapCnt.eq(youtubeScrapCnt)
+                                                .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
+                                lastYoutubeRecipeId, lastYoutubeScrapCnt)
                 )
-                .groupBy(youtubeRecipe.youtubeRecipeId)
-                .having(ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeScrapCnt) -> youtubeScrap.count().lt(youtubeScrapCnt)
-                                .or(youtubeScrap.count().eq(youtubeScrapCnt)
-                                        .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
-                        lastYoutubeRecipeId, lastYoutubeScrapCnt))
-                .orderBy(youtubeScrap.count().desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .orderBy(youtubeRecipe.scrapCnt.desc(), youtubeRecipe.youtubeRecipeId.desc())
                 .limit(size)
                 .fetch();
     }
@@ -75,17 +72,15 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
-                .leftJoin(youtubeView).on(youtubeView.youtubeRecipeId.eq(youtubeRecipe.youtubeRecipeId))
                 .where(
                         youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword))
+                                .or(youtubeRecipe.description.contains(keyword)),
+                        ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeViewCnt) -> youtubeRecipe.viewCnt.lt(youtubeViewCnt)
+                                        .or(youtubeRecipe.viewCnt.eq(youtubeViewCnt)
+                                                .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
+                                lastYoutubeRecipeId, lastYoutubeViewCnt)
                 )
-                .groupBy(youtubeRecipe.youtubeRecipeId)
-                .having(ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeViewCnt) -> youtubeView.count().lt(youtubeViewCnt)
-                                .or(youtubeView.count().eq(youtubeViewCnt)
-                                        .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
-                        lastYoutubeRecipeId, lastYoutubeViewCnt))
-                .orderBy(youtubeView.count().desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .orderBy(youtubeRecipe.viewCnt.desc(), youtubeRecipe.youtubeRecipeId.desc())
                 .limit(size)
                 .fetch();
     }

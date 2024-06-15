@@ -42,10 +42,10 @@ public class YoutubeRecipe extends BaseEntity {
     private String youtubeId;
 
     @Column(name = "scrapCnt", nullable = false)
-    private int scrapCnt;
+    private long scrapCnt;
 
     @Column(name = "viewCnt", nullable = false)
-    private int viewCnt;
+    private long viewCnt;
 
     @Builder
     public YoutubeRecipe(Long youtubeRecipeId, String title, String description, String thumbnailImgUrl, LocalDate postDate, String channelName, String youtubeId) {

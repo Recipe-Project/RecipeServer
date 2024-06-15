@@ -38,12 +38,6 @@ public class YoutubeViewService {
     }
 
     @Transactional(readOnly = true)
-    public List<YoutubeView> findByYoutubeRecipeIds(Collection<Long> youtubeRecipeIds) {
-
-        return youtubeViewRepository.findByYoutubeRecipeIdIn(youtubeRecipeIds);
-    }
-
-    @Transactional(readOnly = true)
     public long countByYoutubeRecipeId(Long youtubeRecipeId) {
 
         return youtubeViewRepository.countByYoutubeRecipeId(youtubeRecipeId);
