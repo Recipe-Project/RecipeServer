@@ -110,10 +110,7 @@ public class BlogRecipeService {
         List<BlogScrap> blogScraps = blogScrapService.findByBlogRecipeIds(blogRecipeIds);
 
         return new RecipesResponse(totalCnt, blogRecipes.stream()
-                .map(blogRecipe -> {
-
-                    return RecipeResponse.from(blogRecipe, isUserScrap(blogScraps, blogRecipe.getBlogRecipeId(), user));
-                })
+                .map(blogRecipe -> RecipeResponse.from(blogRecipe, isUserScrap(blogScraps, blogRecipe.getBlogRecipeId(), user)))
                 .collect(Collectors.toList()));
     }
 

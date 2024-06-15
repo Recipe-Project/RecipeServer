@@ -11,7 +11,6 @@ import java.util.List;
 import static com.recipe.app.common.utils.QueryUtils.*;
 import static com.recipe.app.src.recipe.domain.blog.QBlogRecipe.blogRecipe;
 import static com.recipe.app.src.recipe.domain.blog.QBlogScrap.blogScrap;
-import static com.recipe.app.src.recipe.domain.blog.QBlogView.blogView;
 
 public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements BlogRecipeCustomRepository {
 
