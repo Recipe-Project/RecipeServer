@@ -28,8 +28,6 @@ class RecipeCustomRepositoryTest extends Specification {
     RecipeRepository recipeRepository;
     @Autowired
     RecipeScrapRepository recipeScrapRepository;
-    @Autowired
-    RecipeViewRepository recipeViewRepository;
 
     private List<User> users;
 
@@ -163,6 +161,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
                         .isHidden(false)
+                        .scrapCnt(2L)
                         .build(),
                 Recipe.builder()
                         .recipeNm("제목")
@@ -170,6 +169,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
                         .isHidden(false)
+                        .scrapCnt(0L)
                         .build(),
                 Recipe.builder()
                         .recipeNm("제목")
@@ -177,6 +177,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
                         .isHidden(false)
+                        .scrapCnt(2L)
                         .build(),
         ]
         recipeRepository.saveAll(recipes);
@@ -196,26 +197,6 @@ class RecipeCustomRepositoryTest extends Specification {
                         .build(),
         ]
         recipeIngredientRepository.saveAll(recipeIngredients);
-
-        List<RecipeScrap> recipeScraps = [
-                RecipeScrap.builder()
-                        .userId(users.get(0).userId)
-                        .recipeId(recipes.get(0).recipeId)
-                        .build(),
-                RecipeScrap.builder()
-                        .userId(users.get(1).userId)
-                        .recipeId(recipes.get(0).recipeId)
-                        .build(),
-                RecipeScrap.builder()
-                        .userId(users.get(0).userId)
-                        .recipeId(recipes.get(2).recipeId)
-                        .build(),
-                RecipeScrap.builder()
-                        .userId(users.get(1).userId)
-                        .recipeId(recipes.get(2).recipeId)
-                        .build(),
-        ]
-        recipeScrapRepository.saveAll(recipeScraps);
 
         when:
         List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc("테스트", recipes.get(2).recipeId, 2, 3);
@@ -236,6 +217,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
                         .isHidden(false)
+                        .viewCnt(2L)
                         .build(),
                 Recipe.builder()
                         .recipeNm("제목")
@@ -243,6 +225,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
                         .isHidden(false)
+                        .viewCnt(0L)
                         .build(),
                 Recipe.builder()
                         .recipeNm("제목")
@@ -250,6 +233,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
                         .isHidden(false)
+                        .viewCnt(2L)
                         .build(),
         ]
         recipeRepository.saveAll(recipes);
@@ -257,7 +241,7 @@ class RecipeCustomRepositoryTest extends Specification {
         List<RecipeIngredient> recipeIngredients = [
                 RecipeIngredient.builder()
                         .recipeId(recipes.get(0).recipeId)
-                .ingredientName("재료")
+                        .ingredientName("재료")
                         .build(),
                 RecipeIngredient.builder()
                         .recipeId(recipes.get(1).recipeId)
@@ -269,26 +253,6 @@ class RecipeCustomRepositoryTest extends Specification {
                         .build(),
         ]
         recipeIngredientRepository.saveAll(recipeIngredients);
-
-        List<RecipeView> recipeViews = [
-                RecipeView.builder()
-                        .userId(users.get(0).userId)
-                        .recipeId(recipes.get(0).recipeId)
-                        .build(),
-                RecipeView.builder()
-                        .userId(users.get(1).userId)
-                        .recipeId(recipes.get(0).recipeId)
-                        .build(),
-                RecipeView.builder()
-                        .userId(users.get(0).userId)
-                        .recipeId(recipes.get(2).recipeId)
-                        .build(),
-                RecipeView.builder()
-                        .userId(users.get(0).userId)
-                        .recipeId(recipes.get(2).recipeId)
-                        .build(),
-        ]
-        recipeViewRepository.saveAll(recipeViews);
 
         when:
         List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc("테스트", recipes.get(2).recipeId, 2, 3);

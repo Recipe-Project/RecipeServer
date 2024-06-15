@@ -6,7 +6,6 @@ import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -40,12 +39,6 @@ public class RecipeViewService {
     public List<RecipeView> findByRecipeId(Long recipeId) {
 
         return recipeViewRepository.findByRecipeId(recipeId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<RecipeView> findByRecipeIds(Collection<Long> recipeIds) {
-
-        return recipeViewRepository.findByRecipeIdIn(recipeIds);
     }
 
     @Transactional(readOnly = true)

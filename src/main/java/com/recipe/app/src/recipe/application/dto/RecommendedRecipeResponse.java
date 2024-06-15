@@ -52,7 +52,7 @@ public class RecommendedRecipeResponse {
         this.ingredientsMatchRate = ingredientsMatchRate;
     }
 
-    public static RecommendedRecipeResponse from(Recipe recipe, User recipePostUser, int ingredientsMatchRate, boolean isScrapByUser, long scrapCnt, long viewCnt) {
+    public static RecommendedRecipeResponse from(Recipe recipe, User recipePostUser, int ingredientsMatchRate, boolean isScrapByUser) {
 
         return RecommendedRecipeResponse.builder()
                 .recipeId(recipe.getRecipeId())
@@ -62,8 +62,8 @@ public class RecommendedRecipeResponse {
                 .postUserName(recipePostUser != null ? recipePostUser.getNickname() : null)
                 .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .isUserScrap(isScrapByUser)
-                .scrapCnt(scrapCnt)
-                .viewCnt(viewCnt)
+                .scrapCnt(recipe.getScrapCnt())
+                .viewCnt(recipe.getViewCnt())
                 .ingredientsMatchRate(ingredientsMatchRate)
                 .build();
     }

@@ -6,7 +6,6 @@ import com.recipe.app.src.recipe.application.dto.RecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
-import com.recipe.app.src.recipe.domain.blog.BlogView;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
 import com.recipe.app.src.user.domain.User;
@@ -18,7 +17,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +29,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -54,19 +53,17 @@ public class BlogRecipeService {
     @Value("${naver.client-secret}")
     private String naverClientSecret;
 
-    @Transactional(readOnly = true)
-    public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) throws IOException, ParseException {
+    @Transactional
+    public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) {
 
         badWordService.checkBadWords(keyword);
 
         long totalCnt = blogRecipeRepository.countByKeyword(keyword);
+        List<BlogRecipe> blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);
 
         if (totalCnt < 10) {
-            searchNaverBlogRecipes(keyword);
-            totalCnt = blogRecipeRepository.countByKeyword(keyword);
+            searchNaverBlogRecipes(keyword).join();
         }
-
-        List<BlogRecipe> blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);
 
         return getRecipes(user, totalCnt, blogRecipes);
     }
@@ -110,16 +107,9 @@ public class BlogRecipeService {
                 .map(BlogRecipe::getBlogRecipeId)
                 .collect(Collectors.toList());
         List<BlogScrap> blogScraps = blogScrapService.findByBlogRecipeIds(blogRecipeIds);
-        List<BlogView> blogViews = blogViewService.findByBlogRecipeIds(blogRecipeIds);
 
         return new RecipesResponse(totalCnt, blogRecipes.stream()
-                .map(blogRecipe -> {
-                    long scrapCnt = getBlogScrapCnt(blogScraps, blogRecipe.getBlogRecipeId(), user);
-                    long viewCnt = getBlogViewCnt(blogViews, blogRecipe.getBlogRecipeId(), user);
-                    boolean isUserScrap = isUserScrap(blogScraps, blogRecipe.getBlogRecipeId(), user);
-
-                    return RecipeResponse.from(blogRecipe, isUserScrap, scrapCnt, viewCnt);
-                })
+                .map(blogRecipe -> RecipeResponse.from(blogRecipe, isUserScrap(blogScraps, blogRecipe.getBlogRecipeId(), user)))
                 .collect(Collectors.toList()));
     }
 
@@ -128,60 +118,52 @@ public class BlogRecipeService {
                 .anyMatch(blogScrap -> blogScrap.getBlogRecipeId().equals(blogRecipeId) && blogScrap.getUserId().equals(user.getUserId()));
     }
 
-    private long getBlogViewCnt(List<BlogView> blogViews, Long blogRecipeId, User user) {
-        return blogViews.stream()
-                .filter(blogView -> blogView.getBlogViewId().equals(blogRecipeId) && blogView.getUserId().equals(user.getUserId()))
-                .count();
-    }
+    private CompletableFuture<Void> searchNaverBlogRecipes(String keyword) {
 
-    private long getBlogScrapCnt(List<BlogScrap> blogScraps, Long blogRecipeId, User user) {
-        return blogScraps.stream()
-                .filter(blogScrap -> blogScrap.getBlogRecipeId().equals(blogRecipeId) && blogScrap.getUserId().equals(user.getUserId()))
-                .count();
-    }
+        return CompletableFuture.runAsync(() -> {
+            try {
+                String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&start=1&display=50&query=" + URLEncoder.encode(keyword + " 레시피", "UTF-8");
 
-    @Transactional
-    public void searchNaverBlogRecipes(String keyword) throws IOException, ParseException {
+                Map<String, String> requestHeaders = new HashMap<>();
+                requestHeaders.put("X-Naver-Client-Id", naverClientId);
+                requestHeaders.put("X-Naver-Client-Secret", naverClientSecret);
 
-        String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&start=1&display=100&query=" + URLEncoder.encode(keyword + " 레시피", "UTF-8");
+                JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
+                JSONArray items = (JSONArray) response.get("items");
 
-        Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("X-Naver-Client-Id", naverClientId);
-        requestHeaders.put("X-Naver-Client-Secret", naverClientSecret);
+                List<BlogRecipe> blogs = new ArrayList<>();
+                for (Object item : items) {
+                    String title = ((JSONObject) item).get("title").toString()
+                            .replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
+                    String blogUrl = ((JSONObject) item).get("link").toString();
+                    String description = ((JSONObject) item).get("description").toString()
+                            .replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
+                    String blogName = ((JSONObject) item).get("bloggername").toString();
+                    LocalDate publishedAt = LocalDate.parse(((JSONObject) item).get("postdate").toString(), DateTimeFormatter.ofPattern("yyyyMMdd"));
+                    String thumbnail = getBlogThumbnailUrl(blogUrl);
 
-        JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
-        JSONArray items = (JSONArray) response.get("items");
-        int total = Integer.parseInt(response.get("total").toString());
+                    blogs.add(BlogRecipe.builder()
+                            .blogUrl(blogUrl)
+                            .blogThumbnailImgUrl(thumbnail)
+                            .title(title)
+                            .description(description)
+                            .publishedAt(publishedAt)
+                            .blogName(blogName)
+                            .build());
+                }
 
-        List<BlogRecipe> blogs = new ArrayList<>();
-        for (Object item : items) {
-            String title = ((JSONObject) item).get("title").toString()
-                    .replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
-            String blogUrl = ((JSONObject) item).get("link").toString();
-            String description = ((JSONObject) item).get("description").toString()
-                    .replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
-            String blogName = ((JSONObject) item).get("bloggername").toString();
-            LocalDate publishedAt = LocalDate.parse(((JSONObject) item).get("postdate").toString(), DateTimeFormatter.ofPattern("yyyyMMdd"));
-            String thumbnail = getBlogThumbnailUrl(blogUrl);
+                List<String> blogUrls = blogs.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
+                List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
+                Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity()));
+                List<BlogRecipe> blogRecipes = blogs.stream()
+                        .map(blog -> existBlogRecipeMapByBlogUrl.getOrDefault(blog.getBlogUrl(), blog))
+                        .collect(Collectors.toList());
 
-            blogs.add(BlogRecipe.builder()
-                    .blogUrl(blogUrl)
-                    .blogThumbnailImgUrl(thumbnail)
-                    .title(title)
-                    .description(description)
-                    .publishedAt(publishedAt)
-                    .blogName(blogName)
-                    .build());
-        }
-
-        List<String> blogUrls = blogs.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
-        List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
-        Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity()));
-        List<BlogRecipe> blogRecipes = blogs.stream()
-                .map(blog -> existBlogRecipeMapByBlogUrl.getOrDefault(blog.getBlogUrl(), blog))
-                .collect(Collectors.toList());
-
-        blogRecipeRepository.saveAll(blogRecipes);
+                blogRecipeRepository.saveAll(blogRecipes);
+            } catch (IOException | ParseException e) {
+                throw new RuntimeException(e);
+            }
+        });
     }
 
     private String getBlogThumbnailUrl(String blogUrl) {

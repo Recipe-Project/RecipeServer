@@ -3,7 +3,6 @@ package com.recipe.app.src.recipe.application;
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.fridge.application.FridgeService;
-import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeIngredientResponse;
@@ -46,11 +45,10 @@ public class RecipeService {
     private final FridgeService fridgeService;
     private final UserService userService;
     private final BadWordService badWordService;
-    private final IngredientService ingredientService;
 
     public RecipeService(RecipeRepository recipeRepository, RecipeIngredientService recipeIngredientService, RecipeProcessService recipeProcessService,
                          RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, FridgeService fridgeService,
-                         UserService userService, BadWordService badWordService, IngredientService ingredientService) {
+                         UserService userService, BadWordService badWordService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientService = recipeIngredientService;
         this.recipeProcessService = recipeProcessService;
@@ -59,7 +57,6 @@ public class RecipeService {
         this.fridgeService = fridgeService;
         this.userService = userService;
         this.badWordService = badWordService;
-        this.ingredientService = ingredientService;
     }
 
     @Transactional(readOnly = true)
@@ -222,16 +219,11 @@ public class RecipeService {
         Map<Long, Long> matchRateMapByRecipeId = getMatchRateMapByRecipeId(recipeIds, ingredientIdsInFridge, ingredientNamesInFridge);
 
         List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipeIds);
-        List<RecipeView> recipeViews = recipeViewService.findByRecipeIds(recipeIds);
 
         return new RecommendedRecipesResponse(recipes.size(), recipes.stream()
-                .map((recipe) -> {
-                    long scrapCnt = getRecipeScrapCnt(recipeScraps, recipe.getRecipeId(), user);
-                    long viewCnt = getRecipeViewCnt(recipeViews, recipe.getRecipeId(), user);
-                    boolean isUserScrap = isUserScrap(recipeScraps, recipe.getRecipeId(), user);
-
-                    return RecommendedRecipeResponse.from(recipe, user, matchRateMapByRecipeId.get(recipe.getRecipeId()).intValue(), isUserScrap, scrapCnt, viewCnt);
-                })
+                .map((recipe) -> RecommendedRecipeResponse.from(recipe, user,
+                        matchRateMapByRecipeId.get(recipe.getRecipeId()).intValue(),
+                        isUserScrap(recipeScraps, recipe.getRecipeId(), user)))
                 .sorted(Comparator.comparing(RecommendedRecipeResponse::getIngredientsMatchRate).thenComparing(RecommendedRecipeResponse::getRecipeId).reversed())
                 .filter(recommendedRecipe -> lastRecipeId == null || lastRecipeId <= 0 || recommendedRecipe.getRecipeId() < lastRecipeId)
                 .limit(size)
@@ -288,34 +280,17 @@ public class RecipeService {
                 .map(Recipe::getRecipeId)
                 .collect(Collectors.toList());
         List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipeIds);
-        List<RecipeView> recipeViews = recipeViewService.findByRecipeIds(recipeIds);
 
         return new RecipesResponse(totalCnt, recipes.stream()
-                .map((recipe) -> {
-                    long scrapCnt = getRecipeScrapCnt(recipeScraps, recipe.getRecipeId(), user);
-                    long viewCnt = getRecipeViewCnt(recipeViews, recipe.getRecipeId(), user);
-                    boolean isUserScrap = isUserScrap(recipeScraps, recipe.getRecipeId(), user);
-
-                    return RecipeResponse.from(recipe, recipePostUserMapByUserId.get(recipe.getUserId()), isUserScrap, scrapCnt, viewCnt);
-                })
+                .map((recipe) -> RecipeResponse.from(recipe,
+                        recipePostUserMapByUserId.get(recipe.getUserId()),
+                        isUserScrap(recipeScraps, recipe.getRecipeId(), user)))
                 .collect(Collectors.toList()));
     }
 
     private boolean isUserScrap(List<RecipeScrap> recipeScraps, Long recipeId, User user) {
         return recipeScraps.stream()
                 .anyMatch(recipeScrap -> recipeScrap.getRecipeId().equals(recipeId) && recipeScrap.getUserId().equals(user.getUserId()));
-    }
-
-    private long getRecipeViewCnt(List<RecipeView> recipeViews, Long recipeId, User user) {
-        return recipeViews.stream()
-                .filter(recipeView -> recipeView.getRecipeId().equals(recipeId) && recipeView.getUserId().equals(user.getUserId()))
-                .count();
-    }
-
-    private long getRecipeScrapCnt(List<RecipeScrap> recipeScraps, Long recipeId, User user) {
-        return recipeScraps.stream()
-                .filter(recipeScrap -> recipeScrap.getRecipeId().equals(recipeId) && recipeScrap.getUserId().equals(user.getUserId()))
-                .count();
     }
 
     @Transactional

@@ -51,7 +51,7 @@ public class RecipeResponse {
         this.viewCnt = viewCnt;
     }
 
-    public static RecipeResponse from(Recipe recipe, User recipePostUser, boolean isScrapByUser, long scrapCnt, long viewCnt) {
+    public static RecipeResponse from(Recipe recipe, User recipePostUser, boolean isScrapByUser) {
 
         return RecipeResponse.builder()
                 .recipeId(recipe.getRecipeId())
@@ -61,12 +61,12 @@ public class RecipeResponse {
                 .postUserName(recipePostUser != null ? recipePostUser.getNickname() : null)
                 .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .isUserScrap(isScrapByUser)
-                .scrapCnt(scrapCnt)
-                .viewCnt(viewCnt)
+                .scrapCnt(recipe.getScrapCnt())
+                .viewCnt(recipe.getViewCnt())
                 .build();
     }
 
-    public static RecipeResponse from(BlogRecipe recipe, boolean isScrapByUser, long scrapCnt, long viewCnt) {
+    public static RecipeResponse from(BlogRecipe recipe, boolean isScrapByUser) {
         return RecipeResponse.builder()
                 .recipeId(recipe.getBlogRecipeId())
                 .recipeName(recipe.getTitle())
@@ -76,12 +76,12 @@ public class RecipeResponse {
                 .postDate(recipe.getPublishedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .linkUrl(recipe.getBlogUrl())
                 .isUserScrap(isScrapByUser)
-                .scrapCnt(scrapCnt)
-                .viewCnt(viewCnt)
+                .scrapCnt(recipe.getScrapCnt())
+                .viewCnt(recipe.getViewCnt())
                 .build();
     }
 
-    public static RecipeResponse from(YoutubeRecipe recipe, boolean isScrapByUser, long scrapCnt, long viewCnt) {
+    public static RecipeResponse from(YoutubeRecipe recipe, boolean isScrapByUser) {
         return RecipeResponse.builder()
                 .recipeId(recipe.getYoutubeRecipeId())
                 .recipeName(recipe.getTitle())
@@ -91,8 +91,8 @@ public class RecipeResponse {
                 .postDate(recipe.getPostDate().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .linkUrl("https://www.youtube.com/watch?v=" + recipe.getYoutubeId())
                 .isUserScrap(isScrapByUser)
-                .scrapCnt(scrapCnt)
-                .viewCnt(viewCnt)
+                .scrapCnt(recipe.getScrapCnt())
+                .viewCnt(recipe.getViewCnt())
                 .build();
     }
 }

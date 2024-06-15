@@ -25,8 +25,6 @@ class BlogRecipeCustomRepositoryTest extends Specification {
     @Autowired
     BlogScrapRepository blogScrapRepository;
     @Autowired
-    BlogViewRepository blogViewRepository;
-    @Autowired
     BlogRecipeRepository blogRecipeRepository;
 
     def "검색어로 블로그 레시피 갯수 조회"() {
@@ -143,6 +141,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
                         .blogName("테스트")
+                        .scrapCnt(0L)
                         .build(),
                 BlogRecipe.builder()
                         .title("제목2")
@@ -151,6 +150,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
                         .blogName("테스트")
+                        .scrapCnt(2L)
                         .build(),
                 BlogRecipe.builder()
                         .title("제목3")
@@ -159,6 +159,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
                         .blogName("테스트")
+                        .scrapCnt(1L)
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
@@ -167,37 +168,10 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
                         .blogName("테스트")
+                        .scrapCnt(3L)
                         .build()
         ]
         blogRecipeRepository.saveAll(blogRecipes);
-
-        List<BlogScrap> blogScraps = [
-                BlogScrap.builder()
-                        .userId(users.get(0).userId)
-                        .blogRecipeId(blogRecipes.get(3).blogRecipeId)
-                        .build(),
-                BlogScrap.builder()
-                        .userId(users.get(1).userId)
-                        .blogRecipeId(blogRecipes.get(3).blogRecipeId)
-                        .build(),
-                BlogScrap.builder()
-                        .userId(users.get(2).userId)
-                        .blogRecipeId(blogRecipes.get(3).blogRecipeId)
-                        .build(),
-                BlogScrap.builder()
-                        .userId(users.get(0).userId)
-                        .blogRecipeId(blogRecipes.get(2).blogRecipeId)
-                        .build(),
-                BlogScrap.builder()
-                        .userId(users.get(0).userId)
-                        .blogRecipeId(blogRecipes.get(1).blogRecipeId)
-                        .build(),
-                BlogScrap.builder()
-                        .userId(users.get(1).userId)
-                        .blogRecipeId(blogRecipes.get(1).blogRecipeId)
-                        .build()
-        ]
-        blogScrapRepository.saveAll(blogScraps);
 
         when:
         List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc("테스트", blogRecipes.get(3).blogRecipeId, 3, 3);
@@ -231,6 +205,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
                         .blogName("테스트")
+                        .viewCnt(2L)
                         .build(),
                 BlogRecipe.builder()
                         .title("제목2")
@@ -239,6 +214,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
                         .blogName("테스트")
+                        .viewCnt(0L)
                         .build(),
                 BlogRecipe.builder()
                         .title("제목3")
@@ -247,6 +223,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
                         .blogName("테스트")
+                        .viewCnt(0L)
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
@@ -255,29 +232,10 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
                         .blogName("테스트")
+                        .viewCnt(2L)
                         .build()
         ]
         blogRecipeRepository.saveAll(blogRecipes);
-
-        List<BlogView> blogViews = [
-                BlogView.builder()
-                        .userId(users.get(0).userId)
-                        .blogRecipeId(blogRecipes.get(3).blogRecipeId)
-                        .build(),
-                BlogView.builder()
-                        .userId(users.get(1).userId)
-                        .blogRecipeId(blogRecipes.get(3).blogRecipeId)
-                        .build(),
-                BlogView.builder()
-                        .userId(users.get(0).userId)
-                        .blogRecipeId(blogRecipes.get(0).blogRecipeId)
-                        .build(),
-                BlogView.builder()
-                        .userId(users.get(1).userId)
-                        .blogRecipeId(blogRecipes.get(0).blogRecipeId)
-                        .build(),
-        ]
-        blogViewRepository.saveAll(blogViews);
 
         when:
         List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc("테스트", blogRecipes.get(3).blogRecipeId, 2, 3);
@@ -346,7 +304,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
         blogScrapRepository.saveAll(blogScraps);
 
         when:
-        List<BlogRecipe> response = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.userId, 0L, blogScraps.get(0).createdAt.plusHours(1),3)
+        List<BlogRecipe> response = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.userId, 0L, blogScraps.get(0).createdAt.plusHours(1), 3)
 
         then:
         response.size() == 2

@@ -14,14 +14,10 @@ import com.recipe.app.src.recipe.application.dto.RecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
-import com.recipe.app.src.recipe.domain.youtube.YoutubeView;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeRecipeRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +28,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -59,18 +56,17 @@ public class YoutubeRecipeService {
     @Value("${google.api-key}")
     private String youtubeApiKey;
 
-    @Transactional(readOnly = true)
-    public RecipesResponse getYoutubeRecipes(User user, String keyword, Long lastYoutubeRecipeId, int size, String sort) throws IOException {
+    @Transactional
+    public RecipesResponse getYoutubeRecipes(User user, String keyword, Long lastYoutubeRecipeId, int size, String sort) {
 
         badWordService.checkBadWords(keyword);
 
         long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
+        List<YoutubeRecipe> youtubeRecipes = findByKeywordSortBy(keyword, lastYoutubeRecipeId, size, sort);
 
         if (totalCnt < 10) {
-            searchYoutube(keyword);
-            totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
+            searchYoutube(keyword).join();
         }
-        List<YoutubeRecipe> youtubeRecipes = findByKeywordSortBy(keyword, lastYoutubeRecipeId, size, sort);
 
         return getRecipes(user, totalCnt, youtubeRecipes);
     }
@@ -113,16 +109,9 @@ public class YoutubeRecipeService {
                 .map(YoutubeRecipe::getYoutubeRecipeId)
                 .collect(Collectors.toList());
         List<YoutubeScrap> youtubeScraps = youtubeScrapService.findByYoutubeRecipeIds(youtubeRecipeIds);
-        List<YoutubeView> youtubeViews = youtubeViewService.findByYoutubeRecipeIds(youtubeRecipeIds);
 
         return new RecipesResponse(totalCnt, youtubeRecipes.stream()
-                .map((youtubeRecipe) -> {
-                    long scrapCnt = getYoutubeScrapCnt(youtubeScraps, youtubeRecipe.getYoutubeRecipeId(), user);
-                    long viewCnt = getYoutubeViewCnt(youtubeViews, youtubeRecipe.getYoutubeRecipeId(), user);
-                    boolean isUserScrap = isUserScrap(youtubeScraps, youtubeRecipe.getYoutubeRecipeId(), user);
-
-                    return RecipeResponse.from(youtubeRecipe, isUserScrap, scrapCnt, viewCnt);
-                })
+                .map((youtubeRecipe) -> RecipeResponse.from(youtubeRecipe, isUserScrap(youtubeScraps, youtubeRecipe.getYoutubeRecipeId(), user)))
                 .collect(Collectors.toList()));
     }
 
@@ -131,57 +120,52 @@ public class YoutubeRecipeService {
                 .anyMatch(youtubeScrap -> youtubeScrap.getYoutubeRecipeId().equals(youtubeRecipeId) && youtubeScrap.getUserId().equals(user.getUserId()));
     }
 
-    private long getYoutubeViewCnt(List<YoutubeView> youtubeViews, Long youtubeRecipeId, User user) {
-        return youtubeViews.stream()
-                .filter(youtubeView -> youtubeView.getYoutubeRecipeId().equals(youtubeRecipeId) && youtubeView.getUserId().equals(user.getUserId()))
-                .count();
-    }
+    private CompletableFuture<Void> searchYoutube(String keyword) {
 
-    private long getYoutubeScrapCnt(List<YoutubeScrap> youtubeScraps, Long youtubeRecipeId, User user) {
-        return youtubeScraps.stream()
-                .filter(youtubeScrap -> youtubeScrap.getYoutubeRecipeId().equals(youtubeRecipeId) && youtubeScrap.getUserId().equals(user.getUserId()))
-                .count();
-    }
+        return CompletableFuture.runAsync(() -> {
 
-    private void searchYoutube(String keyword) throws IOException {
+            try {
+                YouTube youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
+                    public void initialize(HttpRequest request) throws IOException {
+                    }
+                }).setApplicationName("youtube-cmdline-search-sample").build();
 
-        YouTube youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
-            public void initialize(HttpRequest request) throws IOException {
+                // Define the API request for retrieving search results.
+                YouTube.Search.List search = youtube.search().list("id,snippet");
+
+                search.setKey(youtubeApiKey);
+                search.setQ(keyword + " 레시피");
+                search.setType("video");
+                search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
+                search.setFields(YOUTUBE_SEARCH_FIELDS);
+
+                SearchListResponse searchResponse = search.execute();
+                List<SearchResult> searchResultList = searchResponse.getItems();
+
+                if (searchResultList != null) {
+                    List<YoutubeRecipe> youtubeRecipes = new ArrayList<>();
+                    for (SearchResult rid : searchResultList) {
+                        youtubeRecipes.add(YoutubeRecipe.builder()
+                                .title(rid.getSnippet().getTitle())
+                                .description(rid.getSnippet().getDescription())
+                                .thumbnailImgUrl(rid.getSnippet().getThumbnails().getDefault().getUrl())
+                                .postDate(LocalDate.ofInstant(Instant.ofEpochMilli(rid.getSnippet().getPublishedAt().getValue()), ZoneId.systemDefault()))
+                                .channelName(rid.getSnippet().getChannelTitle())
+                                .youtubeId(rid.getId().getVideoId())
+                                .build());
+                    }
+                    List<String> youtubeIds = youtubeRecipes.stream().map(YoutubeRecipe::getYoutubeId).collect(Collectors.toList());
+                    List<YoutubeRecipe> existYoutubeRecipes = youtubeRecipeRepository.findByYoutubeIdIn(youtubeIds);
+                    Map<String, YoutubeRecipe> existYoutubeRecipesMapByYoutubeId = existYoutubeRecipes.stream().collect(Collectors.toMap(YoutubeRecipe::getYoutubeId, v -> v));
+
+                    youtubeRecipeRepository.saveAll(youtubeRecipes.stream()
+                            .filter(youtubeRecipe -> !existYoutubeRecipesMapByYoutubeId.containsKey(youtubeRecipe.getYoutubeId()))
+                            .collect(Collectors.toList()));
+                }
+            } catch (IOException e) {
+                throw new RuntimeException(e);
             }
-        }).setApplicationName("youtube-cmdline-search-sample").build();
-
-        // Define the API request for retrieving search results.
-        YouTube.Search.List search = youtube.search().list("id,snippet");
-
-        search.setKey(youtubeApiKey);
-        search.setQ(keyword + " 레시피");
-        search.setType("video");
-        search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
-        search.setFields(YOUTUBE_SEARCH_FIELDS);
-
-        SearchListResponse searchResponse = search.execute();
-        List<SearchResult> searchResultList = searchResponse.getItems();
-
-        if (searchResultList != null) {
-            List<YoutubeRecipe> youtubeRecipes = new ArrayList<>();
-            for (SearchResult rid : searchResultList) {
-                youtubeRecipes.add(YoutubeRecipe.builder()
-                        .title(rid.getSnippet().getTitle())
-                        .description(rid.getSnippet().getDescription())
-                        .thumbnailImgUrl(rid.getSnippet().getThumbnails().getDefault().getUrl())
-                        .postDate(LocalDate.ofInstant(Instant.ofEpochMilli(rid.getSnippet().getPublishedAt().getValue()), ZoneId.systemDefault()))
-                        .channelName(rid.getSnippet().getChannelTitle())
-                        .youtubeId(rid.getId().getVideoId())
-                        .build());
-            }
-            List<String> youtubeIds = youtubeRecipes.stream().map(YoutubeRecipe::getYoutubeId).collect(Collectors.toList());
-            List<YoutubeRecipe> existYoutubeRecipes = youtubeRecipeRepository.findByYoutubeIdIn(youtubeIds);
-            Map<String, YoutubeRecipe> existYoutubeRecipesMapByYoutubeId = existYoutubeRecipes.stream().collect(Collectors.toMap(YoutubeRecipe::getYoutubeId, v -> v));
-
-            youtubeRecipeRepository.saveAll(youtubeRecipes.stream()
-                    .filter(youtubeRecipe -> !existYoutubeRecipesMapByYoutubeId.containsKey(youtubeRecipe.getYoutubeId()))
-                    .collect(Collectors.toList()));
-        }
+        });
     }
 
     @Transactional

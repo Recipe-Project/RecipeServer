@@ -26,8 +26,6 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
     YoutubeRecipeRepository youtubeRecipeRepository;
     @Autowired
     YoutubeScrapRepository youtubeScrapRepository;
-    @Autowired
-    YoutubeViewRepository youtubeViewRepository;
 
     def "검색어로 유튜브 레시피 갯수 조회"() {
 
@@ -147,6 +145,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .channelName("테스트")
                         .youtubeId("youtube1")
                         .thumbnailImgUrl("http://test.jpg")
+                        .scrapCnt(0L)
                         .build(),
                 YoutubeRecipe.builder()
                         .title("테스트제목")
@@ -155,6 +154,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .channelName("테스트")
                         .youtubeId("youtube2")
                         .thumbnailImgUrl("http://test.jpg")
+                        .scrapCnt(2L)
                         .build(),
                 YoutubeRecipe.builder()
                         .title("제목")
@@ -163,6 +163,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .channelName("테스트")
                         .youtubeId("youtube3")
                         .thumbnailImgUrl("http://test.jpg")
+                        .scrapCnt(1L)
                         .build(),
                 YoutubeRecipe.builder()
                         .title("제목")
@@ -171,33 +172,10 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .channelName("테스트")
                         .youtubeId("youtube4")
                         .thumbnailImgUrl("http://test.jpg")
+                        .scrapCnt(2L)
                         .build(),
         ]
         youtubeRecipeRepository.saveAll(youtubeRecipes);
-
-        List<YoutubeScrap> youtubeScraps = [
-                YoutubeScrap.builder()
-                        .userId(users.get(0).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(3).youtubeRecipeId)
-                        .build(),
-                YoutubeScrap.builder()
-                        .userId(users.get(1).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(3).youtubeRecipeId)
-                        .build(),
-                YoutubeScrap.builder()
-                        .userId(users.get(0).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(2).youtubeRecipeId)
-                        .build(),
-                YoutubeScrap.builder()
-                        .userId(users.get(0).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(1).youtubeRecipeId)
-                        .build(),
-                YoutubeScrap.builder()
-                        .userId(users.get(1).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(1).youtubeRecipeId)
-                        .build(),
-        ]
-        youtubeScrapRepository.saveAll(youtubeScraps);
 
         when:
         List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc("테스트", youtubeRecipes.get(3).youtubeRecipeId, 2, 3);
@@ -231,6 +209,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .channelName("테스트")
                         .youtubeId("youtube1")
                         .thumbnailImgUrl("http://test.jpg")
+                        .viewCnt(0L)
                         .build(),
                 YoutubeRecipe.builder()
                         .title("테스트제목")
@@ -239,6 +218,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .channelName("테스트")
                         .youtubeId("youtube2")
                         .thumbnailImgUrl("http://test.jpg")
+                        .viewCnt(2L)
                         .build(),
                 YoutubeRecipe.builder()
                         .title("제목")
@@ -247,6 +227,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .channelName("테스트")
                         .youtubeId("youtube3")
                         .thumbnailImgUrl("http://test.jpg")
+                        .viewCnt(1L)
                         .build(),
                 YoutubeRecipe.builder()
                         .title("제목")
@@ -255,33 +236,10 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .channelName("테스트")
                         .youtubeId("youtube4")
                         .thumbnailImgUrl("http://test.jpg")
+                        .viewCnt(2L)
                         .build(),
         ]
         youtubeRecipeRepository.saveAll(youtubeRecipes);
-
-        List<YoutubeView> youtubeViews = [
-                YoutubeView.builder()
-                        .userId(users.get(0).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(3).youtubeRecipeId)
-                        .build(),
-                YoutubeView.builder()
-                        .userId(users.get(1).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(3).youtubeRecipeId)
-                        .build(),
-                YoutubeView.builder()
-                        .userId(users.get(0).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(2).youtubeRecipeId)
-                        .build(),
-                YoutubeView.builder()
-                        .userId(users.get(0).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(1).youtubeRecipeId)
-                        .build(),
-                YoutubeView.builder()
-                        .userId(users.get(0).userId)
-                        .youtubeRecipeId(youtubeRecipes.get(1).youtubeRecipeId)
-                        .build(),
-        ]
-        youtubeViewRepository.saveAll(youtubeViews);
 
         when:
         List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc("테스트", youtubeRecipes.get(3).youtubeRecipeId, 2, 3)

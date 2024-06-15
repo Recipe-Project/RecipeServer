@@ -33,15 +33,15 @@ then
 fi
 
 # docker 구동
-DOCKER_PID=$(pgrep -f $PROJECT_ROOT/deploy/docker-compose.yml)
+DOCKER_PID=$(pgrep -f $PROJECT_ROOT/docker-compose.yml)
 if [ -z $CURRENT_PID ]; then
   echo "start docker-compose up"
-  sudo docker-compose -f $PROJECT_ROOT/deploy/docker-compose.yml up --build -d
+  sudo docker-compose -f $PROJECT_ROOT/docker-compose.yml up --build -d
 fi
 
 # build 파일 복사
 echo "$TIME_NOW > $WAR_FILE 파일 복사" >> $DEPLOY_LOG
-cp $PROJECT_ROOT/deploy/*.war $WAR_FILE
+cp $PROJECT_ROOT/*.war $WAR_FILE
 cp $PROJECT_ROOT/keystore.p12 /keystore.p12
 
 # 실행권한 추가

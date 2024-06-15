@@ -12,7 +12,6 @@ import static com.recipe.app.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThan
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
 import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
 import static com.recipe.app.src.recipe.domain.QRecipeScrap.recipeScrap;
-import static com.recipe.app.src.recipe.domain.QRecipeView.recipeView;
 
 public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCustomRepository {
 
@@ -65,17 +64,16 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .selectFrom(recipe)
                 .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId)
                         .and(recipeIngredient.ingredientName.contains(keyword)))
-                .leftJoin(recipeScrap).on(recipeScrap.recipeId.eq(recipe.recipeId))
-                .where(recipe.hiddenYn.eq("N"))
-                .groupBy(recipe.recipeId)
-                .having(recipe.recipeNm.contains(keyword)
-                                .or(recipe.introduction.contains(keyword))
-                                .or(recipeIngredient.count().gt(0)),
-                        ifIdIsNotNullAndGreaterThanZero((recipeId, recipeScrapCnt) -> recipeScrap.count().lt(recipeScrapCnt)
-                                        .or(recipeScrap.count().eq(recipeScrapCnt)
+                .where(recipe.hiddenYn.eq("N"),
+                        ifIdIsNotNullAndGreaterThanZero((recipeId, recipeScrapCnt) -> recipe.scrapCnt.lt(recipeScrapCnt)
+                                        .or(recipe.scrapCnt.eq(recipeScrapCnt)
                                                 .and(recipe.recipeId.lt(recipeId))),
                                 lastRecipeId, lastRecipeScrapCnt))
-                .orderBy(recipeScrap.count().desc(), recipe.recipeId.desc())
+                .groupBy(recipe.recipeId)
+                .having(recipe.recipeNm.contains(keyword)
+                        .or(recipe.introduction.contains(keyword))
+                        .or(recipeIngredient.count().gt(0)))
+                .orderBy(recipe.scrapCnt.desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
     }
@@ -87,17 +85,16 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .selectFrom(recipe)
                 .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId)
                         .and(recipeIngredient.ingredientName.contains(keyword)))
-                .leftJoin(recipeView).on(recipeView.recipeId.eq(recipe.recipeId))
-                .where(recipe.hiddenYn.eq("N"))
-                .groupBy(recipe.recipeId)
-                .having(recipe.recipeNm.contains(keyword)
-                                .or(recipe.introduction.contains(keyword))
-                                .or(recipeIngredient.count().gt(0)),
-                        ifIdIsNotNullAndGreaterThanZero((recipeId, recipeViewCnt) -> recipeView.count().lt(recipeViewCnt)
-                                        .or(recipeView.count().eq(recipeViewCnt)
+                .where(recipe.hiddenYn.eq("N"),
+                        ifIdIsNotNullAndGreaterThanZero((recipeId, recipeViewCnt) -> recipe.viewCnt.lt(recipeViewCnt)
+                                        .or(recipe.viewCnt.eq(recipeViewCnt)
                                                 .and(recipe.recipeId.lt(recipeId))),
                                 lastRecipeId, lastRecipeViewCnt))
-                .orderBy(recipeView.count().desc(), recipe.recipeId.desc())
+                .groupBy(recipe.recipeId)
+                .having(recipe.recipeNm.contains(keyword)
+                        .or(recipe.introduction.contains(keyword))
+                        .or(recipeIngredient.count().gt(0)))
+                .orderBy(recipe.viewCnt.desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
     }
