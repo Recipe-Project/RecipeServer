@@ -48,7 +48,7 @@ public class BlogRecipe extends BaseEntity {
     private long viewCnt;
 
     @Builder
-    public BlogRecipe(Long blogRecipeId, String blogUrl, String blogThumbnailImgUrl, String title, String description, LocalDate publishedAt, String blogName) {
+    public BlogRecipe(Long blogRecipeId, String blogUrl, String blogThumbnailImgUrl, String title, String description, LocalDate publishedAt, String blogName, long scrapCnt, long viewCnt) {
 
         Preconditions.checkArgument(StringUtils.hasText(blogUrl), "블로그 URL을 입력해주세요.");
         Preconditions.checkArgument(StringUtils.hasText(title), "블로그 레시피 제목을 입력해주세요.");
@@ -63,6 +63,8 @@ public class BlogRecipe extends BaseEntity {
         this.description = description;
         this.publishedAt = publishedAt;
         this.blogName = blogName;
+        this.scrapCnt = scrapCnt;
+        this.viewCnt = viewCnt;
     }
 
     public void plusScrapCnt() {

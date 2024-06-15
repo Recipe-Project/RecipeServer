@@ -48,7 +48,7 @@ public class YoutubeRecipe extends BaseEntity {
     private long viewCnt;
 
     @Builder
-    public YoutubeRecipe(Long youtubeRecipeId, String title, String description, String thumbnailImgUrl, LocalDate postDate, String channelName, String youtubeId) {
+    public YoutubeRecipe(Long youtubeRecipeId, String title, String description, String thumbnailImgUrl, LocalDate postDate, String channelName, String youtubeId, long scrapCnt, long viewCnt) {
 
         Preconditions.checkArgument(StringUtils.hasText(title), "유튜브 레시피 제목을 입력해주세요.");
         Preconditions.checkArgument(StringUtils.hasText(thumbnailImgUrl), "유튜브 레시피 썸네일 URL을 입력해주세요.");
@@ -63,6 +63,8 @@ public class YoutubeRecipe extends BaseEntity {
         this.postDate = postDate;
         this.channelName = channelName;
         this.youtubeId = youtubeId;
+        this.scrapCnt = scrapCnt;
+        this.viewCnt = viewCnt;
     }
 
     public void plusScrapCnt() {

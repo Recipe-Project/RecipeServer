@@ -57,7 +57,7 @@ public class Recipe extends BaseEntity {
 
     @Builder
     public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, RecipeLevel level,
-                  String imgUrl, Long quantity, Long calorie, Long userId, boolean isHidden) {
+                  String imgUrl, Long quantity, Long calorie, Long userId, boolean isHidden, long scrapCnt, long viewCnt) {
 
         Preconditions.checkArgument(StringUtils.hasText(recipeNm), "레시피명을 입력해주세요.");
         Objects.requireNonNull(userId, "유저 아이디를 입력해주세요.");
@@ -72,6 +72,8 @@ public class Recipe extends BaseEntity {
         this.calorie = calorie;
         this.userId = userId;
         this.hiddenYn = isHidden ? "Y" : "N";
+        this.scrapCnt = scrapCnt;
+        this.viewCnt = viewCnt;
     }
 
     public void updateRecipe(String recipeNm, String imgUrl) {
