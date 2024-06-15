@@ -42,10 +42,10 @@ public class BlogRecipe extends BaseEntity {
     private String blogName;
 
     @Column(name = "scrapCnt", nullable = false)
-    private int scrapCnt;
+    private long scrapCnt;
 
     @Column(name = "viewCnt", nullable = false)
-    private int viewCnt;
+    private long viewCnt;
 
     @Builder
     public BlogRecipe(Long blogRecipeId, String blogUrl, String blogThumbnailImgUrl, String title, String description, LocalDate publishedAt, String blogName) {

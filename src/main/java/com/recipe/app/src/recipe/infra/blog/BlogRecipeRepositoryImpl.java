@@ -55,17 +55,15 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
 
         return queryFactory
                 .selectFrom(blogRecipe)
-                .leftJoin(blogScrap).on(blogRecipe.blogRecipeId.eq(blogScrap.blogRecipeId))
                 .where(
                         blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword))
+                                .or(blogRecipe.description.contains(keyword)),
+                        ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogScrapCnt) -> blogRecipe.scrapCnt.lt(blogScrapCnt)
+                                        .or(blogRecipe.scrapCnt.eq(blogScrapCnt)
+                                                .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
+                                lastBlogRecipeId, lastBlogScrapCnt)
                 )
-                .groupBy(blogRecipe.blogRecipeId)
-                .having(ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogScrapCnt) -> blogScrap.count().lt(blogScrapCnt)
-                                .or(blogScrap.count().eq(blogScrapCnt)
-                                        .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
-                        lastBlogRecipeId, lastBlogScrapCnt))
-                .orderBy(blogScrap.count().desc(), blogRecipe.blogRecipeId.desc())
+                .orderBy(blogRecipe.scrapCnt.desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
     }
@@ -75,17 +73,15 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
 
         return queryFactory
                 .selectFrom(blogRecipe)
-                .leftJoin(blogView).on(blogRecipe.blogRecipeId.eq(blogView.blogRecipeId))
                 .where(
                         blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword))
+                                .or(blogRecipe.description.contains(keyword)),
+                        ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogViewCnt) -> blogRecipe.viewCnt.lt(blogViewCnt)
+                                        .or(blogRecipe.viewCnt.eq(blogViewCnt)
+                                                .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
+                                lastBlogRecipeId, lastBlogViewCnt)
                 )
-                .groupBy(blogRecipe.blogRecipeId)
-                .having(ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogViewCnt) -> blogView.count().lt(blogViewCnt)
-                                .or(blogView.count().eq(blogViewCnt)
-                                        .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
-                        lastBlogRecipeId, lastBlogViewCnt))
-                .orderBy(blogView.count().desc(), blogRecipe.blogRecipeId.desc())
+                .orderBy(blogRecipe.viewCnt.desc(), blogRecipe.blogRecipeId.desc())
                 .limit(size)
                 .fetch();
     }

@@ -6,7 +6,6 @@ import com.recipe.app.src.recipe.application.dto.RecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
-import com.recipe.app.src.recipe.domain.blog.BlogView;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
 import com.recipe.app.src.user.domain.User;
@@ -18,7 +17,6 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -110,15 +108,11 @@ public class BlogRecipeService {
                 .map(BlogRecipe::getBlogRecipeId)
                 .collect(Collectors.toList());
         List<BlogScrap> blogScraps = blogScrapService.findByBlogRecipeIds(blogRecipeIds);
-        List<BlogView> blogViews = blogViewService.findByBlogRecipeIds(blogRecipeIds);
 
         return new RecipesResponse(totalCnt, blogRecipes.stream()
                 .map(blogRecipe -> {
-                    long scrapCnt = getBlogScrapCnt(blogScraps, blogRecipe.getBlogRecipeId(), user);
-                    long viewCnt = getBlogViewCnt(blogViews, blogRecipe.getBlogRecipeId(), user);
-                    boolean isUserScrap = isUserScrap(blogScraps, blogRecipe.getBlogRecipeId(), user);
 
-                    return RecipeResponse.from(blogRecipe, isUserScrap, scrapCnt, viewCnt);
+                    return RecipeResponse.from(blogRecipe, isUserScrap(blogScraps, blogRecipe.getBlogRecipeId(), user));
                 })
                 .collect(Collectors.toList()));
     }
@@ -126,18 +120,6 @@ public class BlogRecipeService {
     private boolean isUserScrap(List<BlogScrap> blogScraps, Long blogRecipeId, User user) {
         return blogScraps.stream()
                 .anyMatch(blogScrap -> blogScrap.getBlogRecipeId().equals(blogRecipeId) && blogScrap.getUserId().equals(user.getUserId()));
-    }
-
-    private long getBlogViewCnt(List<BlogView> blogViews, Long blogRecipeId, User user) {
-        return blogViews.stream()
-                .filter(blogView -> blogView.getBlogViewId().equals(blogRecipeId) && blogView.getUserId().equals(user.getUserId()))
-                .count();
-    }
-
-    private long getBlogScrapCnt(List<BlogScrap> blogScraps, Long blogRecipeId, User user) {
-        return blogScraps.stream()
-                .filter(blogScrap -> blogScrap.getBlogRecipeId().equals(blogRecipeId) && blogScrap.getUserId().equals(user.getUserId()))
-                .count();
     }
 
     @Transactional
