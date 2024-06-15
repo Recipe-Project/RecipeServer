@@ -36,7 +36,7 @@ public class BlogRecipeController {
                                                         @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                         @RequestParam(value = "size") int size,
                                                         @ApiParam(name = "sort", type = "String", example = "조회수순(blogViews) / 좋아요순(blogScraps) / 최신순(newest) = 기본값", value = "정렬")
-                                                        @RequestParam(value = "sort") String sort) throws IOException, ParseException {
+                                                        @RequestParam(value = "sort") String sort) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
