@@ -51,7 +51,7 @@ public class RecipeResponse {
         this.viewCnt = viewCnt;
     }
 
-    public static RecipeResponse from(Recipe recipe, User recipePostUser, boolean isScrapByUser, long scrapCnt, long viewCnt) {
+    public static RecipeResponse from(Recipe recipe, User recipePostUser, boolean isScrapByUser) {
 
         return RecipeResponse.builder()
                 .recipeId(recipe.getRecipeId())
@@ -61,8 +61,8 @@ public class RecipeResponse {
                 .postUserName(recipePostUser != null ? recipePostUser.getNickname() : null)
                 .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .isUserScrap(isScrapByUser)
-                .scrapCnt(scrapCnt)
-                .viewCnt(viewCnt)
+                .scrapCnt(recipe.getScrapCnt())
+                .viewCnt(recipe.getViewCnt())
                 .build();
     }
 

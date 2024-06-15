@@ -50,10 +50,10 @@ public class Recipe extends BaseEntity {
     private String hiddenYn = "Y";
 
     @Column(name = "scrapCnt", nullable = false)
-    private int scrapCnt;
+    private long scrapCnt;
 
     @Column(name = "viewCnt", nullable = false)
-    private int viewCnt;
+    private long viewCnt;
 
     @Builder
     public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, RecipeLevel level,
