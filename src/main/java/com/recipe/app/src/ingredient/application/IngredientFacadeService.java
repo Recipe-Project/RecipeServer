@@ -46,7 +46,7 @@ public class IngredientFacadeService {
 
         long fridgeBasketCount = fridgeBasketService.countByUserId(user.getUserId());
         List<IngredientCategory> categories = ingredientCategoryService.findAll();
-        List<Ingredient> ingredients = ingredientService.findByUserIdOrderByCreatedAtDesc(user.getUserId());
+        List<Ingredient> ingredients = ingredientService.findByUserId(user.getUserId());
 
         return IngredientsResponse.from(fridgeBasketCount, categories, ingredients);
     }
