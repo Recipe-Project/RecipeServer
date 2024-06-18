@@ -170,4 +170,16 @@ public class RecipeController {
 
         recipeService.deleteRecipe(user, recipeId);
     }
+
+    @ApiOperation(value = "레시피 신고 API")
+    @PostMapping("/{recipeId}/reports")
+    public void postRecipeReport(@ApiIgnore final Authentication authentication, @PathVariable Long recipeId) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+
+        recipeService.createRecipeReport(user, recipeId);
+    }
 }
