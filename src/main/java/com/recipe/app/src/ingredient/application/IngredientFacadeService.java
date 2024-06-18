@@ -5,7 +5,6 @@ import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.ingredient.application.dto.IngredientsResponse;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
-import com.recipe.app.src.recipe.application.RecipeIngredientService;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,16 +18,14 @@ public class IngredientFacadeService {
     private final IngredientCategoryService ingredientCategoryService;
     private final FridgeBasketService fridgeBasketService;
     private final FridgeService fridgeService;
-    private final RecipeIngredientService recipeIngredientService;
 
     public IngredientFacadeService(IngredientService ingredientService, IngredientCategoryService ingredientCategoryService,
-                                   FridgeBasketService fridgeBasketService, FridgeService fridgeService, RecipeIngredientService recipeIngredientService) {
+                                   FridgeBasketService fridgeBasketService, FridgeService fridgeService) {
 
         this.ingredientService = ingredientService;
         this.ingredientCategoryService = ingredientCategoryService;
         this.fridgeBasketService = fridgeBasketService;
         this.fridgeService = fridgeService;
-        this.recipeIngredientService = recipeIngredientService;
     }
 
     @Transactional(readOnly = true)
@@ -51,7 +48,7 @@ public class IngredientFacadeService {
         return IngredientsResponse.from(fridgeBasketCount, categories, ingredients);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public void deleteMyIngredient(User user, Long ingredientId) {
 
         fridgeService.deleteByUserIdAndIngredientId(user.getUserId(), ingredientId);
