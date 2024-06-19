@@ -55,6 +55,9 @@ public class Recipe extends BaseEntity {
     @Column(name = "viewCnt", nullable = false)
     private long viewCnt;
 
+    @Column(name = "reportYn", nullable = false)
+    private String reportYn = "N";
+
     @Builder
     public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, RecipeLevel level,
                   String imgUrl, Long quantity, Long calorie, Long userId, boolean isHidden, long scrapCnt, long viewCnt) {
@@ -95,5 +98,10 @@ public class Recipe extends BaseEntity {
 
     public void plusViewCnt() {
         this.viewCnt++;
+    }
+
+    public void report() {
+        this.reportYn = "Y";
+        this.hiddenYn = "Y";
     }
 }

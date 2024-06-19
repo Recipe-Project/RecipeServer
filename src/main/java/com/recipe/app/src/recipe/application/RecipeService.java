@@ -45,10 +45,11 @@ public class RecipeService {
     private final FridgeService fridgeService;
     private final UserService userService;
     private final BadWordService badWordService;
+    private final RecipeReportService recipeReportService;
 
     public RecipeService(RecipeRepository recipeRepository, RecipeIngredientService recipeIngredientService, RecipeProcessService recipeProcessService,
                          RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, FridgeService fridgeService,
-                         UserService userService, BadWordService badWordService) {
+                         UserService userService, BadWordService badWordService, RecipeReportService recipeReportService) {
         this.recipeRepository = recipeRepository;
         this.recipeIngredientService = recipeIngredientService;
         this.recipeProcessService = recipeProcessService;
@@ -57,6 +58,7 @@ public class RecipeService {
         this.fridgeService = fridgeService;
         this.userService = userService;
         this.badWordService = badWordService;
+        this.recipeReportService = recipeReportService;
     }
 
     @Transactional(readOnly = true)
@@ -326,6 +328,20 @@ public class RecipeService {
         recipe.plusViewCnt();
         recipeRepository.save(recipe);
         recipeViewService.createRecipeView(user, recipeId);
+    }
+
+    @Transactional
+    public void createRecipeReport(User user, Long recipeId) {
+
+        recipeReportService.createRecipeReport(user, recipeId);
+
+        if (recipeReportService.isRecipeReported(recipeId)) {
+            Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> {
+                throw new NotFoundRecipeException();
+            });
+
+            recipe.report();
+        }
     }
 }
 
