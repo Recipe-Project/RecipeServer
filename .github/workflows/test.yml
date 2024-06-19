@@ -40,9 +40,11 @@ jobs:
           SECRET_JAVA_FILE: ${{ secrets.SECRET_JAVA }}
         run: echo $SECRET_JAVA_FILE | base64 --decode > src/main/java/com/recipe/app/config/secret/Secret.java
 
-      - name: Get Github action IP
-        id: ip
-        uses: haythem/public-ip@v1.2
+      - name: Get Public IP
+          id: publicip
+          run: |
+            response=$(curl -s canhazip.com)
+            echo "ip='$response'" >> "$GITHUB_OUTPUT"
 
       - name: Setting environment variables
         run: |
@@ -58,7 +60,7 @@ jobs:
 
       - name: Add Github Actions IP to Security group
         run: |
-          aws ec2 authorize-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 3306 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+          aws ec2 authorize-security-group-ingress --group-name ${{ env.AWS_SG_NAME }} --protocol tcp --port 3306 --cidr ${{ steps.publicip.outputs.ip }}/32
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
