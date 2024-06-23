@@ -104,7 +104,12 @@ public class RecipeService {
         boolean isUserScrap = recipeScraps.stream()
                 .anyMatch(recipeScrap -> recipeScrap.getUserId().equals(user.getUserId()));
 
-        return RecipeDetailResponse.from(recipe, recipeIngredients, recipeProcesses, isUserScrap, recipeScraps.size(), recipeViews.size());
+        User postUser = null;
+        if (recipe.getUserId() != null) {
+            postUser = userService.findByUserId(recipe.getUserId());
+        }
+
+        return RecipeDetailResponse.from(recipe, recipeIngredients, recipeProcesses, isUserScrap, recipeScraps.size(), recipeViews.size(), postUser);
     }
 
     @Transactional(readOnly = true)
