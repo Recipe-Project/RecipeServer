@@ -38,7 +38,9 @@ public class RecipeDetailResponse {
     private final long scrapCnt;
     @Schema(description = "총 조회수")
     private final long viewCnt;
-    @Schema(description = "게시자")
+    @Schema(description = "게시자 아이디")
+    private final Long postUserId;
+    @Schema(description = "게시자명")
     private final String postUserName;
     @Schema(description = "신고 여부")
     private final Boolean isReported;
@@ -46,7 +48,7 @@ public class RecipeDetailResponse {
     @Builder
     public RecipeDetailResponse(Long recipeId, String recipeName, String introduction, String thumbnailImgUrl, Long cookingTime, String level,
                                 List<RecipeIngredientResponse> recipeIngredients, List<RecipeProcessResponse> recipeProcesses,
-                                Boolean isUserScrap, long scrapCnt, long viewCnt, String postUserName, Boolean isReported) {
+                                Boolean isUserScrap, long scrapCnt, long viewCnt, Long postUserId, String postUserName, Boolean isReported) {
 
         this.recipeId = recipeId;
         this.recipeName = recipeName;
@@ -59,6 +61,7 @@ public class RecipeDetailResponse {
         this.isUserScrap = isUserScrap;
         this.scrapCnt = scrapCnt;
         this.viewCnt = viewCnt;
+        this.postUserId = postUserId;
         this.postUserName = postUserName;
         this.isReported = isReported;
     }
@@ -78,6 +81,7 @@ public class RecipeDetailResponse {
                 .isUserScrap(isUserScrap)
                 .scrapCnt(scrapCnt)
                 .viewCnt(viewCnt)
+                .postUserId(postUser != null ? postUser.getUserId() : null)
                 .postUserName(postUser != null ? postUser.getNickname() : null)
                 .isReported(recipe.isReported())
                 .build();
