@@ -88,6 +88,10 @@ public class Recipe extends BaseEntity {
         return hiddenYn.equals("Y");
     }
 
+    public boolean isReported() {
+        return reportYn.equals("Y");
+    }
+
     public void plusScrapCnt() {
         this.scrapCnt++;
     }

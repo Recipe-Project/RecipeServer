@@ -38,11 +38,17 @@ public class RecipeDetailResponse {
     private final long scrapCnt;
     @Schema(description = "총 조회수")
     private final long viewCnt;
+    @Schema(description = "게시자 아이디")
+    private final Long postUserId;
+    @Schema(description = "게시자명")
+    private final String postUserName;
+    @Schema(description = "신고 여부")
+    private final Boolean isReported;
 
     @Builder
     public RecipeDetailResponse(Long recipeId, String recipeName, String introduction, String thumbnailImgUrl, Long cookingTime, String level,
                                 List<RecipeIngredientResponse> recipeIngredients, List<RecipeProcessResponse> recipeProcesses,
-                                Boolean isUserScrap, long scrapCnt, long viewCnt) {
+                                Boolean isUserScrap, long scrapCnt, long viewCnt, Long postUserId, String postUserName, Boolean isReported) {
 
         this.recipeId = recipeId;
         this.recipeName = recipeName;
@@ -55,10 +61,13 @@ public class RecipeDetailResponse {
         this.isUserScrap = isUserScrap;
         this.scrapCnt = scrapCnt;
         this.viewCnt = viewCnt;
+        this.postUserId = postUserId;
+        this.postUserName = postUserName;
+        this.isReported = isReported;
     }
 
     public static RecipeDetailResponse from(Recipe recipe, List<RecipeIngredientResponse> recipeIngredients, List<RecipeProcessResponse> recipeProcesses,
-                                            boolean isUserScrap, long scrapCnt, long viewCnt) {
+                                            boolean isUserScrap, long scrapCnt, long viewCnt, User postUser) {
 
         return RecipeDetailResponse.builder()
                 .recipeId(recipe.getRecipeId())
@@ -72,6 +81,9 @@ public class RecipeDetailResponse {
                 .isUserScrap(isUserScrap)
                 .scrapCnt(scrapCnt)
                 .viewCnt(viewCnt)
+                .postUserId(postUser != null ? postUser.getUserId() : null)
+                .postUserName(postUser != null ? postUser.getNickname() : null)
+                .isReported(recipe.isReported())
                 .build();
     }
 }
