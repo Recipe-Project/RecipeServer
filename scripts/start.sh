@@ -14,13 +14,11 @@ if ! type docker > /dev/null #docker를 깔아주는 코드, EC2 인스턴스에
 then
   echo "docker does not exist"
   echo "Start installing docker"
-  sudo apt-get update
-  sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
-  curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-  sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-  sudo apt update
-  apt-cache policy docker-ce
-  sudo apt install -y docker-ce
+  sudo yum -y update
+  sudo yum install -y yum-utils
+  sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+  sudo yum install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+  sudo systemctl start docker
 fi
 
 # Installing docker-compose if not exists
