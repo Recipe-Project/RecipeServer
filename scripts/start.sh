@@ -16,7 +16,7 @@ then
   echo "Start installing docker"
   sudo yum -y update
   sudo yum install -y docker
-  sudo service start docker
+  sudo systemctl start docker
 fi
 
 # Installing docker-compose if not exists
