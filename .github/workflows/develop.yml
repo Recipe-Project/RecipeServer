@@ -63,9 +63,11 @@ jobs:
         KEYSTORE_FILE: ${{ secrets.KEYSTORE }}
       run: echo $KEYSTORE_FILE | base64 --decode -i > keystore.p12
 
-    - name: Get Github action IP
-      id: ip
-      uses: haythem/public-ip@v1.2
+    - name: Get Public IP
+        id: publicip
+        run: |
+          response=$(curl -s canhazip.com)
+          echo "ip='$response'" >> "$GITHUB_OUTPUT"
 
     - name: Setting environment variables
       run: |
