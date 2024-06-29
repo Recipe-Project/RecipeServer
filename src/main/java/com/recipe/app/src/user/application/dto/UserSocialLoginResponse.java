@@ -9,21 +9,25 @@ import lombok.Getter;
 @Getter
 public class UserSocialLoginResponse {
 
-    @Schema(description = "jwt")
-    private final String jwt;
+    @Schema(description = "access token")
+    private final String accessToken;
+    @Schema(description = "refresh token")
+    private final String refreshToken;
     @Schema(description = "회원 고유번호")
     private final Long userId;
 
     @Builder
-    public UserSocialLoginResponse(String jwt, Long userId) {
+    public UserSocialLoginResponse(String accessToken, String refreshToken, Long userId) {
 
-        this.jwt = jwt;
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
         this.userId = userId;
     }
 
-    public static UserSocialLoginResponse from(User user, String jwt) {
+    public static UserSocialLoginResponse from(User user, String accessToken, String refreshToken) {
         return UserSocialLoginResponse.builder()
-                .jwt(jwt)
+                .accessToken(accessToken)
+                .refreshToken(refreshToken)
                 .userId(user.getUserId())
                 .build();
     }

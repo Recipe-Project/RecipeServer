@@ -28,18 +28,35 @@ public class JwtUtil {
     private String tokenHeader;
     @Value("${jwt.token-validity-in-ms}")
     private long tokenValidMillisecond;
+    @Value("${jwt.refresh-token-validity-in-ms}")
+    private long refreshTokenValidMillisecond;
 
     public JwtUtil(JwtBlacklistRepository jwtBlacklistRepository) {
         this.jwtBlacklistRepository = jwtBlacklistRepository;
     }
 
-    public String createJwt(Long userId) {
+    public String createToken(Long userId) {
+
         Date now = new Date();
         Key key = new SecretKeySpec(Base64.getDecoder().decode(this.secretKey), SignatureAlgorithm.HS256.getJcaName());
+
         return Jwts.builder()
                 .claim("userId", userId)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + tokenValidMillisecond))
+                .signWith(key)
+                .compact();
+    }
+
+    public String createRefreshToken(Long userId) {
+
+        Date now = new Date();
+        Key key = new SecretKeySpec(Base64.getDecoder().decode(this.secretKey), SignatureAlgorithm.HS256.getJcaName());
+
+        return Jwts.builder()
+                .claim("userId", userId)
+                .setIssuedAt(now)
+                .setExpiration(new Date(now.getTime() + refreshTokenValidMillisecond))
                 .signWith(key)
                 .compact();
     }

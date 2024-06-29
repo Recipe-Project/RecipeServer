@@ -121,9 +121,10 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtUtil.createJwt(user.getUserId());
+        String accessToken = jwtUtil.createToken(user.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
-        return UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
     @Transactional(readOnly = true)
@@ -167,9 +168,10 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtUtil.createJwt(user.getUserId());
+        String accessToken = jwtUtil.createToken(user.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
-        return UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
     @Transactional(readOnly = true)
@@ -209,9 +211,10 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtUtil.createJwt(user.getUserId());
+        String accessToken = jwtUtil.createToken(user.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
-        return UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
     @Transactional
