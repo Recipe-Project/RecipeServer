@@ -18,10 +18,10 @@ import java.util.Base64;
 import java.util.Date;
 
 @Service
-public class JwtService {
+public class JwtUtil {
 
     private final JwtBlacklistRepository jwtBlacklistRepository;
-    private final Logger logger = LoggerFactory.getLogger(JwtService.class);
+    private final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     @Value("${jwt.secret}")
     private String secretKey;
     @Value("${jwt.token-header}")
@@ -29,7 +29,7 @@ public class JwtService {
     @Value("${jwt.token-validity-in-ms}")
     private long tokenValidMillisecond;
 
-    public JwtService(JwtBlacklistRepository jwtBlacklistRepository) {
+    public JwtUtil(JwtBlacklistRepository jwtBlacklistRepository) {
         this.jwtBlacklistRepository = jwtBlacklistRepository;
     }
 

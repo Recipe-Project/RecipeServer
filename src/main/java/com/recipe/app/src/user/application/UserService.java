@@ -2,7 +2,7 @@ package com.recipe.app.src.user.application;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.common.utils.HttpUtil;
-import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.common.utils.JwtUtil;
 import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
@@ -50,12 +50,12 @@ public class UserService {
     private String googleRedirectURI;
 
     private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final BadWordService badWordService;
 
-    public UserService(UserRepository userRepository, JwtService jwtService, BadWordService badWordService) {
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, BadWordService badWordService) {
         this.userRepository = userRepository;
-        this.jwtService = jwtService;
+        this.jwtUtil = jwtUtil;
         this.badWordService = badWordService;
     }
 
@@ -121,7 +121,7 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtService.createJwt(user.getUserId());
+        String jwt = jwtUtil.createJwt(user.getUserId());
 
         return UserSocialLoginResponse.from(user, jwt);
     }
@@ -167,7 +167,7 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtService.createJwt(user.getUserId());
+        String jwt = jwtUtil.createJwt(user.getUserId());
 
         return UserSocialLoginResponse.from(user, jwt);
     }
@@ -209,7 +209,7 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtService.createJwt(user.getUserId());
+        String jwt = jwtUtil.createJwt(user.getUserId());
 
         return UserSocialLoginResponse.from(user, jwt);
     }
@@ -227,7 +227,7 @@ public class UserService {
 
         userRepository.delete(user);
 
-        jwtService.createJwtBlacklist(request);
+        jwtUtil.createJwtBlacklist(request);
     }
 
     @Transactional

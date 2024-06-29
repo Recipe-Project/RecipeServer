@@ -1,6 +1,6 @@
 package com.recipe.app.src.user.api;
 
-import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.common.utils.JwtUtil;
 import com.recipe.app.src.user.application.UserFacadeService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
@@ -29,13 +29,13 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final UserFacadeService userFacadeService;
 
-    public UserController(UserService userService, JwtService jwtService, UserFacadeService userFacadeService) {
+    public UserController(UserService userService, JwtUtil jwtUtil, UserFacadeService userFacadeService) {
 
         this.userService = userService;
-        this.jwtService = jwtService;
+        this.jwtUtil = jwtUtil;
         this.userFacadeService = userFacadeService;
     }
 
@@ -114,7 +114,7 @@ public class UserController {
     @PostMapping("/logout")
     public void logout(HttpServletRequest request) {
 
-        jwtService.createJwtBlacklist(request);
+        jwtUtil.createJwtBlacklist(request);
     }
 
     @ApiOperation(value = "FCM 디바이스 토큰 수정 API")
