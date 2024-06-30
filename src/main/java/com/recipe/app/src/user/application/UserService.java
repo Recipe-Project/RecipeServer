@@ -245,4 +245,9 @@ public class UserService {
 
         return userRepository.findAllById(userIds);
     }
+
+    @Transactional
+    public void logout(HttpServletRequest request) {
+        jwtUtil.createJwtBlacklist(request);
+    }
 }

@@ -1,6 +1,5 @@
 package com.recipe.app.src.user.api;
 
-import com.recipe.app.common.utils.JwtUtil;
 import com.recipe.app.src.user.application.UserFacadeService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
@@ -29,13 +28,11 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
-    private final JwtUtil jwtUtil;
     private final UserFacadeService userFacadeService;
 
-    public UserController(UserService userService, JwtUtil jwtUtil, UserFacadeService userFacadeService) {
+    public UserController(UserService userService, UserFacadeService userFacadeService) {
 
         this.userService = userService;
-        this.jwtUtil = jwtUtil;
         this.userFacadeService = userFacadeService;
     }
 
@@ -87,8 +84,8 @@ public class UserController {
     @ApiOperation(value = "유저 프로필 수정 API")
     @PatchMapping
     public void patchUser(@ApiIgnore final Authentication authentication,
-                                                               @ApiParam(value = "수정할 회원 정보", required = true)
-                                                               @RequestBody UserProfileRequest request) {
+                          @ApiParam(value = "수정할 회원 정보", required = true)
+                          @RequestBody UserProfileRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -114,14 +111,14 @@ public class UserController {
     @PostMapping("/logout")
     public void logout(HttpServletRequest request) {
 
-        jwtUtil.createJwtBlacklist(request);
+        userService.logout(request);
     }
 
     @ApiOperation(value = "FCM 디바이스 토큰 수정 API")
     @PatchMapping("/fcm-token")
     public void patchFcmToken(@ApiIgnore final Authentication authentication,
-                                            @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
-                                            @RequestBody UserDeviceTokenRequest request) {
+                              @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
+                              @RequestBody UserDeviceTokenRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
