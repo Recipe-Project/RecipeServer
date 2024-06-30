@@ -9,9 +9,12 @@ import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserLoginResponse;
 import com.recipe.app.src.user.application.dto.UserProfileRequest;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
+import com.recipe.app.src.user.application.dto.UserTokenRefreshRequest;
+import com.recipe.app.src.user.application.dto.UserTokenRefreshResponse;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import com.recipe.app.src.user.exception.NotFoundUserException;
+import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import com.recipe.app.src.user.infra.UserRepository;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -249,5 +252,17 @@ public class UserService {
     @Transactional
     public void logout(HttpServletRequest request) {
         jwtUtil.createJwtBlacklist(request);
+    }
+
+    public UserTokenRefreshResponse reissueToken(UserTokenRefreshRequest request) {
+
+        if (!jwtUtil.isValidRefreshToken(request.getRefreshToken())) {
+            throw new UserTokenNotExistException();
+        }
+
+        return UserTokenRefreshResponse.builder()
+                .userId(request.getUserId())
+                .accessToken(jwtUtil.createAccessToken(request.getUserId()))
+                .build();
     }
 }

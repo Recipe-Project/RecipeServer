@@ -8,6 +8,8 @@ import com.recipe.app.src.user.application.dto.UserLoginResponse;
 import com.recipe.app.src.user.application.dto.UserProfileRequest;
 import com.recipe.app.src.user.application.dto.UserProfileResponse;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
+import com.recipe.app.src.user.application.dto.UserTokenRefreshRequest;
+import com.recipe.app.src.user.application.dto.UserTokenRefreshResponse;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
@@ -34,6 +36,13 @@ public class UserController {
 
         this.userService = userService;
         this.userFacadeService = userFacadeService;
+    }
+
+    @ApiOperation(value = "토큰 재발급 API")
+    @PostMapping("/token-reissue")
+    public UserTokenRefreshResponse reissueToken(@RequestBody UserTokenRefreshRequest request) {
+
+        return userService.reissueToken(request);
     }
 
     @ApiOperation(value = "자동 로그인 API")
