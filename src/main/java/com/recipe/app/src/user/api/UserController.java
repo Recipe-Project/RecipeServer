@@ -1,6 +1,5 @@
 package com.recipe.app.src.user.api;
 
-import com.recipe.app.common.utils.JwtService;
 import com.recipe.app.src.user.application.UserFacadeService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
@@ -9,6 +8,8 @@ import com.recipe.app.src.user.application.dto.UserLoginResponse;
 import com.recipe.app.src.user.application.dto.UserProfileRequest;
 import com.recipe.app.src.user.application.dto.UserProfileResponse;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
+import com.recipe.app.src.user.application.dto.UserTokenRefreshRequest;
+import com.recipe.app.src.user.application.dto.UserTokenRefreshResponse;
 import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
@@ -29,14 +30,19 @@ import java.io.IOException;
 public class UserController {
 
     private final UserService userService;
-    private final JwtService jwtService;
     private final UserFacadeService userFacadeService;
 
-    public UserController(UserService userService, JwtService jwtService, UserFacadeService userFacadeService) {
+    public UserController(UserService userService, UserFacadeService userFacadeService) {
 
         this.userService = userService;
-        this.jwtService = jwtService;
         this.userFacadeService = userFacadeService;
+    }
+
+    @ApiOperation(value = "토큰 재발급 API")
+    @PostMapping("/token-reissue")
+    public UserTokenRefreshResponse reissueToken(@RequestBody UserTokenRefreshRequest request) {
+
+        return userService.reissueToken(request);
     }
 
     @ApiOperation(value = "자동 로그인 API")
@@ -87,8 +93,8 @@ public class UserController {
     @ApiOperation(value = "유저 프로필 수정 API")
     @PatchMapping
     public void patchUser(@ApiIgnore final Authentication authentication,
-                                                               @ApiParam(value = "수정할 회원 정보", required = true)
-                                                               @RequestBody UserProfileRequest request) {
+                          @ApiParam(value = "수정할 회원 정보", required = true)
+                          @RequestBody UserProfileRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -112,16 +118,19 @@ public class UserController {
 
     @ApiOperation(value = "로그아웃 API")
     @PostMapping("/logout")
-    public void logout(HttpServletRequest request) {
+    public void logout(HttpServletRequest request, @ApiIgnore final Authentication authentication) {
 
-        jwtService.createJwtBlacklist(request);
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        userService.logout(request);
     }
 
     @ApiOperation(value = "FCM 디바이스 토큰 수정 API")
     @PatchMapping("/fcm-token")
     public void patchFcmToken(@ApiIgnore final Authentication authentication,
-                                            @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
-                                            @RequestBody UserDeviceTokenRequest request) {
+                              @ApiParam(value = "FCM 디바이스 토큰 정보", required = true)
+                              @RequestBody UserDeviceTokenRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();

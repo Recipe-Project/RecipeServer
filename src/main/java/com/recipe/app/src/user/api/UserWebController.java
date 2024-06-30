@@ -64,7 +64,7 @@ public class UserWebController {
                 .accessToken(accessToken)
                 .build());
 
-        model.addAttribute("jwtToken", data.getJwt());
+        model.addAttribute("accessToken", data.getAccessToken());
         model.addAttribute("withdrawalURI", withdrawalURI);
 
         return "/user-withdrawal";
@@ -79,7 +79,7 @@ public class UserWebController {
                 .accessToken(accessToken)
                 .build());
 
-        model.addAttribute("jwtToken", data.getJwt());
+        model.addAttribute("accessToken", data.getAccessToken());
         model.addAttribute("withdrawalURI", withdrawalURI);
 
         return "/user-withdrawal";
@@ -94,7 +94,7 @@ public class UserWebController {
                 .accessToken(idToken)
                 .build());
 
-        model.addAttribute("jwtToken", data.getJwt());
+        model.addAttribute("accessToken", data.getAccessToken());
         model.addAttribute("withdrawalURI", withdrawalURI);
 
         return "/user-withdrawal";

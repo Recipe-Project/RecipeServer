@@ -2,16 +2,19 @@ package com.recipe.app.src.user.application;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.common.utils.HttpUtil;
-import com.recipe.app.common.utils.JwtService;
+import com.recipe.app.common.utils.JwtUtil;
 import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserLoginResponse;
 import com.recipe.app.src.user.application.dto.UserProfileRequest;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
+import com.recipe.app.src.user.application.dto.UserTokenRefreshRequest;
+import com.recipe.app.src.user.application.dto.UserTokenRefreshResponse;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import com.recipe.app.src.user.exception.NotFoundUserException;
+import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import com.recipe.app.src.user.infra.UserRepository;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -50,12 +53,12 @@ public class UserService {
     private String googleRedirectURI;
 
     private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private final JwtUtil jwtUtil;
     private final BadWordService badWordService;
 
-    public UserService(UserRepository userRepository, JwtService jwtService, BadWordService badWordService) {
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, BadWordService badWordService) {
         this.userRepository = userRepository;
-        this.jwtService = jwtService;
+        this.jwtUtil = jwtUtil;
         this.badWordService = badWordService;
     }
 
@@ -121,9 +124,10 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtService.createJwt(user.getUserId());
+        String accessToken = jwtUtil.createAccessToken(user.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
-        return UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
     @Transactional(readOnly = true)
@@ -167,9 +171,10 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtService.createJwt(user.getUserId());
+        String accessToken = jwtUtil.createAccessToken(user.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
-        return UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
     @Transactional(readOnly = true)
@@ -209,9 +214,10 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String jwt = jwtService.createJwt(user.getUserId());
+        String accessToken = jwtUtil.createAccessToken(user.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
-        return UserSocialLoginResponse.from(user, jwt);
+        return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
     @Transactional
@@ -227,7 +233,7 @@ public class UserService {
 
         userRepository.delete(user);
 
-        jwtService.createJwtBlacklist(request);
+        logout(request);
     }
 
     @Transactional
@@ -241,5 +247,26 @@ public class UserService {
     public List<User> findByUserIds(Collection<Long> userIds) {
 
         return userRepository.findAllById(userIds);
+    }
+
+    @Transactional
+    public void logout(HttpServletRequest request) {
+
+        String accessToken = jwtUtil.resolveAccessToken(request);
+        jwtUtil.setAccessTokenBlacklist(accessToken);
+        jwtUtil.removeRefreshToken(jwtUtil.getUserId(accessToken));
+    }
+
+    @Transactional(readOnly = true)
+    public UserTokenRefreshResponse reissueToken(UserTokenRefreshRequest request) {
+
+        if (!jwtUtil.isValidRefreshToken(request.getRefreshToken())) {
+            throw new UserTokenNotExistException();
+        }
+
+        return UserTokenRefreshResponse.builder()
+                .userId(request.getUserId())
+                .accessToken(jwtUtil.createAccessToken(request.getUserId()))
+                .build();
     }
 }

@@ -1,6 +1,6 @@
 <%@page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%
-    String jwtToken = (String) request.getAttribute("jwtToken");
+    String accessToken = (String) request.getAttribute("accessToken");
     String withdrawalURI = (String) request.getAttribute("withdrawalURI");
 %>
 <!DOCTYPE html>
@@ -18,7 +18,7 @@
             method: 'DELETE',
             url: '<%=withdrawalURI%>',
             headers: {
-                "X-ACCESS-TOKEN": "<%=jwtToken%>"
+                "Authorization": "Bearer <%=accessToken%>"
             }
         })
 
