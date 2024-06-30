@@ -7,18 +7,21 @@ import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
+import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
 
 @Service
 public class JwtUtil {
 
+    private final RedisTemplate<String, String> redisTemplate;
     private final JwtBlacklistRepository jwtBlacklistRepository;
     private final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     @Value("${jwt.secret}")
@@ -28,7 +31,8 @@ public class JwtUtil {
     @Value("${jwt.refresh-token-validity-in-ms}")
     private long refreshTokenValidMillisecond;
 
-    public JwtUtil(JwtBlacklistRepository jwtBlacklistRepository) {
+    public JwtUtil(RedisTemplate<String, String> redisTemplate, JwtBlacklistRepository jwtBlacklistRepository) {
+        this.redisTemplate = redisTemplate;
         this.jwtBlacklistRepository = jwtBlacklistRepository;
     }
 
@@ -50,12 +54,16 @@ public class JwtUtil {
         Date now = new Date();
         Key key = new SecretKeySpec(Base64.getDecoder().decode(this.secretKey), SignatureAlgorithm.HS256.getJcaName());
 
-        return Jwts.builder()
+        String token = Jwts.builder()
                 .claim("userId", userId)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + refreshTokenValidMillisecond))
                 .signWith(key)
                 .compact();
+
+        redisTemplate.opsForValue().set("refresh_token_user_id_" + userId, token, Duration.ofMillis(refreshTokenValidMillisecond));
+
+        return token;
     }
 
     public String resolveAccessToken(HttpServletRequest request) {
