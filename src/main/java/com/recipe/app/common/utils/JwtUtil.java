@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -25,6 +24,9 @@ public class JwtUtil {
     private final RedisTemplate<String, String> redisTemplate;
     private final JwtBlacklistRepository jwtBlacklistRepository;
     private final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
+    private final static String TOKEN_KEY = "userId";
+    private final static String REFRESH_TOKEN_KEY_PREFIX = "refresh_token_user_id_";
+    private final static String TOKEN_HEADER = "Authorization";
     @Value("${jwt.secret}")
     private String secretKey;
     @Value("${jwt.access-token-validity-in-ms}")
@@ -43,7 +45,7 @@ public class JwtUtil {
         Key key = new SecretKeySpec(Base64.getDecoder().decode(this.secretKey), SignatureAlgorithm.HS256.getJcaName());
 
         return Jwts.builder()
-                .claim("userId", userId)
+                .claim(TOKEN_KEY, userId)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + accessTokenValidMillisecond))
                 .signWith(key)
@@ -56,20 +58,20 @@ public class JwtUtil {
         Key key = new SecretKeySpec(Base64.getDecoder().decode(this.secretKey), SignatureAlgorithm.HS256.getJcaName());
 
         String token = Jwts.builder()
-                .claim("userId", userId)
+                .claim(TOKEN_KEY, userId)
                 .setIssuedAt(now)
                 .setExpiration(new Date(now.getTime() + refreshTokenValidMillisecond))
                 .signWith(key)
                 .compact();
 
-        redisTemplate.opsForValue().set("refresh_token_user_id_" + userId, token, Duration.ofMillis(refreshTokenValidMillisecond));
+        redisTemplate.opsForValue().set(REFRESH_TOKEN_KEY_PREFIX + userId, token, Duration.ofMillis(refreshTokenValidMillisecond));
 
         return token;
     }
 
     public String resolveAccessToken(HttpServletRequest request) {
 
-        String header = request.getHeader("Authorization");
+        String header = request.getHeader(TOKEN_HEADER);
 
         return header != null ? header.substring(7) : null;
     }
@@ -81,7 +83,7 @@ public class JwtUtil {
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .get("userId", Long.class);
+                .get(TOKEN_KEY, Long.class);
     }
 
     @Transactional(readOnly = true)
@@ -99,7 +101,7 @@ public class JwtUtil {
         if (isValidToken(refreshToken)) {
 
             long userId = getUserId(refreshToken);
-            String foundRefreshToken = redisTemplate.opsForValue().get("refresh_token_user_id_" + userId);
+            String foundRefreshToken = redisTemplate.opsForValue().get(REFRESH_TOKEN_KEY_PREFIX + userId);
 
             return refreshToken.equals(foundRefreshToken);
         }
