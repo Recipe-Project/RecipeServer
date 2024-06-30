@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -68,7 +69,9 @@ public class JwtUtil {
 
     public String resolveAccessToken(HttpServletRequest request) {
 
-        return request.getHeader("Authorization").substring(7);
+        String header = request.getHeader("Authorization");
+
+        return header != null ? header.substring(7) : null;
     }
 
     public long getUserId(String token) {
