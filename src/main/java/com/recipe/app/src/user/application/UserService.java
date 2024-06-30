@@ -121,7 +121,7 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String accessToken = jwtUtil.createToken(user.getUserId());
+        String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
         return UserSocialLoginResponse.from(user, accessToken, refreshToken);
@@ -168,7 +168,7 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String accessToken = jwtUtil.createToken(user.getUserId());
+        String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
         return UserSocialLoginResponse.from(user, accessToken, refreshToken);
@@ -211,7 +211,7 @@ public class UserService {
         user.changeRecentLoginAt(LocalDateTime.now());
         userRepository.save(user);
 
-        String accessToken = jwtUtil.createToken(user.getUserId());
+        String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
 
         return UserSocialLoginResponse.from(user, accessToken, refreshToken);

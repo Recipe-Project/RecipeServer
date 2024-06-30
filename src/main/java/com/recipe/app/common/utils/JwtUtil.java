@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -24,10 +23,12 @@ public class JwtUtil {
     private final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     @Value("${jwt.secret}")
     private String secretKey;
-    @Value("${jwt.token-header}")
-    private String tokenHeader;
-    @Value("${jwt.token-validity-in-ms}")
-    private long tokenValidMillisecond;
+    @Value("${jwt.access-token-header}")
+    private String accessTokenHeader;
+    @Value("${jwt.access-token-validity-in-ms}")
+    private long accessTokenValidMillisecond;
+    @Value("${jwt.refresh-token-header}")
+    private String refreshTokenHeader;
     @Value("${jwt.refresh-token-validity-in-ms}")
     private long refreshTokenValidMillisecond;
 
@@ -35,7 +36,7 @@ public class JwtUtil {
         this.jwtBlacklistRepository = jwtBlacklistRepository;
     }
 
-    public String createToken(Long userId) {
+    public String createAccessToken(Long userId) {
 
         Date now = new Date();
         Key key = new SecretKeySpec(Base64.getDecoder().decode(this.secretKey), SignatureAlgorithm.HS256.getJcaName());
@@ -43,7 +44,7 @@ public class JwtUtil {
         return Jwts.builder()
                 .claim("userId", userId)
                 .setIssuedAt(now)
-                .setExpiration(new Date(now.getTime() + tokenValidMillisecond))
+                .setExpiration(new Date(now.getTime() + accessTokenValidMillisecond))
                 .signWith(key)
                 .compact();
     }
@@ -61,17 +62,18 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String resolveToken(HttpServletRequest request) {
-        String token = request.getHeader(tokenHeader);
+    public String resolveAccessToken(HttpServletRequest request) {
 
-        if (!StringUtils.hasText(token)) {
-            token = request.getParameter(tokenHeader);
-        }
+        return request.getHeader(accessTokenHeader);
+    }
 
-        return StringUtils.hasText(token) ? token : null;
+    public String resolveRefreshToken(HttpServletRequest request) {
+
+        return request.getHeader(refreshTokenHeader);
     }
 
     public int getUserId(String token) {
+
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
@@ -102,7 +104,7 @@ public class JwtUtil {
     @Transactional
     public void createJwtBlacklist(HttpServletRequest request) {
 
-        String jwt = resolveToken(request);
+        String jwt = resolveAccessToken(request);
         jwtBlacklistRepository.save(new JwtBlacklist(jwt));
     }
 }
