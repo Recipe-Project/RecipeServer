@@ -23,12 +23,8 @@ public class JwtUtil {
     private final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     @Value("${jwt.secret}")
     private String secretKey;
-    @Value("${jwt.access-token-header}")
-    private String accessTokenHeader;
     @Value("${jwt.access-token-validity-in-ms}")
     private long accessTokenValidMillisecond;
-    @Value("${jwt.refresh-token-header}")
-    private String refreshTokenHeader;
     @Value("${jwt.refresh-token-validity-in-ms}")
     private long refreshTokenValidMillisecond;
 
@@ -64,30 +60,46 @@ public class JwtUtil {
 
     public String resolveAccessToken(HttpServletRequest request) {
 
-        return request.getHeader(accessTokenHeader);
+        return request.getHeader("Authorization").substring(7);
     }
 
-    public String resolveRefreshToken(HttpServletRequest request) {
-
-        return request.getHeader(refreshTokenHeader);
-    }
-
-    public int getUserId(String token) {
+    public long getUserId(String token) {
 
         return Jwts.parserBuilder()
                 .setSigningKey(secretKey)
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
-                .get("userId", Integer.class);
+                .get("userId", Long.class);
     }
 
     @Transactional(readOnly = true)
-    public boolean validateToken(String token) {
+    public boolean isValidAccessToken(String accessToken) {
+
+        if (jwtBlacklistRepository.findById(accessToken).isPresent()) {
+            return false;
+        }
+
+        return isValidToken(accessToken);
+    }
+
+    public boolean isValidRefreshToken(String refreshToken) {
+
+        if (isValidToken(refreshToken)) {
+
+            long userId = getUserId(refreshToken);
+            String foundRefreshToken = redisTemplate.opsForValue().get("refresh_token_user_id_" + userId);
+
+            return refreshToken.equals(foundRefreshToken);
+        }
+
+        return false;
+    }
+
+    private boolean isValidToken(String token) {
+
         try {
             logger.debug(this.secretKey);
-            if (jwtBlacklistRepository.findById(token).isPresent())
-                return false;
             Jws<Claims> claims = Jwts.parserBuilder().setSigningKey(this.secretKey).build().parseClaimsJws(token);
             return !claims.getBody().getExpiration().before(new Date());
         } catch (SecurityException | MalformedJwtException | IllegalArgumentException | SignatureException exception) {
