@@ -118,7 +118,10 @@ public class UserController {
 
     @ApiOperation(value = "로그아웃 API")
     @PostMapping("/logout")
-    public void logout(HttpServletRequest request) {
+    public void logout(HttpServletRequest request, @ApiIgnore final Authentication authentication) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
 
         userService.logout(request);
     }

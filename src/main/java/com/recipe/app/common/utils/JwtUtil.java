@@ -1,7 +1,5 @@
 package com.recipe.app.common.utils;
 
-import com.recipe.app.src.user.domain.JwtBlacklist;
-import com.recipe.app.src.user.infra.JwtBlacklistRepository;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import org.slf4j.Logger;
@@ -10,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.servlet.http.HttpServletRequest;
@@ -22,10 +21,10 @@ import java.util.Date;
 public class JwtUtil {
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final JwtBlacklistRepository jwtBlacklistRepository;
     private final Logger logger = LoggerFactory.getLogger(JwtUtil.class);
     private final static String TOKEN_KEY = "userId";
     private final static String REFRESH_TOKEN_KEY_PREFIX = "refresh_token_user_id_";
+    private final static String ACCESS_TOKEN_BLACKLIST_VALUE = "access_token_blacklist";
     private final static String TOKEN_HEADER = "Authorization";
     @Value("${jwt.secret}")
     private String secretKey;
@@ -34,9 +33,8 @@ public class JwtUtil {
     @Value("${jwt.refresh-token-validity-in-ms}")
     private long refreshTokenValidMillisecond;
 
-    public JwtUtil(RedisTemplate<String, String> redisTemplate, JwtBlacklistRepository jwtBlacklistRepository) {
+    public JwtUtil(RedisTemplate<String, String> redisTemplate) {
         this.redisTemplate = redisTemplate;
-        this.jwtBlacklistRepository = jwtBlacklistRepository;
     }
 
     public String createAccessToken(Long userId) {
@@ -89,7 +87,7 @@ public class JwtUtil {
     @Transactional(readOnly = true)
     public boolean isValidAccessToken(String accessToken) {
 
-        if (jwtBlacklistRepository.findById(accessToken).isPresent()) {
+        if (StringUtils.hasText(redisTemplate.opsForValue().get(accessToken))) {
             return false;
         }
 
@@ -127,9 +125,14 @@ public class JwtUtil {
     }
 
     @Transactional
-    public void createJwtBlacklist(HttpServletRequest request) {
+    public void removeRefreshToken(Long userId) {
 
-        String jwt = resolveAccessToken(request);
-        jwtBlacklistRepository.save(new JwtBlacklist(jwt));
+        redisTemplate.delete(REFRESH_TOKEN_KEY_PREFIX + userId);
+    }
+
+    @Transactional
+    public void setAccessTokenBlacklist(String accessToken) {
+
+        redisTemplate.opsForValue().set(accessToken, ACCESS_TOKEN_BLACKLIST_VALUE, Duration.ofMillis(accessTokenValidMillisecond));
     }
 }

@@ -233,7 +233,7 @@ public class UserService {
 
         userRepository.delete(user);
 
-        jwtUtil.createJwtBlacklist(request);
+        logout(request);
     }
 
     @Transactional
@@ -251,9 +251,13 @@ public class UserService {
 
     @Transactional
     public void logout(HttpServletRequest request) {
-        jwtUtil.createJwtBlacklist(request);
+
+        String accessToken = jwtUtil.resolveAccessToken(request);
+        jwtUtil.setAccessTokenBlacklist(accessToken);
+        jwtUtil.removeRefreshToken(jwtUtil.getUserId(accessToken));
     }
 
+    @Transactional(readOnly = true)
     public UserTokenRefreshResponse reissueToken(UserTokenRefreshRequest request) {
 
         if (!jwtUtil.isValidRefreshToken(request.getRefreshToken())) {
