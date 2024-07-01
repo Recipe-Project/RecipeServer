@@ -7,6 +7,7 @@ import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 import static com.recipe.app.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
@@ -17,6 +18,17 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
     public RecipeRepositoryImpl(EntityManager em) {
         super(em);
+    }
+
+    @Override
+    public Optional<Recipe> findRecipeDetail(Long recipeId, Long userId) {
+        return Optional.ofNullable(queryFactory
+                .selectFrom(recipe)
+                .where(recipe.recipeId.eq(recipeId)
+                        .and(recipe.hiddenYn.eq("N")
+                                .or(recipe.hiddenYn.eq("Y").and(recipe.userId.eq(userId))))
+                        )
+                .fetchOne());
     }
 
     @Override

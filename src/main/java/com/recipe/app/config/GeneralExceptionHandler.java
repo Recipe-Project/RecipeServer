@@ -7,8 +7,6 @@ import com.recipe.app.src.ingredient.exception.NotFoundIngredientCategoryExcepti
 import com.recipe.app.src.ingredient.exception.NotFoundIngredientException;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeLevelException;
-import com.recipe.app.src.user.exception.ForbiddenAccessException;
-import com.recipe.app.src.user.exception.ForbiddenUserException;
 import com.recipe.app.src.user.exception.NotFoundUserException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import org.slf4j.Logger;
@@ -29,12 +27,6 @@ public class GeneralExceptionHandler {
     public ResponseEntity<?> handleNotFoundException(Exception e) {
         log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e);
-    }
-
-    @ExceptionHandler({ForbiddenAccessException.class, ForbiddenUserException.class})
-    public ResponseEntity<?> handleForbiddenException(Exception e) {
-        log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(e);
     }
 
     @ExceptionHandler({UserTokenNotExistException.class})

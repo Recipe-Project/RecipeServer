@@ -13,4 +13,6 @@ public class UserTokenRefreshResponse {
     private Long userId;
     @Schema(description = "액세스 토큰")
     private String accessToken;
+    @Schema(description = "리프레시 토큰")
+    private String refreshToken;
 }

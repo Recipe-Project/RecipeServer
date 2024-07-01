@@ -4,7 +4,7 @@ import com.recipe.app.src.recipe.domain.Recipe
 import com.recipe.app.src.recipe.domain.RecipeIngredient
 import com.recipe.app.src.recipe.domain.RecipeLevel
 import com.recipe.app.src.recipe.domain.RecipeScrap
-import com.recipe.app.src.recipe.domain.RecipeView
+import com.recipe.app.src.recipe.exception.NotFoundRecipeException
 import com.recipe.app.src.user.domain.User
 import com.recipe.app.src.user.infra.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -43,6 +43,92 @@ class RecipeCustomRepositoryTest extends Specification {
                         .build(),
         ]
         userRepository.saveAll(users);
+    }
+
+    def "레시피 상세 조회 시 공개인 경우 성공"() {
+
+        given:
+        List<Recipe> recipes = [
+                Recipe.builder()
+                        .recipeNm("제목")
+                        .introduction("테스트설명")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(1).userId)
+                        .isHidden(false)
+                        .build(),
+                Recipe.builder()
+                        .recipeNm("제목")
+                        .introduction("설명")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(true)
+                        .build(),
+        ]
+        recipeRepository.saveAll(recipes)
+
+        when:
+        Optional<Recipe> recipe = recipeRepository.findRecipeDetail(recipes.get(0).getRecipeId(), users.get(0).getUserId())
+
+        then:
+        recipe.isPresent()
+        recipe.get().getRecipeId() == recipes.get(0).getRecipeId()
+    }
+
+    def "레시피 상세 조회 시 비공개인 경우 본인이 작성한 경우에만 성공"() {
+
+        given:
+        List<Recipe> recipes = [
+                Recipe.builder()
+                        .recipeNm("제목")
+                        .introduction("테스트설명")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(1).userId)
+                        .isHidden(false)
+                        .build(),
+                Recipe.builder()
+                        .recipeNm("제목")
+                        .introduction("설명")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(true)
+                        .build(),
+        ]
+        recipeRepository.saveAll(recipes)
+
+        when:
+        Optional<Recipe> recipe = recipeRepository.findRecipeDetail(recipes.get(1).getRecipeId(), users.get(0).getUserId())
+
+        then:
+        recipe.isPresent()
+        recipe.get().getRecipeId() == recipes.get(1).getRecipeId()
+    }
+
+    def "레시피 상세 조회 시 비공개인 경우 본인이 작성하지 않은 경우 실패"() {
+
+        given:
+        List<Recipe> recipes = [
+                Recipe.builder()
+                        .recipeNm("제목")
+                        .introduction("테스트설명")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(1).userId)
+                        .isHidden(false)
+                        .build(),
+                Recipe.builder()
+                        .recipeNm("제목")
+                        .introduction("설명")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(true)
+                        .build(),
+        ]
+        recipeRepository.saveAll(recipes)
+
+        when:
+        Optional<Recipe> recipe = recipeRepository.findRecipeDetail(recipes.get(1).getRecipeId(), users.get(1).getUserId())
+
+        then:
+        !recipe.isPresent()
     }
 
     def "검색어로 레시피 갯수 조회"() {
