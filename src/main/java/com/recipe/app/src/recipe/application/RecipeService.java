@@ -90,12 +90,10 @@ public class RecipeService {
     @Transactional(readOnly = true)
     public RecipeDetailResponse getRecipe(User user, Long recipeId) {
 
-        Recipe recipe = recipeRepository.findById(recipeId)
+        Recipe recipe = recipeRepository.findRecipeDetail(recipeId, user.getUserId())
                 .orElseThrow(() -> {
                     throw new NotFoundRecipeException();
                 });
-        if (recipe.isHidden() && !user.getUserId().equals(recipe.getUserId()))
-            throw new ForbiddenUserException();
 
         List<RecipeIngredientResponse> recipeIngredients = recipeIngredientService.findRecipeIngredientsByUserIdAndRecipeId(user.getUserId(), recipeId);
         List<RecipeProcessResponse> recipeProcesses = recipeProcessService.fineRecipeProcessesByRecipeId(recipeId);

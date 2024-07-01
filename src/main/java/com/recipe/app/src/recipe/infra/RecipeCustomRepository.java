@@ -5,8 +5,11 @@ import com.recipe.app.src.recipe.domain.Recipe;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public interface RecipeCustomRepository {
+
+    Optional<Recipe> findRecipeDetail(Long recipeId, Long userId);
 
     Long countByKeyword(String keyword);
 
