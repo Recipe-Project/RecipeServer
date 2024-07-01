@@ -7,7 +7,6 @@ import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.ingredient.exception.NotFoundIngredientException;
 import com.recipe.app.src.ingredient.infra.IngredientRepository;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.exception.ForbiddenUserException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
