@@ -98,13 +98,9 @@ public class IngredientService {
     @Transactional
     public void deleteIngredient(User user, Long ingredientId) {
 
-        Ingredient ingredient = ingredientRepository.findById(ingredientId).orElseThrow(() -> {
+        Ingredient ingredient = ingredientRepository.findByIngredientIdAndUserId(ingredientId, user.getUserId()).orElseThrow(() -> {
             throw new NotFoundIngredientException();
         });
-
-        if (!user.getUserId().equals(ingredient.getUserId())) {
-            throw new ForbiddenUserException();
-        }
 
         ingredientRepository.delete(ingredient);
     }
