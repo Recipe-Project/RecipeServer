@@ -267,6 +267,7 @@ public class UserService {
         return UserTokenRefreshResponse.builder()
                 .userId(request.getUserId())
                 .accessToken(jwtUtil.createAccessToken(request.getUserId()))
+                .refreshToken(jwtUtil.createRefreshToken(request.getUserId()))
                 .build();
     }
 }
