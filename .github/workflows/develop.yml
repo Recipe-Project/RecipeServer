@@ -126,6 +126,8 @@ jobs:
       run: |
         cp ./scripts/start.sh ./deploy/start.sh
         cp ./scripts/stop.sh ./deploy/stop.sh
+        cp ./scripts/certbot_install.sh ./deploy/certbot_install.sh
+        cp ./scripts/certbot_renew.sh ./deploy/certbot_renew.sh
 
     # keystore.p12 deploy 폴더로 복사
     - name: Copy keystore
