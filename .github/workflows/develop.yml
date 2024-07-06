@@ -126,6 +126,8 @@ jobs:
       run: |
         cp ./scripts/start.sh ./deploy/start.sh
         cp ./scripts/stop.sh ./deploy/stop.sh
+        cp ./scripts/certbot_install.sh ./deploy/certbot_install.sh
+        cp ./scripts/certbot_renew.sh ./deploy/certbot_renew.sh
 
     # keystore.p12 deploy 폴더로 복사
     - name: Copy keystore
@@ -145,7 +147,7 @@ jobs:
         aws s3 cp \
           --region ap-northeast-2 \
           --acl private \
-          ./recipe-storage-build.zip s3://recipe-storage-test-2023-github-actions-s3-bucket/
+          ./recipe-storage-build.zip s3://recipe-storage-test-2024-github-actions-s3-bucket/
 
     # EC2 서버에 deploy
     - name: Deploy
@@ -157,5 +159,5 @@ jobs:
           --application-name recipe-storage-codedeploy-app \
           --deployment-group-name recipe-storage-codedeploy-deployment-app \
           --file-exists-behavior OVERWRITE \
-          --s3-location bucket=recipe-storage-test-2023-github-actions-s3-bucket,bundleType=zip,key=recipe-storage-build.zip \
+          --s3-location bucket=recipe-storage-test-2024-github-actions-s3-bucket,bundleType=zip,key=recipe-storage-build.zip \
           --region ap-northeast-2
