@@ -35,7 +35,7 @@ public class YoutubeRecipeController {
                                                            @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                            @RequestParam(value = "size") int size,
                                                            @ApiParam(name = "sort", type = "String", example = "조회수순(youtubeViews) / 좋아요순(youtubeScraps) / 최신순(newest) = 기본값", value = "정렬")
-                                                           @RequestParam(value = "sort") String sort) {
+                                                           @RequestParam(value = "sort") String sort) throws IOException {
 
         if (authentication == null)
             throw new UserTokenNotExistException();

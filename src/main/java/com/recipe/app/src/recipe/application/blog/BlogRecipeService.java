@@ -62,7 +62,7 @@ public class BlogRecipeService {
     }
 
     @Transactional
-    public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) {
+    public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) throws UnsupportedEncodingException {
 
         badWordService.checkBadWords(keyword);
 
@@ -70,7 +70,7 @@ public class BlogRecipeService {
         List<BlogRecipe> blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);
 
         if (totalCnt < 10) {
-            searchNaverBlogRecipes(keyword).join();
+            searchNaverBlogRecipes(keyword);
         }
 
         return getRecipes(user, totalCnt, blogRecipes);
@@ -126,32 +126,25 @@ public class BlogRecipeService {
                 .anyMatch(blogScrap -> blogScrap.getBlogRecipeId().equals(blogRecipeId) && blogScrap.getUserId().equals(user.getUserId()));
     }
 
-    private CompletableFuture<Void> searchNaverBlogRecipes(String keyword) {
+    private void searchNaverBlogRecipes(String keyword) throws UnsupportedEncodingException {
 
-        return CompletableFuture.runAsync(() -> {
-            String query = null;
-            try {
-                query = URLEncoder.encode(keyword + " 레시피", "UTF-8");
-            } catch (UnsupportedEncodingException e) {
-                throw new RuntimeException(e);
-            }
+        String query = URLEncoder.encode(keyword + " 레시피", "UTF-8");
 
-            List<BlogRecipe> blogs = naverFeignClient.searchNaverBlog(naverClientId,
-                    naverClientSecret,
-                    NAVER_BLOG_SEARCH_START_PAGE,
-                    NAVER_BLOG_SEARCH_DISPLAY_SIZE,
-                    NAVER_BLOG_SEARCH_SORT,
-                    query).toEntity();
+        List<BlogRecipe> blogs = naverFeignClient.searchNaverBlog(naverClientId,
+                naverClientSecret,
+                NAVER_BLOG_SEARCH_START_PAGE,
+                NAVER_BLOG_SEARCH_DISPLAY_SIZE,
+                NAVER_BLOG_SEARCH_SORT,
+                query).toEntity();
 
-            List<String> blogUrls = blogs.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
-            List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
-            Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity()));
-            List<BlogRecipe> blogRecipes = blogs.stream()
-                    .map(blog -> existBlogRecipeMapByBlogUrl.getOrDefault(blog.getBlogUrl(), blog))
-                    .collect(Collectors.toList());
+        List<String> blogUrls = blogs.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
+        List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
+        Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity()));
+        List<BlogRecipe> blogRecipes = blogs.stream()
+                .map(blog -> existBlogRecipeMapByBlogUrl.getOrDefault(blog.getBlogUrl(), blog))
+                .collect(Collectors.toList());
 
-            blogRecipeRepository.saveAll(blogRecipes);
-        });
+        blogRecipeRepository.saveAll(blogRecipes);
     }
 
     private String getBlogThumbnailUrl(String blogUrl) {

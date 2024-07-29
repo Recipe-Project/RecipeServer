@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 @Api(tags = {"블로그 레시피 Controller"})
 @RestController
@@ -36,7 +37,7 @@ public class BlogRecipeController {
                                                         @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                         @RequestParam(value = "size") int size,
                                                         @ApiParam(name = "sort", type = "String", example = "조회수순(blogViews) / 좋아요순(blogScraps) / 최신순(newest) = 기본값", value = "정렬")
-                                                        @RequestParam(value = "sort") String sort) {
+                                                        @RequestParam(value = "sort") String sort) throws UnsupportedEncodingException {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
