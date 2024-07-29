@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.application.blog;
 
+import com.recipe.app.common.client.NaverFeignClient;
 import com.recipe.app.common.utils.HttpUtil;
 import com.recipe.app.src.common.application.BadWordService;
 import com.recipe.app.src.recipe.application.dto.RecipeResponse;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.time.LocalDate;
@@ -40,18 +42,24 @@ public class BlogRecipeService {
     private final BlogScrapService blogScrapService;
     private final BlogViewService blogViewService;
     private final BadWordService badWordService;
-
-    public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BlogViewService blogViewService, BadWordService badWordService) {
-        this.blogRecipeRepository = blogRecipeRepository;
-        this.blogScrapService = blogScrapService;
-        this.blogViewService = blogViewService;
-        this.badWordService = badWordService;
-    }
+    private final NaverFeignClient naverFeignClient;
 
     @Value("${naver.client-id}")
     private String naverClientId;
     @Value("${naver.client-secret}")
     private String naverClientSecret;
+    private static final int NAVER_BLOG_SEARCH_START_PAGE = 1;
+    private static final int NAVER_BLOG_SEARCH_DISPLAY_SIZE = 50;
+    private static final String NAVER_BLOG_SEARCH_SORT = "sim";
+
+    public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BlogViewService blogViewService,
+                             BadWordService badWordService, NaverFeignClient naverFeignClient) {
+        this.blogRecipeRepository = blogRecipeRepository;
+        this.blogScrapService = blogScrapService;
+        this.blogViewService = blogViewService;
+        this.badWordService = badWordService;
+        this.naverFeignClient = naverFeignClient;
+    }
 
     @Transactional
     public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) {
@@ -121,48 +129,28 @@ public class BlogRecipeService {
     private CompletableFuture<Void> searchNaverBlogRecipes(String keyword) {
 
         return CompletableFuture.runAsync(() -> {
+            String query = null;
             try {
-                String apiURL = "https://openapi.naver.com/v1/search/blog?sort=sim&start=1&display=50&query=" + URLEncoder.encode(keyword + " 레시피", "UTF-8");
-
-                Map<String, String> requestHeaders = new HashMap<>();
-                requestHeaders.put("X-Naver-Client-Id", naverClientId);
-                requestHeaders.put("X-Naver-Client-Secret", naverClientSecret);
-
-                JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
-                JSONArray items = (JSONArray) response.get("items");
-
-                List<BlogRecipe> blogs = new ArrayList<>();
-                for (Object item : items) {
-                    String title = ((JSONObject) item).get("title").toString()
-                            .replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
-                    String blogUrl = ((JSONObject) item).get("link").toString();
-                    String description = ((JSONObject) item).get("description").toString()
-                            .replaceAll("<(/)?([a-zA-Z]*)(\\s[a-zA-Z]*=[^>]*)?(\\s)*(/)?>", "");
-                    String blogName = ((JSONObject) item).get("bloggername").toString();
-                    LocalDate publishedAt = LocalDate.parse(((JSONObject) item).get("postdate").toString(), DateTimeFormatter.ofPattern("yyyyMMdd"));
-                    String thumbnail = getBlogThumbnailUrl(blogUrl);
-
-                    blogs.add(BlogRecipe.builder()
-                            .blogUrl(blogUrl)
-                            .blogThumbnailImgUrl(thumbnail)
-                            .title(title)
-                            .description(description)
-                            .publishedAt(publishedAt)
-                            .blogName(blogName)
-                            .build());
-                }
-
-                List<String> blogUrls = blogs.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
-                List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
-                Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity()));
-                List<BlogRecipe> blogRecipes = blogs.stream()
-                        .map(blog -> existBlogRecipeMapByBlogUrl.getOrDefault(blog.getBlogUrl(), blog))
-                        .collect(Collectors.toList());
-
-                blogRecipeRepository.saveAll(blogRecipes);
-            } catch (IOException | ParseException e) {
+                query = URLEncoder.encode(keyword + " 레시피", "UTF-8");
+            } catch (UnsupportedEncodingException e) {
                 throw new RuntimeException(e);
             }
+
+            List<BlogRecipe> blogs = naverFeignClient.searchNaverBlog(naverClientId,
+                    naverClientSecret,
+                    NAVER_BLOG_SEARCH_START_PAGE,
+                    NAVER_BLOG_SEARCH_DISPLAY_SIZE,
+                    NAVER_BLOG_SEARCH_SORT,
+                    query).toEntity();
+
+            List<String> blogUrls = blogs.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
+            List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
+            Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity()));
+            List<BlogRecipe> blogRecipes = blogs.stream()
+                    .map(blog -> existBlogRecipeMapByBlogUrl.getOrDefault(blog.getBlogUrl(), blog))
+                    .collect(Collectors.toList());
+
+            blogRecipeRepository.saveAll(blogRecipes);
         });
     }
 
