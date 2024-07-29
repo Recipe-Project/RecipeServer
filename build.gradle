@@ -93,6 +93,8 @@ dependencies {
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
 }
 
 test {
