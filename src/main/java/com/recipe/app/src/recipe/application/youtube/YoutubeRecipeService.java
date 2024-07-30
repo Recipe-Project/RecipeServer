@@ -10,13 +10,14 @@ import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
 import com.google.api.services.youtube.model.SearchResult;
 import com.recipe.app.src.common.application.BadWordService;
-import com.recipe.app.src.recipe.application.dto.RecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
+import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipes;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeRecipeRepository;
 import com.recipe.app.src.user.domain.User;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -28,8 +29,6 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Service
@@ -110,9 +109,7 @@ public class YoutubeRecipeService {
                 .collect(Collectors.toList());
         List<YoutubeScrap> youtubeScraps = youtubeScrapService.findByYoutubeRecipeIds(youtubeRecipeIds);
 
-        return new RecipesResponse(totalCnt, youtubeRecipes.stream()
-                .map((youtubeRecipe) -> RecipeResponse.from(youtubeRecipe, isUserScrap(youtubeScraps, youtubeRecipe.getYoutubeRecipeId(), user)))
-                .collect(Collectors.toList()));
+        return RecipesResponse.from(totalCnt, new YoutubeRecipes(youtubeRecipes), youtubeScraps, user);
     }
 
     private boolean isUserScrap(List<YoutubeScrap> youtubeScraps, Long youtubeRecipeId, User user) {

@@ -227,7 +227,10 @@ public class RecipeService {
         return new RecommendedRecipesResponse(recipes.size(), recipes.stream()
                 .map((recipe) -> RecommendedRecipeResponse.from(recipe, user,
                         matchRateMapByRecipeId.get(recipe.getRecipeId()).intValue(),
-                        isUserScrap(recipeScraps, recipe.getRecipeId(), user)))
+                        recipeScraps.stream()
+                                .anyMatch(recipeScrap ->
+                                        recipeScrap.getRecipeId().equals(recipe.getRecipeId())
+                                                && recipeScrap.getUserId().equals(user.getUserId()))))
                 .sorted(Comparator.comparing(RecommendedRecipeResponse::getIngredientsMatchRate).thenComparing(RecommendedRecipeResponse::getRecipeId).reversed())
                 .filter(recommendedRecipe -> lastRecipeId == null || lastRecipeId <= 0 || recommendedRecipe.getRecipeId() < lastRecipeId)
                 .limit(size)
@@ -277,24 +280,14 @@ public class RecipeService {
                 .map(Recipe::getUserId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        Map<Long, User> recipePostUserMapByUserId = userService.findByUserIds(recipePostUserIds).stream()
-                .collect(Collectors.toMap(User::getUserId, Function.identity()));
+        List<User> recipePostUsers =  userService.findByUserIds(recipePostUserIds);
 
         List<Long> recipeIds = recipes.stream()
                 .map(Recipe::getRecipeId)
                 .collect(Collectors.toList());
         List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipeIds);
 
-        return new RecipesResponse(totalCnt, recipes.stream()
-                .map((recipe) -> RecipeResponse.from(recipe,
-                        recipePostUserMapByUserId.get(recipe.getUserId()),
-                        isUserScrap(recipeScraps, recipe.getRecipeId(), user)))
-                .collect(Collectors.toList()));
-    }
-
-    private boolean isUserScrap(List<RecipeScrap> recipeScraps, Long recipeId, User user) {
-        return recipeScraps.stream()
-                .anyMatch(recipeScrap -> recipeScrap.getRecipeId().equals(recipeId) && recipeScrap.getUserId().equals(user.getUserId()));
+        return RecipesResponse.from(totalCnt, recipes, recipePostUsers, recipeScraps, user);
     }
 
     @Transactional
