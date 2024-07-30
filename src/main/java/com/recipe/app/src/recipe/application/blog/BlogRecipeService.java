@@ -15,6 +15,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -133,6 +134,7 @@ public class BlogRecipeService {
         return getRecipes(user, blogRecipes.size(), blogRecipes.subList(0, size));
     }
 
+    @Async
     @Transactional
     public void createBlogRecipes(List<BlogRecipe> blogRecipes) {
 
