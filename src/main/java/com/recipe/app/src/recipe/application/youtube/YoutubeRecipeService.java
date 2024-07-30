@@ -19,6 +19,7 @@ import com.recipe.app.src.recipe.infra.youtube.YoutubeRecipeRepository;
 import com.recipe.app.src.user.domain.User;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -151,6 +152,7 @@ public class YoutubeRecipeService {
         return getRecipes(user, youtubeRecipes.size(), youtubeRecipes.subList(0, size));
     }
 
+    @Async
     @Transactional
     public void createYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes) {
 
