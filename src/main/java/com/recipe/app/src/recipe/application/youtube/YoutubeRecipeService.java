@@ -36,10 +36,9 @@ public class YoutubeRecipeService {
 
     private static final HttpTransport HTTP_TRANSPORT = new NetHttpTransport();
     private static final JsonFactory JSON_FACTORY = new JacksonFactory();
-    private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
-    private static final String GOOGLE_YOUTUBE_URL = "https://www.youtube.com/watch?v=";
     private static final String YOUTUBE_SEARCH_FIELDS = "items(id/kind,id/videoId,snippet/title,snippet/channelTitle,snippet/thumbnails/default/url,snippet/publishedAt)";
-
+    private static final long NUMBER_OF_VIDEOS_RETURNED = 50;
+    private static final int MIN_RECIPE_CNT = 10;
     private final YoutubeRecipeRepository youtubeRecipeRepository;
     private final YoutubeScrapService youtubeScrapService;
     private final YoutubeViewService youtubeViewService;
@@ -55,22 +54,24 @@ public class YoutubeRecipeService {
     @Value("${google.api-key}")
     private String youtubeApiKey;
 
-    @Transactional
+
     public RecipesResponse getYoutubeRecipes(User user, String keyword, Long lastYoutubeRecipeId, int size, String sort) throws IOException {
 
         badWordService.checkBadWords(keyword);
 
         long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
-        List<YoutubeRecipe> youtubeRecipes = findByKeywordSortBy(keyword, lastYoutubeRecipeId, size, sort);
 
-        if (totalCnt < 10) {
-            searchYoutube(keyword);
+        if (totalCnt < MIN_RECIPE_CNT) {
+            return searchYoutube(user, keyword, size);
         }
+
+        List<YoutubeRecipe> youtubeRecipes = findByKeywordSortBy(keyword, lastYoutubeRecipeId, size, sort);
 
         return getRecipes(user, totalCnt, youtubeRecipes);
     }
 
-    private List<YoutubeRecipe> findByKeywordSortBy(String keyword, Long lastYoutubeRecipeId, int size, String sort) {
+    @Transactional(readOnly = true)
+    public List<YoutubeRecipe> findByKeywordSortBy(String keyword, Long lastYoutubeRecipeId, int size, String sort) {
 
         if (sort.equals("youtubeScraps")) {
             long youtubeScrapCnt = youtubeScrapService.countByYoutubeRecipeId(lastYoutubeRecipeId);
@@ -112,12 +113,8 @@ public class YoutubeRecipeService {
         return RecipesResponse.from(totalCnt, new YoutubeRecipes(youtubeRecipes), youtubeScraps, user);
     }
 
-    private boolean isUserScrap(List<YoutubeScrap> youtubeScraps, Long youtubeRecipeId, User user) {
-        return youtubeScraps.stream()
-                .anyMatch(youtubeScrap -> youtubeScrap.getYoutubeRecipeId().equals(youtubeRecipeId) && youtubeScrap.getUserId().equals(user.getUserId()));
-    }
-
-    private void searchYoutube(String keyword) throws IOException {
+    @CircuitBreaker(name = "recipe", fallbackMethod = "fallbackSearchYoutube")
+    public RecipesResponse searchYoutube(User user, String keyword, int size) throws IOException {
 
         YouTube youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
             public void initialize(HttpRequest request) throws IOException {
@@ -136,8 +133,8 @@ public class YoutubeRecipeService {
         SearchListResponse searchResponse = search.execute();
         List<SearchResult> searchResultList = searchResponse.getItems();
 
+        List<YoutubeRecipe> youtubeRecipes = new ArrayList<>();
         if (searchResultList != null) {
-            List<YoutubeRecipe> youtubeRecipes = new ArrayList<>();
             for (SearchResult rid : searchResultList) {
                 youtubeRecipes.add(YoutubeRecipe.builder()
                         .title(rid.getSnippet().getTitle())
@@ -148,14 +145,30 @@ public class YoutubeRecipeService {
                         .youtubeId(rid.getId().getVideoId())
                         .build());
             }
-            List<String> youtubeIds = youtubeRecipes.stream().map(YoutubeRecipe::getYoutubeId).collect(Collectors.toList());
-            List<YoutubeRecipe> existYoutubeRecipes = youtubeRecipeRepository.findByYoutubeIdIn(youtubeIds);
-            Map<String, YoutubeRecipe> existYoutubeRecipesMapByYoutubeId = existYoutubeRecipes.stream().collect(Collectors.toMap(YoutubeRecipe::getYoutubeId, v -> v));
-
-            youtubeRecipeRepository.saveAll(youtubeRecipes.stream()
-                    .filter(youtubeRecipe -> !existYoutubeRecipesMapByYoutubeId.containsKey(youtubeRecipe.getYoutubeId()))
-                    .collect(Collectors.toList()));
         }
+        createYoutubeRecipes(youtubeRecipes);
+
+        return getRecipes(user, youtubeRecipes.size(), youtubeRecipes.subList(0, size));
+    }
+
+    @Transactional
+    public void createYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes) {
+
+        List<String> youtubeIds = youtubeRecipes.stream().map(YoutubeRecipe::getYoutubeId).collect(Collectors.toList());
+        List<YoutubeRecipe> existYoutubeRecipes = youtubeRecipeRepository.findByYoutubeIdIn(youtubeIds);
+        Map<String, YoutubeRecipe> existYoutubeRecipesMapByYoutubeId = existYoutubeRecipes.stream().collect(Collectors.toMap(YoutubeRecipe::getYoutubeId, v -> v));
+
+        youtubeRecipeRepository.saveAll(youtubeRecipes.stream()
+                .filter(youtubeRecipe -> !existYoutubeRecipesMapByYoutubeId.containsKey(youtubeRecipe.getYoutubeId()))
+                .collect(Collectors.toList()));
+    }
+
+    public RecipesResponse fallbackSearchYoutube(User user, String keyword, int size, Exception e) {
+
+        long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
+        List<YoutubeRecipe> youtubeRecipes = youtubeRecipeRepository.findByKeywordLimit(keyword, size);
+
+        return getRecipes(user, totalCnt, youtubeRecipes);
     }
 
     @Transactional

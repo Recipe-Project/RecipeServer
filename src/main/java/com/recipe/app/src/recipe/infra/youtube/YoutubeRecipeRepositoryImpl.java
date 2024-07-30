@@ -32,6 +32,19 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
     }
 
     @Override
+    public List<YoutubeRecipe> findByKeywordLimit(String keyword, int size) {
+
+        return queryFactory
+                .selectFrom(youtubeRecipe)
+                .where(
+                        youtubeRecipe.title.contains(keyword)
+                                .or(youtubeRecipe.description.contains(keyword))
+                )
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
     public List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(String keyword, Long lastYoutubeRecipeId, LocalDate lastYoutubeRecipePostDate, int size) {
 
         return queryFactory
