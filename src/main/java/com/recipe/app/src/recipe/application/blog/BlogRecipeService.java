@@ -1,18 +1,15 @@
 package com.recipe.app.src.recipe.application.blog;
 
 import com.recipe.app.common.client.NaverFeignClient;
-import com.recipe.app.common.utils.HttpUtil;
 import com.recipe.app.src.common.application.BadWordService;
-import com.recipe.app.src.recipe.application.dto.RecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
+import com.recipe.app.src.recipe.domain.blog.BlogRecipes;
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
 import com.recipe.app.src.user.domain.User;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -21,17 +18,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -51,6 +42,7 @@ public class BlogRecipeService {
     private static final int NAVER_BLOG_SEARCH_START_PAGE = 1;
     private static final int NAVER_BLOG_SEARCH_DISPLAY_SIZE = 50;
     private static final String NAVER_BLOG_SEARCH_SORT = "sim";
+    private static final int MIN_RECIPE_CNT = 10;
 
     public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BlogViewService blogViewService,
                              BadWordService badWordService, NaverFeignClient naverFeignClient) {
@@ -61,22 +53,23 @@ public class BlogRecipeService {
         this.naverFeignClient = naverFeignClient;
     }
 
-    @Transactional
     public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) throws UnsupportedEncodingException {
 
         badWordService.checkBadWords(keyword);
 
         long totalCnt = blogRecipeRepository.countByKeyword(keyword);
-        List<BlogRecipe> blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);
 
-        if (totalCnt < 10) {
-            searchNaverBlogRecipes(keyword);
+        if (totalCnt < MIN_RECIPE_CNT) {
+            return searchNaverBlogRecipes(user, keyword, size);
         }
+
+        List<BlogRecipe> blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);
 
         return getRecipes(user, totalCnt, blogRecipes);
     }
 
-    private List<BlogRecipe> findByKeywordSortBy(String keyword, Long lastBlogRecipeId, int size, String sort) {
+    @Transactional(readOnly = true)
+    public List<BlogRecipe> findByKeywordSortBy(String keyword, Long lastBlogRecipeId, int size, String sort) {
 
         if (sort.equals("blogScraps")) {
             long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
@@ -116,35 +109,48 @@ public class BlogRecipeService {
                 .collect(Collectors.toList());
         List<BlogScrap> blogScraps = blogScrapService.findByBlogRecipeIds(blogRecipeIds);
 
-        return new RecipesResponse(totalCnt, blogRecipes.stream()
-                .map(blogRecipe -> RecipeResponse.from(blogRecipe, isUserScrap(blogScraps, blogRecipe.getBlogRecipeId(), user)))
-                .collect(Collectors.toList()));
+        return RecipesResponse.from(totalCnt, new BlogRecipes(blogRecipes), blogScraps, user);
     }
 
-    private boolean isUserScrap(List<BlogScrap> blogScraps, Long blogRecipeId, User user) {
-        return blogScraps.stream()
-                .anyMatch(blogScrap -> blogScrap.getBlogRecipeId().equals(blogRecipeId) && blogScrap.getUserId().equals(user.getUserId()));
-    }
-
-    private void searchNaverBlogRecipes(String keyword) throws UnsupportedEncodingException {
+    @CircuitBreaker(name = "recipe", fallbackMethod = "fallbackSearchNaverBlog(")
+    public RecipesResponse searchNaverBlogRecipes(User user, String keyword, int size) throws UnsupportedEncodingException {
 
         String query = URLEncoder.encode(keyword + " 레시피", "UTF-8");
 
-        List<BlogRecipe> blogs = naverFeignClient.searchNaverBlog(naverClientId,
+        List<BlogRecipe> blogRecipes = naverFeignClient.searchNaverBlog(naverClientId,
                 naverClientSecret,
                 NAVER_BLOG_SEARCH_START_PAGE,
                 NAVER_BLOG_SEARCH_DISPLAY_SIZE,
                 NAVER_BLOG_SEARCH_SORT,
                 query).toEntity();
 
-        List<String> blogUrls = blogs.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
+        for (BlogRecipe blogRecipe : blogRecipes) {
+            blogRecipe.changeThumbnail(getBlogThumbnailUrl(blogRecipe.getBlogUrl()));
+        }
+
+        createBlogRecipes(blogRecipes);
+
+        return getRecipes(user, blogRecipes.size(), blogRecipes.subList(0, size));
+    }
+
+    @Transactional
+    public void createBlogRecipes(List<BlogRecipe> blogRecipes) {
+
+        List<String> blogUrls = blogRecipes.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
         List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
         Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity()));
-        List<BlogRecipe> blogRecipes = blogs.stream()
-                .map(blog -> existBlogRecipeMapByBlogUrl.getOrDefault(blog.getBlogUrl(), blog))
-                .collect(Collectors.toList());
 
-        blogRecipeRepository.saveAll(blogRecipes);
+        blogRecipeRepository.saveAll(blogRecipes.stream()
+                .filter(blogRecipe -> !existBlogRecipeMapByBlogUrl.containsKey(blogRecipe.getBlogUrl()))
+                .collect(Collectors.toList()));
+    }
+
+    public RecipesResponse fallbackSearchNaverBlog(User user, String keyword, int size) {
+
+        long totalCnt = blogRecipeRepository.countByKeyword(keyword);
+        List<BlogRecipe> blogRecipes = blogRecipeRepository.findByKeywordLimit(keyword, size);
+
+        return getRecipes(user, totalCnt, blogRecipes);
     }
 
     private String getBlogThumbnailUrl(String blogUrl) {

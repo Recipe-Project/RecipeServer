@@ -78,4 +78,8 @@ public class BlogRecipe extends BaseEntity {
     public void plusViewCnt() {
         this.viewCnt++;
     }
+
+    public void changeThumbnail(String blogThumbnailUrl) {
+        this.blogThumbnailImgUrl = blogThumbnailUrl;
+    }
 }

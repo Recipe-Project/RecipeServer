@@ -32,6 +32,19 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
     }
 
     @Override
+    public List<BlogRecipe> findByKeywordLimit(String keyword, int size) {
+
+        return queryFactory
+                .selectFrom(blogRecipe)
+                .where(
+                        blogRecipe.title.contains(keyword)
+                                .or(blogRecipe.description.contains(keyword))
+                )
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
     public List<BlogRecipe> findByKeywordLimitOrderByPublishedAtDesc(String keyword, Long lastBlogRecipeId, LocalDate lastBlogRecipePublishedAt, int size) {
 
         return queryFactory
