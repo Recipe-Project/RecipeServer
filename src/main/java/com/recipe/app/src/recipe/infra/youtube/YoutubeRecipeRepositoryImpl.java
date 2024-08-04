@@ -2,8 +2,8 @@ package com.recipe.app.src.recipe.infra.youtube;
 
 import com.recipe.app.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
+import jakarta.persistence.EntityManager;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

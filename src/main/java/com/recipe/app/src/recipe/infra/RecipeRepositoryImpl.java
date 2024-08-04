@@ -2,8 +2,8 @@ package com.recipe.app.src.recipe.infra;
 
 import com.recipe.app.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.recipe.domain.Recipe;
+import jakarta.persistence.EntityManager;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;

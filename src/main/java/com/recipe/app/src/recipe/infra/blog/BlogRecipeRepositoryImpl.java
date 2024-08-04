@@ -3,7 +3,7 @@ package com.recipe.app.src.recipe.infra.blog;
 import com.recipe.app.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;

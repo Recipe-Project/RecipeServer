@@ -2,8 +2,7 @@ package com.recipe.app.src.common.infra;
 
 import com.recipe.app.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.common.domain.AppVersion;
-
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 import static com.recipe.app.src.common.domain.QAppVersion.appVersion;
 

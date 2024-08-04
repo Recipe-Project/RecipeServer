@@ -16,6 +16,7 @@ import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import com.recipe.app.src.user.exception.NotFoundUserException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import com.recipe.app.src.user.infra.UserRepository;
+import jakarta.servlet.http.HttpServletRequest;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
@@ -24,7 +25,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;

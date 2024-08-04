@@ -1,8 +1,7 @@
 package com.recipe.app.common.infra;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
-
-import javax.persistence.EntityManager;
+import jakarta.persistence.EntityManager;
 
 public class BaseRepositoryImpl {
 
