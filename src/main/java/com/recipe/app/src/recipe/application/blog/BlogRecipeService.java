@@ -44,7 +44,7 @@ public class BlogRecipeService {
 
         List<BlogRecipe> blogRecipes;
         if (totalCnt < MIN_RECIPE_CNT) {
-            blogRecipes = blogRecipeClientSearchService.searchNaverBlogRecipes(keyword).subList(0, size);
+            blogRecipes = blogRecipeClientSearchService.searchNaverBlogRecipes(keyword, size);
             totalCnt = blogRecipeRepository.countByKeyword(keyword);
         } else {
             blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);

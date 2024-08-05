@@ -44,7 +44,7 @@ public class YoutubeRecipeClientSearchService {
     }
 
     @CircuitBreaker(name = "recipe-youtube-search", fallbackMethod = "fallback")
-    public List<YoutubeRecipe> searchYoutube(String keyword) throws IOException {
+    public List<YoutubeRecipe> searchYoutube(String keyword, int size) throws IOException {
 
         log.info("youtube search api call");
 
@@ -81,14 +81,14 @@ public class YoutubeRecipeClientSearchService {
 
         createYoutubeRecipes(youtubeRecipes);
 
-        return youtubeRecipes;
+        return youtubeRecipes.subList(0, size);
     }
 
-    public List<YoutubeRecipe> fallback(String keyword, Exception e) {
+    public List<YoutubeRecipe> fallback(String keyword, int size, Exception e) {
 
         log.info("fallback call - " + e.getMessage());
 
-        return youtubeRecipeRepository.findByKeyword(keyword);
+        return youtubeRecipeRepository.findByKeywordLimit(keyword, size);
     }
 
     @Transactional

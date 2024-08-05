@@ -40,7 +40,7 @@ public class BlogRecipeClientSearchService {
     }
 
     @CircuitBreaker(name = "recipe-blog-search", fallbackMethod = "fallback")
-    public List<BlogRecipe> searchNaverBlogRecipes(String keyword) {
+    public List<BlogRecipe> searchNaverBlogRecipes(String keyword, int size) {
 
         log.info("naver blog search api call");
 
@@ -57,14 +57,14 @@ public class BlogRecipeClientSearchService {
 
         createBlogRecipes(blogRecipes);
 
-        return blogRecipes;
+        return blogRecipes.subList(0, size);
     }
 
-    public List<BlogRecipe> fallback(String keyword, Exception e) {
+    public List<BlogRecipe> fallback(String keyword, int size, Exception e) {
 
         log.info("fallback call - " + e.getMessage());
 
-        return blogRecipeRepository.findByKeyword(keyword);
+        return blogRecipeRepository.findByKeywordLimit(keyword, size);
     }
 
     @Transactional

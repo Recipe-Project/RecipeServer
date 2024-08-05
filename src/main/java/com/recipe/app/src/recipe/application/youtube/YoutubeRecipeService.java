@@ -42,7 +42,7 @@ public class YoutubeRecipeService {
 
         List<YoutubeRecipe> youtubeRecipes;
         if (totalCnt < MIN_RECIPE_CNT) {
-            youtubeRecipes = youtubeRecipeClientSearchService.searchYoutube(keyword).subList(0, size);
+            youtubeRecipes = youtubeRecipeClientSearchService.searchYoutube(keyword, size);
             totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
         } else {
             youtubeRecipes = findByKeywordSortBy(keyword, lastYoutubeRecipeId, size, sort);
