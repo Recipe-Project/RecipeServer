@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class BlogRecipeNaverSearchService {
+public class BlogRecipeClientSearchService {
 
     @Value("${naver.client-id}")
     private String naverClientId;
@@ -35,7 +35,7 @@ public class BlogRecipeNaverSearchService {
     private final BlogRecipeRepository blogRecipeRepository;
     private final NaverFeignClient naverFeignClient;
 
-    public BlogRecipeNaverSearchService(BlogRecipeRepository blogRecipeRepository, NaverFeignClient naverFeignClient) {
+    public BlogRecipeClientSearchService(BlogRecipeRepository blogRecipeRepository, NaverFeignClient naverFeignClient) {
         this.blogRecipeRepository = blogRecipeRepository;
         this.naverFeignClient = naverFeignClient;
     }

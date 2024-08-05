@@ -22,18 +22,18 @@ public class BlogRecipeService {
     private final BlogScrapService blogScrapService;
     private final BlogViewService blogViewService;
     private final BadWordService badWordService;
-    private final BlogRecipeNaverSearchService blogRecipeNaverSearchService;
+    private final BlogRecipeClientSearchService blogRecipeClientSearchService;
 
 
     private static final int MIN_RECIPE_CNT = 10;
 
     public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BlogViewService blogViewService,
-                             BadWordService badWordService, BlogRecipeNaverSearchService blogRecipeNaverSearchService) {
+                             BadWordService badWordService, BlogRecipeClientSearchService blogRecipeClientSearchService) {
         this.blogRecipeRepository = blogRecipeRepository;
         this.blogScrapService = blogScrapService;
         this.blogViewService = blogViewService;
         this.badWordService = badWordService;
-        this.blogRecipeNaverSearchService = blogRecipeNaverSearchService;
+        this.blogRecipeClientSearchService = blogRecipeClientSearchService;
     }
 
     public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) throws UnsupportedEncodingException {
@@ -44,7 +44,7 @@ public class BlogRecipeService {
 
         List<BlogRecipe> blogRecipes;
         if (totalCnt < MIN_RECIPE_CNT) {
-            blogRecipes = blogRecipeNaverSearchService.searchNaverBlogRecipes(user, keyword, size);
+            blogRecipes = blogRecipeClientSearchService.searchNaverBlogRecipes(user, keyword, size);
             totalCnt = blogRecipes.size();
         } else {
             blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);
