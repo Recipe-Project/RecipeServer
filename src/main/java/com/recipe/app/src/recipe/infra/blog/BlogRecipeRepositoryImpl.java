@@ -32,7 +32,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
     }
 
     @Override
-    public List<BlogRecipe> findByKeywordLimit(String keyword, int size) {
+    public List<BlogRecipe> findByKeyword(String keyword) {
 
         return queryFactory
                 .selectFrom(blogRecipe)
@@ -40,7 +40,6 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                         blogRecipe.title.contains(keyword)
                                 .or(blogRecipe.description.contains(keyword))
                 )
-                .limit(size)
                 .fetch();
     }
 
