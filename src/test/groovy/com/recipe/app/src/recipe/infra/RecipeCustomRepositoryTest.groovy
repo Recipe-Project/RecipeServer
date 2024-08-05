@@ -4,18 +4,20 @@ import com.recipe.app.src.recipe.domain.Recipe
 import com.recipe.app.src.recipe.domain.RecipeIngredient
 import com.recipe.app.src.recipe.domain.RecipeLevel
 import com.recipe.app.src.recipe.domain.RecipeScrap
-import com.recipe.app.src.recipe.exception.NotFoundRecipeException
 import com.recipe.app.src.user.domain.User
 import com.recipe.app.src.user.infra.UserRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
+import org.springframework.cloud.openfeign.FeignAutoConfiguration
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
 import spock.lang.Specification
 
 @ActiveProfiles("test")
 @DataJpaTest
+@ImportAutoConfiguration(classes = FeignAutoConfiguration.class)
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @TestPropertySource(locations = "classpath:application-test.yml")
 class RecipeCustomRepositoryTest extends Specification {

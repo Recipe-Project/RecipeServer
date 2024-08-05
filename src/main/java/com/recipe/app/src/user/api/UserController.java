@@ -1,5 +1,6 @@
 package com.recipe.app.src.user.api;
 
+import com.recipe.app.src.common.utils.JwtUtil;
 import com.recipe.app.src.user.application.UserFacadeService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
@@ -16,12 +17,12 @@ import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
+import jakarta.servlet.http.HttpServletRequest;
 import org.json.simple.parser.ParseException;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
 
-import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 
 @Api(tags = {"유저 Controller"})
@@ -31,11 +32,13 @@ public class UserController {
 
     private final UserService userService;
     private final UserFacadeService userFacadeService;
+    private final JwtUtil jwtUtil;
 
-    public UserController(UserService userService, UserFacadeService userFacadeService) {
+    public UserController(UserService userService, UserFacadeService userFacadeService, JwtUtil jwtUtil) {
 
         this.userService = userService;
         this.userFacadeService = userFacadeService;
+        this.jwtUtil = jwtUtil;
     }
 
     @ApiOperation(value = "토큰 재발급 API")
@@ -48,6 +51,8 @@ public class UserController {
     @ApiOperation(value = "자동 로그인 API")
     @PostMapping("/auto-login")
     public UserLoginResponse autoLogin(@ApiIgnore final Authentication authentication) {
+
+        System.out.println(jwtUtil.createAccessToken(18L));
 
         if (authentication == null)
             throw new UserTokenNotExistException();
