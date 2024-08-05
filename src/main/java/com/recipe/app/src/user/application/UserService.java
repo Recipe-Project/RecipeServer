@@ -1,9 +1,9 @@
 package com.recipe.app.src.user.application;
 
 import com.google.common.base.Preconditions;
-import com.recipe.app.common.utils.HttpUtil;
-import com.recipe.app.common.utils.JwtUtil;
-import com.recipe.app.src.common.application.BadWordService;
+import com.recipe.app.src.common.utils.HttpUtil;
+import com.recipe.app.src.common.utils.JwtUtil;
+import com.recipe.app.src.etc.application.BadWordService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserLoginResponse;
@@ -12,7 +12,6 @@ import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import com.recipe.app.src.user.application.dto.UserTokenRefreshRequest;
 import com.recipe.app.src.user.application.dto.UserTokenRefreshResponse;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.exception.ForbiddenAccessException;
 import com.recipe.app.src.user.exception.NotFoundUserException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import com.recipe.app.src.user.infra.UserRepository;
