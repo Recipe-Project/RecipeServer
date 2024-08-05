@@ -38,7 +38,7 @@ jobs:
       - name: Copy Secret.java
         env:
           SECRET_JAVA_FILE: ${{ secrets.SECRET_JAVA }}
-        run: echo $SECRET_JAVA_FILE | base64 --decode > src/main/java/com/recipe/app/config/secret/Secret.java
+        run: echo $SECRET_JAVA_FILE | base64 --decode > src/main/java/com/recipe/app/src/config/secret/Secret.java
 
       - name: Get Public IP
         id: publicip
