@@ -9,6 +9,10 @@ import java.util.stream.Collectors;
 @Getter
 public class NaverBlogSearchResponse {
 
+    private int total;
+    private String lastBuildDate;
+    private int display;
+    private int start;
     private List<NaverBlogSearchItemResponse> items;
 
     public List<BlogRecipe> toEntity() {

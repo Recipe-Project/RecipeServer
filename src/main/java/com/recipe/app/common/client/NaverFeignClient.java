@@ -9,12 +9,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 @FeignClient(name = "naver-client", url = "https://openapi.naver.com")
 public interface NaverFeignClient {
 
-    @GetMapping("/v1/search/blog?sort=sim&start=1&display=50&query=")
+    @GetMapping("/v1/search/blog")
     NaverBlogSearchResponse searchNaverBlog(
             @RequestHeader("X-Naver-Client-Id") String clientId,
             @RequestHeader("X-Naver-Client-Secret") String clientSecret,
             @RequestParam(value = "start") int start,
             @RequestParam(value = "display") int display,
-            @RequestParam("sort") String sort,
-            @RequestParam("query") String query);
+            @RequestParam(value = "sort") String sort,
+            @RequestParam(value = "query") String query);
 }
