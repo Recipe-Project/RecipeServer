@@ -4,14 +4,11 @@ import com.recipe.app.src.user.application.UserAuthClientService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-
-import java.io.IOException;
 
 @Controller
 @RequestMapping("/users")
@@ -86,13 +83,11 @@ public class UserWebController {
     }
 
     @GetMapping("/auth/google/callback")
-    public String googleLogin(String code, Model model) throws IOException, ParseException {
+    public String googleLogin(String code, Model model) {
 
-        String idToken = userService.getGoogleIdToken(code);
+        UserLoginRequest request = userAuthClientService.getGoogleLoginRequest(code);
 
-        UserSocialLoginResponse data = userService.googleLogin(UserLoginRequest.builder()
-                .accessToken(idToken)
-                .build());
+        UserSocialLoginResponse data = userService.googleLogin(request);
 
         model.addAttribute("accessToken", data.getAccessToken());
         model.addAttribute("withdrawalURI", withdrawalURI);

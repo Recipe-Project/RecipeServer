@@ -1,7 +1,6 @@
 package com.recipe.app.src.user.application;
 
 import com.google.common.base.Preconditions;
-import com.recipe.app.src.common.utils.HttpUtil;
 import com.recipe.app.src.common.utils.JwtUtil;
 import com.recipe.app.src.etc.application.BadWordService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
@@ -16,29 +15,16 @@ import com.recipe.app.src.user.exception.NotFoundUserException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import com.recipe.app.src.user.infra.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.ParseException;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @Service
 public class UserService {
-
-    @Value("${google.client-id}")
-    private String googleClientId;
-    @Value("${google.client-secret}")
-    private String googleClientSecret;
-    @Value("${google.redirect-uri}")
-    private String googleRedirectURI;
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
@@ -104,42 +90,17 @@ public class UserService {
         return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
-    @Transactional(readOnly = true)
-    public String getGoogleIdToken(String code) throws IOException, ParseException {
-
-        String apiURL = "https://oauth2.googleapis.com/token";
-        String request = "grant_type=authorization_code" +
-                "&client_id=" + googleClientId +
-                "&client_secret=" + googleClientSecret +
-                "&redirect_uri=" + googleRedirectURI +
-                "&code=" + code;
-
-        JSONObject response = HttpUtil.postHTTP(apiURL, request);
-
-        return response.get("id_token").toString();
-    }
-
     @Transactional
-    public UserSocialLoginResponse googleLogin(UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse googleLogin(UserLoginRequest request) {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        String apiURL = "https://oauth2.googleapis.com/tokeninfo?id_token=" + request.getAccessToken();
-        Map<String, String> requestHeaders = new HashMap<>();
+        User loginUser = userAuthClientService.getUserByGoogleAuthInfo(request);
 
-        JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
-
-        String socialId = "google_" + response.get("sub").toString();
-        User user = userRepository.findBySocialId(socialId).orElseGet(() ->
-                userRepository.save(User.builder()
-                        .socialId(socialId)
-                        .nickname(response.get("name").toString())
-                        .email(response.get("email").toString())
-                        .deviceToken(request.getFcmToken())
-                        .build()));
+        User user = userRepository.findBySocialId(loginUser.getSocialId())
+                .orElseGet(() -> userRepository.save(loginUser));
 
         user.changeRecentLoginAt(LocalDateTime.now());
-        userRepository.save(user);
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
