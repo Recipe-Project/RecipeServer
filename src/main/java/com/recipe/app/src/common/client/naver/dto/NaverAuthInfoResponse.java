@@ -1,4 +1,4 @@
-package com.recipe.app.src.common.client.dto;
+package com.recipe.app.src.common.client.naver.dto;
 
 import com.recipe.app.src.user.domain.User;
 import lombok.Getter;

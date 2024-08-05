@@ -1,6 +1,6 @@
-package com.recipe.app.src.common.client;
+package com.recipe.app.src.common.client.naver;
 
-import com.recipe.app.src.common.client.dto.NaverAccessTokenResponse;
+import com.recipe.app.src.common.client.naver.dto.NaverAccessTokenResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;

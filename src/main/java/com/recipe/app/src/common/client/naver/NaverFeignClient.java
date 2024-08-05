@@ -1,7 +1,7 @@
-package com.recipe.app.src.common.client;
+package com.recipe.app.src.common.client.naver;
 
-import com.recipe.app.src.common.client.dto.NaverAuthResponse;
-import com.recipe.app.src.common.client.dto.NaverBlogSearchResponse;
+import com.recipe.app.src.common.client.naver.dto.NaverAuthResponse;
+import com.recipe.app.src.common.client.naver.dto.NaverBlogSearchResponse;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;

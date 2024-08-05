@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application.blog;
 
-import com.recipe.app.src.common.client.NaverFeignClient;
+import com.recipe.app.src.common.client.naver.NaverFeignClient;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;

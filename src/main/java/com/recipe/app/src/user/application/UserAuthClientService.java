@@ -1,8 +1,8 @@
 package com.recipe.app.src.user.application;
 
-import com.recipe.app.src.common.client.NaverFeignClient;
-import com.recipe.app.src.common.client.NaverOAuthFeignClient;
-import com.recipe.app.src.common.client.dto.NaverAuthResponse;
+import com.recipe.app.src.common.client.naver.NaverFeignClient;
+import com.recipe.app.src.common.client.naver.NaverOAuthFeignClient;
+import com.recipe.app.src.common.client.naver.dto.NaverAuthResponse;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.ForbiddenAccessException;
