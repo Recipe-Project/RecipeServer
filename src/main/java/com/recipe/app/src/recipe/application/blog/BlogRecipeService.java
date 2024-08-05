@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application.blog;
 
-import com.recipe.app.src.common.application.BadWordService;
+import com.recipe.app.src.etc.application.BadWordService;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipes;

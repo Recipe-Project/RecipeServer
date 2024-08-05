@@ -1,6 +1,6 @@
 package com.recipe.app.src.fridge.domain;
 
-import com.recipe.app.common.entity.BaseEntity;
+import com.recipe.app.src.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

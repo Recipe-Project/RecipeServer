@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.infra.blog;
 
-import com.recipe.app.common.infra.BaseRepositoryImpl;
+import com.recipe.app.src.common.infra.BaseRepositoryImpl;
+import com.recipe.app.src.common.utils.QueryUtils;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 
 import jakarta.persistence.EntityManager;
@@ -8,7 +9,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.recipe.app.common.utils.QueryUtils.*;
+import static com.recipe.app.src.common.utils.QueryUtils.*;
 import static com.recipe.app.src.recipe.domain.blog.QBlogRecipe.blogRecipe;
 import static com.recipe.app.src.recipe.domain.blog.QBlogScrap.blogScrap;
 

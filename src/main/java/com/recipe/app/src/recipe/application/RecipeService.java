@@ -1,14 +1,13 @@
 package com.recipe.app.src.recipe.application;
 
 import com.google.common.base.Preconditions;
-import com.recipe.app.src.common.application.BadWordService;
+import com.recipe.app.src.etc.application.BadWordService;
 import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeIngredientResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeProcessResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeRequest;
-import com.recipe.app.src.recipe.application.dto.RecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse;

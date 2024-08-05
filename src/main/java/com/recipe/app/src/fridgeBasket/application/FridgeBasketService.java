@@ -1,7 +1,7 @@
 package com.recipe.app.src.fridgeBasket.application;
 
 import com.google.common.base.Preconditions;
-import com.recipe.app.src.common.application.BadWordService;
+import com.recipe.app.src.etc.application.BadWordService;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketCountResponse;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketIngredientIdsRequest;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketIngredientRequest;
