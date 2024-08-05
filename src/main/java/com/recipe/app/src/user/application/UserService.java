@@ -38,12 +38,6 @@ public class UserService {
     private String kakaoClientId;
     @Value("${kakao.redirect-uri}")
     private String kakaoRedirectURI;
-    @Value("${naver.client-id}")
-    private String naverClientId;
-    @Value("${naver.client-secret}")
-    private String naverClientSecret;
-    @Value("${kakao.redirect-uri}")
-    private String naverRedirectURI;
     @Value("${google.client-id}")
     private String googleClientId;
     @Value("${google.client-secret}")
@@ -54,11 +48,13 @@ public class UserService {
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
     private final BadWordService badWordService;
+    private final UserAuthClientService userAuthClientService;
 
-    public UserService(UserRepository userRepository, JwtUtil jwtUtil, BadWordService badWordService) {
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, BadWordService badWordService, UserAuthClientService userAuthClientService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.badWordService = badWordService;
+        this.userAuthClientService = userAuthClientService;
     }
 
     @Transactional(readOnly = true)
@@ -75,53 +71,18 @@ public class UserService {
         return UserLoginResponse.from(user);
     }
 
-    @Transactional(readOnly = true)
-    public String getNaverAccessToken(String code, String state) throws IOException, ParseException {
-
-        String apiURL = "https://nid.naver.com/oauth2.0/token" +
-                "?grant_type=authorization_code" +
-                "&client_id=" + naverClientId +
-                "&client_secret=" + naverClientSecret +
-                "&redirect_uri=" + naverRedirectURI +
-                "&code=" + code +
-                "&state=" + state;
-        Map<String, String> requestHeaders = new HashMap<>();
-
-        JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
-
-        return response.get("access_token").toString();
-    }
-
     @Transactional
-    public UserSocialLoginResponse naverLogin(UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse naverLogin(UserLoginRequest request) {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        String apiURL = "https://openapi.naver.com/v1/nid/me";
-        Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("Authorization", "Bearer " + request.getAccessToken());
+        User user = userAuthClientService.getUserByNaverAuthInfo(request);
 
-        JSONObject jsonObject = HttpUtil.getHTTP(apiURL, requestHeaders);
-
-        String resultCode = jsonObject.get("resultcode").toString();
-
-        if (!resultCode.equals("00"))
-            throw new ForbiddenAccessException();
-
-        JSONObject response = (JSONObject) new JSONParser().parse(jsonObject.get("response").toString());
-
-        String socialId = "naver_" + response.get("id").toString();
-        User user = userRepository.findBySocialId(socialId)
-                .orElseGet(() -> userRepository.save(User.builder()
-                        .socialId(socialId)
-                        .nickname(response.get("name").toString())
-                        .email(response.get("email") != null ? response.get("email").toString() : null)
-                        .phoneNumber(response.get("mobile") != null ? response.get("mobile").toString() : null)
-                        .deviceToken(request.getFcmToken())
-                        .build()));
-
-        user.changeRecentLoginAt(LocalDateTime.now());
-        userRepository.save(user);
+        userRepository.findBySocialId(user.getSocialId())
+                .orElseGet(() -> {
+                    user.changeRecentLoginAt(LocalDateTime.now());
+                    return userRepository.save(user);
+                });
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
