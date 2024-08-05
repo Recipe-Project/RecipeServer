@@ -57,13 +57,12 @@ public class UserService {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        User user = userAuthClientService.getUserByNaverAuthInfo(request);
+        User loginUser = userAuthClientService.getUserByNaverAuthInfo(request);
 
-        userRepository.findBySocialId(user.getSocialId())
-                .orElseGet(() -> {
-                    user.changeRecentLoginAt(LocalDateTime.now());
-                    return userRepository.save(user);
-                });
+        User user = userRepository.findBySocialId(loginUser.getSocialId())
+                .orElseGet(() -> userRepository.save(loginUser));
+
+        user.changeRecentLoginAt(LocalDateTime.now());
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
@@ -76,13 +75,12 @@ public class UserService {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        User user = userAuthClientService.getUserByKakaoAuthInfo(request);
+        User loginUser = userAuthClientService.getUserByKakaoAuthInfo(request);
 
-        userRepository.findBySocialId(user.getSocialId())
-                .orElseGet(() -> {
-                    user.changeRecentLoginAt(LocalDateTime.now());
-                    return userRepository.save(user);
-                });
+        User user = userRepository.findBySocialId(loginUser.getSocialId())
+                .orElseGet(() -> userRepository.save(loginUser));
+
+        user.changeRecentLoginAt(LocalDateTime.now());
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
