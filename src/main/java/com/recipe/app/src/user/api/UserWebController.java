@@ -1,22 +1,19 @@
 package com.recipe.app.src.user.api;
 
+import com.recipe.app.src.user.application.UserAuthClientService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
-import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import java.io.IOException;
-
 @Controller
 @RequestMapping("/users")
 public class UserWebController {
 
-    private final UserService userService;
     @Value("${kakao.client-id}")
     private String kakaoClientId;
     @Value("${kakao.redirect-uri}")
@@ -32,8 +29,12 @@ public class UserWebController {
     @Value("${withdrawal.uri}")
     private String withdrawalURI;
 
-    public UserWebController(UserService userService) {
+    private final UserService userService;
+    private final UserAuthClientService userAuthClientService;
+
+    public UserWebController(UserService userService, UserAuthClientService userAuthClientService) {
         this.userService = userService;
+        this.userAuthClientService = userAuthClientService;
     }
 
     @GetMapping("/social-login")
@@ -56,13 +57,11 @@ public class UserWebController {
     }
 
     @GetMapping("/auth/kakao/callback")
-    public String kakaoLogin(String code, Model model) throws IOException, ParseException {
+    public String kakaoLogin(String code, Model model) {
 
-        String accessToken = userService.getKakaoAccessToken(code);
+        UserLoginRequest request = userAuthClientService.getKakaoLoginRequest(code);
 
-        UserSocialLoginResponse data = userService.kakaoLogin(UserLoginRequest.builder()
-                .accessToken(accessToken)
-                .build());
+        UserSocialLoginResponse data = userService.kakaoLogin(request);
 
         model.addAttribute("accessToken", data.getAccessToken());
         model.addAttribute("withdrawalURI", withdrawalURI);
@@ -71,13 +70,11 @@ public class UserWebController {
     }
 
     @GetMapping("/auth/naver/callback")
-    public String naverLogin(String code, String state, Model model) throws IOException, ParseException {
+    public String naverLogin(String code, String state, Model model) {
 
-        String accessToken = userService.getNaverAccessToken(code, state);
+        UserLoginRequest request = userAuthClientService.getNaverLoginRequest(code, state);
 
-        UserSocialLoginResponse data = userService.naverLogin(UserLoginRequest.builder()
-                .accessToken(accessToken)
-                .build());
+        UserSocialLoginResponse data = userService.naverLogin(request);
 
         model.addAttribute("accessToken", data.getAccessToken());
         model.addAttribute("withdrawalURI", withdrawalURI);
@@ -86,13 +83,11 @@ public class UserWebController {
     }
 
     @GetMapping("/auth/google/callback")
-    public String googleLogin(String code, Model model) throws IOException, ParseException {
+    public String googleLogin(String code, Model model) {
 
-        String idToken = userService.getGoogleIdToken(code);
+        UserLoginRequest request = userAuthClientService.getGoogleLoginRequest(code);
 
-        UserSocialLoginResponse data = userService.googleLogin(UserLoginRequest.builder()
-                .accessToken(idToken)
-                .build());
+        UserSocialLoginResponse data = userService.googleLogin(request);
 
         model.addAttribute("accessToken", data.getAccessToken());
         model.addAttribute("withdrawalURI", withdrawalURI);

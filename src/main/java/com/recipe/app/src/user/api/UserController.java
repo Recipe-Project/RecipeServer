@@ -1,5 +1,6 @@
 package com.recipe.app.src.user.api;
 
+import com.recipe.app.src.common.utils.JwtUtil;
 import com.recipe.app.src.user.application.UserFacadeService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
@@ -16,13 +17,10 @@ import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
-import org.json.simple.parser.ParseException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import springfox.documentation.annotations.ApiIgnore;
-
-import javax.servlet.http.HttpServletRequest;
-import java.io.IOException;
 
 @Api(tags = {"유저 Controller"})
 @RestController
@@ -59,21 +57,21 @@ public class UserController {
 
     @ApiOperation(value = "네이버 로그인 API")
     @PostMapping("/naver-login")
-    public UserSocialLoginResponse naverLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse naverLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) {
 
         return userService.naverLogin(request);
     }
 
     @ApiOperation(value = "카카오 로그인 API")
     @PostMapping("/kakao-login")
-    public UserSocialLoginResponse kakaoLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse kakaoLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) {
 
         return userService.kakaoLogin(request);
     }
 
     @ApiOperation(value = "구글 로그인 API")
     @PostMapping("/google-login")
-    public UserSocialLoginResponse googleLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse googleLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) {
 
         return userService.googleLogin(request);
     }

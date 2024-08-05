@@ -1,15 +1,15 @@
 package com.recipe.app.src.recipe.infra;
 
-import com.recipe.app.common.infra.BaseRepositoryImpl;
+import com.recipe.app.src.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.recipe.domain.Recipe;
+import jakarta.persistence.EntityManager;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import static com.recipe.app.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
+import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
 import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
 import static com.recipe.app.src.recipe.domain.QRecipeScrap.recipeScrap;

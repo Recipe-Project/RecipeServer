@@ -1,9 +1,9 @@
 package com.recipe.app.src.ingredient.infra;
 
-import com.recipe.app.common.infra.BaseRepositoryImpl;
+import com.recipe.app.src.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.ingredient.domain.Ingredient;
+import jakarta.persistence.EntityManager;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.recipe.app.src.ingredient.domain.QIngredient.ingredient;

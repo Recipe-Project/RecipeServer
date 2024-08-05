@@ -13,10 +13,10 @@ import com.recipe.app.src.recipe.application.youtube.YoutubeViewService;
 import com.recipe.app.src.user.application.dto.UserProfileResponse;
 import com.recipe.app.src.user.application.dto.UserRecipeResponse;
 import com.recipe.app.src.user.domain.User;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 @Service

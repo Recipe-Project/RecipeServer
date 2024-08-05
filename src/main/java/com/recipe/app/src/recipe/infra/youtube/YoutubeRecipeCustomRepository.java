@@ -10,6 +10,8 @@ public interface YoutubeRecipeCustomRepository {
 
     Long countByKeyword(String keyword);
 
+    List<YoutubeRecipe> findByKeywordLimit(String keyword, int size);
+
     List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(String keyword, Long lastYoutubeRecipeId, LocalDate lastYoutubeRecipePostDate, int size);
 
     List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeScrapCntDesc(String keyword, Long lastYoutubeRecipeId, long youtubeScrapCnt, int size);

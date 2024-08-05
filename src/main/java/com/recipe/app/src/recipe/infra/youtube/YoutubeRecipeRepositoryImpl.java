@@ -1,14 +1,14 @@
 package com.recipe.app.src.recipe.infra.youtube;
 
-import com.recipe.app.common.infra.BaseRepositoryImpl;
+import com.recipe.app.src.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
+import jakarta.persistence.EntityManager;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.recipe.app.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
+import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeRecipe.youtubeRecipe;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeScrap.youtubeScrap;
 
@@ -29,6 +29,19 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
                                 .or(youtubeRecipe.description.contains(keyword))
                 )
                 .fetchOne();
+    }
+
+    @Override
+    public List<YoutubeRecipe> findByKeywordLimit(String keyword, int size) {
+
+        return queryFactory
+                .selectFrom(youtubeRecipe)
+                .where(
+                        youtubeRecipe.title.contains(keyword)
+                                .or(youtubeRecipe.description.contains(keyword))
+                )
+                .limit(size)
+                .fetch();
     }
 
     @Override

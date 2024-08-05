@@ -1,14 +1,18 @@
 package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.recipe.domain.Recipe;
+import com.recipe.app.src.recipe.domain.RecipeScrap;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
+import com.recipe.app.src.recipe.domain.blog.BlogScrap;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
+import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Schema(description = "레시피 응답 DTO")
 @Getter
@@ -51,7 +55,7 @@ public class RecipeResponse {
         this.viewCnt = viewCnt;
     }
 
-    public static RecipeResponse from(Recipe recipe, User recipePostUser, boolean isScrapByUser) {
+    public static RecipeResponse from(Recipe recipe, User recipePostUser, List<RecipeScrap> recipeScraps, User user) {
 
         return RecipeResponse.builder()
                 .recipeId(recipe.getRecipeId())
@@ -60,13 +64,16 @@ public class RecipeResponse {
                 .thumbnailImgUrl(recipe.getImgUrl())
                 .postUserName(recipePostUser != null ? recipePostUser.getNickname() : null)
                 .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
-                .isUserScrap(isScrapByUser)
+                .isUserScrap(recipeScraps.stream()
+                        .anyMatch(recipeScrap ->
+                                recipeScrap.getRecipeId().equals(recipe.getRecipeId())
+                                        && recipeScrap.getUserId().equals(user.getUserId())))
                 .scrapCnt(recipe.getScrapCnt())
                 .viewCnt(recipe.getViewCnt())
                 .build();
     }
 
-    public static RecipeResponse from(BlogRecipe recipe, boolean isScrapByUser) {
+    public static RecipeResponse from(BlogRecipe recipe, List<BlogScrap> blogScraps, User user) {
         return RecipeResponse.builder()
                 .recipeId(recipe.getBlogRecipeId())
                 .recipeName(recipe.getTitle())
@@ -75,13 +82,16 @@ public class RecipeResponse {
                 .postUserName(recipe.getBlogName())
                 .postDate(recipe.getPublishedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .linkUrl(recipe.getBlogUrl())
-                .isUserScrap(isScrapByUser)
+                .isUserScrap(blogScraps.stream()
+                        .anyMatch(blogScrap ->
+                                blogScrap.getBlogRecipeId().equals(recipe.getBlogRecipeId())
+                                        && blogScrap.getUserId().equals(user.getUserId())))
                 .scrapCnt(recipe.getScrapCnt())
                 .viewCnt(recipe.getViewCnt())
                 .build();
     }
 
-    public static RecipeResponse from(YoutubeRecipe recipe, boolean isScrapByUser) {
+    public static RecipeResponse from(YoutubeRecipe recipe, List<YoutubeScrap> youtubeScraps, User user) {
         return RecipeResponse.builder()
                 .recipeId(recipe.getYoutubeRecipeId())
                 .recipeName(recipe.getTitle())
@@ -90,7 +100,10 @@ public class RecipeResponse {
                 .postUserName(recipe.getChannelName())
                 .postDate(recipe.getPostDate().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .linkUrl("https://www.youtube.com/watch?v=" + recipe.getYoutubeId())
-                .isUserScrap(isScrapByUser)
+                .isUserScrap(youtubeScraps.stream()
+                        .anyMatch(youtubeScrap ->
+                                youtubeScrap.getYoutubeRecipeId().equals(recipe.getYoutubeRecipeId())
+                                        && youtubeScrap.getUserId().equals(user.getUserId())))
                 .scrapCnt(recipe.getScrapCnt())
                 .viewCnt(recipe.getViewCnt())
                 .build();

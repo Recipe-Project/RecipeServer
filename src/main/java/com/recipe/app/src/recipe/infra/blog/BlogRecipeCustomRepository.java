@@ -10,6 +10,8 @@ public interface BlogRecipeCustomRepository {
 
     Long countByKeyword(String keyword);
 
+    List<BlogRecipe> findByKeywordLimit(String keyword, int size);
+
     List<BlogRecipe> findByKeywordLimitOrderByPublishedAtDesc(String keyword, Long lastBlogRecipeId, LocalDate lastBlogRecipePublishedAt, int size);
 
     List<BlogRecipe> findByKeywordLimitOrderByBlogScrapCntDesc(String keyword, Long lastBlogRecipeId, long lastBlogScrapCnt, int size);
