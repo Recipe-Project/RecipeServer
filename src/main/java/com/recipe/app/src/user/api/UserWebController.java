@@ -1,6 +1,5 @@
 package com.recipe.app.src.user.api;
 
-import com.recipe.app.src.user.application.UserAuthClientService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
