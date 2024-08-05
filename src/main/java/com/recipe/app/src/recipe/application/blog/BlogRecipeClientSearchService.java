@@ -3,7 +3,6 @@ package com.recipe.app.src.recipe.application.blog;
 import com.recipe.app.common.client.NaverFeignClient;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
-import com.recipe.app.src.user.domain.User;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
@@ -41,7 +40,7 @@ public class BlogRecipeClientSearchService {
     }
 
     @CircuitBreaker(name = "recipe-blog-search", fallbackMethod = "fallback")
-    public List<BlogRecipe> searchNaverBlogRecipes(User user, String keyword, int size) {
+    public List<BlogRecipe> searchNaverBlogRecipes(String keyword) {
 
         log.info("naver blog search api call");
 
@@ -58,14 +57,14 @@ public class BlogRecipeClientSearchService {
 
         createBlogRecipes(blogRecipes);
 
-        return blogRecipes.subList(0, size);
+        return blogRecipes;
     }
 
-    public List<BlogRecipe> fallback(User user, String keyword, int size, Exception e) {
+    public List<BlogRecipe> fallback(String keyword, Exception e) {
 
         log.info("fallback call - " + e.getMessage());
 
-        return blogRecipeRepository.findByKeywordLimit(keyword, size);
+        return blogRecipeRepository.findByKeyword(keyword);
     }
 
     @Transactional
