@@ -18,8 +18,6 @@ configurations {
 
 repositories {
     mavenCentral()
-    // jitpack.io를 저장소로 추가
-    maven { url 'https://jitpack.io' }
 }
 
 dependencies {
@@ -88,8 +86,8 @@ dependencies {
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
     // Spock
-    testImplementation 'org.spockframework.spock:spock-core:spock-2.3'
-    testImplementation 'org.spockframework.spock:spock-spring:spock-2.3'
+    testImplementation 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
+    testImplementation 'org.spockframework:spock-spring:2.4-M1-groovy-4.0'
 
     // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
