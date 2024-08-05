@@ -60,13 +60,11 @@ public class UserWebController {
     }
 
     @GetMapping("/auth/kakao/callback")
-    public String kakaoLogin(String code, Model model) throws IOException, ParseException {
+    public String kakaoLogin(String code, Model model) {
 
-        String accessToken = userService.getKakaoAccessToken(code);
+        UserLoginRequest request = userAuthClientService.getKakaoLoginRequest(code);
 
-        UserSocialLoginResponse data = userService.kakaoLogin(UserLoginRequest.builder()
-                .accessToken(accessToken)
-                .build());
+        UserSocialLoginResponse data = userService.kakaoLogin(request);
 
         model.addAttribute("accessToken", data.getAccessToken());
         model.addAttribute("withdrawalURI", withdrawalURI);

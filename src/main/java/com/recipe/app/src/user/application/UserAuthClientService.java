@@ -1,5 +1,7 @@
 package com.recipe.app.src.user.application;
 
+import com.recipe.app.src.common.client.kakao.KakaoFeignClient;
+import com.recipe.app.src.common.client.kakao.KakaoOAuthFeignClient;
 import com.recipe.app.src.common.client.naver.NaverFeignClient;
 import com.recipe.app.src.common.client.naver.NaverOAuthFeignClient;
 import com.recipe.app.src.common.client.naver.dto.NaverAuthResponse;
@@ -18,13 +20,22 @@ public class UserAuthClientService {
     private String naverClientSecret;
     @Value("${kakao.redirect-uri}")
     private String naverRedirectURI;
+    @Value("${kakao.client-id}")
+    private String kakaoClientId;
+    @Value("${kakao.redirect-uri}")
+    private String kakaoRedirectURI;
 
     private final NaverFeignClient naverFeignClient;
     private final NaverOAuthFeignClient naverOAuthFeignClient;
+    private final KakaoFeignClient kakaoFeignClient;
+    private final KakaoOAuthFeignClient kakaoOAuthFeignClient;
 
-    public UserAuthClientService(NaverFeignClient naverFeignClient, NaverOAuthFeignClient naverOAuthFeignClient) {
+    public UserAuthClientService(NaverFeignClient naverFeignClient, NaverOAuthFeignClient naverOAuthFeignClient,
+                                 KakaoFeignClient kakaoFeignClient, KakaoOAuthFeignClient kakaoOAuthFeignClient) {
         this.naverFeignClient = naverFeignClient;
         this.naverOAuthFeignClient = naverOAuthFeignClient;
+        this.kakaoFeignClient = kakaoFeignClient;
+        this.kakaoOAuthFeignClient = kakaoOAuthFeignClient;
     }
 
     public UserLoginRequest getNaverLoginRequest(String code, String state) {
@@ -46,5 +57,21 @@ public class UserAuthClientService {
             throw new ForbiddenAccessException();
 
         return response.toEntity(request.getFcmToken());
+    }
+
+    public UserLoginRequest getKakaoLoginRequest(String code) {
+
+        return kakaoOAuthFeignClient.getAccessToken(
+                "authorization_code",
+                kakaoClientId,
+                kakaoRedirectURI,
+                code
+        ).toLoginRequest();
+    }
+
+    public User getUserByKakaoAuthInfo(UserLoginRequest request) {
+
+        return kakaoFeignClient.getAuthInfo("Bearer " + request.getAccessToken())
+                .toEntity(request.getFcmToken());
     }
 }

@@ -64,14 +64,14 @@ public class UserController {
 
     @ApiOperation(value = "네이버 로그인 API")
     @PostMapping("/naver-login")
-    public UserSocialLoginResponse naverLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse naverLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) {
 
         return userService.naverLogin(request);
     }
 
     @ApiOperation(value = "카카오 로그인 API")
     @PostMapping("/kakao-login")
-    public UserSocialLoginResponse kakaoLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse kakaoLogin(@ApiParam(value = "로그인 요청 정보", required = true) @RequestBody UserLoginRequest request) {
 
         return userService.kakaoLogin(request);
     }

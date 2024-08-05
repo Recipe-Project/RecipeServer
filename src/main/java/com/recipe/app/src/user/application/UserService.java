@@ -17,7 +17,6 @@ import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import com.recipe.app.src.user.infra.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -34,10 +33,6 @@ import java.util.Map;
 @Service
 public class UserService {
 
-    @Value("${kakao.client-id}")
-    private String kakaoClientId;
-    @Value("${kakao.redirect-uri}")
-    private String kakaoRedirectURI;
     @Value("${google.client-id}")
     private String googleClientId;
     @Value("${google.client-secret}")
@@ -90,46 +85,18 @@ public class UserService {
         return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
-    @Transactional(readOnly = true)
-    public String getKakaoAccessToken(String code) throws IOException, ParseException {
-
-        String apiURL = "https://kauth.kakao.com/oauth/token";
-        String request = "grant_type=authorization_code" +
-                "&client_id=" + kakaoClientId +
-                "&redirect_uri=" + kakaoRedirectURI +
-                "&code=" + code;
-
-        JSONObject response = HttpUtil.postHTTP(apiURL, request);
-
-        return response.get("access_token").toString();
-    }
-
     @Transactional
-    public UserSocialLoginResponse kakaoLogin(UserLoginRequest request) throws IOException, ParseException {
+    public UserSocialLoginResponse kakaoLogin(UserLoginRequest request) {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        String apiURL = "https://kapi.kakao.com/v2/user/me";
-        Map<String, String> requestHeaders = new HashMap<>();
-        requestHeaders.put("Authorization", "Bearer " + request.getAccessToken());
+        User user = userAuthClientService.getUserByKakaoAuthInfo(request);
 
-        JSONObject response = HttpUtil.getHTTP(apiURL, requestHeaders);
-
-        JSONParser jsonParser = new JSONParser();
-        JSONObject kakaoAccount = (JSONObject) jsonParser.parse(response.get("kakao_account").toString());
-        JSONObject profile = (JSONObject) jsonParser.parse(kakaoAccount.get("profile").toString());
-
-        String socialId = "kakao_" + response.get("id").toString();
-        User user = userRepository.findBySocialId(socialId)
-                .orElseGet(() -> userRepository.save(User.builder()
-                        .socialId(socialId)
-                        .nickname(profile.get("nickname").toString())
-                        .email(kakaoAccount.get("email") != null ? kakaoAccount.get("email").toString() : null)
-                        .deviceToken(request.getFcmToken())
-                        .build()));
-
-        user.changeRecentLoginAt(LocalDateTime.now());
-        userRepository.save(user);
+        userRepository.findBySocialId(user.getSocialId())
+                .orElseGet(() -> {
+                    user.changeRecentLoginAt(LocalDateTime.now());
+                    return userRepository.save(user);
+                });
 
         String accessToken = jwtUtil.createAccessToken(user.getUserId());
         String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
