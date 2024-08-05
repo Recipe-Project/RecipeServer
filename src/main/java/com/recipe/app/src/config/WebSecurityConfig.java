@@ -1,6 +1,6 @@
-package com.recipe.app.config;
+package com.recipe.app.src.config;
 
-import com.recipe.app.common.utils.JwtUtil;
+import com.recipe.app.src.common.utils.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -47,17 +47,11 @@ public class WebSecurityConfig {
                 .formLogin(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/swagger-ui/**").permitAll()
-                        .requestMatchers("/swagger-ui.html").permitAll()
-                        .requestMatchers("/swagger-resources/**").permitAll()
-                        .requestMatchers("/v2/api-docs/**").permitAll()
-                        .requestMatchers("/static/**").permitAll()
-                        .requestMatchers("/actuator/**").permitAll()
-                        .requestMatchers("/users/**").permitAll()
-                        .requestMatchers("/app/version/**").permitAll()
-                        .requestMatchers("/notice/**").permitAll()
-                        .requestMatchers("/dialog/**").permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/fridges/**").authenticated()
+                        .requestMatchers("/fridges/basket/**").authenticated()
+                        .requestMatchers("/ingredients/**").authenticated()
+                        .requestMatchers("/recipes/**").authenticated()
+                        .anyRequest().permitAll())
                 .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
