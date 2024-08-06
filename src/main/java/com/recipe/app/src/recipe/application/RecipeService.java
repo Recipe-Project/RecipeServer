@@ -24,6 +24,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
+import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -60,29 +61,47 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getRecipesByKeyword(User user, String keyword, Long lastRecipeId, int size, String sort) {
+    public RecipesResponse findRecipesByKeyword(User user, String keyword, long lastRecipeId, int size, String sort) {
 
         badWordService.checkBadWords(keyword);
 
         long totalCnt = recipeRepository.countByKeyword(keyword);
+
         List<Recipe> recipes;
         if (sort.equals("recipeScraps")) {
-            long recipeScrapCnt = recipeScrapService.countByRecipeId(lastRecipeId);
-            recipes = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(keyword, lastRecipeId, recipeScrapCnt, size);
+            recipes = findByKeywordOrderByRecipeScrapCnt(keyword, lastRecipeId, size);
         } else if (sort.equals("recipeViews")) {
-            long recipeViewCnt = recipeViewService.countByRecipeId(lastRecipeId);
-            recipes = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(keyword, lastRecipeId, recipeViewCnt, size);
+            recipes = findByKeywordOrderByRecipeViewCnt(keyword, lastRecipeId, size);
         } else {
-            Recipe recipe = null;
-            if (lastRecipeId != null && lastRecipeId > 0) {
-                recipe = recipeRepository.findById(lastRecipeId).orElseThrow(() -> {
-                    throw new NotFoundRecipeException();
-                });
-            }
-            recipes = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, recipe != null ? recipe.getCreatedAt() : null, size);
+            recipes = findByKeywordOrderByCreatedAt(keyword, lastRecipeId, size);
         }
 
         return getRecipes(user, totalCnt, recipes);
+    }
+
+    private List<Recipe> findByKeywordOrderByRecipeScrapCnt(String keyword, long lastRecipeId, int size) {
+
+        long recipeScrapCnt = recipeScrapService.countByRecipeId(lastRecipeId);
+
+        return recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(keyword, lastRecipeId, recipeScrapCnt, size);
+    }
+
+    private List<Recipe> findByKeywordOrderByRecipeViewCnt(String keyword, long lastRecipeId, int size) {
+
+        long recipeViewCnt = recipeViewService.countByRecipeId(lastRecipeId);
+
+        return recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(keyword, lastRecipeId, recipeViewCnt, size);
+    }
+
+    private List<Recipe> findByKeywordOrderByCreatedAt(String keyword, long lastRecipeId, int size) {
+
+        Recipe recipe = recipeRepository.findById(lastRecipeId).orElseThrow(() -> {
+            throw new NotFoundRecipeException();
+        });
+
+        LocalDateTime createdAt = recipe != null ? recipe.getCreatedAt() : null;
+
+        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, createdAt, size);
     }
 
     @Transactional(readOnly = true)

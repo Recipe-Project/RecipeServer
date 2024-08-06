@@ -32,7 +32,7 @@ public class RecipeController {
                                                     @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                                     @RequestParam(value = "keyword") String keyword,
                                                     @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                    @RequestParam(value = "startAfter", required = false) Long startAfter,
+                                                    @RequestParam(value = "startAfter", required = false) long startAfter,
                                                     @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                     @RequestParam(value = "size") int size,
                                                     @ApiParam(name = "sort", type = "String", example = "조회수순(recipeViews) / 좋아요순(recipeScraps) / 최신순(newest) = 기본값", value = "정렬")
@@ -43,7 +43,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.getRecipesByKeyword(user, keyword, startAfter, size, sort);
+        return recipeService.findRecipesByKeyword(user, keyword, startAfter, size, sort);
     }
 
     @ApiOperation(value = "레시피 상세 조회 API")
