@@ -2,9 +2,10 @@ package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.recipe.domain.RecipeReport;
 import com.recipe.app.src.recipe.infra.RecipeReportRepository;
-import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class RecipeReportService {
@@ -16,11 +17,11 @@ public class RecipeReportService {
     }
 
     @Transactional
-    public void createRecipeReport(User user, Long recipeId) {
+    public void createRecipeReport(long userId, long recipeId) {
 
-        RecipeReport recipeReport = recipeReportRepository.findByUserIdAndRecipeId(user.getUserId(), recipeId)
+        RecipeReport recipeReport = recipeReportRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .orElseGet(() -> RecipeReport.builder()
-                        .userId(user.getUserId())
+                        .userId(userId)
                         .recipeId(recipeId)
                         .build());
 
@@ -28,8 +29,15 @@ public class RecipeReportService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isRecipeReported(Long recipeId) {
+    public boolean isRecipeReported(long recipeId) {
 
         return recipeReportRepository.countByRecipeId(recipeId) >= 5;
+    }
+
+    public void deleteAllByRecipeId(long recipeId) {
+
+        List<RecipeReport> reports = recipeReportRepository.findByRecipeId(recipeId);
+
+        recipeReportRepository.deleteAll(reports);
     }
 }

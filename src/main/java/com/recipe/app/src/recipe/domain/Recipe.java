@@ -3,12 +3,14 @@ package com.recipe.app.src.recipe.domain;
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
 import com.recipe.app.src.recipe.infra.RecipeLevelPersistConverter;
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -16,6 +18,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 @Getter
@@ -66,6 +70,12 @@ public class Recipe extends BaseEntity {
     @Column(name = "reportYn", nullable = false)
     private String reportYn = "N";
 
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    List<RecipeIngredient> ingredients = new ArrayList<>();
+
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    List<RecipeProcess> processes = new ArrayList<>();
+
     @Builder
     public Recipe(Long recipeId, String recipeNm, String introduction, Long cookingTime, RecipeLevel level,
                   String imgUrl, Long quantity, Long calorie, Long userId, boolean isHidden, long scrapCnt, long viewCnt) {
@@ -87,9 +97,20 @@ public class Recipe extends BaseEntity {
         this.viewCnt = viewCnt;
     }
 
-    public void updateRecipe(String recipeNm, String imgUrl) {
-        this.recipeNm = recipeNm;
-        this.imgUrl = imgUrl;
+    public void updateRecipe(Recipe updateRecipe) {
+
+        this.recipeNm = updateRecipe.recipeNm;
+        this.introduction = updateRecipe.introduction;
+        this.cookingTime = updateRecipe.cookingTime;
+        this.level = updateRecipe.level;
+        this.imgUrl = updateRecipe.imgUrl;
+        this.hiddenYn = updateRecipe.hiddenYn;
+
+        ingredients.forEach(RecipeIngredient::delete);
+        this.ingredients = updateRecipe.ingredients;
+
+        processes.forEach(RecipeProcess::delete);
+        this.processes = updateRecipe.processes;
     }
 
     public boolean isHidden() {
@@ -115,5 +136,14 @@ public class Recipe extends BaseEntity {
     public void report() {
         this.reportYn = "Y";
         this.hiddenYn = "Y";
+    }
+
+    public long calculateIngredientMatchRate(List<String> ingredientNamesInFridge) {
+
+        long ingredientMatchCnt = ingredients.stream()
+                .filter(ingredient -> ingredient.hasInFridge(ingredientNamesInFridge))
+                .count();
+
+        return ingredientMatchCnt / ingredients.size() * 100;
     }
 }

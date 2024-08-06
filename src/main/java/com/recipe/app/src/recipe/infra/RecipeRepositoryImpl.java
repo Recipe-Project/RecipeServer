@@ -27,7 +27,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .where(recipe.recipeId.eq(recipeId)
                         .and(recipe.hiddenYn.eq("N")
                                 .or(recipe.hiddenYn.eq("Y").and(recipe.userId.eq(userId))))
-                        )
+                )
                 .fetchOne());
     }
 
@@ -36,8 +36,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
         return (long) queryFactory
                 .select(recipe.recipeId, recipe.recipeNm, recipe.introduction)
                 .from(recipe)
-                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId)
-                        .and(recipeIngredient.ingredientName.contains(keyword)))
+                .leftJoin(recipe.ingredients, recipeIngredient).on(recipeIngredient.ingredientName.contains(keyword))
                 .where(recipe.hiddenYn.eq("N"))
                 .groupBy(recipe.recipeId)
                 .having(recipe.recipeNm.contains(keyword)
@@ -51,8 +50,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId)
-                        .and(recipeIngredient.ingredientName.contains(keyword)))
+                .leftJoin(recipe.ingredients, recipeIngredient).on(recipeIngredient.ingredientName.contains(keyword))
                 .where(
                         ifIdIsNotNullAndGreaterThanZero((recipeId, createdAt) -> recipe.createdAt.lt(createdAt)
                                         .or(recipe.createdAt.eq(createdAt)
@@ -74,8 +72,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId)
-                        .and(recipeIngredient.ingredientName.contains(keyword)))
+                .leftJoin(recipe.ingredients, recipeIngredient).on(recipeIngredient.ingredientName.contains(keyword))
                 .where(recipe.hiddenYn.eq("N"),
                         ifIdIsNotNullAndGreaterThanZero((recipeId, recipeScrapCnt) -> recipe.scrapCnt.lt(recipeScrapCnt)
                                         .or(recipe.scrapCnt.eq(recipeScrapCnt)
@@ -95,8 +92,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .leftJoin(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId)
-                        .and(recipeIngredient.ingredientName.contains(keyword)))
+                .leftJoin(recipe.ingredients, recipeIngredient).on(recipeIngredient.ingredientName.contains(keyword))
                 .where(recipe.hiddenYn.eq("N"),
                         ifIdIsNotNullAndGreaterThanZero((recipeId, recipeViewCnt) -> recipe.viewCnt.lt(recipeViewCnt)
                                         .or(recipe.viewCnt.eq(recipeViewCnt)
@@ -113,6 +109,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
     @Override
     public List<Recipe> findUserScrapRecipesLimit(Long userId, Long lastRecipeId, LocalDateTime lastScrapCreatedAt, int size) {
+
         return queryFactory
                 .selectFrom(recipe)
                 .join(recipeScrap).on(recipe.recipeId.eq(recipeScrap.recipeId), recipeScrap.userId.eq(userId))
@@ -147,7 +144,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipeId))
+                .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipe.recipeId))
                 .where(
                         (recipeIngredient.ingredientName.in(ingredientNames)),
                         recipe.hiddenYn.eq("N")

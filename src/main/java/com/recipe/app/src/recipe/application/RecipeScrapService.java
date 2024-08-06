@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.application;
 
+import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
 import com.recipe.app.src.recipe.exception.NotFoundScrapException;
 import com.recipe.app.src.recipe.infra.RecipeScrapRepository;
@@ -9,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class RecipeScrapService {
@@ -20,11 +22,11 @@ public class RecipeScrapService {
     }
 
     @Transactional
-    public void createRecipeScrap(User user, Long recipeId) {
+    public void createRecipeScrap(long userId, long recipeId) {
 
-        RecipeScrap recipeScrap = recipeScrapRepository.findByUserIdAndRecipeId(user.getUserId(), recipeId)
+        RecipeScrap recipeScrap = recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .orElseGet(() -> RecipeScrap.builder()
-                        .userId(user.getUserId())
+                        .userId(userId)
                         .recipeId(recipeId)
                         .build());
 
@@ -32,9 +34,9 @@ public class RecipeScrapService {
     }
 
     @Transactional
-    public void deleteRecipeScrap(User user, Long recipeId) {
+    public void deleteRecipeScrap(long userId, long recipeId) {
 
-        recipeScrapRepository.findByUserIdAndRecipeId(user.getUserId(), recipeId)
+        recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .ifPresent(recipeScrapRepository::delete);
     }
 
@@ -48,18 +50,14 @@ public class RecipeScrapService {
 
     @Transactional(readOnly = true)
     public long countByUserId(Long userId) {
-
         return recipeScrapRepository.countByUserId(userId);
     }
 
-    @Transactional(readOnly = true)
-    public List<RecipeScrap> findByRecipeId(Long recipeId) {
+    public List<RecipeScrap> findByRecipeIds(Collection<Recipe> recipes) {
 
-        return recipeScrapRepository.findByRecipeId(recipeId);
-    }
-
-    @Transactional(readOnly = true)
-    public List<RecipeScrap> findByRecipeIds(Collection<Long> recipeIds) {
+        List<Long> recipeIds = recipes.stream()
+                .map(Recipe::getRecipeId)
+                .collect(Collectors.toList());
 
         return recipeScrapRepository.findByRecipeIdIn(recipeIds);
     }
@@ -76,6 +74,12 @@ public class RecipeScrapService {
         return recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId).orElseThrow(() -> {
             throw new NotFoundScrapException();
         });
+    }
+
+    @Transactional(readOnly = true)
+    public boolean existsByUserIdAndRecipeId(Long userId, Long recipeId) {
+
+        return recipeScrapRepository.existsByUserIdAndRecipeId(userId, recipeId);
     }
 
     @Transactional

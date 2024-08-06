@@ -3,60 +3,42 @@ package com.recipe.app.src.recipe.application;
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.etc.application.BadWordService;
 import com.recipe.app.src.fridge.application.FridgeService;
-import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
-import com.recipe.app.src.recipe.application.dto.RecipeIngredientResponse;
-import com.recipe.app.src.recipe.application.dto.RecipeProcessResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeRequest;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
-import com.recipe.app.src.recipe.application.dto.RecommendedRecipeResponse;
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse;
 import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
-import com.recipe.app.src.recipe.domain.RecipeView;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.RecipeRepository;
 import com.recipe.app.src.user.application.UserService;
-import com.recipe.app.src.user.application.dto.UserRecipeResponse;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
-import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
-    private final RecipeIngredientService recipeIngredientService;
-    private final RecipeProcessService recipeProcessService;
-    private final RecipeScrapService recipeScrapService;
-    private final RecipeViewService recipeViewService;
     private final FridgeService fridgeService;
     private final UserService userService;
     private final BadWordService badWordService;
+    private final RecipeScrapService recipeScrapService;
+    private final RecipeViewService recipeViewService;
     private final RecipeReportService recipeReportService;
 
-    public RecipeService(RecipeRepository recipeRepository, RecipeIngredientService recipeIngredientService, RecipeProcessService recipeProcessService,
-                         RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, FridgeService fridgeService,
-                         UserService userService, BadWordService badWordService, RecipeReportService recipeReportService) {
+    public RecipeService(RecipeRepository recipeRepository, FridgeService fridgeService, UserService userService, BadWordService badWordService,
+                         RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, RecipeReportService recipeReportService) {
         this.recipeRepository = recipeRepository;
-        this.recipeIngredientService = recipeIngredientService;
-        this.recipeProcessService = recipeProcessService;
-        this.recipeScrapService = recipeScrapService;
-        this.recipeViewService = recipeViewService;
         this.fridgeService = fridgeService;
         this.userService = userService;
         this.badWordService = badWordService;
+        this.recipeScrapService = recipeScrapService;
+        this.recipeViewService = recipeViewService;
         this.recipeReportService = recipeReportService;
     }
 
@@ -95,80 +77,82 @@ public class RecipeService {
 
     private List<Recipe> findByKeywordOrderByCreatedAt(String keyword, long lastRecipeId, int size) {
 
-        Recipe recipe = recipeRepository.findById(lastRecipeId).orElseThrow(() -> {
-            throw new NotFoundRecipeException();
-        });
+        Recipe recipe = recipeRepository.findById(lastRecipeId).orElse(null);
 
-        LocalDateTime createdAt = recipe != null ? recipe.getCreatedAt() : null;
-
-        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, createdAt, size);
+        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, recipe != null ? recipe.getCreatedAt() : null, size);
     }
 
     @Transactional(readOnly = true)
-    public RecipeDetailResponse getRecipe(User user, Long recipeId) {
+    public RecipeDetailResponse findRecipeDetail(User user, long recipeId) {
 
         Recipe recipe = recipeRepository.findRecipeDetail(recipeId, user.getUserId())
                 .orElseThrow(() -> {
                     throw new NotFoundRecipeException();
                 });
 
-        List<RecipeIngredientResponse> recipeIngredients = recipeIngredientService.findRecipeIngredientsByUserIdAndRecipeId(user.getUserId(), recipeId);
-        List<RecipeProcessResponse> recipeProcesses = recipeProcessService.fineRecipeProcessesByRecipeId(recipeId);
-        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeId(recipeId);
-        List<RecipeView> recipeViews = recipeViewService.findByRecipeId(recipeId);
-        boolean isUserScrap = recipeScraps.stream()
-                .anyMatch(recipeScrap -> recipeScrap.getUserId().equals(user.getUserId()));
+        List<String> ingredientNamesInFridge = fridgeService.findIngredientNamesInFridge(user.getUserId());
+
+        boolean isUserScrap = recipeScrapService.existsByUserIdAndRecipeId(user.getUserId(), recipe.getRecipeId());
 
         User postUser = null;
         if (recipe.getUserId() != null) {
             postUser = userService.findByUserId(recipe.getUserId());
         }
 
-        return RecipeDetailResponse.from(recipe, recipeIngredients, recipeProcesses, isUserScrap, recipeScraps.size(), recipeViews.size(), postUser);
+        return RecipeDetailResponse.from(recipe, isUserScrap, postUser, ingredientNamesInFridge);
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getScrapRecipes(User user, Long lastRecipeId, int size) {
+    public RecipesResponse findScrapRecipes(User user, long lastRecipeId, int size) {
 
         long totalCnt = recipeScrapService.countByUserId(user.getUserId());
-        RecipeScrap recipeScrap = null;
-        if (lastRecipeId != null && lastRecipeId > 0) {
-            recipeScrap = recipeScrapService.findByUserIdAndRecipeId(user.getUserId(), lastRecipeId);
-        }
+
+        RecipeScrap recipeScrap = recipeScrapService.findByUserIdAndRecipeId(user.getUserId(), lastRecipeId);
+
         List<Recipe> recipes = recipeRepository.findUserScrapRecipesLimit(user.getUserId(), lastRecipeId, recipeScrap != null ? recipeScrap.getCreatedAt() : null, size);
 
         return getRecipes(user, totalCnt, recipes);
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getRecipesByUser(User user, Long lastRecipeId, int size) {
+    public RecipesResponse findRecipesByUser(User user, long lastRecipeId, int size) {
 
         long totalCnt = recipeRepository.countByUserId(user.getUserId());
-        List<Recipe> recipes = recipeRepository.findLimitByUserId(user.getUserId(), lastRecipeId, size);
+
+        List<Recipe> recipes = findLimitByUserId(user.getUserId(), lastRecipeId, size);
 
         return getRecipes(user, totalCnt, recipes);
     }
 
     @Transactional(readOnly = true)
-    public List<UserRecipeResponse> getUserRecipesByUser(User user, Long lastRecipeId, int size) {
+    public List<Recipe> findLimitByUserId(Long userId, long lastRecipeId, int size) {
 
-        List<Recipe> recipes = recipeRepository.findLimitByUserId(user.getUserId(), lastRecipeId, size);
-
-        return recipes.stream()
-                .map(r -> new UserRecipeResponse(r.getRecipeId(), r.getImgUrl()))
-                .collect(Collectors.toList());
+        return recipeRepository.findLimitByUserId(userId, lastRecipeId, size);
     }
 
-    @Transactional
-    public void deleteRecipe(User user, Long recipeId) {
+    private RecipesResponse getRecipes(User user, long totalCnt, List<Recipe> recipes) {
 
-        Recipe recipe = getRecipeByUserIdAndRecipeId(user, recipeId);
+        List<User> recipePostUsers = userService.findRecipePostUsers(recipes);
 
-        recipeScrapService.deleteAllByRecipeId(recipe.getRecipeId());
-        recipeViewService.deleteAllByRecipeId(recipe.getRecipeId());
-        recipeIngredientService.deleteAllByRecipeId(recipe.getRecipeId());
-        recipeProcessService.deleteAllByRecipeId(recipe.getRecipeId());
-        recipeRepository.delete(recipe);
+        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes);
+
+        return RecipesResponse.from(totalCnt, recipes, recipePostUsers, recipeScraps, user);
+    }
+
+    @Transactional(readOnly = true)
+    public RecommendedRecipesResponse findRecommendedRecipesByUserFridge(User user, long lastRecipeId, int size) {
+
+        List<String> ingredientNamesInFridge = fridgeService.findIngredientNamesInFridge(user.getUserId());
+
+        List<Recipe> recipes = recipeRepository.findRecipesInFridge(ingredientNamesInFridge);
+
+        List<User> recipePostUsers = userService.findRecipePostUsers(recipes);
+
+        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes);
+
+        Recipe lastRecipe = recipeRepository.findById(lastRecipeId).orElse(null);
+
+        return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, user, ingredientNamesInFridge, lastRecipe, size);
     }
 
     @Transactional
@@ -179,9 +163,7 @@ public class RecipeService {
         badWordService.checkBadWords(request.getTitle());
         badWordService.checkBadWords(request.getIntroduction());
 
-        Recipe recipe = recipeRepository.save(request.toRecipeEntity(user.getUserId()));
-        recipeIngredientService.createRecipeIngredients(request.toRecipeIngredientEntities(recipe.getRecipeId()));
-        recipeProcessService.createRecipeProcesses(request.toRecipeProcessEntities(recipe.getRecipeId()));
+        recipeRepository.save(request.toRecipeEntity(user.getUserId()));
     }
 
     @Transactional
@@ -193,15 +175,9 @@ public class RecipeService {
         badWordService.checkBadWords(request.getIntroduction());
 
         Recipe recipe = getRecipeByUserIdAndRecipeId(user, recipeId);
+        recipe.updateRecipe(request.toRecipeEntity(user.getUserId()));
 
-        recipe.updateRecipe(request.getTitle(), request.getThumbnailImgUrl());
         recipeRepository.save(recipe);
-
-        recipeProcessService.deleteAllByRecipeId(recipeId);
-        recipeProcessService.createRecipeProcesses(request.toRecipeProcessEntities(recipeId));
-
-        recipeIngredientService.deleteAllByRecipeId(recipeId);
-        recipeIngredientService.createRecipeIngredients(request.toRecipeIngredientEntities(recipeId));
     }
 
     private void validateRecipeRequest(RecipeRequest request) {
@@ -212,6 +188,17 @@ public class RecipeService {
         Objects.requireNonNull(request.getProcesses(), "레시피 과정을 입력해주세요.");
     }
 
+    @Transactional
+    public void deleteRecipe(User user, Long recipeId) {
+
+        Recipe recipe = getRecipeByUserIdAndRecipeId(user, recipeId);
+
+        recipeScrapService.deleteAllByRecipeId(recipe.getRecipeId());
+        recipeViewService.deleteAllByRecipeId(recipe.getRecipeId());
+        recipeReportService.deleteAllByRecipeId(recipe.getRecipeId());
+        recipeRepository.delete(recipe);
+    }
+
     private Recipe getRecipeByUserIdAndRecipeId(User user, Long recipeId) {
         return recipeRepository.findByUserIdAndRecipeId(user.getUserId(), recipeId)
                 .orElseThrow(() -> {
@@ -219,56 +206,12 @@ public class RecipeService {
                 });
     }
 
-    @Transactional(readOnly = true)
-    public RecommendedRecipesResponse findRecommendedRecipesByUserFridge(User user, Long lastRecipeId, int size) {
+    @Transactional
+    public void deleteRecipesByUser(User user) {
 
-        List<Ingredient> ingredientsInFridge = fridgeService.findIngredientsInUserFridge(user);
-        List<Long> ingredientIdsInFridge = ingredientsInFridge.stream()
-                .map(Ingredient::getIngredientId)
-                .collect(Collectors.toList());
-        List<String> ingredientNamesInFridge = ingredientsInFridge.stream()
-                .flatMap(ingredient -> Stream.of(ingredient.getIngredientName(), ingredient.getSimilarIngredientName()))
-                .map(Object::toString)
-                .collect(Collectors.toList());
+        List<Recipe> recipes = recipeRepository.findByUserId(user.getUserId());
 
-        List<Recipe> recipes = recipeRepository.findRecipesInFridge(ingredientNamesInFridge);
-        List<Long> recipeIds = recipes.stream()
-                .map(Recipe::getRecipeId)
-                .collect(Collectors.toList());
-
-        Map<Long, Long> matchRateMapByRecipeId = getMatchRateMapByRecipeId(recipeIds, ingredientIdsInFridge, ingredientNamesInFridge);
-
-        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipeIds);
-
-        return new RecommendedRecipesResponse(recipes.size(), recipes.stream()
-                .map((recipe) -> RecommendedRecipeResponse.from(recipe, user,
-                        matchRateMapByRecipeId.get(recipe.getRecipeId()).intValue(),
-                        recipeScraps.stream()
-                                .anyMatch(recipeScrap ->
-                                        recipeScrap.getRecipeId().equals(recipe.getRecipeId())
-                                                && recipeScrap.getUserId().equals(user.getUserId()))))
-                .sorted(Comparator.comparing(RecommendedRecipeResponse::getIngredientsMatchRate).thenComparing(RecommendedRecipeResponse::getRecipeId).reversed())
-                .filter(recommendedRecipe -> lastRecipeId == null || lastRecipeId <= 0 || recommendedRecipe.getRecipeId() < lastRecipeId)
-                .limit(size)
-                .collect(Collectors.toList()));
-    }
-
-    private Map<Long, Long> getMatchRateMapByRecipeId(List<Long> recipeIds, List<Long> ingredientIdsInFridge, List<String> ingredientNamesInFridge) {
-
-        List<RecipeIngredient> recipeIngredients = recipeIngredientService.findByRecipeIds(recipeIds);
-        Map<Long, List<String>> ingredientNamesMapByRecipeId = recipeIngredients.stream()
-                .collect(Collectors.groupingBy(RecipeIngredient::getRecipeId, Collectors.mapping(RecipeIngredient::getIngredientName, Collectors.toList())));
-
-        return ingredientNamesMapByRecipeId.keySet().stream()
-                .collect(Collectors.toMap(Function.identity(), recipeId -> {
-                    List<String> ingredientNamesInRecipe = ingredientNamesMapByRecipeId.get(recipeId);
-                    long recipeIngredientCnt = ingredientNamesInRecipe.size();
-                    long recipeIngredientInFridgeCnt = ingredientNamesInRecipe.stream()
-                            .filter(ingredientNamesInFridge::contains)
-                            .count();
-
-                    return (long) ((double) recipeIngredientInFridgeCnt / recipeIngredientCnt * 100);
-                }));
+        recipeRepository.deleteAll(recipes);
     }
 
     @Transactional(readOnly = true)
@@ -278,81 +221,47 @@ public class RecipeService {
     }
 
     @Transactional
-    public void deleteRecipesByUser(User user) {
-
-        List<Recipe> recipes = recipeRepository.findByUserId(user.getUserId());
-        List<Long> recipeIds = recipes.stream()
-                .map(Recipe::getRecipeId)
-                .collect(Collectors.toList());
-
-        recipeIngredientService.deleteAllByRecipeIds(recipeIds);
-        recipeProcessService.deleteAllByRecipeIds(recipeIds);
-        recipeRepository.deleteAll(recipes);
-    }
-
-    private RecipesResponse getRecipes(User user, long totalCnt, List<Recipe> recipes) {
-
-        List<Long> recipePostUserIds = recipes.stream()
-                .map(Recipe::getUserId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toList());
-        List<User> recipePostUsers = userService.findByUserIds(recipePostUserIds);
-
-        List<Long> recipeIds = recipes.stream()
-                .map(Recipe::getRecipeId)
-                .collect(Collectors.toList());
-        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipeIds);
-
-        return RecipesResponse.from(totalCnt, recipes, recipePostUsers, recipeScraps, user);
-    }
-
-    @Transactional
     public void createRecipeScrap(User user, Long recipeId) {
 
-        Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> {
-                    throw new NotFoundRecipeException();
+        recipeRepository.findById(recipeId)
+                .ifPresent((recipe) -> {
+                    recipe.plusScrapCnt();
+                    recipeScrapService.createRecipeScrap(user.getUserId(), recipeId);
                 });
-        recipe.plusScrapCnt();
-        recipeRepository.save(recipe);
-        recipeScrapService.createRecipeScrap(user, recipeId);
     }
 
     @Transactional
-    public void deleteRecipeScrap(User user, Long recipeId) {
+    public void deleteRecipeScrap(User user, long recipeId) {
 
-        Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> {
-                    throw new NotFoundRecipeException();
+        recipeRepository.findById(recipeId)
+                .ifPresent((recipe) -> {
+                    recipe.minusScrapCnt();
+                    recipeScrapService.deleteRecipeScrap(user.getUserId(), recipeId);
                 });
-        recipe.minusScrapCnt();
-        recipeRepository.save(recipe);
-        recipeScrapService.deleteRecipeScrap(user, recipeId);
     }
 
     @Transactional
-    public void createRecipeView(User user, Long recipeId) {
-        Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> {
-                    throw new NotFoundRecipeException();
+    public void createRecipeView(User user, long recipeId) {
+
+        recipeRepository.findById(recipeId)
+                .ifPresent((recipe) -> {
+                    recipe.plusViewCnt();
+                    recipeViewService.createRecipeView(user.getUserId(), recipeId);
                 });
-        recipe.plusViewCnt();
-        recipeRepository.save(recipe);
-        recipeViewService.createRecipeView(user, recipeId);
     }
 
     @Transactional
     public void createRecipeReport(User user, Long recipeId) {
 
-        recipeReportService.createRecipeReport(user, recipeId);
+        recipeRepository.findById(recipeId)
+                .ifPresent((recipe) -> {
 
-        if (recipeReportService.isRecipeReported(recipeId)) {
-            Recipe recipe = recipeRepository.findById(recipeId).orElseThrow(() -> {
-                throw new NotFoundRecipeException();
-            });
+                    recipeReportService.createRecipeReport(user.getUserId(), recipeId);
 
-            recipe.report();
-        }
+                    if (recipeReportService.isRecipeReported(recipeId)) {
+                        recipe.report();
+                    }
+                });
     }
 }
 

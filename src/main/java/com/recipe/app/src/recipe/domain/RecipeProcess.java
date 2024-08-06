@@ -4,9 +4,12 @@ import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -27,8 +30,9 @@ public class RecipeProcess extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recipeProcessId;
 
-    @Column(name = "recipeId", nullable = false)
-    private Long recipeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipeId")
+    private Recipe recipe;
 
     @Column(name = "cookingNo", nullable = false)
     private Integer cookingNo;
@@ -40,16 +44,20 @@ public class RecipeProcess extends BaseEntity {
     private String recipeProcessImgUrl;
 
     @Builder
-    public RecipeProcess(Long recipeProcessId, Long recipeId, Integer cookingNo, String cookingDescription, String recipeProcessImgUrl) {
+    public RecipeProcess(Long recipeProcessId, Recipe recipe, Integer cookingNo, String cookingDescription, String recipeProcessImgUrl) {
 
-        Objects.requireNonNull(recipeId, "레시피 아이디를 입력해주세요.");
         Objects.requireNonNull(cookingNo, "레시피 요리 순서를 입력해주세요.");
         Preconditions.checkArgument(StringUtils.hasText(cookingDescription), "레시피 요리 과정 설명을 입력해주세요.");
 
         this.recipeProcessId = recipeProcessId;
-        this.recipeId = recipeId;
+        this.recipe = recipe;
+        recipe.processes.add(this);
         this.cookingNo = cookingNo;
         this.cookingDescription = cookingDescription;
         this.recipeProcessImgUrl = recipeProcessImgUrl;
+    }
+
+    public void delete() {
+        this.recipe = null;
     }
 }

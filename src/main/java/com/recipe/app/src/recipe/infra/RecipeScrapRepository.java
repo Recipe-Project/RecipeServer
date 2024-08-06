@@ -11,6 +11,8 @@ import java.util.Optional;
 @Repository
 public interface RecipeScrapRepository extends JpaRepository<RecipeScrap, Long> {
 
+    boolean existsByUserIdAndRecipeId(Long userId, Long recipeId);
+
     Optional<RecipeScrap> findByUserIdAndRecipeId(Long userId, Long recipeId);
 
     long countByUserId(Long userId);

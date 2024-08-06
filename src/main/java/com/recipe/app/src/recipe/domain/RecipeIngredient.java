@@ -4,9 +4,12 @@ import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -14,7 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 
-import java.util.Objects;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -27,8 +30,9 @@ public class RecipeIngredient extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long recipeIngredientId;
 
-    @Column(name = "recipeId", nullable = false)
-    private Long recipeId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "recipeId")
+    private Recipe recipe;
 
     @Column(name = "ingredientName", nullable = false, length = 64)
     private String ingredientName;
@@ -43,16 +47,24 @@ public class RecipeIngredient extends BaseEntity {
     private String unit;
 
     @Builder
-    public RecipeIngredient(Long recipeIngredientId, Long recipeId, String ingredientName, Long ingredientIconId, String quantity, String unit) {
+    public RecipeIngredient(Long recipeIngredientId, Recipe recipe, String ingredientName, Long ingredientIconId, String quantity, String unit) {
 
-        Objects.requireNonNull(recipeId, "레시피 아이디를 입력해주세요.");
         Preconditions.checkArgument(StringUtils.hasText(ingredientName), "레시피 재료명을 입력해주세요.");
 
         this.recipeIngredientId = recipeIngredientId;
-        this.recipeId = recipeId;
+        this.recipe = recipe;
+        recipe.ingredients.add(this);
         this.ingredientName = ingredientName;
         this.ingredientIconId = ingredientIconId;
         this.quantity = quantity;
         this.unit = unit;
+    }
+
+    public void delete() {
+        this.recipe = null;
+    }
+
+    public boolean hasInFridge(List<String> ingredientNames) {
+        return ingredientNames.contains(ingredientName);
     }
 }

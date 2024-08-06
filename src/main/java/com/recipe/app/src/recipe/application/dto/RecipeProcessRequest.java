@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.application.dto;
 
+import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeProcess;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
@@ -18,10 +19,10 @@ public class RecipeProcessRequest {
     @Schema(description = "레시피 과정 이미지 url")
     private String recipeProcessImgUrl;
 
-    public RecipeProcess toEntity(Long recipeId) {
+    public RecipeProcess toEntity(Recipe recipe) {
 
         return RecipeProcess.builder()
-                .recipeId(recipeId)
+                .recipe(recipe)
                 .cookingNo(cookingNo)
                 .cookingDescription(cookingDescription)
                 .recipeProcessImgUrl(recipeProcessImgUrl)

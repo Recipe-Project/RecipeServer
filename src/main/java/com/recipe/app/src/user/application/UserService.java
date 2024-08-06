@@ -3,6 +3,7 @@ package com.recipe.app.src.user.application;
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.utils.JwtUtil;
 import com.recipe.app.src.etc.application.BadWordService;
+import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserLoginResponse;
@@ -22,6 +23,8 @@ import org.springframework.util.StringUtils;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Service
 public class UserService {
@@ -130,9 +133,14 @@ public class UserService {
     }
 
     @Transactional(readOnly = true)
-    public List<User> findByUserIds(Collection<Long> userIds) {
+    public List<User> findRecipePostUsers(Collection<Recipe> recipes) {
 
-        return userRepository.findAllById(userIds);
+        List<Long> recipePostUserIds = recipes.stream()
+                .map(Recipe::getUserId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+        return userRepository.findAllById(recipePostUserIds);
     }
 
     @Transactional

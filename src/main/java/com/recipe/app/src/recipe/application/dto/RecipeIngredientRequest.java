@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.application.dto;
 
+import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
@@ -20,10 +21,10 @@ public class RecipeIngredientRequest {
     @Schema(description = "레시피 재료 단위", nullable = true)
     private String unit;
 
-    public RecipeIngredient toEntity(Long recipeId) {
+    public RecipeIngredient toEntity(Recipe recipe) {
 
         return RecipeIngredient.builder()
-                .recipeId(recipeId)
+                .recipe(recipe)
                 .ingredientName(ingredientName)
                 .ingredientIconId(ingredientIconId)
                 .quantity(quantity)

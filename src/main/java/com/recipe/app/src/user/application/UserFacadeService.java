@@ -10,8 +10,8 @@ import com.recipe.app.src.recipe.application.blog.BlogScrapService;
 import com.recipe.app.src.recipe.application.blog.BlogViewService;
 import com.recipe.app.src.recipe.application.youtube.YoutubeScrapService;
 import com.recipe.app.src.recipe.application.youtube.YoutubeViewService;
+import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.user.application.dto.UserProfileResponse;
-import com.recipe.app.src.user.application.dto.UserRecipeResponse;
 import com.recipe.app.src.user.domain.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
@@ -57,7 +57,8 @@ public class UserFacadeService {
         long youtubeScrapCnt = youtubeScrapService.countYoutubeScrapByUser(user);
         long blogScrapCnt = blogScrapService.countBlogScrapByUser(user);
         long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
-        List<UserRecipeResponse> userRecipes = recipeService.getUserRecipesByUser(user, 0L, 6);
+
+        List<Recipe> userRecipes = recipeService.findLimitByUserId(user.getUserId(), 0L, 6);
 
         return UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
     }

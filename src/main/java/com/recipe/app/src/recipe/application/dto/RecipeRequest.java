@@ -1,16 +1,13 @@
 package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import com.recipe.app.src.recipe.domain.RecipeLevel;
-import com.recipe.app.src.recipe.domain.RecipeProcess;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Schema(description = "레시피 요청 DTO")
 @Getter
@@ -36,7 +33,7 @@ public class RecipeRequest {
 
     public Recipe toRecipeEntity(Long userId) {
 
-        return Recipe.builder()
+        Recipe recipe = Recipe.builder()
                 .recipeNm(title)
                 .introduction(introduction)
                 .cookingTime(cookingTime)
@@ -45,19 +42,10 @@ public class RecipeRequest {
                 .isHidden(isHidden)
                 .userId(userId)
                 .build();
-    }
 
-    public List<RecipeIngredient> toRecipeIngredientEntities(Long recipeId) {
+        ingredients.forEach(ingredient -> ingredient.toEntity(recipe));
+        processes.forEach(process -> process.toEntity(recipe));
 
-        return ingredients.stream()
-                .map(ingredient -> ingredient.toEntity(recipeId))
-                .collect(Collectors.toList());
-    }
-
-    public List<RecipeProcess> toRecipeProcessEntities(Long recipeId) {
-
-        return processes.stream()
-                .map(process -> process.toEntity(recipeId))
-                .collect(Collectors.toList());
+        return recipe;
     }
 }
