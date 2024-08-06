@@ -1,16 +1,23 @@
 package com.recipe.app.src.recipe.domain.youtube;
 
-import java.util.List;
+import lombok.Getter;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Getter
 public class YoutubeRecipes {
 
-    private List<YoutubeRecipe> youtubeRecipes;
+    private final List<YoutubeRecipe> youtubeRecipes;
 
     public YoutubeRecipes(List<YoutubeRecipe> youtubeRecipes) {
         this.youtubeRecipes = youtubeRecipes;
     }
 
-    public List<YoutubeRecipe> getYoutubeRecipes() {
-        return this.youtubeRecipes;
+    public List<Long> getYoutubeRecipeIds() {
+
+        return youtubeRecipes.stream()
+                .map(YoutubeRecipe::getYoutubeRecipeId)
+                .collect(Collectors.toList());
     }
 }
