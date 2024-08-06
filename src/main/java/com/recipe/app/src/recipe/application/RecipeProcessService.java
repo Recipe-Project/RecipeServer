@@ -28,15 +28,8 @@ public class RecipeProcessService {
     }
 
     @Transactional
-    public void createRecipeProcesses(Long recipeId, String content) {
-
-        RecipeProcess recipeProcess = RecipeProcess.builder()
-                .recipeId(recipeId)
-                .cookingNo(1)
-                .cookingDescription(content)
-                .build();
-
-        recipeProcessRepository.save(recipeProcess);
+    public void createRecipeProcesses(List<RecipeProcess> processes) {
+        recipeProcessRepository.saveAll(processes);
     }
 
     @Transactional

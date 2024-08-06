@@ -155,44 +155,42 @@ public class RecipeService {
     @Transactional
     public void createRecipe(User user, RecipeRequest request) {
 
-        Preconditions.checkArgument(StringUtils.hasText(request.getTitle()), "레시피 제목을 입력해주세요.");
-        Preconditions.checkArgument(StringUtils.hasText(request.getContent()), "레시피 설명을 입력해주세요.");
-        Objects.requireNonNull(request.getIngredients(), "레시피 재료 목록을 입력해주세요.");
+        validateRecipeRequest(request);
 
         badWordService.checkBadWords(request.getTitle());
-        badWordService.checkBadWords(request.getContent());
+        badWordService.checkBadWords(request.getIntroduction());
 
-        Recipe recipe = Recipe.builder()
-                .recipeNm(request.getTitle())
-                .imgUrl(request.getThumbnail())
-                .userId(user.getUserId())
-                .build();
-
-        recipeRepository.save(recipe);
-        recipeProcessService.createRecipeProcesses(recipe.getRecipeId(), request.getContent());
-        recipeIngredientService.createRecipeIngredients(recipe.getRecipeId(), request.getIngredients());
+        Recipe recipe = recipeRepository.save(request.toRecipeEntity(user.getUserId()));
+        recipeIngredientService.createRecipeIngredients(request.toRecipeIngredientEntities(recipe.getRecipeId()));
+        recipeProcessService.createRecipeProcesses(request.toRecipeProcessEntities(recipe.getRecipeId()));
     }
 
     @Transactional
     public void updateRecipe(User user, Long recipeId, RecipeRequest request) {
 
-        Preconditions.checkArgument(StringUtils.hasText(request.getTitle()), "레시피 제목을 입력해주세요.");
-        Preconditions.checkArgument(StringUtils.hasText(request.getContent()), "레시피 설명을 입력해주세요.");
-        Objects.requireNonNull(request.getIngredients(), "레시피 재료 목록을 입력해주세요.");
+        validateRecipeRequest(request);
 
         badWordService.checkBadWords(request.getTitle());
-        badWordService.checkBadWords(request.getContent());
+        badWordService.checkBadWords(request.getIntroduction());
 
         Recipe recipe = getRecipeByUserIdAndRecipeId(user, recipeId);
 
-        recipe.updateRecipe(request.getTitle(), request.getThumbnail());
+        recipe.updateRecipe(request.getTitle(), request.getThumbnailImgUrl());
         recipeRepository.save(recipe);
 
         recipeProcessService.deleteAllByRecipeId(recipeId);
-        recipeProcessService.createRecipeProcesses(recipeId, request.getContent());
+        recipeProcessService.createRecipeProcesses(request.toRecipeProcessEntities(recipeId));
 
         recipeIngredientService.deleteAllByRecipeId(recipeId);
-        recipeIngredientService.createRecipeIngredients(recipeId, request.getIngredients());
+        recipeIngredientService.createRecipeIngredients(request.toRecipeIngredientEntities(recipeId));
+    }
+
+    private void validateRecipeRequest(RecipeRequest request) {
+
+        Preconditions.checkArgument(StringUtils.hasText(request.getTitle()), "레시피 제목을 입력해주세요.");
+        Preconditions.checkArgument(StringUtils.hasText(request.getIntroduction()), "레시피 설명을 입력해주세요.");
+        Objects.requireNonNull(request.getIngredients(), "레시피 재료 목록을 입력해주세요.");
+        Objects.requireNonNull(request.getProcesses(), "레시피 과정을 입력해주세요.");
     }
 
     private Recipe getRecipeByUserIdAndRecipeId(User user, Long recipeId) {
@@ -279,7 +277,7 @@ public class RecipeService {
                 .map(Recipe::getUserId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
-        List<User> recipePostUsers =  userService.findByUserIds(recipePostUserIds);
+        List<User> recipePostUsers = userService.findByUserIds(recipePostUserIds);
 
         List<Long> recipeIds = recipes.stream()
                 .map(Recipe::getRecipeId)

@@ -1,7 +1,6 @@
 package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.fridge.application.FridgeService;
-import com.recipe.app.src.recipe.application.dto.RecipeIngredientRequest;
 import com.recipe.app.src.recipe.application.dto.RecipeIngredientResponse;
 import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import com.recipe.app.src.recipe.infra.RecipeIngredientRepository;
@@ -31,13 +30,8 @@ public class RecipeIngredientService {
     }
 
     @Transactional
-    public void createRecipeIngredients(Long recipeId, List<RecipeIngredientRequest> request) {
-
-        List<RecipeIngredient> recipeIngredients = request.stream()
-                .map(recipeIngredientRequest -> recipeIngredientRequest.toEntity(recipeId))
-                .collect(Collectors.toList());
-
-        recipeIngredientRepository.saveAll(recipeIngredients);
+    public void createRecipeIngredients(List<RecipeIngredient> ingredients) {
+        recipeIngredientRepository.saveAll(ingredients);
     }
 
     @Transactional
