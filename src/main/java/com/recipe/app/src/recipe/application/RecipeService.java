@@ -43,7 +43,7 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse findRecipesByKeyword(User user, String keyword, long lastRecipeId, int size, String sort) {
+    public RecipesResponse findRecipesByKeywordOrderBy(User user, String keyword, long lastRecipeId, int size, String sort) {
 
         badWordService.checkBadWords(keyword);
 
@@ -215,9 +215,9 @@ public class RecipeService {
     }
 
     @Transactional(readOnly = true)
-    public long countRecipeScrapByUser(User user) {
+    public long countRecipeScrapByUserId(long userId) {
 
-        return recipeScrapService.countByUserId(user.getUserId());
+        return recipeScrapService.countByUserId(userId);
     }
 
     @Transactional

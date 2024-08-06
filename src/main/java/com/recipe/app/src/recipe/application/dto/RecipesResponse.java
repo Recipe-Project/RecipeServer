@@ -2,10 +2,8 @@ package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
-import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipes;
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
-import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipes;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
 import com.recipe.app.src.user.domain.User;
@@ -29,7 +27,6 @@ public class RecipesResponse {
 
     @Builder
     public RecipesResponse(long totalCnt, List<RecipeResponse> recipes) {
-
         this.totalCnt = totalCnt;
         this.recipes = recipes;
     }
@@ -52,9 +49,12 @@ public class RecipesResponse {
 
     public static RecipesResponse from(long totalCnt, BlogRecipes recipes, List<BlogScrap> recipeScraps, User user) {
 
-        return new RecipesResponse(totalCnt, recipes.getBlogRecipes().stream()
-                .map((recipe) -> RecipeResponse.from(recipe, recipeScraps, user))
-                .collect(Collectors.toList()));
+        return RecipesResponse.builder()
+                .totalCnt(totalCnt)
+                .recipes(recipes.getBlogRecipes().stream()
+                        .map((recipe) -> RecipeResponse.from(recipe, recipeScraps, user))
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     public static RecipesResponse from(long totalCnt, YoutubeRecipes recipes, List<YoutubeScrap> recipeScraps, User user) {

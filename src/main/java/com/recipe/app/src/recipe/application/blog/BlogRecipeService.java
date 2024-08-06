@@ -5,13 +5,11 @@ import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipes;
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
-import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ public class BlogRecipeService {
         this.blogRecipeClientSearchService = blogRecipeClientSearchService;
     }
 
-    public RecipesResponse getBlogRecipes(User user, String keyword, Long lastBlogRecipeId, int size, String sort) throws UnsupportedEncodingException {
+    public RecipesResponse findBlogRecipesByKeyword(User user, String keyword, long lastBlogRecipeId, int size, String sort) {
 
         badWordService.checkBadWords(keyword);
 
@@ -44,44 +42,57 @@ public class BlogRecipeService {
 
         List<BlogRecipe> blogRecipes;
         if (totalCnt < MIN_RECIPE_CNT) {
+
             blogRecipes = blogRecipeClientSearchService.searchNaverBlogRecipes(keyword, size);
+
             totalCnt = blogRecipeRepository.countByKeyword(keyword);
         } else {
-            blogRecipes = findByKeywordSortBy(keyword, lastBlogRecipeId, size, sort);
+            blogRecipes = findByKeywordOrderBy(keyword, lastBlogRecipeId, size, sort);
         }
 
         return getRecipes(user, totalCnt, blogRecipes);
     }
 
     @Transactional(readOnly = true)
-    public List<BlogRecipe> findByKeywordSortBy(String keyword, Long lastBlogRecipeId, int size, String sort) {
+    public List<BlogRecipe> findByKeywordOrderBy(String keyword, long lastBlogRecipeId, int size, String sort) {
 
         if (sort.equals("blogScraps")) {
-            long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
-            return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(keyword, lastBlogRecipeId, lastBlogScrapCnt, size);
+            return findByKeywordOrderByBlogScrapCnt(keyword, lastBlogRecipeId, size);
         } else if (sort.equals("blogViews")) {
-            long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
-            return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(keyword, lastBlogRecipeId, lastBlogViewCnt, size);
+            return findByKeywordOrderByBlogViewCnt(keyword, lastBlogRecipeId, size);
         } else {
-            BlogRecipe blogRecipe = null;
-            if (lastBlogRecipeId != null && lastBlogRecipeId > 0) {
-                blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElseThrow(()
-                        -> {
-                    throw new NotFoundRecipeException();
-                });
-            }
-            return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(keyword, lastBlogRecipeId, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
+            return findByKeywordOrderByPublishedAt(keyword, lastBlogRecipeId, size);
         }
     }
 
-    @Transactional(readOnly = true)
-    public RecipesResponse getScrapBlogRecipes(User user, Long lastBlogRecipeId, int size) {
+    private List<BlogRecipe> findByKeywordOrderByBlogScrapCnt(String keyword, long lastBlogRecipeId, int size) {
 
-        long totalCnt = blogScrapService.countBlogScrapByUser(user);
-        BlogScrap blogScrap = null;
-        if (lastBlogRecipeId != null && lastBlogRecipeId > 0) {
-            blogScrap = blogScrapService.findByUserIdAndBlogRecipeId(user.getUserId(), lastBlogRecipeId);
-        }
+        long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
+
+        return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(keyword, lastBlogRecipeId, lastBlogScrapCnt, size);
+    }
+
+    private List<BlogRecipe> findByKeywordOrderByBlogViewCnt(String keyword, long lastBlogRecipeId, int size) {
+
+        long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
+
+        return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(keyword, lastBlogRecipeId, lastBlogViewCnt, size);
+    }
+
+    private List<BlogRecipe> findByKeywordOrderByPublishedAt(String keyword, long lastBlogRecipeId, int size) {
+
+        BlogRecipe blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElse(null);
+
+        return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(keyword, lastBlogRecipeId, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
+    }
+
+    @Transactional(readOnly = true)
+    public RecipesResponse findScrapBlogRecipes(User user, long lastBlogRecipeId, int size) {
+
+        long totalCnt = blogScrapService.countBlogScrapByUserId(user.getUserId());
+
+        BlogScrap blogScrap = blogScrapService.findByUserIdAndBlogRecipeId(user.getUserId(), lastBlogRecipeId);
+
         List<BlogRecipe> blogRecipes = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.getUserId(), lastBlogRecipeId, blogScrap != null ? blogScrap.getCreatedAt() : null, size);
 
         return getRecipes(user, totalCnt, blogRecipes);
@@ -98,35 +109,32 @@ public class BlogRecipeService {
     }
 
     @Transactional
-    public void createBlogScrap(User user, Long blogRecipeId) {
+    public void createBlogScrap(User user, long blogRecipeId) {
 
-        BlogRecipe blogRecipe = blogRecipeRepository.findById(blogRecipeId).orElseThrow(() -> {
-            throw new NotFoundRecipeException();
-        });
-        blogRecipe.plusScrapCnt();
-        blogRecipeRepository.save(blogRecipe);
-        blogScrapService.createBlogScrap(user, blogRecipeId);
+        blogRecipeRepository.findById(blogRecipeId)
+                .ifPresent((blogRecipe) -> {
+                    blogRecipe.plusScrapCnt();
+                    blogScrapService.createBlogScrap(user.getUserId(), blogRecipeId);
+                });
     }
 
     @Transactional
-    public void deleteBlogScrap(User user, Long blogRecipeId) {
+    public void deleteBlogScrap(User user, long blogRecipeId) {
 
-        BlogRecipe blogRecipe = blogRecipeRepository.findById(blogRecipeId).orElseThrow(() -> {
-            throw new NotFoundRecipeException();
-        });
-        blogRecipe.minusScrapCnt();
-        blogRecipeRepository.save(blogRecipe);
-        blogScrapService.deleteBlogScrap(user, blogRecipeId);
+        blogRecipeRepository.findById(blogRecipeId)
+                .ifPresent((blogRecipe) -> {
+                    blogRecipe.minusScrapCnt();
+                    blogScrapService.deleteBlogScrap(user.getUserId(), blogRecipeId);
+                });
     }
 
     @Transactional
-    public void createBlogView(User user, Long blogRecipeId) {
+    public void createBlogView(User user, long blogRecipeId) {
 
-        BlogRecipe blogRecipe = blogRecipeRepository.findById(blogRecipeId).orElseThrow(() -> {
-            throw new NotFoundRecipeException();
-        });
-        blogRecipe.plusViewCnt();
-        blogRecipeRepository.save(blogRecipe);
-        blogViewService.createBlogView(user, blogRecipeId);
+        blogRecipeRepository.findById(blogRecipeId)
+                .ifPresent((blogRecipe) -> {
+                    blogRecipe.plusViewCnt();
+                    blogViewService.createBlogView(user.getUserId(), blogRecipeId);
+                });
     }
 }

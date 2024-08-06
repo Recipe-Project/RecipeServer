@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.application.blog;
 
 import com.recipe.app.src.recipe.domain.blog.BlogView;
 import com.recipe.app.src.recipe.infra.blog.BlogViewRepository;
-import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -18,11 +17,11 @@ public class BlogViewService {
     }
 
     @Transactional
-    public void createBlogView(User user, Long blogRecipeId) {
+    public void createBlogView(long userId, long blogRecipeId) {
 
-        BlogView blogView = blogViewRepository.findByUserIdAndBlogRecipeId(user.getUserId(), blogRecipeId)
+        BlogView blogView = blogViewRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
                 .orElseGet(() -> BlogView.builder()
-                        .userId(user.getUserId())
+                        .userId(userId)
                         .blogRecipeId(blogRecipeId)
                         .build());
 
@@ -30,14 +29,15 @@ public class BlogViewService {
     }
 
     @Transactional
-    public void deleteBlogRecipeViewByUser(User user) {
+    public void deleteBlogRecipeViewByUserId(long userId) {
 
-        List<BlogView> blogViews = blogViewRepository.findByUserId(user.getUserId());
+        List<BlogView> blogViews = blogViewRepository.findByUserId(userId);
+
         blogViewRepository.deleteAll(blogViews);
     }
 
     @Transactional(readOnly = true)
-    public Long countByBlogRecipeId(Long blogRecipeId) {
+    public long countByBlogRecipeId(long blogRecipeId) {
 
         return blogViewRepository.countByBlogRecipeId(blogRecipeId);
     }

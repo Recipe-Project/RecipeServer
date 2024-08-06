@@ -43,7 +43,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.findRecipesByKeyword(user, keyword, startAfter, size, sort);
+        return recipeService.findRecipesByKeywordOrderBy(user, keyword, startAfter, size, sort);
     }
 
     @ApiOperation(value = "레시피 상세 조회 API")

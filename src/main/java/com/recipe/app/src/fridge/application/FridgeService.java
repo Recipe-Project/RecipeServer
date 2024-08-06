@@ -123,9 +123,9 @@ public class FridgeService {
     }
 
     @Transactional
-    public void deleteFridgesByUser(User user) {
+    public void deleteFridgesByUserId(long userId) {
 
-        List<Fridge> fridges = fridgeRepository.findByUserId(user.getUserId());
+        List<Fridge> fridges = fridgeRepository.findByUserId(userId);
         fridgeRepository.deleteAll(fridges);
     }
 

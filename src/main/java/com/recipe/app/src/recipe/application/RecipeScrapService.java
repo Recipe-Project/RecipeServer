@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
-import com.recipe.app.src.recipe.exception.NotFoundScrapException;
 import com.recipe.app.src.recipe.infra.RecipeScrapRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
@@ -71,9 +70,7 @@ public class RecipeScrapService {
     @Transactional(readOnly = true)
     public RecipeScrap findByUserIdAndRecipeId(Long userId, Long recipeId) {
 
-        return recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId).orElseThrow(() -> {
-            throw new NotFoundScrapException();
-        });
+        return recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId).orElse(null);
     }
 
     @Transactional(readOnly = true)
