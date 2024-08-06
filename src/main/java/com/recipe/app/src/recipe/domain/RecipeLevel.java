@@ -9,8 +9,8 @@ public enum RecipeLevel {
     NORMAL("01", "보통"),
     EASY("02", "초보환영");
 
-    private String code;
-    private String name;
+    private final String code;
+    private final String name;
 
     RecipeLevel(String code, String name) {
         this.code = code;
@@ -26,7 +26,7 @@ public enum RecipeLevel {
                 });
     }
 
-    private String getCode() {
+    public String getCode() {
         return this.code;
     }
 

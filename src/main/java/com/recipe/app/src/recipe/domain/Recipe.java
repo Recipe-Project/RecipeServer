@@ -2,7 +2,9 @@ package com.recipe.app.src.recipe.domain;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
+import com.recipe.app.src.recipe.infra.RecipeLevelPersistConverter;
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -36,6 +38,7 @@ public class Recipe extends BaseEntity {
     @Column(name = "cookingTime")
     private Long cookingTime;
 
+    @Convert(converter = RecipeLevelPersistConverter.class)
     @Column(name = "level", length = 2)
     private RecipeLevel level;
 
