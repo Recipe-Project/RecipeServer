@@ -2,11 +2,9 @@ package com.recipe.app.src.recipe.application.youtube;
 
 import com.recipe.app.src.recipe.domain.youtube.YoutubeView;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeViewRepository;
-import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -19,11 +17,11 @@ public class YoutubeViewService {
     }
 
     @Transactional
-    public void createYoutubeView(User user, Long youtubeRecipeId) {
+    public void createYoutubeView(long userId, long youtubeRecipeId) {
 
-        YoutubeView youtubeView = youtubeViewRepository.findByUserIdAndYoutubeRecipeId(user.getUserId(), youtubeRecipeId)
+        YoutubeView youtubeView = youtubeViewRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
                 .orElseGet(() -> YoutubeView.builder()
-                        .userId(user.getUserId())
+                        .userId(userId)
                         .youtubeRecipeId(youtubeRecipeId)
                         .build());
 
@@ -31,14 +29,15 @@ public class YoutubeViewService {
     }
 
     @Transactional
-    public void deleteYoutubeViewsByUser(User user) {
+    public void deleteYoutubeViewsByUserId(long userId) {
 
-        List<YoutubeView> youtubeViews = youtubeViewRepository.findByUserId(user.getUserId());
+        List<YoutubeView> youtubeViews = youtubeViewRepository.findByUserId(userId);
+
         youtubeViewRepository.deleteAll(youtubeViews);
     }
 
     @Transactional(readOnly = true)
-    public long countByYoutubeRecipeId(Long youtubeRecipeId) {
+    public long countByYoutubeRecipeId(long youtubeRecipeId) {
 
         return youtubeViewRepository.countByYoutubeRecipeId(youtubeRecipeId);
     }

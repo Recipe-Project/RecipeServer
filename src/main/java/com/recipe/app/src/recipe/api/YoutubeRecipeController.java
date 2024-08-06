@@ -31,7 +31,7 @@ public class YoutubeRecipeController {
                                                            @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                                            @RequestParam(value = "keyword") String keyword,
                                                            @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 유튜브 레시피 아이디")
-                                                           @RequestParam(value = "startAfter", required = false) Long startAfter,
+                                                           @RequestParam(value = "startAfter") long startAfter,
                                                            @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                            @RequestParam(value = "size") int size,
                                                            @ApiParam(name = "sort", type = "String", example = "조회수순(youtubeViews) / 좋아요순(youtubeScraps) / 최신순(newest) = 기본값", value = "정렬")
@@ -42,12 +42,12 @@ public class YoutubeRecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return youtubeRecipeService.getYoutubeRecipes(user, keyword, startAfter, size, sort);
+        return youtubeRecipeService.findYoutubeRecipesByKeyword(user, keyword, startAfter, size, sort);
     }
 
     @ApiOperation(value = "유튜브 레시피 상세 조회 API")
     @PostMapping("/{youtubeRecipeId}/views")
-    public void postYoutubeRecipeView(@ApiIgnore final Authentication authentication, @PathVariable Long youtubeRecipeId) {
+    public void postYoutubeRecipeView(@ApiIgnore final Authentication authentication, @PathVariable long youtubeRecipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -61,7 +61,7 @@ public class YoutubeRecipeController {
     @GetMapping("/scraps")
     public RecipesResponse getScrapYoutubeRecipes(@ApiIgnore final Authentication authentication,
                                                                 @ApiParam(name = "startAfter", type = "int", example = "0", value = "마지막 조회 유튜브 레시피 아이디")
-                                                                @RequestParam(value = "startAfter") Long startAfter,
+                                                                @RequestParam(value = "startAfter") long startAfter,
                                                                 @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                                 @RequestParam(value = "size") int size) {
 
@@ -75,7 +75,7 @@ public class YoutubeRecipeController {
 
     @ApiOperation(value = "유튜브 레시피 스크랩 생성 API")
     @PostMapping("/{youtubeRecipeId}/scraps")
-    public void postYoutubeRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable Long youtubeRecipeId) {
+    public void postYoutubeRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable long youtubeRecipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -87,7 +87,7 @@ public class YoutubeRecipeController {
 
     @ApiOperation(value = "유튜브 레시피 스크랩 삭제 API")
     @DeleteMapping("/{youtubeRecipeId}/scraps")
-    public void deleteYoutubeRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable Long youtubeRecipeId) {
+    public void deleteYoutubeRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable long youtubeRecipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();

@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class BlogRecipeService {
@@ -50,7 +49,7 @@ public class BlogRecipeService {
             blogRecipes = findByKeywordOrderBy(keyword, lastBlogRecipeId, size, sort);
         }
 
-        return getRecipes(user, totalCnt, blogRecipes);
+        return getRecipes(user, totalCnt, new BlogRecipes(blogRecipes));
     }
 
     @Transactional(readOnly = true)
@@ -95,17 +94,14 @@ public class BlogRecipeService {
 
         List<BlogRecipe> blogRecipes = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.getUserId(), lastBlogRecipeId, blogScrap != null ? blogScrap.getCreatedAt() : null, size);
 
-        return getRecipes(user, totalCnt, blogRecipes);
+        return getRecipes(user, totalCnt, new BlogRecipes(blogRecipes));
     }
 
-    private RecipesResponse getRecipes(User user, long totalCnt, List<BlogRecipe> blogRecipes) {
+    private RecipesResponse getRecipes(User user, long totalCnt, BlogRecipes blogRecipes) {
 
-        List<Long> blogRecipeIds = blogRecipes.stream()
-                .map(BlogRecipe::getBlogRecipeId)
-                .collect(Collectors.toList());
-        List<BlogScrap> blogScraps = blogScrapService.findByBlogRecipeIds(blogRecipeIds);
+        List<BlogScrap> blogScraps = blogScrapService.findByBlogRecipeIds(blogRecipes.getBlogRecipeIds());
 
-        return RecipesResponse.from(totalCnt, new BlogRecipes(blogRecipes), blogScraps, user);
+        return RecipesResponse.from(totalCnt, blogRecipes, blogScraps, user);
     }
 
     @Transactional

@@ -9,6 +9,7 @@ import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse;
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
+import com.recipe.app.src.recipe.domain.Recipes;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.RecipeRepository;
 import com.recipe.app.src.user.application.UserService;
@@ -58,7 +59,7 @@ public class RecipeService {
             recipes = findByKeywordOrderByCreatedAt(keyword, lastRecipeId, size);
         }
 
-        return getRecipes(user, totalCnt, recipes);
+        return getRecipes(user, totalCnt, new Recipes(recipes));
     }
 
     private List<Recipe> findByKeywordOrderByRecipeScrapCnt(String keyword, long lastRecipeId, int size) {
@@ -111,7 +112,7 @@ public class RecipeService {
 
         List<Recipe> recipes = recipeRepository.findUserScrapRecipesLimit(user.getUserId(), lastRecipeId, recipeScrap != null ? recipeScrap.getCreatedAt() : null, size);
 
-        return getRecipes(user, totalCnt, recipes);
+        return getRecipes(user, totalCnt, new Recipes(recipes));
     }
 
     @Transactional(readOnly = true)
@@ -121,7 +122,7 @@ public class RecipeService {
 
         List<Recipe> recipes = findLimitByUserId(user.getUserId(), lastRecipeId, size);
 
-        return getRecipes(user, totalCnt, recipes);
+        return getRecipes(user, totalCnt, new Recipes(recipes));
     }
 
     @Transactional(readOnly = true)
@@ -130,11 +131,11 @@ public class RecipeService {
         return recipeRepository.findLimitByUserId(userId, lastRecipeId, size);
     }
 
-    private RecipesResponse getRecipes(User user, long totalCnt, List<Recipe> recipes) {
+    private RecipesResponse getRecipes(User user, long totalCnt, Recipes recipes) {
 
-        List<User> recipePostUsers = userService.findRecipePostUsers(recipes);
+        List<User> recipePostUsers = userService.findByUserIds(recipes.getUserIds());
 
-        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes);
+        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes.getRecipeIds());
 
         return RecipesResponse.from(totalCnt, recipes, recipePostUsers, recipeScraps, user);
     }
@@ -144,11 +145,11 @@ public class RecipeService {
 
         List<String> ingredientNamesInFridge = fridgeService.findIngredientNamesInFridge(user.getUserId());
 
-        List<Recipe> recipes = recipeRepository.findRecipesInFridge(ingredientNamesInFridge);
+        Recipes recipes = new Recipes(recipeRepository.findRecipesInFridge(ingredientNamesInFridge));
 
-        List<User> recipePostUsers = userService.findRecipePostUsers(recipes);
+        List<User> recipePostUsers = userService.findByUserIds(recipes.getUserIds());
 
-        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes);
+        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes.getRecipeIds());
 
         Recipe lastRecipe = recipeRepository.findById(lastRecipeId).orElse(null);
 
@@ -200,6 +201,7 @@ public class RecipeService {
     }
 
     private Recipe getRecipeByUserIdAndRecipeId(User user, Long recipeId) {
+
         return recipeRepository.findByUserIdAndRecipeId(user.getUserId(), recipeId)
                 .orElseThrow(() -> {
                     throw new NotFoundRecipeException();

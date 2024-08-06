@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
+import com.recipe.app.src.recipe.domain.Recipes;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -29,7 +30,7 @@ public class RecommendedRecipesResponse {
         this.recipes = recipes;
     }
 
-    public static RecommendedRecipesResponse from(List<Recipe> recipes, List<User> recipePostUsers, List<RecipeScrap> recipeScraps, User user,
+    public static RecommendedRecipesResponse from(Recipes recipes, List<User> recipePostUsers, List<RecipeScrap> recipeScraps, User user,
                                                   List<String> ingredientNamesInFridge, Recipe lastRecipe, int size) {
 
         Map<Long, User> recipePostUserMapByUserId = recipePostUsers.stream()
@@ -37,7 +38,7 @@ public class RecommendedRecipesResponse {
 
         return RecommendedRecipesResponse.builder()
                 .totalCnt(recipes.size())
-                .recipes(recipes.stream()
+                .recipes(recipes.getRecipes().stream()
                         .map((recipe) -> RecommendedRecipeResponse.from(recipe,
                                 recipePostUserMapByUserId.get(recipe.getUserId()),
                                 recipe.calculateIngredientMatchRate(ingredientNamesInFridge),

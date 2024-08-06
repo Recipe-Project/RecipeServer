@@ -1,6 +1,5 @@
 package com.recipe.app.src.recipe.application;
 
-import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
 import com.recipe.app.src.recipe.infra.RecipeScrapRepository;
 import com.recipe.app.src.user.domain.User;
@@ -9,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 public class RecipeScrapService {
@@ -52,11 +50,7 @@ public class RecipeScrapService {
         return recipeScrapRepository.countByUserId(userId);
     }
 
-    public List<RecipeScrap> findByRecipeIds(Collection<Recipe> recipes) {
-
-        List<Long> recipeIds = recipes.stream()
-                .map(Recipe::getRecipeId)
-                .collect(Collectors.toList());
+    public List<RecipeScrap> findByRecipeIds(Collection<Long> recipeIds) {
 
         return recipeScrapRepository.findByRecipeIdIn(recipeIds);
     }
