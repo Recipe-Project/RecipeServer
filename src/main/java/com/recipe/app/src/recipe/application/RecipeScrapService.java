@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.recipe.domain.RecipeScrap;
 import com.recipe.app.src.recipe.infra.RecipeScrapRepository;
-import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -56,27 +55,27 @@ public class RecipeScrapService {
     }
 
     @Transactional(readOnly = true)
-    public long countByRecipeId(Long recipeId) {
+    public long countByRecipeId(long recipeId) {
 
         return recipeScrapRepository.countByRecipeId(recipeId);
     }
 
     @Transactional(readOnly = true)
-    public RecipeScrap findByUserIdAndRecipeId(Long userId, Long recipeId) {
+    public RecipeScrap findByUserIdAndRecipeId(long userId, long recipeId) {
 
         return recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId).orElse(null);
     }
 
     @Transactional(readOnly = true)
-    public boolean existsByUserIdAndRecipeId(Long userId, Long recipeId) {
+    public boolean existsByUserIdAndRecipeId(long userId, long recipeId) {
 
         return recipeScrapRepository.existsByUserIdAndRecipeId(userId, recipeId);
     }
 
     @Transactional
-    public void deleteAllByUser(User user) {
+    public void deleteAllByUserId(long userId) {
 
-        List<RecipeScrap> recipeScraps = recipeScrapRepository.findByUserId(user.getUserId());
+        List<RecipeScrap> recipeScraps = recipeScrapRepository.findByUserId(userId);
 
         recipeScrapRepository.deleteAll(recipeScraps);
     }

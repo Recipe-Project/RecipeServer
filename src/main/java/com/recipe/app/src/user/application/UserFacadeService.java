@@ -54,9 +54,9 @@ public class UserFacadeService {
     @Transactional(readOnly = true)
     public UserProfileResponse findUserProfile(User user) {
 
-        long youtubeScrapCnt = youtubeScrapService.countYoutubeScrapByUser(user);
-        long blogScrapCnt = blogScrapService.countBlogScrapByUser(user);
-        long recipeScrapCnt = recipeService.countRecipeScrapByUser(user);
+        long youtubeScrapCnt = youtubeScrapService.countYoutubeScrapByUserId(user.getUserId());
+        long blogScrapCnt = blogScrapService.countBlogScrapByUserId(user.getUserId());
+        long recipeScrapCnt = recipeService.countRecipeScrapByUserId(user.getUserId());
 
         List<Recipe> userRecipes = recipeService.findLimitByUserId(user.getUserId(), 0L, 6);
 
@@ -66,16 +66,16 @@ public class UserFacadeService {
     @Transactional
     public void deleteUser(User user, HttpServletRequest request) {
 
-        fridgeService.deleteFridgesByUser(user);
-        fridgeBasketService.deleteFridgeBasketsByUser(user);
-        recipeScrapService.deleteAllByUser(user);
-        recipeViewService.deleteAllByUser(user);
-        recipeService.deleteRecipesByUser(user);
-        ingredientService.deleteIngredientsByUser(user);
-        youtubeScrapService.deleteYoutubeScrapsByUser(user);
-        youtubeViewService.deleteYoutubeViewsByUser(user);
-        blogScrapService.deleteBlogRecipeScrapsByUser(user);
-        blogViewService.deleteBlogRecipeViewByUser(user);
+        fridgeService.deleteFridgesByUserId(user.getUserId());
+        fridgeBasketService.deleteFridgeBasketsByUserId(user.getUserId());
+        recipeScrapService.deleteAllByUserId(user.getUserId());
+        recipeViewService.deleteAllByUserId(user.getUserId());
+        recipeService.deleteRecipesByUserId(user.getUserId());
+        ingredientService.deleteIngredientsByUserId(user.getUserId());
+        youtubeScrapService.deleteYoutubeScrapsByUserId(user.getUserId());
+        youtubeViewService.deleteYoutubeViewsByUserId(user.getUserId());
+        blogScrapService.deleteBlogRecipeScrapsByUserId(user.getUserId());
+        blogViewService.deleteBlogRecipeViewByUserId(user.getUserId());
 
         userService.deleteUser(user, request);
     }

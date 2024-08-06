@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.recipe.domain.RecipeView;
 import com.recipe.app.src.recipe.infra.RecipeViewRepository;
-import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,27 +29,27 @@ public class RecipeViewService {
     }
 
     @Transactional
-    public void deleteAllByRecipeId(Long recipeId) {
+    public void deleteAllByRecipeId(long recipeId) {
 
         recipeViewRepository.deleteAll(findByRecipeId(recipeId));
     }
 
     @Transactional(readOnly = true)
-    public List<RecipeView> findByRecipeId(Long recipeId) {
+    public List<RecipeView> findByRecipeId(long recipeId) {
 
         return recipeViewRepository.findByRecipeId(recipeId);
     }
 
     @Transactional(readOnly = true)
-    public long countByRecipeId(Long recipeId) {
+    public long countByRecipeId(long recipeId) {
 
         return recipeViewRepository.countByRecipeId(recipeId);
     }
 
     @Transactional
-    public void deleteAllByUser(User user) {
+    public void deleteAllByUserId(long userId) {
 
-        List<RecipeView> recipeViews = recipeViewRepository.findByUserId(user.getUserId());
+        List<RecipeView> recipeViews = recipeViewRepository.findByUserId(userId);
 
         recipeViewRepository.deleteAll(recipeViews);
     }

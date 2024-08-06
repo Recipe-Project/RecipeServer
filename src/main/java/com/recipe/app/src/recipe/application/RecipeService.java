@@ -209,9 +209,9 @@ public class RecipeService {
     }
 
     @Transactional
-    public void deleteRecipesByUser(User user) {
+    public void deleteRecipesByUserId(long userId) {
 
-        List<Recipe> recipes = recipeRepository.findByUserId(user.getUserId());
+        List<Recipe> recipes = recipeRepository.findByUserId(userId);
 
         recipeRepository.deleteAll(recipes);
     }
