@@ -10,6 +10,7 @@ import java.util.List;
 @Service
 public class RecipeReportService {
 
+    private static final int RECIPE_REPORT_MIN_CNT = 5;
     private final RecipeReportRepository recipeReportRepository;
 
     public RecipeReportService(RecipeReportRepository recipeReportRepository) {
@@ -31,7 +32,7 @@ public class RecipeReportService {
     @Transactional(readOnly = true)
     public boolean isRecipeReported(long recipeId) {
 
-        return recipeReportRepository.countByRecipeId(recipeId) >= 5;
+        return recipeReportRepository.countByRecipeId(recipeId) >= RECIPE_REPORT_MIN_CNT;
     }
 
     @Transactional
