@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.api;
 
+import com.recipe.app.src.recipe.application.RecipeSearchService;
 import com.recipe.app.src.recipe.application.RecipeService;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeRequest;
@@ -21,9 +22,11 @@ import springfox.documentation.annotations.ApiIgnore;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final RecipeSearchService recipeSearchService;
 
-    public RecipeController(RecipeService recipeService) {
+    public RecipeController(RecipeService recipeService, RecipeSearchService recipeSearchService) {
         this.recipeService = recipeService;
+        this.recipeSearchService = recipeSearchService;
     }
 
     @ApiOperation(value = "레시피 목록 조회 API")
@@ -43,7 +46,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.findRecipesByKeywordOrderBy(user, keyword, startAfter, size, sort);
+        return recipeSearchService.findRecipesByKeywordOrderBy(user, keyword, startAfter, size, sort);
     }
 
     @ApiOperation(value = "레시피 상세 조회 API")
@@ -56,7 +59,7 @@ public class RecipeController {
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         recipeService.createRecipeView(user, recipeId);
 
-        return recipeService.findRecipeDetail(user, recipeId);
+        return recipeSearchService.findRecipeDetail(user, recipeId);
     }
 
     @ApiOperation(value = "레시피 스크랩 생성 API")
@@ -96,7 +99,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.findScrapRecipes(user, startAfter, size);
+        return recipeSearchService.findScrapRecipes(user, startAfter, size);
     }
 
     @ApiOperation(value = "냉장고 파먹기 레시피 목록 조회 API")
@@ -112,7 +115,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.findRecommendedRecipesByUserFridge(user, startAfter, size);
+        return recipeSearchService.findRecommendedRecipesByUserFridge(user, startAfter, size);
     }
 
     @ApiOperation(value = "등록한 레시피 목록 조회 API")
@@ -128,7 +131,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.findRecipesByUser(user, startAfter, size);
+        return recipeSearchService.findRecipesByUser(user, startAfter, size);
     }
 
     @ApiOperation(value = "레시피 등록 API")
