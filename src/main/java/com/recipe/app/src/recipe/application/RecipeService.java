@@ -59,10 +59,11 @@ public class RecipeService {
 
     private void validateRecipeRequest(RecipeRequest request) {
 
-        Preconditions.checkArgument(StringUtils.hasText(request.getTitle()), "레시피 제목을 입력해주세요.");
-        Preconditions.checkArgument(StringUtils.hasText(request.getIntroduction()), "레시피 설명을 입력해주세요.");
         Objects.requireNonNull(request.getIngredients(), "레시피 재료 목록을 입력해주세요.");
         Objects.requireNonNull(request.getProcesses(), "레시피 과정을 입력해주세요.");
+        Preconditions.checkArgument(StringUtils.hasText(request.getTitle()), "레시피 제목을 입력해주세요.");
+        Preconditions.checkArgument(request.getIngredients().size() > 0, "레시피 재료 목록을 입력해주세요.");
+        Preconditions.checkArgument(request.getProcesses().size() > 0, "레시피 과정을 입력해주세요.");
     }
 
     @Transactional
