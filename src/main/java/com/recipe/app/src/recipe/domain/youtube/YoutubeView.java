@@ -43,7 +43,7 @@ public class YoutubeView {
     public YoutubeView(Long youtubeViewId, Long userId, Long youtubeRecipeId) {
 
         Objects.requireNonNull(userId, "유저 아이디를 입력해주세요.");
-        Objects.requireNonNull(youtubeRecipeId, "유튜브 레시피 아이디를 입력해수제요.");
+        Objects.requireNonNull(youtubeRecipeId, "유튜브 레시피 아이디를 입력해주세요.");
 
         this.youtubeViewId = youtubeViewId;
         this.userId = userId;
