@@ -34,6 +34,7 @@ public class RecipeReportService {
         return recipeReportRepository.countByRecipeId(recipeId) >= 5;
     }
 
+    @Transactional
     public void deleteAllByRecipeId(long recipeId) {
 
         List<RecipeReport> reports = recipeReportRepository.findByRecipeId(recipeId);
