@@ -19,13 +19,12 @@ public class RecipeViewService {
     @Transactional
     public void createRecipeView(long userId, long recipeId) {
 
-        RecipeView recipeView = recipeViewRepository.findByUserIdAndRecipeId(userId, recipeId)
-                .orElseGet(() -> RecipeView.builder()
-                        .userId(userId)
-                        .recipeId(recipeId)
-                        .build());
-
-        recipeViewRepository.save(recipeView);
+        recipeViewRepository.findByUserIdAndRecipeId(userId, recipeId)
+                .orElseGet(() -> recipeViewRepository.save(
+                        RecipeView.builder()
+                                .userId(userId)
+                                .recipeId(recipeId)
+                                .build()));
     }
 
     @Transactional

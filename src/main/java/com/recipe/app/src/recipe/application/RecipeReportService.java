@@ -20,13 +20,12 @@ public class RecipeReportService {
     @Transactional
     public void createRecipeReport(long userId, long recipeId) {
 
-        RecipeReport recipeReport = recipeReportRepository.findByUserIdAndRecipeId(userId, recipeId)
-                .orElseGet(() -> RecipeReport.builder()
-                        .userId(userId)
-                        .recipeId(recipeId)
-                        .build());
-
-        recipeReportRepository.save(recipeReport);
+        recipeReportRepository.findByUserIdAndRecipeId(userId, recipeId)
+                .orElseGet(() -> recipeReportRepository.save(
+                        RecipeReport.builder()
+                                .userId(userId)
+                                .recipeId(recipeId)
+                                .build()));
     }
 
     @Transactional(readOnly = true)

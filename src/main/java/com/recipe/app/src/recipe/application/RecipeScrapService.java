@@ -20,13 +20,12 @@ public class RecipeScrapService {
     @Transactional
     public void createRecipeScrap(long userId, long recipeId) {
 
-        RecipeScrap recipeScrap = recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId)
-                .orElseGet(() -> RecipeScrap.builder()
-                        .userId(userId)
-                        .recipeId(recipeId)
-                        .build());
-
-        recipeScrapRepository.save(recipeScrap);
+        recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId)
+                .orElseGet(() -> recipeScrapRepository.save(
+                        RecipeScrap.builder()
+                                .userId(userId)
+                                .recipeId(recipeId)
+                                .build()));
     }
 
     @Transactional
@@ -49,6 +48,7 @@ public class RecipeScrapService {
         return recipeScrapRepository.countByUserId(userId);
     }
 
+    @Transactional(readOnly = true)
     public List<RecipeScrap> findByRecipeIds(Collection<Long> recipeIds) {
 
         return recipeScrapRepository.findByRecipeIdIn(recipeIds);
