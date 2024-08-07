@@ -89,6 +89,8 @@ public class RecipeService {
 
         List<Recipe> recipes = recipeRepository.findByUserId(userId);
 
+        recipeScrapService.deleteAllByUserId(userId);
+        recipeViewService.deleteAllByUserId(userId);
         recipeRepository.deleteAll(recipes);
     }
 
