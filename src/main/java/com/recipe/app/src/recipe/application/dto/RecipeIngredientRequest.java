@@ -4,6 +4,7 @@ import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeIngredient;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,6 +21,14 @@ public class RecipeIngredientRequest {
     private String quantity;
     @Schema(description = "레시피 재료 단위", nullable = true)
     private String unit;
+
+    @Builder
+    public RecipeIngredientRequest(String ingredientName, Long ingredientIconId, String quantity, String unit) {
+        this.ingredientName = ingredientName;
+        this.ingredientIconId = ingredientIconId;
+        this.quantity = quantity;
+        this.unit = unit;
+    }
 
     public RecipeIngredient toEntity(Recipe recipe) {
 

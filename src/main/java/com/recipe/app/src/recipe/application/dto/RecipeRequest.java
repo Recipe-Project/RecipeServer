@@ -4,6 +4,7 @@ import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeLevel;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -30,6 +31,19 @@ public class RecipeRequest {
     private List<RecipeIngredientRequest> ingredients;
     @Schema(description = "레시피 과정 목록")
     private List<RecipeProcessRequest> processes;
+
+    @Builder
+    public RecipeRequest(String thumbnailImgUrl, String title, String introduction, long cookingTime, RecipeLevel level,
+                         Boolean isHidden, List<RecipeIngredientRequest> ingredients, List<RecipeProcessRequest> processes) {
+        this.thumbnailImgUrl = thumbnailImgUrl;
+        this.title = title;
+        this.introduction = introduction;
+        this.cookingTime = cookingTime;
+        this.level = level;
+        this.isHidden = isHidden;
+        this.ingredients = ingredients;
+        this.processes = processes;
+    }
 
     public Recipe toRecipeEntity(Long userId) {
 

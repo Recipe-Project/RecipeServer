@@ -4,6 +4,7 @@ import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeProcess;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +19,13 @@ public class RecipeProcessRequest {
     private String cookingDescription;
     @Schema(description = "레시피 과정 이미지 url")
     private String recipeProcessImgUrl;
+
+    @Builder
+    public RecipeProcessRequest(int cookingNo, String cookingDescription, String recipeProcessImgUrl) {
+        this.cookingNo = cookingNo;
+        this.cookingDescription = cookingDescription;
+        this.recipeProcessImgUrl = recipeProcessImgUrl;
+    }
 
     public RecipeProcess toEntity(Recipe recipe) {
 
