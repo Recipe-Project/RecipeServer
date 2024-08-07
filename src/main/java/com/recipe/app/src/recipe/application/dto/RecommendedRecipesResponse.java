@@ -45,8 +45,14 @@ public class RecommendedRecipesResponse {
                                 recipeScraps,
                                 user))
                         .sorted(Comparator.comparing(RecommendedRecipeResponse::getIngredientsMatchRate).thenComparing(RecommendedRecipeResponse::getRecipeId).reversed())
-                        .filter(recommendedRecipe -> recommendedRecipe.getRecipeId() > lastRecipe.getRecipeId()
-                                || recommendedRecipe.getIngredientsMatchRate() >= lastRecipe.calculateIngredientMatchRate(ingredientNamesInFridge))
+                        .filter(recommendedRecipe -> {
+                            if (lastRecipe == null) {
+                                return true;
+                            }
+
+                            return recommendedRecipe.getRecipeId() > lastRecipe.getRecipeId()
+                                    || recommendedRecipe.getIngredientsMatchRate() >= lastRecipe.calculateIngredientMatchRate(ingredientNamesInFridge);
+                        })
                         .limit(size)
                         .collect(Collectors.toList()))
                 .build();
