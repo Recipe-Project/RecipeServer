@@ -4,6 +4,7 @@ import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.recipe.application.RecipeScrapService;
+import com.recipe.app.src.recipe.application.RecipeSearchService;
 import com.recipe.app.src.recipe.application.RecipeService;
 import com.recipe.app.src.recipe.application.RecipeViewService;
 import com.recipe.app.src.recipe.application.blog.BlogScrapService;
@@ -24,6 +25,7 @@ public class UserFacadeService {
 
     private final UserService userService;
     private final RecipeService recipeService;
+    private final RecipeSearchService recipeSearchService;
     private final RecipeScrapService recipeScrapService;
     private final RecipeViewService recipeViewService;
     private final YoutubeScrapService youtubeScrapService;
@@ -34,12 +36,15 @@ public class UserFacadeService {
     private final FridgeBasketService fridgeBasketService;
     private final IngredientService ingredientService;
 
-    public UserFacadeService(UserService userService, RecipeService recipeService, RecipeScrapService recipeScrapService, RecipeViewService recipeViewService,
+    public UserFacadeService(UserService userService, RecipeService recipeService, RecipeSearchService recipeSearchService,
+                             RecipeScrapService recipeScrapService, RecipeViewService recipeViewService,
                              YoutubeScrapService youtubeScrapService, YoutubeViewService youtubeViewService,
-                             BlogScrapService blogScrapService, BlogViewService blogViewService, FridgeService fridgeService, FridgeBasketService fridgeBasketService, IngredientService ingredientService) {
+                             BlogScrapService blogScrapService, BlogViewService blogViewService,
+                             FridgeService fridgeService, FridgeBasketService fridgeBasketService, IngredientService ingredientService) {
 
         this.userService = userService;
         this.recipeService = recipeService;
+        this.recipeSearchService = recipeSearchService;
         this.recipeScrapService = recipeScrapService;
         this.recipeViewService = recipeViewService;
         this.youtubeScrapService = youtubeScrapService;
@@ -58,7 +63,7 @@ public class UserFacadeService {
         long blogScrapCnt = blogScrapService.countBlogScrapByUserId(user.getUserId());
         long recipeScrapCnt = recipeService.countRecipeScrapByUserId(user.getUserId());
 
-        List<Recipe> userRecipes = recipeService.findLimitByUserId(user.getUserId(), 0L, 6);
+        List<Recipe> userRecipes = recipeSearchService.findLimitByUserId(user.getUserId(), 0L, 6);
 
         return UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
     }
