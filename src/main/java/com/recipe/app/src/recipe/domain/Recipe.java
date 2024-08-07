@@ -44,13 +44,13 @@ public class Recipe extends BaseEntity {
 
     @Convert(converter = RecipeLevelPersistConverter.class)
     @Column(name = "level", length = 2)
-    private RecipeLevel level;
+    private RecipeLevel level = RecipeLevel.NORMAL;
 
     @Column(name = "imgUrl")
     private String imgUrl;
 
     @Column(name = "quantity")
-    private Long quantity;
+    private Long quantity = 1L;
 
     @Column(name = "calorie")
     private Long calorie;
@@ -144,6 +144,6 @@ public class Recipe extends BaseEntity {
                 .filter(ingredient -> ingredient.hasInFridge(ingredientNamesInFridge))
                 .count();
 
-        return ingredientMatchCnt / ingredients.size() * 100;
+        return Math.round((double) ingredientMatchCnt / ingredients.size() * 100);
     }
 }
