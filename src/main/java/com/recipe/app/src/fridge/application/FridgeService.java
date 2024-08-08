@@ -40,7 +40,7 @@ public class FridgeService {
     }
 
     @Transactional
-    public void createFridges(User user) {
+    public void create(User user) {
 
         List<FridgeBasket> fridgeBaskets = fridgeBasketService.findByUserId(user.getUserId());
         List<Fridge> existFridges = findByUserId(user.getUserId());
@@ -85,17 +85,17 @@ public class FridgeService {
     }
 
     @Transactional
-    public void deleteFridge(User user, Long fridgeId) {
+    public void delete(User user, Long fridgeId) {
 
         Fridge fridge = findByUserIdAndFridgeId(user.getUserId(), fridgeId);
         fridgeRepository.delete(fridge);
     }
 
     @Transactional
-    public void updateFridge(User user, Long fridgeId, FridgeRequest request) {
+    public void update(User user, Long fridgeId, FridgeRequest request) {
 
         Fridge fridge = findByUserIdAndFridgeId(user.getUserId(), fridgeId);
-        fridge.updateFridge(request.getExpiredAt(), request.getQuantity(), request.getUnit());
+        fridge.update(request.getExpiredAt(), request.getQuantity(), request.getUnit());
         fridgeRepository.save(fridge);
     }
 
@@ -123,7 +123,7 @@ public class FridgeService {
     }
 
     @Transactional
-    public void deleteFridgesByUserId(long userId) {
+    public void deleteAllByUserId(long userId) {
 
         List<Fridge> fridges = fridgeRepository.findByUserId(userId);
         fridgeRepository.deleteAll(fridges);

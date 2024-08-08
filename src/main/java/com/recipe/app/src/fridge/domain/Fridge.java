@@ -45,7 +45,7 @@ public class Fridge extends BaseEntity {
     public Fridge(Long fridgeId, Long userId, Long ingredientId, LocalDate expiredAt, float quantity, String unit) {
 
         Objects.requireNonNull(userId, "유저 아이디를 입력해주세요.");
-        Objects.requireNonNull(ingredientId, "재료 아이디를 입력해주세요");
+        Objects.requireNonNull(ingredientId, "재료 아이디를 입력해주세요.");
 
         this.fridgeId = fridgeId;
         this.userId = userId;
@@ -55,7 +55,7 @@ public class Fridge extends BaseEntity {
         this.unit = unit;
     }
 
-    public void updateFridge(LocalDate expiredAt, float quantity, String unit) {
+    public void update(LocalDate expiredAt, float quantity, String unit) {
         this.expiredAt = expiredAt;
         this.quantity = quantity;
         this.unit = unit;

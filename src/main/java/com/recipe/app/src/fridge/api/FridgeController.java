@@ -34,7 +34,7 @@ public class FridgeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        fridgeService.createFridges(user);
+        fridgeService.create(user);
     }
 
     @ApiOperation(value = "냉장고 목록 조회 API")
@@ -70,7 +70,7 @@ public class FridgeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        fridgeService.deleteFridge(user, fridgeId);
+        fridgeService.delete(user, fridgeId);
     }
 
     @ApiOperation(value = "냉장고 수정 API")
@@ -84,6 +84,6 @@ public class FridgeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        fridgeService.updateFridge(user, fridgeId, request);
+        fridgeService.update(user, fridgeId, request);
     }
 }
