@@ -17,7 +17,7 @@ class RecipeScrapServiceTest extends Specification {
         recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId) >> Optional.empty()
 
         when:
-        recipeScrapService.createRecipeScrap(userId, recipeId)
+        recipeScrapService.create(userId, recipeId)
 
         then:
         1 * recipeScrapRepository.save(_)
@@ -36,7 +36,7 @@ class RecipeScrapServiceTest extends Specification {
         recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId) >> Optional.of(recipeScrap)
 
         when:
-        recipeScrapService.createRecipeScrap(userId, recipeId)
+        recipeScrapService.create(userId, recipeId)
 
         then:
         0 * recipeScrapRepository.save(recipeScrap)
@@ -55,7 +55,7 @@ class RecipeScrapServiceTest extends Specification {
         recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId) >> Optional.of(recipeScrap)
 
         when:
-        recipeScrapService.deleteRecipeScrap(userId, recipeId)
+        recipeScrapService.delete(userId, recipeId)
 
         then:
         1 * recipeScrapRepository.delete(recipeScrap)
@@ -74,7 +74,7 @@ class RecipeScrapServiceTest extends Specification {
         recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId) >> Optional.empty()
 
         when:
-        recipeScrapService.deleteRecipeScrap(userId, recipeId)
+        recipeScrapService.delete(userId, recipeId)
 
         then:
         0 * recipeScrapRepository.delete(recipeScrap)

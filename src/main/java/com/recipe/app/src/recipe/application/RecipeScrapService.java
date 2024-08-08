@@ -18,7 +18,7 @@ public class RecipeScrapService {
     }
 
     @Transactional
-    public void createRecipeScrap(long userId, long recipeId) {
+    public void create(long userId, long recipeId) {
 
         recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .orElseGet(() -> recipeScrapRepository.save(
@@ -29,7 +29,7 @@ public class RecipeScrapService {
     }
 
     @Transactional
-    public void deleteRecipeScrap(long userId, long recipeId) {
+    public void delete(long userId, long recipeId) {
 
         recipeScrapRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .ifPresent(recipeScrapRepository::delete);

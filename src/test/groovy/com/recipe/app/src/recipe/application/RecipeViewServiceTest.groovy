@@ -17,7 +17,7 @@ class RecipeViewServiceTest extends Specification {
         recipeViewRepository.findByUserIdAndRecipeId(userId, recipeId) >> Optional.empty()
 
         when:
-        recipeViewService.createRecipeView(userId, recipeId)
+        recipeViewService.create(userId, recipeId)
 
         then:
         1 * recipeViewRepository.save(_)
@@ -36,7 +36,7 @@ class RecipeViewServiceTest extends Specification {
         recipeViewRepository.findByUserIdAndRecipeId(userId, recipeId) >> Optional.of(recipeView)
 
         when:
-        recipeViewService.createRecipeView(userId, recipeId)
+        recipeViewService.create(userId, recipeId)
 
         then:
         0 * recipeViewRepository.save(recipeView)

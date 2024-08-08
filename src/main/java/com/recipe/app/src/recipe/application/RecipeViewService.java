@@ -17,7 +17,7 @@ public class RecipeViewService {
     }
 
     @Transactional
-    public void createRecipeView(long userId, long recipeId) {
+    public void create(long userId, long recipeId) {
 
         recipeViewRepository.findByUserIdAndRecipeId(userId, recipeId)
                 .orElseGet(() -> recipeViewRepository.save(

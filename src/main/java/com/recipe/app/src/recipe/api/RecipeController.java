@@ -145,7 +145,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        recipeService.createRecipe(user, request);
+        recipeService.create(user, request);
     }
 
     @ApiOperation(value = "레시피 수정 API")
@@ -159,7 +159,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        recipeService.updateRecipe(user, recipeId, request);
+        recipeService.update(user, recipeId, request);
     }
 
     @ApiOperation(value = "레시피 삭제 API")
@@ -171,7 +171,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        recipeService.deleteRecipe(user, recipeId);
+        recipeService.delete(user, recipeId);
     }
 
     @ApiOperation(value = "레시피 신고 API")

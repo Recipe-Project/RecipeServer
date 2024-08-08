@@ -33,7 +33,7 @@ public class RecipeService {
     }
 
     @Transactional
-    public void createRecipe(User user, RecipeRequest request) {
+    public void create(User user, RecipeRequest request) {
 
         validateRecipeRequest(request);
 
@@ -44,14 +44,14 @@ public class RecipeService {
     }
 
     @Transactional
-    public void updateRecipe(User user, Long recipeId, RecipeRequest request) {
+    public void update(User user, Long recipeId, RecipeRequest request) {
 
         validateRecipeRequest(request);
 
         badWordService.checkBadWords(request.getTitle());
         badWordService.checkBadWords(request.getIntroduction());
 
-        Recipe recipe = getRecipeByUserIdAndRecipeId(user, recipeId);
+        Recipe recipe = findByUserIdAndRecipeId(user, recipeId);
         recipe.updateRecipe(request.toRecipeEntity(user.getUserId()));
 
         recipeRepository.save(recipe);
@@ -67,9 +67,9 @@ public class RecipeService {
     }
 
     @Transactional
-    public void deleteRecipe(User user, Long recipeId) {
+    public void delete(User user, Long recipeId) {
 
-        Recipe recipe = getRecipeByUserIdAndRecipeId(user, recipeId);
+        Recipe recipe = findByUserIdAndRecipeId(user, recipeId);
 
         recipeScrapService.deleteAllByRecipeId(recipe.getRecipeId());
         recipeViewService.deleteAllByRecipeId(recipe.getRecipeId());
@@ -77,7 +77,7 @@ public class RecipeService {
         recipeRepository.delete(recipe);
     }
 
-    private Recipe getRecipeByUserIdAndRecipeId(User user, Long recipeId) {
+    private Recipe findByUserIdAndRecipeId(User user, Long recipeId) {
 
         return recipeRepository.findByUserIdAndRecipeId(user.getUserId(), recipeId)
                 .orElseThrow(() -> {
@@ -86,7 +86,7 @@ public class RecipeService {
     }
 
     @Transactional
-    public void deleteRecipesByUserId(long userId) {
+    public void deleteAllByUserId(long userId) {
 
         List<Recipe> recipes = recipeRepository.findByUserId(userId);
 
@@ -107,7 +107,7 @@ public class RecipeService {
         recipeRepository.findById(recipeId)
                 .ifPresent((recipe) -> {
                     recipe.plusScrapCnt();
-                    recipeScrapService.createRecipeScrap(user.getUserId(), recipeId);
+                    recipeScrapService.create(user.getUserId(), recipeId);
                 });
     }
 
@@ -117,7 +117,7 @@ public class RecipeService {
         recipeRepository.findById(recipeId)
                 .ifPresent((recipe) -> {
                     recipe.minusScrapCnt();
-                    recipeScrapService.deleteRecipeScrap(user.getUserId(), recipeId);
+                    recipeScrapService.delete(user.getUserId(), recipeId);
                 });
     }
 
@@ -127,7 +127,7 @@ public class RecipeService {
         recipeRepository.findById(recipeId)
                 .ifPresent((recipe) -> {
                     recipe.plusViewCnt();
-                    recipeViewService.createRecipeView(user.getUserId(), recipeId);
+                    recipeViewService.create(user.getUserId(), recipeId);
                 });
     }
 

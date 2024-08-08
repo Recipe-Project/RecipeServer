@@ -65,7 +65,7 @@ class RecipeServiceTest extends Specification {
                 .build()
 
         when:
-        recipeService.createRecipe(user, request)
+        recipeService.create(user, request)
 
         then:
         1 * recipeRepository.save(_) >> { args ->
@@ -110,7 +110,7 @@ class RecipeServiceTest extends Specification {
                 .build()
 
         when:
-        recipeService.createRecipe(user, request)
+        recipeService.create(user, request)
 
         then:
         def e = thrown(NullPointerException.class)
@@ -160,7 +160,7 @@ class RecipeServiceTest extends Specification {
                 .build()
 
         when:
-        recipeService.createRecipe(user, request)
+        recipeService.create(user, request)
 
         then:
         def e = thrown(IllegalArgumentException.class)
@@ -258,7 +258,7 @@ class RecipeServiceTest extends Specification {
         recipeRepository.findByUserIdAndRecipeId(user.userId, recipe.recipeId) >> Optional.of(recipe)
 
         when:
-        recipeService.updateRecipe(user, recipe.recipeId, request)
+        recipeService.update(user, recipe.recipeId, request)
 
         then:
         1 * recipeRepository.save(_) >> { args ->
@@ -332,7 +332,7 @@ class RecipeServiceTest extends Specification {
         recipeRepository.findByUserIdAndRecipeId(user.userId, recipe.recipeId) >> Optional.empty()
 
         when:
-        recipeService.updateRecipe(user, recipe.recipeId, request)
+        recipeService.update(user, recipe.recipeId, request)
 
         then:
         def e = thrown(NotFoundRecipeException.class)
@@ -377,7 +377,7 @@ class RecipeServiceTest extends Specification {
                 .build()
 
         when:
-        recipeService.updateRecipe(user, recipe.recipeId, request)
+        recipeService.update(user, recipe.recipeId, request)
 
         then:
         def e = thrown(NullPointerException.class)
@@ -435,7 +435,7 @@ class RecipeServiceTest extends Specification {
                 .build()
 
         when:
-        recipeService.updateRecipe(user, recipe.recipeId, request)
+        recipeService.update(user, recipe.recipeId, request)
 
         then:
         def e = thrown(IllegalArgumentException.class)
@@ -498,7 +498,7 @@ class RecipeServiceTest extends Specification {
         recipeRepository.findByUserIdAndRecipeId(user.userId, recipe.recipeId) >> Optional.of(recipe)
 
         when:
-        recipeService.deleteRecipe(user, recipe.recipeId)
+        recipeService.delete(user, recipe.recipeId)
 
         then:
         1 * recipeScrapService.deleteAllByRecipeId(recipe.recipeId)
@@ -528,7 +528,7 @@ class RecipeServiceTest extends Specification {
         recipeRepository.findByUserIdAndRecipeId(user.userId, recipe.recipeId) >> Optional.empty()
 
         when:
-        recipeService.deleteRecipe(user, recipe.recipeId)
+        recipeService.delete(user, recipe.recipeId)
 
         then:
         def e = thrown(NotFoundRecipeException.class)
@@ -560,7 +560,7 @@ class RecipeServiceTest extends Specification {
         recipeRepository.findByUserId(userId) >> recipes
 
         when:
-        recipeService.deleteRecipesByUserId(userId)
+        recipeService.deleteAllByUserId(userId)
 
         then:
         1 * recipeScrapService.deleteAllByUserId(userId)
@@ -607,7 +607,7 @@ class RecipeServiceTest extends Specification {
         recipeService.createRecipeScrap(user, recipe.recipeId)
 
         then:
-        1 * recipeScrapService.createRecipeScrap(user.getUserId(), recipe.recipeId)
+        1 * recipeScrapService.create(user.getUserId(), recipe.recipeId)
         recipe.scrapCnt == 2
     }
 
@@ -637,7 +637,7 @@ class RecipeServiceTest extends Specification {
         recipeService.deleteRecipeScrap(user, recipe.recipeId)
 
         then:
-        1 * recipeScrapService.deleteRecipeScrap(user.getUserId(), recipe.recipeId)
+        1 * recipeScrapService.delete(user.getUserId(), recipe.recipeId)
         recipe.scrapCnt == 0
     }
 
@@ -667,7 +667,7 @@ class RecipeServiceTest extends Specification {
         recipeService.createRecipeView(user, recipe.recipeId)
 
         then:
-        1 * recipeViewService.createRecipeView(user.userId, recipe.recipeId)
+        1 * recipeViewService.create(user.userId, recipe.recipeId)
         recipe.viewCnt == 2
     }
 

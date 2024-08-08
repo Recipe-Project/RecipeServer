@@ -53,7 +53,7 @@ public class UserFacadeService {
     public UserProfileResponse findUserProfile(User user) {
 
         long youtubeScrapCnt = youtubeScrapService.countYoutubeScrapByUserId(user.getUserId());
-        long blogScrapCnt = blogScrapService.countBlogScrapByUserId(user.getUserId());
+        long blogScrapCnt = blogScrapService.countByUserId(user.getUserId());
         long recipeScrapCnt = recipeService.countRecipeScrapByUserId(user.getUserId());
 
         List<Recipe> userRecipes = recipeSearchService.findLimitByUserId(user.getUserId(), 0L, 6);
@@ -66,12 +66,12 @@ public class UserFacadeService {
 
         fridgeService.deleteFridgesByUserId(user.getUserId());
         fridgeBasketService.deleteFridgeBasketsByUserId(user.getUserId());
-        recipeService.deleteRecipesByUserId(user.getUserId());
+        recipeService.deleteAllByUserId(user.getUserId());
         ingredientService.deleteIngredientsByUserId(user.getUserId());
         youtubeScrapService.deleteYoutubeScrapsByUserId(user.getUserId());
         youtubeViewService.deleteYoutubeViewsByUserId(user.getUserId());
-        blogScrapService.deleteBlogRecipeScrapsByUserId(user.getUserId());
-        blogViewService.deleteBlogRecipeViewByUserId(user.getUserId());
+        blogScrapService.deleteAllByUserId(user.getUserId());
+        blogViewService.deleteAllByUserId(user.getUserId());
 
         userService.deleteUser(user, request);
     }
