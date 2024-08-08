@@ -64,7 +64,7 @@ public class FridgeService {
                 .collect(Collectors.toList());
 
         fridgeRepository.saveAll(fridges);
-        fridgeBasketService.deleteFridgeBaskets(fridgeBaskets);
+        fridgeBasketService.deleteAll(fridgeBaskets);
     }
 
     private void checkFridgeUnitMatch(FridgeBasket fridgeBasket, Fridge fridge, Ingredient ingredient) {

@@ -60,8 +60,7 @@ public class FridgeBasket extends BaseEntity {
         this.quantity += quantity;
     }
 
-    public void updateFridgeBasket(LocalDate expiredAt, float quantity, String unit) {
-
+    public void update(LocalDate expiredAt, float quantity, String unit) {
         this.expiredAt = expiredAt;
         this.quantity = quantity;
         this.unit = unit;

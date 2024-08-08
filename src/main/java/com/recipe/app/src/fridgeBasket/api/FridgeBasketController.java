@@ -2,7 +2,7 @@ package com.recipe.app.src.fridgeBasket.api;
 
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketCountResponse;
-import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketIngredientIdsRequest;
+import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketsRequest;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketRequest;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketsResponse;
 import com.recipe.app.src.user.domain.SecurityUser;
@@ -37,14 +37,14 @@ public class FridgeBasketController {
     @PostMapping
     public void postFridgeBasketByIngredientId(@ApiIgnore final Authentication authentication,
                                                              @ApiParam(value = "재료 선택 목록", required = true)
-                                                             @RequestBody FridgeBasketIngredientIdsRequest request) {
+                                                             @RequestBody FridgeBasketsRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        fridgeBasketService.createFridgeBasketsByIngredientId(user, request);
+        fridgeBasketService.create(user, request);
     }
 
     @ApiOperation(value = "냉장고 바구니 조회 API")
@@ -56,7 +56,7 @@ public class FridgeBasketController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return fridgeBasketService.getFridgeBasketsByUser(user);
+        return fridgeBasketService.findAllByUser(user);
     }
 
     @ApiOperation(value = "냉장고 바구니 삭제 API")
@@ -68,7 +68,7 @@ public class FridgeBasketController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        fridgeBasketService.deleteFridgeBasket(user, fridgeBasketId);
+        fridgeBasketService.delete(user, fridgeBasketId);
     }
 
     @ApiOperation(value = "냉장고 바구니 수정 API")
@@ -82,7 +82,7 @@ public class FridgeBasketController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        fridgeBasketService.updateFridgeBasket(user, fridgeBasketId, request);
+        fridgeBasketService.update(user, fridgeBasketId, request);
     }
 
     @ApiOperation(value = "냉장고 바구니 갯수 조회 API")
