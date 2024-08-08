@@ -19,13 +19,11 @@ public class YoutubeViewService {
     @Transactional
     public void createYoutubeView(long userId, long youtubeRecipeId) {
 
-        YoutubeView youtubeView = youtubeViewRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
-                .orElseGet(() -> YoutubeView.builder()
+        youtubeViewRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
+                .orElseGet(() -> youtubeViewRepository.save(YoutubeView.builder()
                         .userId(userId)
                         .youtubeRecipeId(youtubeRecipeId)
-                        .build());
-
-        youtubeViewRepository.save(youtubeView);
+                        .build()));
     }
 
     @Transactional

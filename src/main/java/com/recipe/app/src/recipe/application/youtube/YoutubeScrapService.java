@@ -20,13 +20,11 @@ public class YoutubeScrapService {
     @Transactional
     public void createYoutubeScrap(long userId, long youtubeRecipeId) {
 
-        YoutubeScrap youtubeScrap = youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
-                .orElseGet(() -> YoutubeScrap.builder()
+        youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
+                .orElseGet(() -> youtubeScrapRepository.save(YoutubeScrap.builder()
                         .userId(userId)
                         .youtubeRecipeId(youtubeRecipeId)
-                        .build());
-
-        youtubeScrapRepository.save(youtubeScrap);
+                        .build()));
     }
 
     @Transactional
