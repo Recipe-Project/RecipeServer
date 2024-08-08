@@ -59,7 +59,7 @@ public class IngredientController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return ingredientFacadeService.findMyIngredients(user);
+        return ingredientFacadeService.findIngredientsByUser(user);
     }
 
     @ApiOperation(value = "나만의 재료 등록 API")
@@ -73,7 +73,7 @@ public class IngredientController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return ingredientService.createIngredient(user.getUserId(), request);
+        return ingredientService.create(user.getUserId(), request);
     }
 
     @ApiOperation(value = "나만의 재료 삭제 API")
@@ -85,6 +85,6 @@ public class IngredientController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        ingredientFacadeService.deleteMyIngredient(user, ingredientId);
+        ingredientFacadeService.deleteIngredient(user, ingredientId);
     }
 }

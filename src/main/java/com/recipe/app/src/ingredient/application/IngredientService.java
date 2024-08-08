@@ -13,7 +13,6 @@ import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class IngredientService {
@@ -43,28 +42,22 @@ public class IngredientService {
     }
 
     @Transactional
-    public IngredientCreateResponse createIngredient(Long userId, IngredientRequest request) {
+    public IngredientCreateResponse create(Long userId, IngredientRequest request) {
 
         IngredientCategory ingredientCategory = ingredientCategoryService.findById(request.getIngredientCategoryId());
+
         Ingredient ingredient = ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(
                         userId,
                         request.getIngredientName(),
                         request.getIngredientIconId(),
                         ingredientCategory.getIngredientCategoryId())
-                .orElseGet(() -> Ingredient.builder()
-                        .userId(userId)
-                        .ingredientName(request.getIngredientName())
-                        .ingredientIconId(request.getIngredientIconId())
-                        .ingredientCategoryId(ingredientCategory.getIngredientCategoryId())
-                        .build());
-
-        ingredientRepository.save(ingredient);
+                .orElseGet(() -> ingredientRepository.save(request.toEntity(userId)));
 
         return new IngredientCreateResponse(ingredient.getIngredientId());
     }
 
     @Transactional
-    public void deleteIngredientsByUserId(long userId) {
+    public void deleteAllByUserId(long userId) {
 
         List<Ingredient> ingredients = ingredientRepository.findByUserId(userId);
 
@@ -80,13 +73,10 @@ public class IngredientService {
     }
 
     @Transactional
-    public void deleteIngredient(User user, Long ingredientId) {
+    public void delete(User user, Long ingredientId) {
 
-        Ingredient ingredient = ingredientRepository.findByIngredientIdAndUserId(ingredientId, user.getUserId()).orElseThrow(() -> {
-            throw new NotFoundIngredientException();
-        });
-
-        ingredientRepository.delete(ingredient);
+        ingredientRepository.findByIngredientIdAndUserId(ingredientId, user.getUserId())
+                .ifPresent(ingredientRepository::delete);
     }
 
     @Transactional(readOnly = true)
