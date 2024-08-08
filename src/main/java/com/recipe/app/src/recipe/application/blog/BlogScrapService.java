@@ -18,7 +18,7 @@ public class BlogScrapService {
     }
 
     @Transactional
-    public void createBlogScrap(long userId, long blogRecipeId) {
+    public void create(long userId, long blogRecipeId) {
 
         blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
                 .orElseGet(() -> blogScrapRepository.save(BlogScrap.builder()
@@ -28,14 +28,14 @@ public class BlogScrapService {
     }
 
     @Transactional
-    public void deleteBlogScrap(long userId, long blogRecipeId) {
+    public void delete(long userId, long blogRecipeId) {
 
         blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
                 .ifPresent(blogScrapRepository::delete);
     }
 
     @Transactional
-    public void deleteBlogRecipeScrapsByUserId(long userId) {
+    public void deleteAllByUserId(long userId) {
 
         List<BlogScrap> blogScraps = blogScrapRepository.findByUserId(userId);
 
@@ -43,7 +43,7 @@ public class BlogScrapService {
     }
 
     @Transactional(readOnly = true)
-    public long countBlogScrapByUserId(long userId) {
+    public long countByUserId(long userId) {
 
         return blogScrapRepository.countByUserId(userId);
     }

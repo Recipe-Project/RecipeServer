@@ -17,7 +17,7 @@ public class BlogViewService {
     }
 
     @Transactional
-    public void createBlogView(long userId, long blogRecipeId) {
+    public void create(long userId, long blogRecipeId) {
 
         blogViewRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
                 .orElseGet(() -> blogViewRepository.save(BlogView.builder()
@@ -27,7 +27,7 @@ public class BlogViewService {
     }
 
     @Transactional
-    public void deleteBlogRecipeViewByUserId(long userId) {
+    public void deleteAllByUserId(long userId) {
 
         List<BlogView> blogViews = blogViewRepository.findByUserId(userId);
 

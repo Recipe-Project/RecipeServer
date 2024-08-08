@@ -88,7 +88,7 @@ public class BlogRecipeService {
     @Transactional(readOnly = true)
     public RecipesResponse findScrapBlogRecipes(User user, long lastBlogRecipeId, int size) {
 
-        long totalCnt = blogScrapService.countBlogScrapByUserId(user.getUserId());
+        long totalCnt = blogScrapService.countByUserId(user.getUserId());
 
         BlogScrap blogScrap = blogScrapService.findByUserIdAndBlogRecipeId(user.getUserId(), lastBlogRecipeId);
 
@@ -110,7 +110,7 @@ public class BlogRecipeService {
         blogRecipeRepository.findById(blogRecipeId)
                 .ifPresent((blogRecipe) -> {
                     blogRecipe.plusScrapCnt();
-                    blogScrapService.createBlogScrap(user.getUserId(), blogRecipeId);
+                    blogScrapService.create(user.getUserId(), blogRecipeId);
                 });
     }
 
@@ -120,7 +120,7 @@ public class BlogRecipeService {
         blogRecipeRepository.findById(blogRecipeId)
                 .ifPresent((blogRecipe) -> {
                     blogRecipe.minusScrapCnt();
-                    blogScrapService.deleteBlogScrap(user.getUserId(), blogRecipeId);
+                    blogScrapService.delete(user.getUserId(), blogRecipeId);
                 });
     }
 
@@ -130,7 +130,7 @@ public class BlogRecipeService {
         blogRecipeRepository.findById(blogRecipeId)
                 .ifPresent((blogRecipe) -> {
                     blogRecipe.plusViewCnt();
-                    blogViewService.createBlogView(user.getUserId(), blogRecipeId);
+                    blogViewService.create(user.getUserId(), blogRecipeId);
                 });
     }
 }
