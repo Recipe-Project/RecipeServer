@@ -2,6 +2,7 @@ package com.recipe.app.src.fridge.application.dto;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -18,4 +19,11 @@ public class FridgeRequest {
     private float quantity;
     @Schema(description = "단위")
     private String unit;
+
+    @Builder
+    public FridgeRequest(LocalDate expiredAt, float quantity, String unit) {
+        this.expiredAt = expiredAt;
+        this.quantity = quantity;
+        this.unit = unit;
+    }
 }
