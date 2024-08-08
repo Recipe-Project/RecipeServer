@@ -394,6 +394,7 @@ class BlogRecipeServiceTest extends Specification {
 
         then:
         1 * blogScrapService.create(user.userId, blogRecipe.blogRecipeId)
+        blogRecipe.scrapCnt == 2
     }
 
     def "블로그 스크랩 정보 생성 시 블로그 레시피 존재하지 않으면 실행 안함"() {
@@ -454,6 +455,7 @@ class BlogRecipeServiceTest extends Specification {
 
         then:
         1 * blogScrapService.delete(user.userId, blogRecipe.blogRecipeId)
+        blogRecipe.scrapCnt == 0
     }
 
     def "블로그 스크랩 정보 삭제 시 블로그 레시피 존재하지 않으면 실행 안함"() {
@@ -514,6 +516,7 @@ class BlogRecipeServiceTest extends Specification {
 
         then:
         1 * blogViewService.create(user.userId, blogRecipe.blogRecipeId)
+        blogRecipe.viewCnt == 2
     }
 
     def "블로그 조회 정보 생성 시 블로그 레시피 존재하지 않으면 실행 안함"() {
