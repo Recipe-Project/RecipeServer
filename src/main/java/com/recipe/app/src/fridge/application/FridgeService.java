@@ -4,8 +4,6 @@ import com.recipe.app.src.fridge.application.dto.FridgeRequest;
 import com.recipe.app.src.fridge.application.dto.FridgeResponse;
 import com.recipe.app.src.fridge.application.dto.FridgesResponse;
 import com.recipe.app.src.fridge.domain.Fridge;
-import com.recipe.app.src.fridge.exception.FridgeSaveExpiredDateNotMatchException;
-import com.recipe.app.src.fridge.exception.FridgeSaveUnitNotMatchException;
 import com.recipe.app.src.fridge.exception.NotFoundFridgeException;
 import com.recipe.app.src.fridge.infra.FridgeRepository;
 import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
@@ -18,6 +16,7 @@ import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -80,6 +79,7 @@ public class FridgeService {
     public void delete(User user, Long fridgeId) {
 
         Fridge fridge = findByUserIdAndFridgeId(user.getUserId(), fridgeId);
+
         fridgeRepository.delete(fridge);
     }
 
@@ -87,7 +87,9 @@ public class FridgeService {
     public void update(User user, Long fridgeId, FridgeRequest request) {
 
         Fridge fridge = findByUserIdAndFridgeId(user.getUserId(), fridgeId);
+
         fridge.update(request.getExpiredAt(), request.getQuantity(), request.getUnit());
+
         fridgeRepository.save(fridge);
     }
 
@@ -95,11 +97,13 @@ public class FridgeService {
     public FridgesResponse getFridges(User user) {
 
         long fridgeBasketCount = fridgeBasketService.countByUserId(user.getUserId());
-        List<Fridge> fridges = findByUserId(user.getUserId());
+
         List<IngredientCategory> ingredientCategories = ingredientCategoryService.findAll();
-        List<Long> ingredientIds = fridges.stream()
-                .map(Fridge::getIngredientId)
-                .collect(Collectors.toList());
+
+        List<Fridge> fridges = findByUserId(user.getUserId());
+
+        List<Long> ingredientIds = getIngredientIdsInFridges(fridges);
+
         List<Ingredient> ingredients = ingredientService.findByIngredientIds(ingredientIds);
 
         return FridgesResponse.from(fridgeBasketCount, fridges, ingredientCategories, ingredients);
@@ -109,6 +113,7 @@ public class FridgeService {
     public FridgeResponse getFridge(User user, Long fridgeId) {
 
         Fridge fridge = findByUserIdAndFridgeId(user.getUserId(), fridgeId);
+
         Ingredient ingredient = ingredientService.findByIngredientId(fridge.getIngredientId());
 
         return FridgeResponse.from(fridge, ingredient);
@@ -118,6 +123,7 @@ public class FridgeService {
     public void deleteAllByUserId(long userId) {
 
         List<Fridge> fridges = fridgeRepository.findByUserId(userId);
+
         fridgeRepository.deleteAll(fridges);
     }
 
@@ -130,15 +136,21 @@ public class FridgeService {
     public List<String> findIngredientNamesInFridge(Long userId) {
 
         List<Fridge> fridges = fridgeRepository.findByUserId(userId);
-        List<Long> ingredientIds = fridges.stream()
-                .map(Fridge::getIngredientId)
-                .collect(Collectors.toList());
+
+        List<Long> ingredientIds = getIngredientIdsInFridges(fridges);
 
         List<Ingredient> ingredients = ingredientService.findByIngredientIds(ingredientIds);
 
         return ingredients.stream()
                 .flatMap(ingredient -> Stream.of(ingredient.getIngredientName(), ingredient.getSimilarIngredientName()))
                 .map(Object::toString)
+                .collect(Collectors.toList());
+    }
+
+    private List<Long> getIngredientIdsInFridges(Collection<Fridge> fridges) {
+
+        return fridges.stream()
+                .map(Fridge::getIngredientId)
                 .collect(Collectors.toList());
     }
 
