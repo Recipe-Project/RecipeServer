@@ -251,7 +251,7 @@ class UserServiceTest extends Specification {
                 .build()
 
         when:
-        userService.updateUser(user, request)
+        userService.update(user, request)
 
         then:
         1 * userRepository.save(_)
@@ -279,7 +279,7 @@ class UserServiceTest extends Specification {
                 .build()
 
         when:
-        userService.deleteUser(user, request)
+        userService.withdraw(user, request)
 
         then:
         1 * userRepository.delete(user)

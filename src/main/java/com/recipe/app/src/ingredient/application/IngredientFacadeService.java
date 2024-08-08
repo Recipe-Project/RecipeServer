@@ -39,7 +39,7 @@ public class IngredientFacadeService {
     }
 
     @Transactional(readOnly = true)
-    public IngredientsResponse findMyIngredients(User user) {
+    public IngredientsResponse findIngredientsByUser(User user) {
 
         long fridgeBasketCount = fridgeBasketService.countByUserId(user.getUserId());
         List<IngredientCategory> categories = ingredientCategoryService.findAll();
@@ -49,10 +49,10 @@ public class IngredientFacadeService {
     }
 
     @Transactional
-    public void deleteMyIngredient(User user, Long ingredientId) {
+    public void deleteIngredient(User user, Long ingredientId) {
 
         fridgeService.deleteByUserIdAndIngredientId(user.getUserId(), ingredientId);
         fridgeBasketService.deleteByUserIdAndIngredientId(user.getUserId(), ingredientId);
-        ingredientService.deleteIngredient(user, ingredientId);
+        ingredientService.delete(user, ingredientId);
     }
 }

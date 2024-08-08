@@ -1,6 +1,5 @@
 package com.recipe.app.src.user.api;
 
-import com.recipe.app.src.common.utils.JwtUtil;
 import com.recipe.app.src.user.application.UserFacadeService;
 import com.recipe.app.src.user.application.UserService;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
@@ -99,7 +98,7 @@ public class UserController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        userService.updateUser(user, request);
+        userService.update(user, request);
     }
 
     @ApiOperation(value = "회원 탈퇴 API")

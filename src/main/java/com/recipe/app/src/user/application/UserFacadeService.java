@@ -69,12 +69,12 @@ public class UserFacadeService {
         fridgeService.deleteFridgesByUserId(user.getUserId());
         fridgeBasketService.deleteFridgeBasketsByUserId(user.getUserId());
         recipeService.deleteAllByUserId(user.getUserId());
-        ingredientService.deleteIngredientsByUserId(user.getUserId());
+        ingredientService.deleteAllByUserId(user.getUserId());
         youtubeScrapService.deleteAllByUserId(user.getUserId());
         youtubeViewService.deleteAllByUserId(user.getUserId());
         blogScrapService.deleteAllByUserId(user.getUserId());
         blogViewService.deleteAllByUserId(user.getUserId());
 
-        userService.deleteUser(user, request);
+        userService.withdraw(user, request);
     }
 }

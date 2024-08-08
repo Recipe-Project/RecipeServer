@@ -1,10 +1,8 @@
 package com.recipe.app.src.fridgeBasket.application;
 
-import com.google.common.base.Preconditions;
 import com.recipe.app.src.etc.application.BadWordService;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketCountResponse;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketIngredientIdsRequest;
-import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketIngredientRequest;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketRequest;
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketsResponse;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
@@ -17,7 +15,6 @@ import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -65,36 +62,6 @@ public class FridgeBasketService {
                 .collect(Collectors.toList());
 
         fridgeBasketRepository.saveAll(fridgeBaskets);
-    }
-
-    @Transactional
-    public void createFridgeBasketWithIngredientSave(User user, FridgeBasketIngredientRequest request) {
-
-        Preconditions.checkArgument(StringUtils.hasText(request.getIngredientName()), "재료명을 입력해주세요.");
-        Objects.requireNonNull(request.getIngredientCategoryId(), "재료 카테고리 아이디를 입력해주세요.");
-        badWordService.checkBadWords(request.getIngredientName());
-
-        IngredientCategory ingredientCategory = ingredientCategoryService.findById(request.getIngredientCategoryId());
-        Ingredient ingredient = ingredientService.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(
-                        user.getUserId(),
-                        request.getIngredientName(),
-                        request.getIngredientIconId(),
-                        ingredientCategory.getIngredientCategoryId())
-                .orElseGet(() -> Ingredient.builder()
-                        .userId(user.getUserId())
-                        .ingredientName(request.getIngredientName())
-                        .ingredientIconId(request.getIngredientIconId())
-                        .ingredientCategoryId(ingredientCategory.getIngredientCategoryId())
-                        .build());
-        ingredientService.createIngredient(ingredient);
-
-        FridgeBasket fridgeBasket = fridgeBasketRepository.findByIngredientIdAndUserId(ingredient.getIngredientId(), user.getUserId())
-                .orElseGet(() -> FridgeBasket.builder()
-                        .userId(user.getUserId())
-                        .ingredientId(ingredient.getIngredientId())
-                        .build());
-        fridgeBasket.plusQuantity(1);
-        fridgeBasketRepository.save(fridgeBasket);
     }
 
     @Transactional

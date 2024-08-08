@@ -105,11 +105,11 @@ class UserFacadeServiceTest extends Specification {
         1 * fridgeService.deleteFridgesByUserId(user.userId)
         1 * fridgeBasketService.deleteFridgeBasketsByUserId(user.userId)
         1 * recipeService.deleteAllByUserId(user.userId)
-        1 * ingredientService.deleteIngredientsByUserId(user.userId)
+        1 * ingredientService.deleteAllByUserId(user.userId)
         1 * youtubeScrapService.deleteAllByUserId(user.userId)
         1 * youtubeViewService.deleteAllByUserId(user.userId)
         1 * blogScrapService.deleteAllByUserId(user.userId)
         1 * blogViewService.deleteAllByUserId(user.userId)
-        1 * userService.deleteUser(user, request)
+        1 * userService.withdraw(user, request)
     }
 }

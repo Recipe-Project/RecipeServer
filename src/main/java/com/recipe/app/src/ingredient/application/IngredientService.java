@@ -9,11 +9,9 @@ import com.recipe.app.src.ingredient.infra.IngredientRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class IngredientService {
@@ -29,10 +27,6 @@ public class IngredientService {
     @Transactional(readOnly = true)
     public List<Ingredient> findByKeyword(Long userId, String keyword) {
 
-        if (!StringUtils.hasText(keyword)) {
-            return ingredientRepository.findDefaultIngredients(userId);
-        }
-
         return ingredientRepository.findDefaultIngredientsByKeyword(userId, keyword);
     }
 
@@ -42,45 +36,23 @@ public class IngredientService {
         return ingredientRepository.findByIngredientIdIn(ingredientIds);
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Ingredient> findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(Long userId, String ingredientName, Long ingredientIconId, Long ingredientCategoryId) {
-
-        return ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(userId, ingredientName, ingredientIconId, ingredientCategoryId);
-    }
-
     @Transactional
-    public void createIngredient(Ingredient ingredient) {
-        ingredientRepository.save(ingredient);
-    }
-
-    @Transactional
-    public IngredientCreateResponse createIngredient(Long userId, IngredientRequest request) {
+    public IngredientCreateResponse create(Long userId, IngredientRequest request) {
 
         IngredientCategory ingredientCategory = ingredientCategoryService.findById(request.getIngredientCategoryId());
+
         Ingredient ingredient = ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(
                         userId,
                         request.getIngredientName(),
                         request.getIngredientIconId(),
                         ingredientCategory.getIngredientCategoryId())
-                .orElseGet(() -> Ingredient.builder()
-                        .userId(userId)
-                        .ingredientName(request.getIngredientName())
-                        .ingredientIconId(request.getIngredientIconId())
-                        .ingredientCategoryId(ingredientCategory.getIngredientCategoryId())
-                        .build());
-
-        ingredientRepository.save(ingredient);
+                .orElseGet(() -> ingredientRepository.save(request.toEntity(userId)));
 
         return new IngredientCreateResponse(ingredient.getIngredientId());
     }
 
     @Transactional
-    public void createIngredients(Collection<Ingredient> ingredients) {
-        ingredientRepository.saveAll(ingredients);
-    }
-
-    @Transactional
-    public void deleteIngredientsByUserId(long userId) {
+    public void deleteAllByUserId(long userId) {
 
         List<Ingredient> ingredients = ingredientRepository.findByUserId(userId);
 
@@ -96,13 +68,10 @@ public class IngredientService {
     }
 
     @Transactional
-    public void deleteIngredient(User user, Long ingredientId) {
+    public void delete(User user, Long ingredientId) {
 
-        Ingredient ingredient = ingredientRepository.findByIngredientIdAndUserId(ingredientId, user.getUserId()).orElseThrow(() -> {
-            throw new NotFoundIngredientException();
-        });
-
-        ingredientRepository.delete(ingredient);
+        ingredientRepository.findByIngredientIdAndUserId(ingredientId, user.getUserId())
+                .ifPresent(ingredientRepository::delete);
     }
 
     @Transactional(readOnly = true)
