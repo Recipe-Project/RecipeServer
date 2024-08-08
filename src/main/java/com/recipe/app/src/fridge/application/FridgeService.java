@@ -43,40 +43,32 @@ public class FridgeService {
     public void create(User user) {
 
         List<FridgeBasket> fridgeBaskets = fridgeBasketService.findByUserId(user.getUserId());
+
         List<Fridge> existFridges = findByUserId(user.getUserId());
+
         Map<Long, Fridge> fridgeMapByIngredientId = existFridges.stream()
                 .collect(Collectors.toMap(Fridge::getIngredientId, Function.identity()));
-        List<Long> ingredientIds = existFridges.stream()
-                .map(Fridge::getIngredientId)
-                .collect(Collectors.toList());
-        Map<Long, Ingredient> ingredientMapById = ingredientService.findByIngredientIds(ingredientIds).stream()
-                .collect(Collectors.toMap(Ingredient::getIngredientId, Function.identity()));
 
         List<Fridge> fridges = fridgeBaskets.stream()
                 .map(fridgeBasket -> {
+
                     Fridge fridge = fridgeMapByIngredientId.getOrDefault(fridgeBasket.getIngredientId(), fridgeBasket.toFridge());
-                    fridge.plusQuantity(fridgeBasket.getQuantity());
-                    Ingredient ingredient = ingredientMapById.get(fridge.getIngredientId());
-                    checkFridgeExpiredDateMatch(fridgeBasket, fridge, ingredient);
-                    checkFridgeUnitMatch(fridgeBasket, fridge, ingredient);
+
+                    if (fridge.getFridgeId() != null) {
+                        if (!fridge.match(fridgeBasket)) {
+                            fridgeRepository.delete(fridge);
+                            fridge = fridgeBasket.toFridge();
+                        } else {
+                            fridge.plusQuantity(fridgeBasket.getQuantity());
+                        }
+                    }
+
                     return fridge;
                 })
                 .collect(Collectors.toList());
 
         fridgeRepository.saveAll(fridges);
         fridgeBasketService.deleteAll(fridgeBaskets);
-    }
-
-    private void checkFridgeUnitMatch(FridgeBasket fridgeBasket, Fridge fridge, Ingredient ingredient) {
-        if ((fridge.getUnit() == null && fridgeBasket.getUnit() != null)
-                || (fridge.getUnit() != null && !fridge.getUnit().equals(fridgeBasket.getUnit())))
-            throw new FridgeSaveUnitNotMatchException(ingredient.getIngredientName());
-    }
-
-    private void checkFridgeExpiredDateMatch(FridgeBasket fridgeBasket, Fridge fridge, Ingredient ingredient) {
-        if ((fridge.getExpiredAt() != null && !fridge.getExpiredAt().equals(fridgeBasket.getExpiredAt()))
-                || (fridgeBasket.getExpiredAt() != null && !fridgeBasket.getExpiredAt().equals(fridge.getExpiredAt())))
-            throw new FridgeSaveExpiredDateNotMatchException(ingredient.getIngredientName());
     }
 
     @Transactional(readOnly = true)
