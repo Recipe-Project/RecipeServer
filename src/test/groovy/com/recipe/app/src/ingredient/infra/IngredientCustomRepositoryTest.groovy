@@ -54,46 +54,15 @@ class IngredientCustomRepositoryTest extends Specification {
         ingredientRepository.saveAll(ingredients);
 
         when:
-        List<Ingredient> response = ingredientRepository.findDefaultIngredientsByKeyword(1L, "리");
+        List<Ingredient> response = ingredientRepository.findDefaultIngredientsByKeyword(1L, keyword);
 
         then:
-        response.size() == 2
-    }
+        response.size() == expected
 
-    def "기본 재료 목록 조회"() {
-
-        given:
-        IngredientCategory ingredientCategory = IngredientCategory.builder()
-                .ingredientCategoryName("과일")
-                .build();
-        ingredientCategoryRepository.save(ingredientCategory);
-
-        List<Ingredient> ingredients = [
-                Ingredient.builder()
-                        .userId(1L)
-                        .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
-                        .ingredientName("사과")
-                        .ingredientIconId(10000)
-                        .build(),
-                Ingredient.builder()
-                        .userId(1L)
-                        .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
-                        .ingredientName("포도")
-                        .ingredientIconId(10000)
-                        .build(),
-                Ingredient.builder()
-                        .userId(1L)
-                        .ingredientCategoryId(ingredientCategory.ingredientCategoryId)
-                        .ingredientName("귤")
-                        .ingredientIconId(10000)
-                        .build(),
-        ]
-        ingredientRepository.saveAll(ingredients);
-
-        when:
-        List<Ingredient> response = ingredientRepository.findDefaultIngredients(1L);
-
-        then:
-        response.size() == 3
+        where:
+        keyword || expected
+        "리"     || 2
+        null    || 3
+        ""      || 3
     }
 }
