@@ -57,10 +57,7 @@ public class UserService {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        User loginUser = userAuthClientService.getUserByNaverAuthInfo(request);
-
-        User user = userRepository.findBySocialId(loginUser.getSocialId())
-                .orElseGet(() -> userRepository.save(loginUser));
+        User user = create(userAuthClientService.getUserByNaverAuthInfo(request));
 
         user.changeRecentLoginAt(LocalDateTime.now());
 
@@ -75,10 +72,7 @@ public class UserService {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        User loginUser = userAuthClientService.getUserByKakaoAuthInfo(request);
-
-        User user = userRepository.findBySocialId(loginUser.getSocialId())
-                .orElseGet(() -> userRepository.save(loginUser));
+        User user = create(userAuthClientService.getUserByKakaoAuthInfo(request));
 
         user.changeRecentLoginAt(LocalDateTime.now());
 
@@ -93,10 +87,7 @@ public class UserService {
 
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
-        User loginUser = userAuthClientService.getUserByGoogleAuthInfo(request);
-
-        User user = userRepository.findBySocialId(loginUser.getSocialId())
-                .orElseGet(() -> userRepository.save(loginUser));
+        User user = create(userAuthClientService.getUserByGoogleAuthInfo(request));
 
         user.changeRecentLoginAt(LocalDateTime.now());
 
@@ -106,8 +97,14 @@ public class UserService {
         return UserSocialLoginResponse.from(user, accessToken, refreshToken);
     }
 
+    private User create(User user) {
+
+        return userRepository.findBySocialId(user.getSocialId())
+                .orElseGet(() -> userRepository.save(user));
+    }
+
     @Transactional
-    public void updateUser(User user, UserProfileRequest request) {
+    public void update(User user, UserProfileRequest request) {
 
         badWordService.checkBadWords(request.getNickname());
         user.changeProfile(request.getProfileImgUrl(), request.getNickname());
@@ -115,7 +112,7 @@ public class UserService {
     }
 
     @Transactional
-    public void deleteUser(User user, HttpServletRequest request) {
+    public void withdraw(User user, HttpServletRequest request) {
 
         userRepository.delete(user);
 

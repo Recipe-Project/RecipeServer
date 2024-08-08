@@ -75,6 +75,6 @@ public class UserFacadeService {
         blogScrapService.deleteAllByUserId(user.getUserId());
         blogViewService.deleteAllByUserId(user.getUserId());
 
-        userService.deleteUser(user, request);
+        userService.withdraw(user, request);
     }
 }

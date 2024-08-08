@@ -110,6 +110,6 @@ class UserFacadeServiceTest extends Specification {
         1 * youtubeViewService.deleteAllByUserId(user.userId)
         1 * blogScrapService.deleteAllByUserId(user.userId)
         1 * blogViewService.deleteAllByUserId(user.userId)
-        1 * userService.deleteUser(user, request)
+        1 * userService.withdraw(user, request)
     }
 }
