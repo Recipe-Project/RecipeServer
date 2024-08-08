@@ -2,6 +2,7 @@ package com.recipe.app.src.user.application.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,4 +15,10 @@ public class UserTokenRefreshRequest {
     private Long userId;
     @ApiModelProperty(value = "리프레쉬 토큰")
     private String refreshToken;
+
+    @Builder
+    public UserTokenRefreshRequest(Long userId, String refreshToken) {
+        this.userId = userId;
+        this.refreshToken = refreshToken;
+    }
 }
