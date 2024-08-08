@@ -35,6 +35,7 @@ class IngredientServiceTest extends Specification {
                         .ingredientName("재료2")
                         .ingredientIconId(1)
                         .userId(1)
+                        .build()
         ]
 
         ingredientRepository.findDefaultIngredientsByKeyword(userId, keyword) >> ingredients
@@ -65,6 +66,7 @@ class IngredientServiceTest extends Specification {
                         .ingredientName("재료2")
                         .ingredientIconId(1)
                         .userId(1)
+                        .build()
         ]
 
         ingredientRepository.findByIngredientIdIn(ingredientIds) >> ingredients
@@ -137,6 +139,7 @@ class IngredientServiceTest extends Specification {
                         .ingredientName("재료2")
                         .ingredientIconId(1)
                         .userId(1)
+                        .build()
         ]
 
         ingredientRepository.findByUserId(userId) >> ingredients
@@ -248,6 +251,7 @@ class IngredientServiceTest extends Specification {
                         .ingredientName("재료2")
                         .ingredientIconId(1)
                         .userId(1)
+                        .build()
         ]
 
         ingredientRepository.findByUserId(userId) >> ingredients
