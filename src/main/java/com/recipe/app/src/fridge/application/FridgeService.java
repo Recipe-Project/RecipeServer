@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Service
 public class FridgeService {
@@ -142,8 +141,7 @@ public class FridgeService {
         List<Ingredient> ingredients = ingredientService.findByIngredientIds(ingredientIds);
 
         return ingredients.stream()
-                .flatMap(ingredient -> Stream.of(ingredient.getIngredientName(), ingredient.getSimilarIngredientName()))
-                .map(Object::toString)
+                .flatMap(ingredient -> ingredient.getIngredientNameWithSimilar().stream())
                 .collect(Collectors.toList());
     }
 
