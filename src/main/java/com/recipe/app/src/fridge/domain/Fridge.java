@@ -1,6 +1,7 @@
 package com.recipe.app.src.fridge.domain;
 
 import com.recipe.app.src.common.entity.BaseEntity;
+import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -63,5 +64,11 @@ public class Fridge extends BaseEntity {
 
     public void plusQuantity(float quantity) {
         this.quantity += quantity;
+    }
+
+    public boolean match(FridgeBasket fridgeBasket) {
+        return Objects.equals(ingredientId, fridgeBasket.getIngredientId()) &&
+                Objects.equals(this.unit, fridgeBasket.getUnit()) &&
+                Objects.equals(this.expiredAt, fridgeBasket.getExpiredAt());
     }
 }
