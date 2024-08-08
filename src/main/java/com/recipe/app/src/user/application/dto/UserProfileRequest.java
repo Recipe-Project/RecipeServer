@@ -2,6 +2,7 @@ package com.recipe.app.src.user.application.dto;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -14,4 +15,10 @@ public class UserProfileRequest {
     private String profileImgUrl;
     @ApiModelProperty(value = "닉네임")
     private String nickname;
+
+    @Builder
+    public UserProfileRequest(String profileImgUrl, String nickname) {
+        this.profileImgUrl = profileImgUrl;
+        this.nickname = nickname;
+    }
 }
