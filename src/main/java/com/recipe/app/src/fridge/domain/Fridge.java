@@ -13,7 +13,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 @Getter
@@ -56,30 +55,13 @@ public class Fridge extends BaseEntity {
         this.unit = unit;
     }
 
-    public Freshness getFreshness() {
-
-        if (this.expiredAt == null) {
-            return Freshness.FRESH;
-        }
-        long diffDay = ChronoUnit.DAYS.between(LocalDate.now(), expiredAt);
-        if (diffDay <= 0) {
-            return Freshness.SPOILED;
-        }
-        if (diffDay < 7) {
-            return Freshness.RISKY;
-        }
-        return Freshness.FRESH;
-    }
-
     public void updateFridge(LocalDate expiredAt, float quantity, String unit) {
-
         this.expiredAt = expiredAt;
         this.quantity = quantity;
         this.unit = unit;
     }
 
     public void plusQuantity(float quantity) {
-
         this.quantity += quantity;
     }
 }

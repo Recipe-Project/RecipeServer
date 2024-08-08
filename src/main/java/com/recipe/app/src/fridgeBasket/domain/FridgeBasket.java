@@ -1,7 +1,6 @@
 package com.recipe.app.src.fridgeBasket.domain;
 
 import com.recipe.app.src.common.entity.BaseEntity;
-import com.recipe.app.src.fridge.domain.Freshness;
 import com.recipe.app.src.fridge.domain.Fridge;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 @Getter
@@ -59,7 +57,6 @@ public class FridgeBasket extends BaseEntity {
     }
 
     public void plusQuantity(float quantity) {
-
         this.quantity += quantity;
     }
 
@@ -70,22 +67,8 @@ public class FridgeBasket extends BaseEntity {
         this.unit = unit;
     }
 
-    public Freshness getFreshness() {
-
-        if (this.expiredAt == null) {
-            return Freshness.FRESH;
-        }
-        long diffDay = ChronoUnit.DAYS.between(LocalDate.now(), expiredAt);
-        if (diffDay <= 0) {
-            return Freshness.SPOILED;
-        }
-        if (diffDay < 7) {
-            return Freshness.RISKY;
-        }
-        return Freshness.FRESH;
-    }
-
     public Fridge toFridge() {
+
         return Fridge.builder()
                 .userId(userId)
                 .ingredientId(ingredientId)
