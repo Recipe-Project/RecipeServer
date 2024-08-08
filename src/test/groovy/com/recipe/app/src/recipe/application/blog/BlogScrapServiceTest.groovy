@@ -88,17 +88,12 @@ class BlogScrapServiceTest extends Specification {
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()
                         .blogScrapId(1)
-                        .userId(1)
+                        .userId(userId)
                         .blogRecipeId(1)
                         .build(),
                 BlogScrap.builder()
                         .blogScrapId(1)
-                        .userId(1)
-                        .blogRecipeId(2)
-                        .build(),
-                BlogScrap.builder()
-                        .blogScrapId(1)
-                        .userId(2)
+                        .userId(userId)
                         .blogRecipeId(2)
                         .build(),
         ]
