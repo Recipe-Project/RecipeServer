@@ -85,9 +85,9 @@ public class YoutubeRecipeService {
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse getScrapYoutubeRecipes(User user, long lastYoutubeRecipeId, int size) {
+    public RecipesResponse findScrapYoutubeRecipes(User user, long lastYoutubeRecipeId, int size) {
 
-        long totalCnt = youtubeScrapService.countYoutubeScrapByUserId(user.getUserId());
+        long totalCnt = youtubeScrapService.countByUserId(user.getUserId());
 
         YoutubeScrap youtubeScrap = youtubeScrapService.findByUserIdAndYoutubeRecipeId(user.getUserId(), lastYoutubeRecipeId);
 
@@ -109,7 +109,7 @@ public class YoutubeRecipeService {
         youtubeRecipeRepository.findById(youtubeRecipeId)
                 .ifPresent((youtubeRecipe) -> {
                     youtubeRecipe.plusViewCnt();
-                    youtubeViewService.createYoutubeView(user.getUserId(), youtubeRecipeId);
+                    youtubeViewService.create(user.getUserId(), youtubeRecipeId);
                 });
     }
 
@@ -119,7 +119,7 @@ public class YoutubeRecipeService {
         youtubeRecipeRepository.findById(youtubeRecipeId)
                 .ifPresent((youtubeRecipe) -> {
                     youtubeRecipe.plusScrapCnt();
-                    youtubeScrapService.createYoutubeScrap(user.getUserId(), youtubeRecipeId);
+                    youtubeScrapService.create(user.getUserId(), youtubeRecipeId);
                 });
     }
 
@@ -129,7 +129,7 @@ public class YoutubeRecipeService {
         youtubeRecipeRepository.findById(youtubeRecipeId)
                 .ifPresent((youtubeRecipe) -> {
                     youtubeRecipe.minusScrapCnt();
-                    youtubeScrapService.deleteYoutubeScrap(user.getUserId(), youtubeRecipeId);
+                    youtubeScrapService.delete(user.getUserId(), youtubeRecipeId);
                 });
     }
 

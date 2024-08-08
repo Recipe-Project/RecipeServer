@@ -18,7 +18,7 @@ public class YoutubeScrapService {
     }
 
     @Transactional
-    public void createYoutubeScrap(long userId, long youtubeRecipeId) {
+    public void create(long userId, long youtubeRecipeId) {
 
         youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
                 .orElseGet(() -> youtubeScrapRepository.save(YoutubeScrap.builder()
@@ -28,14 +28,14 @@ public class YoutubeScrapService {
     }
 
     @Transactional
-    public void deleteYoutubeScrap(long userId, long youtubeRecipeId) {
+    public void delete(long userId, long youtubeRecipeId) {
 
         youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
                 .ifPresent(youtubeScrapRepository::delete);
     }
 
     @Transactional
-    public void deleteYoutubeScrapsByUserId(long userId) {
+    public void deleteAllByUserId(long userId) {
 
         List<YoutubeScrap> youtubeScraps = youtubeScrapRepository.findByUserId(userId);
 
@@ -43,7 +43,7 @@ public class YoutubeScrapService {
     }
 
     @Transactional(readOnly = true)
-    public long countYoutubeScrapByUserId(long userId) {
+    public long countByUserId(long userId) {
 
         return youtubeScrapRepository.countByUserId(userId);
     }

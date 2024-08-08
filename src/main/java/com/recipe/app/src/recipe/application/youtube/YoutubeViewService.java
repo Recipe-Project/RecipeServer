@@ -17,7 +17,7 @@ public class YoutubeViewService {
     }
 
     @Transactional
-    public void createYoutubeView(long userId, long youtubeRecipeId) {
+    public void create(long userId, long youtubeRecipeId) {
 
         youtubeViewRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
                 .orElseGet(() -> youtubeViewRepository.save(YoutubeView.builder()
@@ -27,7 +27,7 @@ public class YoutubeViewService {
     }
 
     @Transactional
-    public void deleteYoutubeViewsByUserId(long userId) {
+    public void deleteAllByUserId(long userId) {
 
         List<YoutubeView> youtubeViews = youtubeViewRepository.findByUserId(userId);
 

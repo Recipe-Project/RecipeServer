@@ -70,7 +70,7 @@ public class YoutubeRecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return youtubeRecipeService.getScrapYoutubeRecipes(user, startAfter, size);
+        return youtubeRecipeService.findScrapYoutubeRecipes(user, startAfter, size);
     }
 
     @ApiOperation(value = "유튜브 레시피 스크랩 생성 API")

@@ -52,7 +52,7 @@ public class UserFacadeService {
     @Transactional(readOnly = true)
     public UserProfileResponse findUserProfile(User user) {
 
-        long youtubeScrapCnt = youtubeScrapService.countYoutubeScrapByUserId(user.getUserId());
+        long youtubeScrapCnt = youtubeScrapService.countByUserId(user.getUserId());
         long blogScrapCnt = blogScrapService.countByUserId(user.getUserId());
         long recipeScrapCnt = recipeService.countRecipeScrapByUserId(user.getUserId());
 
@@ -68,8 +68,8 @@ public class UserFacadeService {
         fridgeBasketService.deleteFridgeBasketsByUserId(user.getUserId());
         recipeService.deleteAllByUserId(user.getUserId());
         ingredientService.deleteIngredientsByUserId(user.getUserId());
-        youtubeScrapService.deleteYoutubeScrapsByUserId(user.getUserId());
-        youtubeViewService.deleteYoutubeViewsByUserId(user.getUserId());
+        youtubeScrapService.deleteAllByUserId(user.getUserId());
+        youtubeViewService.deleteAllByUserId(user.getUserId());
         blogScrapService.deleteAllByUserId(user.getUserId());
         blogViewService.deleteAllByUserId(user.getUserId());
 
