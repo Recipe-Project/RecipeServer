@@ -86,39 +86,4 @@ public class FridgeController {
 
         fridgeService.updateFridge(user, fridgeId, request);
     }
-
-    /*
-    @PostMapping("/fcm-test")
-    public BaseResponse<Void> posFcmTest() throws BaseException, IOException {
-        HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes()).getRequest();
-        String targetToken = request.getHeader("FCM-TOKEN");
-        String title = "title-test";
-        String body = "body-test";
-
-        firebaseCloudMessageService.sendMessageTo(targetToken, title, body);
-
-        return success();
-    }
-
-    @Scheduled(cron = "0 0 12 * * *") //cron = 0 0 12 * * * 매일 12시
-    @PostMapping("/notification")
-    public BaseResponse<Void> postNotification() throws BaseException, IOException {
-        System.out.println("*******************fcm start!****************");
-        // 유통기한 리스트 조회한다.
-        List<ShelfLifeUser> shelfLifeUsers = fridgeService.retreiveShelfLifeUserList();
-
-        // 유통기한 리스트 있을때만 알림 보내기
-        if (shelfLifeUsers != null) {
-            // 유통기한 리스트로 알림 보낸다.
-            for (ShelfLifeUser shelfLifeUser : shelfLifeUsers) {
-                String deviceToken = shelfLifeUser.getDeviceToken();
-                String title = "유통기한 알림";
-                String body = shelfLifeUser.getIngredientName() + "의 유통기한이 3일 남았습니다.";
-                System.out.println("deviceToken: " + deviceToken + "/title: " + title + "/body: " + body);
-                firebaseCloudMessageService.sendMessageTo(deviceToken, title, body);
-            }
-        }
-        return success();
-    }
-     */
 }

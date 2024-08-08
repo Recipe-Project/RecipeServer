@@ -156,24 +156,4 @@ public class FridgeService {
         fridgeRepository.findByUserIdAndIngredientId(userId, ingredientId)
                 .ifPresent(fridgeRepository::delete);
     }
-
-     /*
-
-    public List<ShelfLifeUser> retreiveShelfLifeUserList() throws BaseException {
-        SimpleDateFormat sdFormat = new SimpleDateFormat("yy.MM.dd");
-        String today = sdFormat.format(new Date());
-
-        List<Fridge> fridges = fridgeRepository.findAllByStatusAnd3DaysBeforeExpiredAt("ACTIVE", today);
-
-        List<ShelfLifeUser> shelfLifeUsers = new ArrayList<>();
-        for (FridgeEntity fridgeEntity : fridgeEntityList) {
-            String deviceToken = fridgeEntity.getUser().getDeviceToken();
-            String ingredientName = fridgeEntity.getIngredient().getIngredientName();
-            ShelfLifeUser shelfLifeUser = new ShelfLifeUser(deviceToken, ingredientName);
-            shelfLifeUsers.add(shelfLifeUser);
-        }
-        return shelfLifeUsers;
-    }
-
-     */
 }
