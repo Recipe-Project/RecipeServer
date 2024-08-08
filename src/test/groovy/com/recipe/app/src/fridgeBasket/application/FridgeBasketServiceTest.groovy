@@ -1,5 +1,6 @@
 package com.recipe.app.src.fridgeBasket.application
 
+
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketCountResponse
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketRequest
 import com.recipe.app.src.fridgeBasket.application.dto.FridgeBasketsRequest
@@ -52,14 +53,85 @@ class FridgeBasketServiceTest extends Specification {
                         .ingredientName("재료2")
                         .ingredientIconId(1)
                         .userId(1)
-                        .build(),
-                Ingredient.builder()
+                        .build()
+        ]
+
+        ingredientService.findByIngredientIds(ingredientIds) >> ingredients
+
+        List<FridgeBasket> fridgeBaskets = [
+                FridgeBasket.builder()
+                        .fridgeBasketId(1)
+                        .userId(user.userId)
                         .ingredientId(3)
-                        .ingredientCategoryId(3)
-                        .ingredientName("재료3")
+                        .expiredAt(null)
+                        .quantity(1.5)
+                        .unit("개")
+                        .build(),
+                FridgeBasket.builder()
+                        .fridgeBasketId(1)
+                        .userId(user.userId)
+                        .ingredientId(4)
+                        .expiredAt(null)
+                        .quantity(1.5)
+                        .unit("개")
+                        .build()
+        ]
+
+        fridgeBasketRepository.findByUserId(user.userId) >> fridgeBaskets
+
+        when:
+        fridgeBasketService.create(user, request)
+
+        then:
+        1 * fridgeBasketRepository.saveAll(_) >> { args ->
+
+            List<FridgeBasket> savedFridgeBaskets = args.get(0) as List<FridgeBasket>
+
+            assert savedFridgeBaskets.get(0).fridgeBasketId == null
+            assert savedFridgeBaskets.get(0).userId == user.userId
+            assert savedFridgeBaskets.get(0).ingredientId == 1
+            assert savedFridgeBaskets.get(0).expiredAt == null
+            assert savedFridgeBaskets.get(0).quantity == 1
+            assert savedFridgeBaskets.get(0).unit == null
+            assert savedFridgeBaskets.get(1).fridgeBasketId == null
+            assert savedFridgeBaskets.get(1).userId == user.userId
+            assert savedFridgeBaskets.get(1).ingredientId == 2
+            assert savedFridgeBaskets.get(1).expiredAt == null
+            assert savedFridgeBaskets.get(1).quantity == 1
+            assert savedFridgeBaskets.get(1).unit == null
+        }
+    }
+
+    def "냉장고 바구니 생성 시 이미 같은 재료 존재하면 수량만 더함"() {
+
+        given:
+        User user = User.builder()
+                .userId(1)
+                .socialId("naver_1")
+                .nickname("테스터1")
+                .build()
+
+        List<Long> ingredientIds = [1L, 2L]
+
+        FridgeBasketsRequest request = FridgeBasketsRequest.builder()
+                .ingredientIds(ingredientIds)
+                .build()
+
+        List<Ingredient> ingredients = [
+                Ingredient.builder()
+                        .ingredientId(1)
+                        .ingredientCategoryId(1)
+                        .ingredientName("재료1")
                         .ingredientIconId(1)
                         .userId(1)
-                        .build()
+                        .build(),
+                Ingredient.builder()
+                        .ingredientId(2)
+                        .ingredientCategoryId(2)
+                        .ingredientName("재료2")
+                        .ingredientIconId(1)
+                        .userId(1)
+                        .build(),
         ]
 
         ingredientService.findByIngredientIds(ingredientIds) >> ingredients
@@ -74,9 +146,9 @@ class FridgeBasketServiceTest extends Specification {
                         .unit("개")
                         .build(),
                 FridgeBasket.builder()
-                        .fridgeBasketId(1)
+                        .fridgeBasketId(2)
                         .userId(user.userId)
-                        .ingredientId(3)
+                        .ingredientId(2)
                         .expiredAt(null)
                         .quantity(1.5)
                         .unit("개")
@@ -89,7 +161,23 @@ class FridgeBasketServiceTest extends Specification {
         fridgeBasketService.create(user, request)
 
         then:
-        1 * fridgeBasketRepository.saveAll(_)
+        1 * fridgeBasketRepository.saveAll(_) >> { args ->
+
+            List<FridgeBasket> savedFridgeBaskets = args.get(0) as List<FridgeBasket>
+
+            assert savedFridgeBaskets.get(0).fridgeBasketId == 1
+            assert savedFridgeBaskets.get(0).userId == user.userId
+            assert savedFridgeBaskets.get(0).ingredientId == 1
+            assert savedFridgeBaskets.get(0).expiredAt == null
+            assert savedFridgeBaskets.get(0).quantity == 2.5f
+            assert savedFridgeBaskets.get(0).unit == "개"
+            assert savedFridgeBaskets.get(1).fridgeBasketId == 2
+            assert savedFridgeBaskets.get(1).userId == user.userId
+            assert savedFridgeBaskets.get(1).ingredientId == 2
+            assert savedFridgeBaskets.get(1).expiredAt == null
+            assert savedFridgeBaskets.get(1).quantity == 2.5f
+            assert savedFridgeBaskets.get(1).unit == "개"
+        }
     }
 
     def "냉장고 바구니 삭제"() {
