@@ -1,6 +1,6 @@
 package com.recipe.app.src.fridge.domain
 
-
+import com.recipe.app.src.fridgeBasket.domain.FridgeBasket
 import spock.lang.Specification
 
 import java.time.LocalDate
@@ -117,5 +117,45 @@ class FridgeTest extends Specification {
         fridge.expiredAt == updateExpiredAt
         fridge.quantity == updateQuantity
         fridge.unit == updateUnit
+    }
+
+    def "냉장고와 냉장고 바구니가 단위와 유통기한 매치가 되는지 확인"() {
+
+        given:
+        Fridge fridge = Fridge.builder()
+                .fridgeId(1)
+                .userId(1)
+                .ingredientId(1)
+                .expiredAt(fridgeExpiredAt)
+                .quantity(1.5)
+                .unit(fridgeUnit)
+                .build()
+
+        FridgeBasket fridgeBasket = FridgeBasket.builder()
+                .fridgeBasketId(1)
+                .userId(1)
+                .ingredientId(1)
+                .expiredAt(fridgeBasketExpiredAt)
+                .quantity(1.5)
+                .unit(fridgeBasketUnit)
+                .build()
+
+        when:
+        boolean result = fridge.match(fridgeBasket)
+
+        then:
+        result == expected
+
+        where:
+        fridgeExpiredAt            | fridgeUnit | fridgeBasketExpiredAt      | fridgeBasketUnit || expected
+        null                       | null       | null                       | null             || true
+        null                       | null       | null                       | ""               || false
+        null                       | "개"        | null                       | "개"              || true
+        null                       | "개"        | null                       | "접시"             || false
+        LocalDate.of(2024, 10, 10) | null       | LocalDate.of(2024, 10, 10) | null             || true
+        LocalDate.of(2024, 10, 10) | null       | null                       | null             || false
+        LocalDate.of(2024, 10, 10) | "개"        | LocalDate.of(2024, 10, 10) | "개"              || true
+        LocalDate.of(2024, 10, 10) | "개"        | null                       | "개"              || false
+        LocalDate.of(2024, 10, 10) | "개"        | null                       | "접시"             || false
     }
 }
