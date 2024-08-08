@@ -7,6 +7,4 @@ import java.util.List;
 public interface IngredientCustomRepository {
 
     List<Ingredient> findDefaultIngredientsByKeyword(Long userId, String keyword);
-
-    List<Ingredient> findDefaultIngredients(Long userId);
 }

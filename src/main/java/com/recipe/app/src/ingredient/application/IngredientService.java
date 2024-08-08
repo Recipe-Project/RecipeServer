@@ -9,7 +9,6 @@ import com.recipe.app.src.ingredient.infra.IngredientRepository;
 import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.Collection;
 import java.util.List;
@@ -27,10 +26,6 @@ public class IngredientService {
 
     @Transactional(readOnly = true)
     public List<Ingredient> findByKeyword(Long userId, String keyword) {
-
-        if (!StringUtils.hasText(keyword)) {
-            return ingredientRepository.findDefaultIngredients(userId);
-        }
 
         return ingredientRepository.findDefaultIngredientsByKeyword(userId, keyword);
     }
