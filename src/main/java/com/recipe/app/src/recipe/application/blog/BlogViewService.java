@@ -19,13 +19,11 @@ public class BlogViewService {
     @Transactional
     public void createBlogView(long userId, long blogRecipeId) {
 
-        BlogView blogView = blogViewRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
-                .orElseGet(() -> BlogView.builder()
+        blogViewRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
+                .orElseGet(() -> blogViewRepository.save(BlogView.builder()
                         .userId(userId)
                         .blogRecipeId(blogRecipeId)
-                        .build());
-
-        blogViewRepository.save(blogView);
+                        .build()));
     }
 
     @Transactional

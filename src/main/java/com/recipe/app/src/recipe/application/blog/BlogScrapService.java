@@ -20,13 +20,11 @@ public class BlogScrapService {
     @Transactional
     public void createBlogScrap(long userId, long blogRecipeId) {
 
-        BlogScrap blogScrap = blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
-                .orElseGet(() -> BlogScrap.builder()
+        blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
+                .orElseGet(() -> blogScrapRepository.save(BlogScrap.builder()
                         .userId(userId)
                         .blogRecipeId(blogRecipeId)
-                        .build());
-
-        blogScrapRepository.save(blogScrap);
+                        .build()));
     }
 
     @Transactional
