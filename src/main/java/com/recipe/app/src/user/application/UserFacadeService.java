@@ -32,6 +32,8 @@ public class UserFacadeService {
     private final FridgeBasketService fridgeBasketService;
     private final IngredientService ingredientService;
 
+    private static final int USER_PROFILE_RECIPE_CNT = 6;
+
     public UserFacadeService(UserService userService, RecipeService recipeService, RecipeSearchService recipeSearchService,
                              YoutubeScrapService youtubeScrapService, YoutubeViewService youtubeViewService,
                              BlogScrapService blogScrapService, BlogViewService blogViewService,
@@ -56,7 +58,7 @@ public class UserFacadeService {
         long blogScrapCnt = blogScrapService.countByUserId(user.getUserId());
         long recipeScrapCnt = recipeService.countRecipeScrapByUserId(user.getUserId());
 
-        List<Recipe> userRecipes = recipeSearchService.findLimitByUserId(user.getUserId(), 0L, 6);
+        List<Recipe> userRecipes = recipeSearchService.findLimitByUserId(user.getUserId(), 0L, USER_PROFILE_RECIPE_CNT);
 
         return UserProfileResponse.from(user, userRecipes, youtubeScrapCnt, blogScrapCnt, recipeScrapCnt);
     }
