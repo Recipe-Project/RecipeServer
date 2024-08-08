@@ -42,17 +42,6 @@ public class IngredientService {
         return ingredientRepository.findByIngredientIdIn(ingredientIds);
     }
 
-    @Transactional(readOnly = true)
-    public Optional<Ingredient> findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(Long userId, String ingredientName, Long ingredientIconId, Long ingredientCategoryId) {
-
-        return ingredientRepository.findByUserIdAndIngredientNameAndIngredientIconIdAndIngredientCategoryId(userId, ingredientName, ingredientIconId, ingredientCategoryId);
-    }
-
-    @Transactional
-    public void createIngredient(Ingredient ingredient) {
-        ingredientRepository.save(ingredient);
-    }
-
     @Transactional
     public IngredientCreateResponse createIngredient(Long userId, IngredientRequest request) {
 
@@ -72,11 +61,6 @@ public class IngredientService {
         ingredientRepository.save(ingredient);
 
         return new IngredientCreateResponse(ingredient.getIngredientId());
-    }
-
-    @Transactional
-    public void createIngredients(Collection<Ingredient> ingredients) {
-        ingredientRepository.saveAll(ingredients);
     }
 
     @Transactional
