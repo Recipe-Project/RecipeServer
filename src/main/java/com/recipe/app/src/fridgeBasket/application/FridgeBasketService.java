@@ -138,9 +138,10 @@ public class FridgeBasketService {
     }
 
     @Transactional
-    public void deleteFridgeBasketsByUser(User user) {
+    public void deleteFridgeBasketsByUserId(long userId) {
 
-        List<FridgeBasket> fridgeBaskets = findByUserId(user.getUserId());
+        List<FridgeBasket> fridgeBaskets = findByUserId(userId);
+
         deleteFridgeBaskets(fridgeBaskets);
     }
 

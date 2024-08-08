@@ -1,9 +1,7 @@
 package com.recipe.app.src.recipe.application.youtube;
 
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
-import com.recipe.app.src.recipe.exception.NotFoundScrapException;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeScrapRepository;
-import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,35 +18,34 @@ public class YoutubeScrapService {
     }
 
     @Transactional
-    public void createYoutubeScrap(User user, Long youtubeRecipeId) {
+    public void create(long userId, long youtubeRecipeId) {
 
-        YoutubeScrap youtubeScrap = youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(user.getUserId(), youtubeRecipeId)
-                .orElseGet(() -> YoutubeScrap.builder()
-                        .userId(user.getUserId())
+        youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
+                .orElseGet(() -> youtubeScrapRepository.save(YoutubeScrap.builder()
+                        .userId(userId)
                         .youtubeRecipeId(youtubeRecipeId)
-                        .build());
-
-        youtubeScrapRepository.save(youtubeScrap);
+                        .build()));
     }
 
     @Transactional
-    public void deleteYoutubeScrap(User user, Long youtubeRecipeId) {
+    public void delete(long userId, long youtubeRecipeId) {
 
-        youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(user.getUserId(), youtubeRecipeId)
+        youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId)
                 .ifPresent(youtubeScrapRepository::delete);
     }
 
     @Transactional
-    public void deleteYoutubeScrapsByUser(User user) {
+    public void deleteAllByUserId(long userId) {
 
-        List<YoutubeScrap> youtubeScraps = youtubeScrapRepository.findByUserId(user.getUserId());
+        List<YoutubeScrap> youtubeScraps = youtubeScrapRepository.findByUserId(userId);
+
         youtubeScrapRepository.deleteAll(youtubeScraps);
     }
 
     @Transactional(readOnly = true)
-    public long countYoutubeScrapByUser(User user) {
+    public long countByUserId(long userId) {
 
-        return youtubeScrapRepository.countByUserId(user.getUserId());
+        return youtubeScrapRepository.countByUserId(userId);
     }
 
     @Transactional(readOnly = true)
@@ -58,16 +55,14 @@ public class YoutubeScrapService {
     }
 
     @Transactional(readOnly = true)
-    public long countByYoutubeRecipeId(Long youtubeRecipeId) {
+    public long countByYoutubeRecipeId(long youtubeRecipeId) {
 
         return youtubeScrapRepository.countByYoutubeRecipeId(youtubeRecipeId);
     }
 
     @Transactional(readOnly = true)
-    public YoutubeScrap findByUserIdAndYoutubeRecipeId(Long userId, Long youtubeRecipeId) {
+    public YoutubeScrap findByUserIdAndYoutubeRecipeId(long userId, long youtubeRecipeId) {
 
-        return youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId).orElseThrow(() -> {
-            throw new NotFoundScrapException();
-        });
+        return youtubeScrapRepository.findByUserIdAndYoutubeRecipeId(userId, youtubeRecipeId).orElse(null);
     }
 }

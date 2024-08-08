@@ -1,5 +1,6 @@
 package com.recipe.app.src.user.application.dto;
 
+import com.recipe.app.src.recipe.domain.Recipe;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,5 +19,13 @@ public class UserRecipeResponse {
 
         this.recipeId = recipeId;
         this.thumbnailImgUrl = thumbnailImgUrl;
+    }
+
+    public static UserRecipeResponse from(Recipe recipe) {
+
+        return UserRecipeResponse.builder()
+                .recipeId(recipe.getRecipeId())
+                .thumbnailImgUrl(recipe.getImgUrl())
+                .build();
     }
 }

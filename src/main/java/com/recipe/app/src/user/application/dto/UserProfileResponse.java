@@ -1,5 +1,6 @@
 package com.recipe.app.src.user.application.dto;
 
+import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.user.domain.LoginProvider;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -7,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Schema(description = "회원 프로필 응답 DTO")
 @Getter
@@ -49,7 +51,7 @@ public class UserProfileResponse {
     }
 
 
-    public static UserProfileResponse from(User user, List<UserRecipeResponse> userRecipes, long youtubeScrapCnt, long blogScrapCnt, long recipeScrapCnt) {
+    public static UserProfileResponse from(User user, List<Recipe> userRecipes, long youtubeScrapCnt, long blogScrapCnt, long recipeScrapCnt) {
 
         return UserProfileResponse.builder()
                 .userId(user.getUserId())
@@ -61,7 +63,9 @@ public class UserProfileResponse {
                 .blogScrapCnt(blogScrapCnt)
                 .recipeScrapCnt(recipeScrapCnt)
                 .userRecipeTotalSize(userRecipes.size())
-                .userRecipes(userRecipes)
+                .userRecipes(userRecipes.stream()
+                        .map(UserRecipeResponse::from)
+                        .collect(Collectors.toList()))
                 .build();
     }
 }

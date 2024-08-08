@@ -21,52 +21,38 @@ repositories {
 }
 
 dependencies {
-    // Spring Boot Starter
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-    // Lombok
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
-
-    // DB
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    runtimeOnly 'com.mysql:mysql-connector-j'
-
-    // Web
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation "org.apache.tomcat.embed:tomcat-embed-jasper"
     implementation 'jakarta.servlet:jakarta.servlet-api'
     implementation 'jakarta.servlet.jsp.jstl:jakarta.servlet.jsp.jstl-api'
     implementation 'org.glassfish.web:jakarta.servlet.jsp.jstl'
 
-    // Security, Authentication
+    compileOnly 'org.projectlombok:lombok'
+    annotationProcessor 'org.projectlombok:lombok'
+
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    runtimeOnly 'com.mysql:mysql-connector-j'
+
+    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
+    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    implementation 'com.google.firebase:firebase-admin:6.8.1'
+
+    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-aop'
+
     implementation 'org.springframework.boot:spring-boot-starter-security'
     compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.2'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.2'
     runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.2'
 
-    //validation
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-    implementation 'com.googlecode.json-simple:json-simple:1.1'
-
-    implementation 'com.google.code.gson:gson:2.8.5'
-
     implementation 'org.jsoup:jsoup:1.13.1'
 
-    // firebase sdk
-    implementation 'com.google.firebase:firebase-admin:6.8.1'
-
-    // okhttp
     implementation group: 'com.squareup.okhttp3', name: 'okhttp', version: '4.2.2'
-
-    implementation group: 'com.googlecode.json-simple', name: 'json-simple', version: '1.1'
-
-    implementation 'org.json:json:20171018'
-    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.0'
-
-//    //HeaderRequestInterceptor
-//    compile group: 'org.springframework', name: 'spring-web', version: '4.1.9.RELEASE'
 
     implementation group: 'com.google.api-client', name: 'google-api-client', version: '1.25.0'
     implementation group: 'com.google.apis', name: 'google-api-services-youtube', version: 'v3-rev212-1.25.0'
@@ -76,27 +62,16 @@ dependencies {
     implementation group: 'com.google.http-client', name: 'google-http-client-jackson2', version: '1.25.0'
     implementation group: 'com.google.collections', name: 'google-collections', version: '1.0'
 
-    // Swagger
-    implementation 'io.springfox:springfox-boot-starter:3.0.0'
-
-    // queryDSL 설정
-    implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-    annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
-    annotationProcessor "jakarta.annotation:jakarta.annotation-api"
-    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
-
-    // Spock
-    testImplementation 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
-    testImplementation 'org.spockframework:spock-spring:2.4-M1-groovy-4.0'
-
-    // redis
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
     implementation 'org.springframework.cloud:spring-cloud-starter-openfeign:4.1.0'
 
-    implementation 'io.github.resilience4j:resilience4j-spring-boot3:2.2.0'
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-aop'
+    implementation 'io.springfox:springfox-boot-starter:3.0.0'
+
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
+    testImplementation 'org.spockframework:spock-core:2.4-M1-groovy-4.0'
+    testImplementation 'org.spockframework:spock-spring:2.4-M1-groovy-4.0'
 }
 
 test {

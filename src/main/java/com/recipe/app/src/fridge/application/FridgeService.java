@@ -123,9 +123,9 @@ public class FridgeService {
     }
 
     @Transactional
-    public void deleteFridgesByUser(User user) {
+    public void deleteFridgesByUserId(long userId) {
 
-        List<Fridge> fridges = fridgeRepository.findByUserId(user.getUserId());
+        List<Fridge> fridges = fridgeRepository.findByUserId(userId);
         fridgeRepository.deleteAll(fridges);
     }
 
@@ -135,29 +135,19 @@ public class FridgeService {
     }
 
     @Transactional(readOnly = true)
-    public boolean isInFridge(Long userId, String ingredientName) {
+    public List<String> findIngredientNamesInFridge(Long userId) {
 
         List<Fridge> fridges = fridgeRepository.findByUserId(userId);
         List<Long> ingredientIds = fridges.stream()
                 .map(Fridge::getIngredientId)
                 .collect(Collectors.toList());
+
         List<Ingredient> ingredients = ingredientService.findByIngredientIds(ingredientIds);
-        List<String> ingredientNamesInFridge = ingredients.stream()
+
+        return ingredients.stream()
                 .flatMap(ingredient -> Stream.of(ingredient.getIngredientName(), ingredient.getSimilarIngredientName()))
                 .map(Object::toString)
                 .collect(Collectors.toList());
-
-        return ingredientNamesInFridge.contains(ingredientName);
-    }
-
-    @Transactional(readOnly = true)
-    public List<Ingredient> findIngredientsInUserFridge(User user) {
-
-        List<Long> ingredientIds = findByUserId(user.getUserId()).stream()
-                .map(Fridge::getIngredientId)
-                .collect(Collectors.toList());
-
-        return ingredientService.findByIngredientIds(ingredientIds);
     }
 
     @Transactional

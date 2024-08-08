@@ -25,8 +25,6 @@ class RecipeCustomRepositoryTest extends Specification {
     @Autowired
     UserRepository userRepository;
     @Autowired
-    RecipeIngredientRepository recipeIngredientRepository;
-    @Autowired
     RecipeRepository recipeRepository;
     @Autowired
     RecipeScrapRepository recipeScrapRepository;
@@ -66,6 +64,16 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(true)
                         .build(),
         ]
+
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("재료")
+                .build()
+
         recipeRepository.saveAll(recipes)
 
         when:
@@ -73,7 +81,13 @@ class RecipeCustomRepositoryTest extends Specification {
 
         then:
         recipe.isPresent()
-        recipe.get().getRecipeId() == recipes.get(0).getRecipeId()
+        recipe.get().recipeId == recipes.get(0).recipeId
+        recipe.get().recipeNm == recipes.get(0).recipeNm
+        recipe.get().introduction == recipes.get(0).introduction
+        recipe.get().level == recipes.get(0).level
+        recipe.get().userId == recipes.get(0).userId
+        !recipe.get().isHidden()
+        recipe.get().ingredients.size() == 1
     }
 
     def "레시피 상세 조회 시 비공개인 경우 본인이 작성한 경우에만 성공"() {
@@ -95,6 +109,16 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(true)
                         .build(),
         ]
+
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("재료")
+                .build()
+
         recipeRepository.saveAll(recipes)
 
         when:
@@ -102,7 +126,14 @@ class RecipeCustomRepositoryTest extends Specification {
 
         then:
         recipe.isPresent()
-        recipe.get().getRecipeId() == recipes.get(1).getRecipeId()
+        recipe.get().recipeId == recipes.get(1).recipeId
+        recipe.get().recipeNm == recipes.get(1).recipeNm
+        recipe.get().introduction == recipes.get(1).introduction
+        recipe.get().level == recipes.get(1).level
+        recipe.get().userId == recipes.get(1).userId
+        recipe.get().isHidden()
+        recipe.get().ingredients.size() == 1
+
     }
 
     def "레시피 상세 조회 시 비공개인 경우 본인이 작성하지 않은 경우 실패"() {
@@ -124,6 +155,16 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(true)
                         .build(),
         ]
+
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("재료")
+                .build()
+
         recipeRepository.saveAll(recipes)
 
         when:
@@ -159,23 +200,21 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(false)
                         .build(),
         ]
-        recipeRepository.saveAll(recipes);
 
-        List<RecipeIngredient> recipeIngredients = [
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(0).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(1).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(2).recipeId)
-                        .ingredientName("테스트")
-                        .build(),
-        ]
-        recipeIngredientRepository.saveAll(recipeIngredients);
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(2))
+                .ingredientName("테스트")
+                .build()
+
+        recipeRepository.saveAll(recipes);
 
         when:
         long response = recipeRepository.countByKeyword("테스트");
@@ -210,23 +249,21 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(false)
                         .build(),
         ]
-        recipeRepository.saveAll(recipes);
 
-        List<RecipeIngredient> recipeIngredients = [
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(0).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(1).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(2).recipeId)
-                        .ingredientName("테스트")
-                        .build(),
-        ]
-        recipeIngredientRepository.saveAll(recipeIngredients);
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(2))
+                .ingredientName("테스트")
+                .build()
+
+        recipeRepository.saveAll(recipes);
 
         when:
         List<Recipe> response = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc("테스트", 0L, recipes.createdAt.max().plusMinutes(1), 3);
@@ -268,23 +305,21 @@ class RecipeCustomRepositoryTest extends Specification {
                         .scrapCnt(2L)
                         .build(),
         ]
-        recipeRepository.saveAll(recipes);
 
-        List<RecipeIngredient> recipeIngredients = [
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(0).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(1).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(2).recipeId)
-                        .ingredientName("테스트")
-                        .build(),
-        ]
-        recipeIngredientRepository.saveAll(recipeIngredients);
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(2))
+                .ingredientName("테스트")
+                .build()
+
+        recipeRepository.saveAll(recipes);
 
         when:
         List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc("테스트", recipes.get(2).recipeId, 2, 3);
@@ -324,23 +359,21 @@ class RecipeCustomRepositoryTest extends Specification {
                         .viewCnt(2L)
                         .build(),
         ]
-        recipeRepository.saveAll(recipes);
 
-        List<RecipeIngredient> recipeIngredients = [
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(0).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(1).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(2).recipeId)
-                        .ingredientName("테스트")
-                        .build(),
-        ]
-        recipeIngredientRepository.saveAll(recipeIngredients);
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(2))
+                .ingredientName("테스트")
+                .build()
+
+        recipeRepository.saveAll(recipes);
 
         when:
         List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc("테스트", recipes.get(2).recipeId, 2, 3);
@@ -463,23 +496,22 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(false)
                         .build(),
         ]
-        recipeRepository.saveAll(recipes);
 
-        List<RecipeIngredient> recipeIngredients = [
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(0).recipeId)
-                        .ingredientName("테스트")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(1).recipeId)
-                        .ingredientName("재료")
-                        .build(),
-                RecipeIngredient.builder()
-                        .recipeId(recipes.get(2).recipeId)
-                        .ingredientName("테스트")
-                        .build(),
-        ]
-        recipeIngredientRepository.saveAll(recipeIngredients);
+
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("테스트")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("재료")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(2))
+                .ingredientName("테스트")
+                .build()
+
+        recipeRepository.saveAll(recipes);
 
         when:
         List<Recipe> response = recipeRepository.findRecipesInFridge(["테스트"]);

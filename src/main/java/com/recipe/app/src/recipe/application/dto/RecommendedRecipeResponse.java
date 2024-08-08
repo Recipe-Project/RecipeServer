@@ -1,12 +1,14 @@
 package com.recipe.app.src.recipe.application.dto;
 
 import com.recipe.app.src.recipe.domain.Recipe;
+import com.recipe.app.src.recipe.domain.RecipeScrap;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 import lombok.Getter;
 
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 
 @Schema(description = "냉장고 추천 레시피 응답 DTO")
 @Getter
@@ -33,11 +35,11 @@ public class RecommendedRecipeResponse {
     @Schema(description = "조회수")
     private final long viewCnt;
     @Schema(description = "재료 일치도")
-    private final int ingredientsMatchRate;
+    private final long ingredientsMatchRate;
 
     @Builder
     public RecommendedRecipeResponse(Long recipeId, String recipeName, String introduction, String thumbnailImgUrl, String postUserName, String postDate,
-                                     String linkUrl, Boolean isUserScrap, long scrapCnt, long viewCnt, Integer ingredientsMatchRate) {
+                                     String linkUrl, Boolean isUserScrap, long scrapCnt, long viewCnt, long ingredientsMatchRate) {
 
         this.recipeId = recipeId;
         this.recipeName = recipeName;
@@ -52,7 +54,7 @@ public class RecommendedRecipeResponse {
         this.ingredientsMatchRate = ingredientsMatchRate;
     }
 
-    public static RecommendedRecipeResponse from(Recipe recipe, User recipePostUser, int ingredientsMatchRate, boolean isScrapByUser) {
+    public static RecommendedRecipeResponse from(Recipe recipe, User recipePostUser, long ingredientsMatchRate, List<RecipeScrap> recipeScraps, User user) {
 
         return RecommendedRecipeResponse.builder()
                 .recipeId(recipe.getRecipeId())
@@ -61,11 +63,13 @@ public class RecommendedRecipeResponse {
                 .thumbnailImgUrl(recipe.getImgUrl())
                 .postUserName(recipePostUser != null ? recipePostUser.getNickname() : null)
                 .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
-                .isUserScrap(isScrapByUser)
+                .isUserScrap(recipeScraps.stream()
+                        .anyMatch(recipeScrap ->
+                                recipeScrap.getRecipeId().equals(recipe.getRecipeId())
+                                        && recipeScrap.getUserId().equals(user.getUserId())))
                 .scrapCnt(recipe.getScrapCnt())
                 .viewCnt(recipe.getViewCnt())
                 .ingredientsMatchRate(ingredientsMatchRate)
                 .build();
     }
-
 }

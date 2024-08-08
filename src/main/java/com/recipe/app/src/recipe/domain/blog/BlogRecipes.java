@@ -1,16 +1,23 @@
 package com.recipe.app.src.recipe.domain.blog;
 
-import java.util.List;
+import lombok.Getter;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
+@Getter
 public class BlogRecipes {
 
-    private List<BlogRecipe> blogRecipes;
+    private final List<BlogRecipe> blogRecipes;
 
     public BlogRecipes(List<BlogRecipe> blogRecipes) {
         this.blogRecipes = blogRecipes;
     }
 
-    public List<BlogRecipe> getBlogRecipes() {
-        return this.blogRecipes;
+    public List<Long> getBlogRecipeIds() {
+
+        return blogRecipes.stream()
+                .map(BlogRecipe::getBlogRecipeId)
+                .collect(Collectors.toList());
     }
 }

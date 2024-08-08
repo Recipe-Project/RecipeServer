@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.api;
 
+import com.recipe.app.src.recipe.application.RecipeSearchService;
 import com.recipe.app.src.recipe.application.RecipeService;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeRequest;
@@ -21,34 +22,36 @@ import springfox.documentation.annotations.ApiIgnore;
 public class RecipeController {
 
     private final RecipeService recipeService;
+    private final RecipeSearchService recipeSearchService;
 
-    public RecipeController(RecipeService recipeService) {
+    public RecipeController(RecipeService recipeService, RecipeSearchService recipeSearchService) {
         this.recipeService = recipeService;
+        this.recipeSearchService = recipeSearchService;
     }
 
     @ApiOperation(value = "레시피 목록 조회 API")
     @GetMapping
     public RecipesResponse getRecipes(@ApiIgnore final Authentication authentication,
-                                                    @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
-                                                    @RequestParam(value = "keyword") String keyword,
-                                                    @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                    @RequestParam(value = "startAfter", required = false) Long startAfter,
-                                                    @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
-                                                    @RequestParam(value = "size") int size,
-                                                    @ApiParam(name = "sort", type = "String", example = "조회수순(recipeViews) / 좋아요순(recipeScraps) / 최신순(newest) = 기본값", value = "정렬")
-                                                    @RequestParam(value = "sort") String sort) {
+                                      @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
+                                      @RequestParam(value = "keyword") String keyword,
+                                      @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
+                                      @RequestParam(value = "startAfter") long startAfter,
+                                      @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                      @RequestParam(value = "size") int size,
+                                      @ApiParam(name = "sort", type = "String", example = "조회수순(recipeViews) / 좋아요순(recipeScraps) / 최신순(newest) = 기본값", value = "정렬")
+                                      @RequestParam(value = "sort") String sort) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.getRecipesByKeyword(user, keyword, startAfter, size, sort);
+        return recipeSearchService.findRecipesByKeywordOrderBy(user, keyword, startAfter, size, sort);
     }
 
     @ApiOperation(value = "레시피 상세 조회 API")
     @GetMapping("/{recipeId}")
-    public RecipeDetailResponse getRecipe(@ApiIgnore final Authentication authentication, @PathVariable Long recipeId) {
+    public RecipeDetailResponse getRecipe(@ApiIgnore final Authentication authentication, @PathVariable long recipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -56,12 +59,12 @@ public class RecipeController {
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
         recipeService.createRecipeView(user, recipeId);
 
-        return recipeService.getRecipe(user, recipeId);
+        return recipeSearchService.findRecipeDetail(user, recipeId);
     }
 
     @ApiOperation(value = "레시피 스크랩 생성 API")
     @PostMapping("/{recipeId}/scraps")
-    public void postRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable Long recipeId) {
+    public void postRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable long recipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -73,7 +76,7 @@ public class RecipeController {
 
     @ApiOperation(value = "레시피 스크랩 삭제 API")
     @DeleteMapping("/{recipeId}/scraps")
-    public void deleteRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable Long recipeId) {
+    public void deleteRecipeScrap(@ApiIgnore final Authentication authentication, @PathVariable long recipeId) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
@@ -86,40 +89,24 @@ public class RecipeController {
     @ApiOperation(value = "레시피 스크랩 목록 조회 API")
     @GetMapping("/scraps")
     public RecipesResponse getScrapRecipes(@ApiIgnore final Authentication authentication,
-                                                         @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                         @RequestParam(value = "startAfter", required = false) Long startAfter,
-                                                         @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
-                                                         @RequestParam(value = "size") int size) {
+                                           @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
+                                           @RequestParam(value = "startAfter") long startAfter,
+                                           @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                           @RequestParam(value = "size") int size) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.getScrapRecipes(user, startAfter, size);
+        return recipeSearchService.findScrapRecipes(user, startAfter, size);
     }
 
     @ApiOperation(value = "냉장고 파먹기 레시피 목록 조회 API")
     @GetMapping("/fridges-recommendation")
     public RecommendedRecipesResponse getFridgesRecipes(@ApiIgnore final Authentication authentication,
-                                                                      @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                                      @RequestParam(value = "startAfter", required = false) Long startAfter,
-                                                                      @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
-                                                                      @RequestParam(value = "size") int size) {
-
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
-
-        return recipeService.findRecommendedRecipesByUserFridge(user, startAfter, size);
-    }
-
-    @ApiOperation(value = "등록한 레시피 목록 조회 API")
-    @GetMapping("/users")
-    public RecipesResponse getUserRecipes(@ApiIgnore final Authentication authentication,
                                                         @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
-                                                        @RequestParam(value = "startAfter", required = false) Long startAfter,
+                                                        @RequestParam(value = "startAfter") long startAfter,
                                                         @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
                                                         @RequestParam(value = "size") int size) {
 
@@ -128,35 +115,51 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        return recipeService.getRecipesByUser(user, startAfter, size);
+        return recipeSearchService.findRecommendedRecipesByUserFridge(user, startAfter, size);
+    }
+
+    @ApiOperation(value = "등록한 레시피 목록 조회 API")
+    @GetMapping("/users")
+    public RecipesResponse getUserRecipes(@ApiIgnore final Authentication authentication,
+                                          @ApiParam(name = "startAfter", type = "long", example = "0", value = "마지막 조회 레시피 아이디")
+                                          @RequestParam(value = "startAfter") long startAfter,
+                                          @ApiParam(name = "size", type = "int", example = "20", value = "사이즈")
+                                          @RequestParam(value = "size") int size) {
+
+        if (authentication == null)
+            throw new UserTokenNotExistException();
+
+        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+
+        return recipeSearchService.findRecipesByUser(user, startAfter, size);
     }
 
     @ApiOperation(value = "레시피 등록 API")
     @PostMapping("")
     public void postRecipe(@ApiIgnore final Authentication authentication,
-                                         @ApiParam(value = "레시피 등록 요청 정보")
-                                         @RequestBody RecipeRequest request) {
+                           @ApiParam(value = "레시피 등록 요청 정보")
+                           @RequestBody RecipeRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        recipeService.createRecipe(user, request);
+        recipeService.create(user, request);
     }
 
     @ApiOperation(value = "레시피 수정 API")
     @PatchMapping("/{recipeId}")
     public void patchRecipe(@ApiIgnore final Authentication authentication, @PathVariable Long recipeId,
-                                          @ApiParam(value = "레시피 수정 요청 정보")
-                                          @RequestBody RecipeRequest request) {
+                            @ApiParam(value = "레시피 수정 요청 정보")
+                            @RequestBody RecipeRequest request) {
 
         if (authentication == null)
             throw new UserTokenNotExistException();
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        recipeService.updateRecipe(user, recipeId, request);
+        recipeService.update(user, recipeId, request);
     }
 
     @ApiOperation(value = "레시피 삭제 API")
@@ -168,7 +171,7 @@ public class RecipeController {
 
         User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
-        recipeService.deleteRecipe(user, recipeId);
+        recipeService.delete(user, recipeId);
     }
 
     @ApiOperation(value = "레시피 신고 API")

@@ -1,9 +1,6 @@
 package com.recipe.app.src.recipe.application.dto;
 
-import com.recipe.app.src.fridge.domain.Fridge;
 import com.recipe.app.src.recipe.domain.Recipe;
-import com.recipe.app.src.recipe.domain.RecipeIngredient;
-import com.recipe.app.src.recipe.domain.RecipeProcess;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
@@ -66,8 +63,7 @@ public class RecipeDetailResponse {
         this.isReported = isReported;
     }
 
-    public static RecipeDetailResponse from(Recipe recipe, List<RecipeIngredientResponse> recipeIngredients, List<RecipeProcessResponse> recipeProcesses,
-                                            boolean isUserScrap, long scrapCnt, long viewCnt, User postUser) {
+    public static RecipeDetailResponse from(Recipe recipe, boolean isUserScrap, User postUser, List<String> ingredientNamesInFridge) {
 
         return RecipeDetailResponse.builder()
                 .recipeId(recipe.getRecipeId())
@@ -76,11 +72,17 @@ public class RecipeDetailResponse {
                 .thumbnailImgUrl(recipe.getImgUrl())
                 .cookingTime(recipe.getCookingTime())
                 .level(recipe.getLevel().getName())
-                .recipeIngredients(recipeIngredients)
-                .recipeProcesses(recipeProcesses)
+                .recipeIngredients(recipe.getIngredients().stream()
+                        .map(ingredient -> RecipeIngredientResponse.from(
+                                ingredient,
+                                ingredient.hasInFridge(ingredientNamesInFridge)))
+                        .collect(Collectors.toList()))
+                .recipeProcesses(recipe.getProcesses().stream()
+                        .map(RecipeProcessResponse::from)
+                        .collect(Collectors.toList()))
                 .isUserScrap(isUserScrap)
-                .scrapCnt(scrapCnt)
-                .viewCnt(viewCnt)
+                .scrapCnt(recipe.getScrapCnt())
+                .viewCnt(recipe.getViewCnt())
                 .postUserId(postUser != null ? postUser.getUserId() : null)
                 .postUserName(postUser != null ? postUser.getNickname() : null)
                 .isReported(recipe.isReported())

@@ -80,9 +80,10 @@ public class IngredientService {
     }
 
     @Transactional
-    public void deleteIngredientsByUser(User user) {
+    public void deleteIngredientsByUserId(long userId) {
 
-        List<Ingredient> ingredients = ingredientRepository.findByUserId(user.getUserId());
+        List<Ingredient> ingredients = ingredientRepository.findByUserId(userId);
+
         ingredientRepository.deleteAll(ingredients);
     }
 

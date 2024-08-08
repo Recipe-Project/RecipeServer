@@ -1,9 +1,7 @@
 package com.recipe.app.src.recipe.application.blog;
 
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
-import com.recipe.app.src.recipe.exception.NotFoundScrapException;
 import com.recipe.app.src.recipe.infra.blog.BlogScrapRepository;
-import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,35 +18,34 @@ public class BlogScrapService {
     }
 
     @Transactional
-    public void createBlogScrap(User user, Long blogRecipeId) {
+    public void create(long userId, long blogRecipeId) {
 
-        BlogScrap blogScrap = blogScrapRepository.findByUserIdAndBlogRecipeId(user.getUserId(), blogRecipeId)
-                .orElseGet(() -> BlogScrap.builder()
-                        .userId(user.getUserId())
+        blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
+                .orElseGet(() -> blogScrapRepository.save(BlogScrap.builder()
+                        .userId(userId)
                         .blogRecipeId(blogRecipeId)
-                        .build());
-
-        blogScrapRepository.save(blogScrap);
+                        .build()));
     }
 
     @Transactional
-    public void deleteBlogScrap(User user, Long blogRecipeId) {
+    public void delete(long userId, long blogRecipeId) {
 
-        blogScrapRepository.findByUserIdAndBlogRecipeId(user.getUserId(), blogRecipeId)
+        blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId)
                 .ifPresent(blogScrapRepository::delete);
     }
 
     @Transactional
-    public void deleteBlogRecipeScrapsByUser(User user) {
+    public void deleteAllByUserId(long userId) {
 
-        List<BlogScrap> blogScraps = blogScrapRepository.findByUserId(user.getUserId());
+        List<BlogScrap> blogScraps = blogScrapRepository.findByUserId(userId);
+
         blogScrapRepository.deleteAll(blogScraps);
     }
 
     @Transactional(readOnly = true)
-    public long countBlogScrapByUser(User user) {
+    public long countByUserId(long userId) {
 
-        return blogScrapRepository.countByUserId(user.getUserId());
+        return blogScrapRepository.countByUserId(userId);
     }
 
     @Transactional(readOnly = true)
@@ -58,16 +55,14 @@ public class BlogScrapService {
     }
 
     @Transactional(readOnly = true)
-    public long countByBlogRecipeId(Long blogRecipeId) {
+    public long countByBlogRecipeId(long blogRecipeId) {
 
         return blogScrapRepository.countByBlogRecipeId(blogRecipeId);
     }
 
     @Transactional(readOnly = true)
-    public BlogScrap findByUserIdAndBlogRecipeId(Long userId, Long blogRecipeId) {
+    public BlogScrap findByUserIdAndBlogRecipeId(long userId, long blogRecipeId) {
 
-        return blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId).orElseThrow(() -> {
-            throw new NotFoundScrapException();
-        });
+        return blogScrapRepository.findByUserIdAndBlogRecipeId(userId, blogRecipeId).orElse(null);
     }
 }
