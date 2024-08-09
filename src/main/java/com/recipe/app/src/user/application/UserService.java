@@ -106,7 +106,7 @@ public class UserService {
     @Transactional
     public void update(User user, UserProfileRequest request) {
 
-        badWordFiltering.checkBadWords(request.getNickname());
+        badWordFiltering.check(request.getNickname());
         user.changeProfile(request.getProfileImgUrl(), request.getNickname());
         userRepository.save(user);
     }

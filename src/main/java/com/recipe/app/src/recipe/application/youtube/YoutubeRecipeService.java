@@ -34,7 +34,7 @@ public class YoutubeRecipeService {
 
     public RecipesResponse findYoutubeRecipesByKeyword(User user, String keyword, long lastYoutubeRecipeId, int size, String sort) throws IOException {
 
-        badWordFiltering.checkBadWords(keyword);
+        badWordFiltering.check(keyword);
 
         long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
 

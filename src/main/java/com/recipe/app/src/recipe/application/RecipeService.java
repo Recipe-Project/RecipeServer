@@ -37,8 +37,8 @@ public class RecipeService {
 
         validateRecipeRequest(request);
 
-        badWordFiltering.checkBadWords(request.getTitle());
-        badWordFiltering.checkBadWords(request.getIntroduction());
+        badWordFiltering.check(request.getTitle());
+        badWordFiltering.check(request.getIntroduction());
 
         recipeRepository.save(request.toRecipeEntity(user.getUserId()));
     }
@@ -48,8 +48,8 @@ public class RecipeService {
 
         validateRecipeRequest(request);
 
-        badWordFiltering.checkBadWords(request.getTitle());
-        badWordFiltering.checkBadWords(request.getIntroduction());
+        badWordFiltering.check(request.getTitle());
+        badWordFiltering.check(request.getIntroduction());
 
         Recipe recipe = findByUserIdAndRecipeId(user, recipeId);
         recipe.updateRecipe(request.toRecipeEntity(user.getUserId()));

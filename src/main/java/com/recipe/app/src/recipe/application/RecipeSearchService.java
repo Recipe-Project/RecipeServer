@@ -40,7 +40,7 @@ public class RecipeSearchService {
     @Transactional(readOnly = true)
     public RecipesResponse findRecipesByKeywordOrderBy(User user, String keyword, long lastRecipeId, int size, String sort) {
 
-        badWordFiltering.checkBadWords(keyword);
+        badWordFiltering.check(keyword);
 
         long totalCnt = recipeRepository.countByKeyword(keyword);
 

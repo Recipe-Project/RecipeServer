@@ -35,7 +35,7 @@ public class BlogRecipeService {
 
     public RecipesResponse findBlogRecipesByKeyword(User user, String keyword, long lastBlogRecipeId, int size, String sort) {
 
-        badWordFiltering.checkBadWords(keyword);
+        badWordFiltering.check(keyword);
 
         long totalCnt = blogRecipeRepository.countByKeyword(keyword);
 

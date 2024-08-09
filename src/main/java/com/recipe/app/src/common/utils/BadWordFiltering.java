@@ -30,7 +30,7 @@ public class BadWordFiltering {
     }
 
 
-    public void checkBadWords(String keyword) {
+    public void check(String keyword) {
 
         for (String badWord : badWords) {
             if (keyword.contains(badWord)) {
