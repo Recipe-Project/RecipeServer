@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application
 
-import com.recipe.app.src.etc.application.BadWordService
+import com.recipe.app.src.common.utils.BadWordFiltering
 import com.recipe.app.src.recipe.application.dto.RecipeIngredientRequest
 import com.recipe.app.src.recipe.application.dto.RecipeProcessRequest
 import com.recipe.app.src.recipe.application.dto.RecipeRequest
@@ -14,7 +14,7 @@ import spock.lang.Specification
 class RecipeServiceTest extends Specification {
 
     private RecipeRepository recipeRepository = Mock()
-    private BadWordService badWordService = Mock()
+    private BadWordFiltering badWordService = Mock()
     private RecipeScrapService recipeScrapService = Mock()
     private RecipeViewService recipeViewService = Mock()
     private RecipeReportService recipeReportService = Mock()

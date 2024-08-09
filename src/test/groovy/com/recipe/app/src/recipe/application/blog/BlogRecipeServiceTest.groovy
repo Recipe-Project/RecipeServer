@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application.blog
 
-import com.recipe.app.src.etc.application.BadWordService
+import com.recipe.app.src.common.utils.BadWordFiltering
 import com.recipe.app.src.recipe.application.dto.RecipesResponse
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe
 import com.recipe.app.src.recipe.domain.blog.BlogScrap
@@ -16,7 +16,7 @@ class BlogRecipeServiceTest extends Specification {
     private BlogRecipeRepository blogRecipeRepository = Mock()
     private BlogScrapService blogScrapService = Mock()
     private BlogViewService blogViewService = Mock()
-    private BadWordService badWordService = Mock()
+    private BadWordFiltering badWordService = Mock()
     private BlogRecipeClientSearchService blogRecipeClientSearchService = Mock()
     private BlogRecipeService blogRecipeService = new BlogRecipeService(blogRecipeRepository, blogScrapService, blogViewService, badWordService, blogRecipeClientSearchService)
 

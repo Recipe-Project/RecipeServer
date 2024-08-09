@@ -2,7 +2,7 @@ package com.recipe.app.src.user.application;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.utils.JwtUtil;
-import com.recipe.app.src.etc.application.BadWordService;
+import com.recipe.app.src.common.utils.BadWordFiltering;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserLoginResponse;
@@ -28,13 +28,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final JwtUtil jwtUtil;
-    private final BadWordService badWordService;
+    private final BadWordFiltering badWordFiltering;
     private final UserAuthClientService userAuthClientService;
 
-    public UserService(UserRepository userRepository, JwtUtil jwtUtil, BadWordService badWordService, UserAuthClientService userAuthClientService) {
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, BadWordFiltering badWordFiltering, UserAuthClientService userAuthClientService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
-        this.badWordService = badWordService;
+        this.badWordFiltering = badWordFiltering;
         this.userAuthClientService = userAuthClientService;
     }
 
@@ -106,7 +106,7 @@ public class UserService {
     @Transactional
     public void update(User user, UserProfileRequest request) {
 
-        badWordService.checkBadWords(request.getNickname());
+        badWordFiltering.checkBadWords(request.getNickname());
         user.changeProfile(request.getProfileImgUrl(), request.getNickname());
         userRepository.save(user);
     }

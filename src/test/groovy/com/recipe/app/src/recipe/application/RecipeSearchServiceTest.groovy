@@ -1,7 +1,7 @@
 package com.recipe.app.src.recipe.application
 
 
-import com.recipe.app.src.etc.application.BadWordService
+import com.recipe.app.src.common.utils.BadWordFiltering
 import com.recipe.app.src.fridge.application.FridgeService
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse
 import com.recipe.app.src.recipe.application.dto.RecipesResponse
@@ -20,7 +20,7 @@ class RecipeSearchServiceTest extends Specification {
     private RecipeRepository recipeRepository = Mock()
     private FridgeService fridgeService = Mock()
     private UserService userService = Mock()
-    private BadWordService badWordService = Mock()
+    private BadWordFiltering badWordService = Mock()
     private RecipeScrapService recipeScrapService = Mock()
     private RecipeViewService recipeViewService = Mock()
     private RecipeSearchService recipeSearchService = new RecipeSearchService(recipeRepository, fridgeService, userService, badWordService,

@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application.blog;
 
-import com.recipe.app.src.etc.application.BadWordService;
+import com.recipe.app.src.common.utils.BadWordFiltering;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipes;
@@ -18,24 +18,24 @@ public class BlogRecipeService {
     private final BlogRecipeRepository blogRecipeRepository;
     private final BlogScrapService blogScrapService;
     private final BlogViewService blogViewService;
-    private final BadWordService badWordService;
+    private final BadWordFiltering badWordFiltering;
     private final BlogRecipeClientSearchService blogRecipeClientSearchService;
 
 
     private static final int MIN_RECIPE_CNT = 10;
 
     public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BlogViewService blogViewService,
-                             BadWordService badWordService, BlogRecipeClientSearchService blogRecipeClientSearchService) {
+                             BadWordFiltering badWordFiltering, BlogRecipeClientSearchService blogRecipeClientSearchService) {
         this.blogRecipeRepository = blogRecipeRepository;
         this.blogScrapService = blogScrapService;
         this.blogViewService = blogViewService;
-        this.badWordService = badWordService;
+        this.badWordFiltering = badWordFiltering;
         this.blogRecipeClientSearchService = blogRecipeClientSearchService;
     }
 
     public RecipesResponse findBlogRecipesByKeyword(User user, String keyword, long lastBlogRecipeId, int size, String sort) {
 
-        badWordService.checkBadWords(keyword);
+        badWordFiltering.checkBadWords(keyword);
 
         long totalCnt = blogRecipeRepository.countByKeyword(keyword);
 

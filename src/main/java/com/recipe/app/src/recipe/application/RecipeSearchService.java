@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application;
 
-import com.recipe.app.src.etc.application.BadWordService;
+import com.recipe.app.src.common.utils.BadWordFiltering;
 import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
@@ -23,16 +23,16 @@ public class RecipeSearchService {
     private final RecipeRepository recipeRepository;
     private final FridgeService fridgeService;
     private final UserService userService;
-    private final BadWordService badWordService;
+    private final BadWordFiltering badWordFiltering;
     private final RecipeScrapService recipeScrapService;
     private final RecipeViewService recipeViewService;
 
-    public RecipeSearchService(RecipeRepository recipeRepository, FridgeService fridgeService, UserService userService, BadWordService badWordService,
+    public RecipeSearchService(RecipeRepository recipeRepository, FridgeService fridgeService, UserService userService, BadWordFiltering badWordFiltering,
                                RecipeScrapService recipeScrapService, RecipeViewService recipeViewService) {
         this.recipeRepository = recipeRepository;
         this.fridgeService = fridgeService;
         this.userService = userService;
-        this.badWordService = badWordService;
+        this.badWordFiltering = badWordFiltering;
         this.recipeScrapService = recipeScrapService;
         this.recipeViewService = recipeViewService;
     }
@@ -40,7 +40,7 @@ public class RecipeSearchService {
     @Transactional(readOnly = true)
     public RecipesResponse findRecipesByKeywordOrderBy(User user, String keyword, long lastRecipeId, int size, String sort) {
 
-        badWordService.checkBadWords(keyword);
+        badWordFiltering.checkBadWords(keyword);
 
         long totalCnt = recipeRepository.countByKeyword(keyword);
 
