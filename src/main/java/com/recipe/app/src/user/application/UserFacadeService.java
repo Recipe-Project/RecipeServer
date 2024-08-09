@@ -66,8 +66,8 @@ public class UserFacadeService {
     @Transactional
     public void deleteUser(User user, HttpServletRequest request) {
 
-        fridgeService.deleteFridgesByUserId(user.getUserId());
-        fridgeBasketService.deleteFridgeBasketsByUserId(user.getUserId());
+        fridgeService.deleteAllByUserId(user.getUserId());
+        fridgeBasketService.deleteAllByUserId(user.getUserId());
         recipeService.deleteAllByUserId(user.getUserId());
         ingredientService.deleteAllByUserId(user.getUserId());
         youtubeScrapService.deleteAllByUserId(user.getUserId());

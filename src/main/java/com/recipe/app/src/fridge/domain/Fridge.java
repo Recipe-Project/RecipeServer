@@ -1,6 +1,7 @@
 package com.recipe.app.src.fridge.domain;
 
 import com.recipe.app.src.common.entity.BaseEntity;
+import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,7 +14,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 @Getter
@@ -46,7 +46,7 @@ public class Fridge extends BaseEntity {
     public Fridge(Long fridgeId, Long userId, Long ingredientId, LocalDate expiredAt, float quantity, String unit) {
 
         Objects.requireNonNull(userId, "유저 아이디를 입력해주세요.");
-        Objects.requireNonNull(ingredientId, "재료 아이디를 입력해주세요");
+        Objects.requireNonNull(ingredientId, "재료 아이디를 입력해주세요.");
 
         this.fridgeId = fridgeId;
         this.userId = userId;
@@ -56,30 +56,19 @@ public class Fridge extends BaseEntity {
         this.unit = unit;
     }
 
-    public Freshness getFreshness() {
-
-        if (this.expiredAt == null) {
-            return Freshness.FRESH;
-        }
-        long diffDay = ChronoUnit.DAYS.between(LocalDate.now(), expiredAt);
-        if (diffDay <= 0) {
-            return Freshness.SPOILED;
-        }
-        if (diffDay < 7) {
-            return Freshness.RISKY;
-        }
-        return Freshness.FRESH;
-    }
-
-    public void updateFridge(LocalDate expiredAt, float quantity, String unit) {
-
+    public void update(LocalDate expiredAt, float quantity, String unit) {
         this.expiredAt = expiredAt;
         this.quantity = quantity;
         this.unit = unit;
     }
 
     public void plusQuantity(float quantity) {
-
         this.quantity += quantity;
+    }
+
+    public boolean match(FridgeBasket fridgeBasket) {
+        return Objects.equals(ingredientId, fridgeBasket.getIngredientId()) &&
+                Objects.equals(this.unit, fridgeBasket.getUnit()) &&
+                Objects.equals(this.expiredAt, fridgeBasket.getExpiredAt());
     }
 }

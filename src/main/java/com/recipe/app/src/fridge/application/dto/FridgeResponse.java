@@ -43,6 +43,7 @@ public class FridgeResponse {
     }
 
     public static FridgeResponse from(Fridge fridge, Ingredient ingredient) {
+
         return FridgeResponse.builder()
                 .fridgeId(fridge.getFridgeId())
                 .ingredientName(ingredient.getIngredientName())
@@ -50,7 +51,7 @@ public class FridgeResponse {
                 .expiredAt(fridge.getExpiredAt() != null ? fridge.getExpiredAt().atTime(LocalTime.MIN).atZone(ZoneId.of("Asia/Seoul")) : null)
                 .quantity(fridge.getQuantity())
                 .unit(fridge.getUnit())
-                .freshness(fridge.getFreshness())
+                .freshness(Freshness.getFreshnessByExpiredAt(fridge.getExpiredAt()))
                 .build();
     }
 }

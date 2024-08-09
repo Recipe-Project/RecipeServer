@@ -50,7 +50,7 @@ public class FridgeBasketResponse {
                 .expiredAt(fridgeBasket.getExpiredAt() != null ? fridgeBasket.getExpiredAt().atTime(LocalTime.MIN).atZone(ZoneId.of("Asia/Seoul")) : null)
                 .quantity(fridgeBasket.getQuantity())
                 .unit(fridgeBasket.getUnit())
-                .freshness(fridgeBasket.getFreshness())
+                .freshness(Freshness.getFreshnessByExpiredAt(fridgeBasket.getExpiredAt()))
                 .build();
     }
 }
