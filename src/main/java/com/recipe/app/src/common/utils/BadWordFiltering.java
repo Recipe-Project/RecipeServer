@@ -23,7 +23,7 @@ public class BadWordFiltering {
             byte[] bdata = FileCopyUtils.copyToByteArray(resource.getInputStream());
             String text = new String(bdata, StandardCharsets.UTF_8);
 
-            this.badWords = Arrays.stream(text.split(",")).toList();
+            this.badWords = Arrays.stream(text.replaceAll("\'", "").split(", ")).toList();
         } catch (Exception e) {
             this.badWords = new ArrayList<>();
         }
