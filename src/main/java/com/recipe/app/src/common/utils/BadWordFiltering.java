@@ -32,10 +32,16 @@ public class BadWordFiltering {
 
     public void check(String keyword) {
 
+        keyword = changeTextWithoutSpecialSymbols(keyword);
+
         for (String badWord : badWords) {
             if (keyword.contains(badWord)) {
                 throw new BadWordException(badWord);
             }
         }
+    }
+
+    private String changeTextWithoutSpecialSymbols(String keyword) {
+        return keyword.replaceAll("[^a-zA-Z0-9가-힣]", "");
     }
 }
