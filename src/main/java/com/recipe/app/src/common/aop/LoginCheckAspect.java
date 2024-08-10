@@ -23,7 +23,7 @@ public class LoginCheckAspect {
 
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null) {
+        if (authentication == null || !(authentication.getPrincipal() instanceof SecurityUser)) {
             throw new UserTokenNotExistException();
         }
 
