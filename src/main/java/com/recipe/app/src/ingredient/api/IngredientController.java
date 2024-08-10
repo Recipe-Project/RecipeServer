@@ -1,18 +1,16 @@
 package com.recipe.app.src.ingredient.api;
 
+import com.recipe.app.src.common.aop.LoginCheck;
 import com.recipe.app.src.ingredient.application.IngredientFacadeService;
 import com.recipe.app.src.ingredient.application.IngredientService;
 import com.recipe.app.src.ingredient.application.dto.IngredientCreateResponse;
 import com.recipe.app.src.ingredient.application.dto.IngredientRequest;
 import com.recipe.app.src.ingredient.application.dto.IngredientsResponse;
-import com.recipe.app.src.user.domain.SecurityUser;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import org.springframework.lang.Nullable;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -38,52 +36,36 @@ public class IngredientController {
 
     @ApiOperation(value = "재료 목록 조회 API")
     @GetMapping("")
-    public IngredientsResponse getIngredients(@ApiIgnore final Authentication authentication,
+    @LoginCheck
+    public IngredientsResponse getIngredients(@ApiIgnore User user,
                                               @ApiParam(name = "keyword", type = "String", example = "감자", value = "검색어")
                                               @RequestParam(value = "keyword", required = false) @Nullable String keyword) {
-
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
 
         return ingredientFacadeService.findIngredientsByKeyword(user, keyword);
     }
 
     @ApiOperation(value = "나만의 재료 목록 조회 API")
     @GetMapping("/my")
-    public IngredientsResponse getMyIngredients(@ApiIgnore final Authentication authentication) {
-
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+    @LoginCheck
+    public IngredientsResponse getMyIngredients(@ApiIgnore User user) {
 
         return ingredientFacadeService.findIngredientsByUser(user);
     }
 
     @ApiOperation(value = "나만의 재료 등록 API")
     @PostMapping("")
-    public IngredientCreateResponse postIngredient(@ApiIgnore final Authentication authentication,
+    @LoginCheck
+    public IngredientCreateResponse postIngredient(@ApiIgnore User user,
                                                    @ApiParam(value = "재료 추가 정보", required = true)
-                               @RequestBody IngredientRequest request) {
-
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+                                                   @RequestBody IngredientRequest request) {
 
         return ingredientService.create(user.getUserId(), request);
     }
 
     @ApiOperation(value = "나만의 재료 삭제 API")
     @DeleteMapping("/{ingredientId}")
-    public void deleteIngredient(@ApiIgnore final Authentication authentication, @PathVariable Long ingredientId) {
-
-        if (authentication == null)
-            throw new UserTokenNotExistException();
-
-        User user = ((SecurityUser) authentication.getPrincipal()).getUser();
+    @LoginCheck
+    public void deleteIngredient(@ApiIgnore User user, @PathVariable Long ingredientId) {
 
         ingredientFacadeService.deleteIngredient(user, ingredientId);
     }
