@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application.youtube
 
-import com.recipe.app.src.etc.application.BadWordService
+import com.recipe.app.src.common.utils.BadWordFiltering
 import com.recipe.app.src.recipe.application.dto.RecipesResponse
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap
@@ -16,7 +16,7 @@ class YoutubeRecipeServiceTest extends Specification {
     private YoutubeRecipeRepository youtubeRecipeRepository = Mock()
     private YoutubeScrapService youtubeScrapService = Mock()
     private YoutubeViewService youtubeViewService = Mock()
-    private BadWordService badWordService = Mock()
+    private BadWordFiltering badWordService = Mock()
     private YoutubeRecipeClientSearchService youtubeRecipeClientSearchService = Mock()
     private YoutubeRecipeService youtubeRecipeService = new YoutubeRecipeService(youtubeRecipeRepository, youtubeScrapService,
             youtubeViewService, badWordService, youtubeRecipeClientSearchService)

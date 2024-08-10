@@ -1,6 +1,6 @@
 package com.recipe.app.src.recipe.application.youtube;
 
-import com.recipe.app.src.etc.application.BadWordService;
+import com.recipe.app.src.common.utils.BadWordFiltering;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipes;
@@ -20,21 +20,21 @@ public class YoutubeRecipeService {
     private final YoutubeRecipeRepository youtubeRecipeRepository;
     private final YoutubeScrapService youtubeScrapService;
     private final YoutubeViewService youtubeViewService;
-    private final BadWordService badWordService;
+    private final BadWordFiltering badWordFiltering;
     private final YoutubeRecipeClientSearchService youtubeRecipeClientSearchService;
 
     public YoutubeRecipeService(YoutubeRecipeRepository youtubeRecipeRepository, YoutubeScrapService youtubeScrapService, YoutubeViewService youtubeViewService,
-                                BadWordService badWordService, YoutubeRecipeClientSearchService youtubeRecipeClientSearchService) {
+                                BadWordFiltering badWordFiltering, YoutubeRecipeClientSearchService youtubeRecipeClientSearchService) {
         this.youtubeRecipeRepository = youtubeRecipeRepository;
         this.youtubeScrapService = youtubeScrapService;
         this.youtubeViewService = youtubeViewService;
-        this.badWordService = badWordService;
+        this.badWordFiltering = badWordFiltering;
         this.youtubeRecipeClientSearchService = youtubeRecipeClientSearchService;
     }
 
     public RecipesResponse findYoutubeRecipesByKeyword(User user, String keyword, long lastYoutubeRecipeId, int size, String sort) throws IOException {
 
-        badWordService.checkBadWords(keyword);
+        badWordFiltering.check(keyword);
 
         long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
 

@@ -1,7 +1,7 @@
 package com.recipe.app.src.user.application
 
 import com.recipe.app.src.common.utils.JwtUtil
-import com.recipe.app.src.etc.application.BadWordService
+import com.recipe.app.src.common.utils.BadWordFiltering
 import com.recipe.app.src.user.application.dto.*
 import com.recipe.app.src.user.domain.User
 import com.recipe.app.src.user.exception.NotFoundUserException
@@ -15,7 +15,7 @@ class UserServiceTest extends Specification {
 
     private UserRepository userRepository = Mock()
     private JwtUtil jwtUtil = Mock()
-    private BadWordService badWordService = Mock()
+    private BadWordFiltering badWordService = Mock()
     private UserAuthClientService userAuthClientService = Mock()
     private UserService userService = new UserService(userRepository, jwtUtil, badWordService, userAuthClientService)
 

@@ -1,7 +1,7 @@
 package com.recipe.app.src.recipe.application;
 
 import com.google.common.base.Preconditions;
-import com.recipe.app.src.etc.application.BadWordService;
+import com.recipe.app.src.common.utils.BadWordFiltering;
 import com.recipe.app.src.recipe.application.dto.RecipeRequest;
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
@@ -18,15 +18,15 @@ import java.util.Objects;
 public class RecipeService {
 
     private final RecipeRepository recipeRepository;
-    private final BadWordService badWordService;
+    private final BadWordFiltering badWordFiltering;
     private final RecipeScrapService recipeScrapService;
     private final RecipeViewService recipeViewService;
     private final RecipeReportService recipeReportService;
 
-    public RecipeService(RecipeRepository recipeRepository, BadWordService badWordService, RecipeScrapService recipeScrapService,
+    public RecipeService(RecipeRepository recipeRepository, BadWordFiltering badWordFiltering, RecipeScrapService recipeScrapService,
                          RecipeViewService recipeViewService, RecipeReportService recipeReportService) {
         this.recipeRepository = recipeRepository;
-        this.badWordService = badWordService;
+        this.badWordFiltering = badWordFiltering;
         this.recipeScrapService = recipeScrapService;
         this.recipeViewService = recipeViewService;
         this.recipeReportService = recipeReportService;
@@ -37,8 +37,8 @@ public class RecipeService {
 
         validateRecipeRequest(request);
 
-        badWordService.checkBadWords(request.getTitle());
-        badWordService.checkBadWords(request.getIntroduction());
+        badWordFiltering.check(request.getTitle());
+        badWordFiltering.check(request.getIntroduction());
 
         recipeRepository.save(request.toRecipeEntity(user.getUserId()));
     }
@@ -48,8 +48,8 @@ public class RecipeService {
 
         validateRecipeRequest(request);
 
-        badWordService.checkBadWords(request.getTitle());
-        badWordService.checkBadWords(request.getIntroduction());
+        badWordFiltering.check(request.getTitle());
+        badWordFiltering.check(request.getIntroduction());
 
         Recipe recipe = findByUserIdAndRecipeId(user, recipeId);
         recipe.updateRecipe(request.toRecipeEntity(user.getUserId()));
