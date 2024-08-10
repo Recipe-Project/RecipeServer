@@ -9,32 +9,6 @@ DEPLOY_LOG="$PROJECT_ROOT/deploy.log"
 
 TIME_NOW=$(date +%c)
 
-# Installing docker engine if not exists
-if ! type docker > /dev/null #docker를 깔아주는 코드, EC2 인스턴스에는 아무것도 없기 때문에 직접 깔아줘야 한다.
-then
-  echo "docker does not exist"
-  echo "Start installing docker"
-  sudo yum -y update
-  sudo yum install -y docker
-  sudo systemctl start docker
-fi
-
-# Installing docker-compose if not exists
-if ! type docker-compose > /dev/null #docker-compose를 깔아주는 코드
-then
-  echo "docker-compose does not exist"
-  echo "Start installing docker-compose"
-  sudo curl -L "https://github.com/docker/compose/releases/download/1.27.3/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
-  sudo chmod +x /usr/local/bin/docker-compose
-fi
-
-# docker 구동
-DOCKER_PID=$(pgrep -f $PROJECT_ROOT/docker-compose.yml)
-if [ -z $CURRENT_PID ]; then
-  echo "start docker-compose up"
-  sudo docker-compose -f $PROJECT_ROOT/docker-compose.yml up --build -d
-fi
-
 # build 파일 복사
 echo "$TIME_NOW > $WAR_FILE 파일 복사" >> $DEPLOY_LOG
 cp $PROJECT_ROOT/*.war $WAR_FILE

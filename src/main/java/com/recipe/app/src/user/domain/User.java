@@ -18,7 +18,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 @Entity
 @Table(name = "UserInfo")
 public class User extends BaseEntity {

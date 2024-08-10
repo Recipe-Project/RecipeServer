@@ -16,7 +16,7 @@ public class DialogController {
         this.dialogService = dialogService;
     }
 
-    @GetMapping("")
+    @GetMapping
     public DialogResponse getDialog() {
 
         return dialogService.findDialog();
