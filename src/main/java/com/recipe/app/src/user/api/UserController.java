@@ -12,12 +12,10 @@ import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import com.recipe.app.src.user.application.dto.UserTokenRefreshRequest;
 import com.recipe.app.src.user.application.dto.UserTokenRefreshResponse;
 import com.recipe.app.src.user.domain.User;
-import com.recipe.app.src.user.exception.UserTokenNotExistException;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -108,10 +106,8 @@ public class UserController {
 
     @ApiOperation(value = "로그아웃 API")
     @PostMapping("/logout")
-    public void logout(HttpServletRequest request, @ApiIgnore final Authentication authentication) {
-
-        if (authentication == null)
-            throw new UserTokenNotExistException();
+    @LoginCheck
+    public void logout(HttpServletRequest request, @ApiIgnore User user) {
 
         userService.logout(request);
     }
