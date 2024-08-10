@@ -31,9 +31,14 @@ public class LoginCheckAspect {
 
         log.info("Login User Id : " + user.getUserId());
 
-        Object[] args = new Object[]{user};
-
-        System.out.println(Arrays.toString(args));
+        Object[] args = Arrays.stream(proceedingJoinPoint.getArgs())
+                .map(arg -> {
+                    if (arg instanceof User) {
+                        return user;
+                    }
+                    return arg;
+                })
+                .toArray();
 
         return proceedingJoinPoint.proceed(args);
     }
