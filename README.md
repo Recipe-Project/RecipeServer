@@ -71,7 +71,7 @@
 
 <img width="1244" alt="스크린샷 2024-08-12 오후 11 58 37" src="https://github.com/user-attachments/assets/465fb51c-6641-48bb-8589-d54c9ad8ba28">
 
-- 개발 서버: https://recipestorage.shop:9090/swagger-ui/index.html
+- 개발 서버: https://recipestoragetest2024.shop:9090/swagger-ui/index.html
 - 로컬: http://localhost:9090/swagger-ui/index.html
 
 ## UI
