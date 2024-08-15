@@ -42,10 +42,4 @@ public class GeneralExceptionHandler {
         log.error(e.getMessage());
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e);
     }
-
-    @ExceptionHandler({Exception.class})
-    public ResponseEntity<?> handleException(Exception e) {
-        log.error(e.getMessage());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e);
-    }
 }
