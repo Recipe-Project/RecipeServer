@@ -36,7 +36,7 @@ public class BlogRecipeController {
                                           @RequestParam(value = "startAfter") long startAfter,
                                           @Parameter(example = "20", name = "사이즈")
                                           @RequestParam(value = "size") int size,
-                                          @Parameter(example = "조회수순(blogViews) / 좋아요순(blogScraps) / 최신순(newest) = 기본값", name = "정렬")
+                                          @Parameter(example = "조회수순(views) / 좋아요순(scraps) / 최신순(newest) = 기본값", name = "정렬")
                                           @RequestParam(value = "sort") String sort) {
 
         return blogRecipeService.findBlogRecipesByKeyword(user, keyword, startAfter, size, sort);

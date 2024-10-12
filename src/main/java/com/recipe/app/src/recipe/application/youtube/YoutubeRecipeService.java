@@ -54,9 +54,9 @@ public class YoutubeRecipeService {
     @Transactional(readOnly = true)
     public List<YoutubeRecipe> findByKeywordOrderBy(String keyword, long lastYoutubeRecipeId, int size, String sort) {
 
-        if (sort.equals("youtubeScraps")) {
+        if (sort.equals("scraps")) {
             return findByKeywordOrderByYoutubeScrapCnt(keyword, lastYoutubeRecipeId, size);
-        } else if (sort.equals("youtubeViews")) {
+        } else if (sort.equals("views")) {
             return findByKeywordOrderByYoutubeViewCnt(keyword, lastYoutubeRecipeId, size);
         } else {
             return findByKeywordOrderByPostDate(keyword, lastYoutubeRecipeId, size);

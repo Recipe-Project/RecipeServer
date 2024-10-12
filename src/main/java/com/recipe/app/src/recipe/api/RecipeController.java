@@ -44,7 +44,7 @@ public class RecipeController {
                                       @RequestParam(value = "startAfter") long startAfter,
                                       @Parameter(example = "20", name = "사이즈")
                                       @RequestParam(value = "size") int size,
-                                      @Parameter(example = "조회수순(recipeViews) / 좋아요순(recipeScraps) / 최신순(newest) = 기본값", name = "정렬")
+                                      @Parameter(example = "조회수순(views) / 좋아요순(scraps) / 최신순(newest) = 기본값", name = "정렬")
                                       @RequestParam(value = "sort") String sort) {
 
         return recipeSearchService.findRecipesByKeywordOrderBy(user, keyword, startAfter, size, sort);
