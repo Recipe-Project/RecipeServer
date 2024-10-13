@@ -33,7 +33,7 @@ class YoutubeRecipeServiceTest extends Specification {
         String keyword = "테스트"
         long lastYoutubeRecipeId = 0
         int size = 2
-        String sort = "youtubeScraps"
+        String sort = "scraps"
 
         youtubeRecipeRepository.countByKeyword(keyword) >> 20
 
@@ -103,7 +103,7 @@ class YoutubeRecipeServiceTest extends Specification {
         String keyword = "테스트"
         long lastYoutubeRecipeId = 0
         int size = 2
-        String sort = "youtubeViews"
+        String sort = "views"
 
         youtubeRecipeRepository.countByKeyword(keyword) >> 20
 

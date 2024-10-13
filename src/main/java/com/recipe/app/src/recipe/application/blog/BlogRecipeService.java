@@ -55,9 +55,9 @@ public class BlogRecipeService {
     @Transactional(readOnly = true)
     public List<BlogRecipe> findByKeywordOrderBy(String keyword, long lastBlogRecipeId, int size, String sort) {
 
-        if (sort.equals("blogScraps")) {
+        if (sort.equals("scraps")) {
             return findByKeywordOrderByBlogScrapCnt(keyword, lastBlogRecipeId, size);
-        } else if (sort.equals("blogViews")) {
+        } else if (sort.equals("views")) {
             return findByKeywordOrderByBlogViewCnt(keyword, lastBlogRecipeId, size);
         } else {
             return findByKeywordOrderByPublishedAt(keyword, lastBlogRecipeId, size);

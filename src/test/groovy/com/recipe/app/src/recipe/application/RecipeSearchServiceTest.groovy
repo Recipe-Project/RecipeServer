@@ -44,7 +44,7 @@ class RecipeSearchServiceTest extends Specification {
         String keyword = "테스트"
         long lastRecipeId = 0
         int size = 10
-        String sort = "recipeScraps"
+        String sort = "scraps"
 
         recipeRepository.countByKeyword(keyword) >> 2
 
@@ -118,7 +118,7 @@ class RecipeSearchServiceTest extends Specification {
         String keyword = "테스트"
         long lastRecipeId = 0
         int size = 10
-        String sort = "recipeViews"
+        String sort = "views"
 
         recipeRepository.countByKeyword(keyword) >> 2
 

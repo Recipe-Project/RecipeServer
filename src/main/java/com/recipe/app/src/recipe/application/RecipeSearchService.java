@@ -45,9 +45,9 @@ public class RecipeSearchService {
         long totalCnt = recipeRepository.countByKeyword(keyword);
 
         List<Recipe> recipes;
-        if (sort.equals("recipeScraps")) {
+        if (sort.equals("scraps")) {
             recipes = findByKeywordOrderByRecipeScrapCnt(keyword, lastRecipeId, size);
-        } else if (sort.equals("recipeViews")) {
+        } else if (sort.equals("views")) {
             recipes = findByKeywordOrderByRecipeViewCnt(keyword, lastRecipeId, size);
         } else {
             recipes = findByKeywordOrderByCreatedAt(keyword, lastRecipeId, size);

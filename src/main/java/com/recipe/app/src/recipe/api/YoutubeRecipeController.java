@@ -38,7 +38,7 @@ public class YoutubeRecipeController {
                                              @RequestParam(value = "startAfter") long startAfter,
                                              @Parameter(example = "20", name = "사이즈")
                                              @RequestParam(value = "size") int size,
-                                             @Parameter(example = "조회수순(youtubeViews) / 좋아요순(youtubeScraps) / 최신순(newest) = 기본값", name = "정렬")
+                                             @Parameter(example = "조회수순(views) / 좋아요순(scraps) / 최신순(newest) = 기본값", name = "정렬")
                                              @RequestParam(value = "sort") String sort) throws IOException {
 
         return youtubeRecipeService.findYoutubeRecipesByKeyword(user, keyword, startAfter, size, sort);

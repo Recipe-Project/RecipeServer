@@ -32,7 +32,7 @@ class BlogRecipeServiceTest extends Specification {
         String keyword = "테스트"
         long lastBlogRecipeId = 0
         int size = 2
-        String sort = "blogScraps"
+        String sort = "scraps"
 
         blogRecipeRepository.countByKeyword(keyword) >> 20
 
@@ -102,7 +102,7 @@ class BlogRecipeServiceTest extends Specification {
         String keyword = "테스트"
         long lastBlogRecipeId = 0
         int size = 2
-        String sort = "blogViews"
+        String sort = "views"
 
         blogRecipeRepository.countByKeyword(keyword) >> 20
 
