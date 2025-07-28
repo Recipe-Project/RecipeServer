@@ -50,8 +50,8 @@ public class RecommendedRecipesResponse {
                                 return true;
                             }
 
-                            return recommendedRecipe.getRecipeId() > lastRecipe.getRecipeId()
-                                    || recommendedRecipe.getIngredientsMatchRate() >= lastRecipe.calculateIngredientMatchRate(ingredientNamesInFridge);
+                            return recommendedRecipe.getRecipeId() < lastRecipe.getRecipeId()
+                                    && recommendedRecipe.getIngredientsMatchRate() <= lastRecipe.calculateIngredientMatchRate(ingredientNamesInFridge);
                         })
                         .limit(size)
                         .collect(Collectors.toList()))
