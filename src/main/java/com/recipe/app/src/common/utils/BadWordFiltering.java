@@ -1,6 +1,6 @@
 package com.recipe.app.src.common.utils;
 
-import com.recipe.app.src.etc.exception.BadWordException;
+import com.recipe.app.src.common.exception.BadWordException;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.FileCopyUtils;

@@ -1,6 +1,6 @@
 package com.recipe.app.src.common.utils
 
-import com.recipe.app.src.etc.exception.BadWordException
+import com.recipe.app.src.common.exception.BadWordException
 import spock.lang.Specification
 
 class BadWordFilteringTest extends Specification {
