@@ -32,13 +32,13 @@ jobs:
 
       # secret 파일 디렉토리 생성
       - name: Create secret directory
-        run: mkdir src/main/java/com/recipe/app/src/config/secret
+        run: mkdir src/main/java/com/recipe/app/src/common/config/secret
 
       # Secret.java 파일 복사
       - name: Copy Secret.java
         env:
           SECRET_JAVA_FILE: ${{ secrets.SECRET_JAVA }}
-        run: echo $SECRET_JAVA_FILE | base64 --decode > src/main/java/com/recipe/app/src/config/secret/Secret.java
+        run: echo $SECRET_JAVA_FILE | base64 --decode > src/main/java/com/recipe/app/src/common/config/secret/Secret.java
 
       - name: Get Public IP
         id: publicip
