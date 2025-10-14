@@ -77,6 +77,14 @@ public class UserController {
         return userService.googleLogin(request);
     }
 
+    @Operation(summary = "애플 로그인 API")
+    @PostMapping("/apple-login")
+    public UserSocialLoginResponse appleLogin(@Parameter(name = "로그인 요청 정보", required = true)
+                                               @RequestBody UserLoginRequest request) {
+
+        return userService.appleLogin(request);
+    }
+
     @Operation(summary = "유저 프로필 조회 API")
     @GetMapping
     @LoginCheck

@@ -1,5 +1,6 @@
 package com.recipe.app.src.common.utils;
 
+import com.recipe.app.src.common.client.apple.dto.ApplePublicKeyResponse;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.SignatureException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -12,7 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import javax.crypto.spec.SecretKeySpec;
+import java.math.BigInteger;
 import java.security.Key;
+import java.security.KeyFactory;
+import java.security.PublicKey;
+import java.security.spec.RSAPublicKeySpec;
 import java.time.Duration;
 import java.util.Base64;
 import java.util.Date;
@@ -134,5 +139,40 @@ public class JwtUtil {
     public void setAccessTokenBlacklist(String accessToken) {
 
         redisTemplate.opsForValue().set(accessToken, ACCESS_TOKEN_BLACKLIST_VALUE, Duration.ofMillis(accessTokenValidMillisecond));
+    }
+
+    public Claims parseAppleIdToken(String idToken, ApplePublicKeyResponse publicKey) {
+
+        try {
+            PublicKey key = generateApplePublicKey(publicKey);
+
+            return Jwts.parserBuilder()
+                    .setSigningKey(key)
+                    .build()
+                    .parseClaimsJws(idToken)
+                    .getBody();
+        } catch (Exception e) {
+            logger.error("Apple id_token 검증 실패", e);
+            throw new IllegalArgumentException("Apple id_token 검증에 실패했습니다.", e);
+        }
+    }
+
+    private PublicKey generateApplePublicKey(ApplePublicKeyResponse publicKey) {
+
+        try {
+            byte[] nBytes = Base64.getUrlDecoder().decode(publicKey.getN());
+            byte[] eBytes = Base64.getUrlDecoder().decode(publicKey.getE());
+
+            BigInteger n = new BigInteger(1, nBytes);
+            BigInteger e = new BigInteger(1, eBytes);
+
+            RSAPublicKeySpec publicKeySpec = new RSAPublicKeySpec(n, e);
+            KeyFactory keyFactory = KeyFactory.getInstance(publicKey.getKty());
+
+            return keyFactory.generatePublic(publicKeySpec);
+        } catch (Exception exception) {
+            logger.error("Apple Public Key 생성 실패", exception);
+            throw new IllegalArgumentException("Apple Public Key 생성에 실패했습니다.", exception);
+        }
     }
 }
