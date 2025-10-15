@@ -51,14 +51,6 @@ public class IngredientService {
         return new IngredientCreateResponse(ingredient.getIngredientId());
     }
 
-    @Transactional
-    public void deleteAllByUserId(long userId) {
-
-        List<Ingredient> ingredients = ingredientRepository.findByUserId(userId);
-
-        ingredientRepository.deleteAll(ingredients);
-    }
-
     @Transactional(readOnly = true)
     public Ingredient findByIngredientId(Long ingredientId) {
 

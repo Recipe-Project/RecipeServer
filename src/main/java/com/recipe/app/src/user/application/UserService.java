@@ -118,7 +118,9 @@ public class UserService {
     @Transactional
     public void withdraw(User user, HttpServletRequest request, UserWithdrawRequest withdrawRequest) {
 
-        userRepository.delete(user);
+        user.maskPersonalInfo();
+        user.markAsDeleted();
+        userRepository.save(user);
 
         logout(request);
 

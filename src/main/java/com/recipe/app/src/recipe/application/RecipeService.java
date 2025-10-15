@@ -85,16 +85,6 @@ public class RecipeService {
                 });
     }
 
-    @Transactional
-    public void deleteAllByUserId(long userId) {
-
-        List<Recipe> recipes = recipeRepository.findByUserId(userId);
-
-        recipeScrapService.deleteAllByUserId(userId);
-        recipeViewService.deleteAllByUserId(userId);
-        recipeRepository.deleteAll(recipes);
-    }
-
     @Transactional(readOnly = true)
     public long countRecipeScrapByUserId(long userId) {
 
