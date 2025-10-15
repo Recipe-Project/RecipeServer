@@ -1,8 +1,8 @@
 package com.recipe.app.src.user.application;
 
 import com.google.common.base.Preconditions;
-import com.recipe.app.src.common.utils.JwtUtil;
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.common.utils.JwtUtil;
 import com.recipe.app.src.user.application.dto.UserDeviceTokenRequest;
 import com.recipe.app.src.user.application.dto.UserLoginRequest;
 import com.recipe.app.src.user.application.dto.UserLoginResponse;
@@ -92,6 +92,21 @@ public class UserService {
         Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "액세스 토큰을 입력해주세요.");
 
         User user = create(userAuthClientService.getUserByGoogleAuthInfo(request));
+
+        user.changeRecentLoginAt(LocalDateTime.now());
+
+        String accessToken = jwtUtil.createAccessToken(user.getUserId());
+        String refreshToken = jwtUtil.createRefreshToken(user.getUserId());
+
+        return UserSocialLoginResponse.from(user, accessToken, refreshToken);
+    }
+
+    @Transactional
+    public UserSocialLoginResponse appleLogin(UserLoginRequest request) {
+
+        Preconditions.checkArgument(StringUtils.hasText(request.getAccessToken()), "id_token을 입력해주세요.");
+
+        User user = create(userAuthClientService.getUserByAppleAuthInfo(request));
 
         user.changeRecentLoginAt(LocalDateTime.now());
 
