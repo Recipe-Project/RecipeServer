@@ -10,6 +10,7 @@ import com.recipe.app.src.user.application.dto.UserProfileRequest;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import com.recipe.app.src.user.application.dto.UserTokenRefreshRequest;
 import com.recipe.app.src.user.application.dto.UserTokenRefreshResponse;
+import com.recipe.app.src.user.application.dto.UserWithdrawRequest;
 import com.recipe.app.src.user.domain.User;
 import com.recipe.app.src.user.exception.NotFoundUserException;
 import com.recipe.app.src.user.exception.UserTokenNotExistException;
@@ -30,12 +31,15 @@ public class UserService {
     private final JwtUtil jwtUtil;
     private final BadWordFiltering badWordFiltering;
     private final UserAuthClientService userAuthClientService;
+    private final UserWithdrawalService userWithdrawalService;
 
-    public UserService(UserRepository userRepository, JwtUtil jwtUtil, BadWordFiltering badWordFiltering, UserAuthClientService userAuthClientService) {
+    public UserService(UserRepository userRepository, JwtUtil jwtUtil, BadWordFiltering badWordFiltering,
+                       UserAuthClientService userAuthClientService, UserWithdrawalService userWithdrawalService) {
         this.userRepository = userRepository;
         this.jwtUtil = jwtUtil;
         this.badWordFiltering = badWordFiltering;
         this.userAuthClientService = userAuthClientService;
+        this.userWithdrawalService = userWithdrawalService;
     }
 
     @Transactional(readOnly = true)
@@ -112,11 +116,15 @@ public class UserService {
     }
 
     @Transactional
-    public void withdraw(User user, HttpServletRequest request) {
+    public void withdraw(User user, HttpServletRequest request, UserWithdrawRequest withdrawRequest) {
 
         userRepository.delete(user);
 
         logout(request);
+
+        if (withdrawRequest != null && StringUtils.hasText(withdrawRequest.getWithdrawalReason())) {
+            userWithdrawalService.saveWithdrawalReason(user.getUserId(), withdrawRequest.getWithdrawalReason());
+        }
     }
 
     @Transactional

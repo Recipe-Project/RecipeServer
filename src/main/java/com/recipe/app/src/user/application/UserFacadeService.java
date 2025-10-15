@@ -11,6 +11,7 @@ import com.recipe.app.src.recipe.application.youtube.YoutubeScrapService;
 import com.recipe.app.src.recipe.application.youtube.YoutubeViewService;
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.user.application.dto.UserProfileResponse;
+import com.recipe.app.src.user.application.dto.UserWithdrawRequest;
 import com.recipe.app.src.user.domain.User;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.stereotype.Service;
@@ -75,6 +76,6 @@ public class UserFacadeService {
         blogScrapService.deleteAllByUserId(user.getUserId());
         blogViewService.deleteAllByUserId(user.getUserId());
 
-        userService.withdraw(user, request);
+        userService.withdraw(user, request, withdrawRequest);
     }
 }

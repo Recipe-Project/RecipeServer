@@ -11,6 +11,7 @@ import com.recipe.app.src.user.application.dto.UserProfileResponse;
 import com.recipe.app.src.user.application.dto.UserSocialLoginResponse;
 import com.recipe.app.src.user.application.dto.UserTokenRefreshRequest;
 import com.recipe.app.src.user.application.dto.UserTokenRefreshResponse;
+import com.recipe.app.src.user.application.dto.UserWithdrawRequest;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -98,9 +99,12 @@ public class UserController {
     @Operation(summary = "회원 탈퇴 API")
     @DeleteMapping
     @LoginCheck
-    public void deleteUser(HttpServletRequest request, @Parameter(hidden = true) User user) {
+    public void deleteUser(HttpServletRequest request,
+                           @Parameter(hidden = true) User user,
+                           @Parameter(name = "회원 탈퇴 요청 정보")
+                           @RequestBody(required = false) UserWithdrawRequest withdrawRequest) {
 
-        userFacadeService.deleteUser(user, request);
+        userFacadeService.deleteUser(user, request, withdrawRequest);
     }
 
     @Operation(summary = "로그아웃 API")
