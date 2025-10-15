@@ -87,4 +87,12 @@ public class User extends BaseEntity {
 
         this.deviceToken = deviceToken;
     }
+
+    public void maskPersonalInfo() {
+        this.email = null;
+        this.phoneNumber = null;
+        this.nickname = "탈퇴한 사용자";
+        this.profileImgUrl = ProfileImage.getInitProfileImgUrl();
+        this.deviceToken = null;
+    }
 }

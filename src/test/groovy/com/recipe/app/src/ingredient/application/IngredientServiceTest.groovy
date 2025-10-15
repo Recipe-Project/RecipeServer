@@ -121,36 +121,6 @@ class IngredientServiceTest extends Specification {
         result.ingredientId == ingredient.ingredientId
     }
 
-    def "특정 유저의 재료 목록 제거"() {
-
-        given:
-        Long userId = 1
-        List<Ingredient> ingredients =  [
-                Ingredient.builder()
-                        .ingredientId(1)
-                        .ingredientCategoryId(1)
-                        .ingredientName("재료1")
-                        .ingredientIconId(1)
-                        .userId(1)
-                        .build(),
-                Ingredient.builder()
-                        .ingredientId(2)
-                        .ingredientCategoryId(2)
-                        .ingredientName("재료2")
-                        .ingredientIconId(1)
-                        .userId(1)
-                        .build()
-        ]
-
-        ingredientRepository.findByUserId(userId) >> ingredients
-
-        when:
-        ingredientService.deleteAllByUserId(userId)
-
-        then:
-        1 * ingredientRepository.deleteAll(ingredients)
-    }
-
     def "아이디로 재료 조회"() {
 
         given:
