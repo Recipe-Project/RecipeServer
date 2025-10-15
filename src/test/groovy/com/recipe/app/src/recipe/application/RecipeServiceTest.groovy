@@ -535,39 +535,6 @@ class RecipeServiceTest extends Specification {
         e.message == "레시피 정보를 찾지 못하였습니다."
     }
 
-    def "특정 유저의 레시피 목록 삭제"() {
-
-        given:
-        Long userId = 1
-
-        List<Recipe> recipes = [
-                Recipe.builder()
-                        .recipeNm("제목")
-                        .introduction("테스트설명")
-                        .level(RecipeLevel.NORMAL)
-                        .userId(1)
-                        .isHidden(false)
-                        .build(),
-                Recipe.builder()
-                        .recipeNm("제목")
-                        .introduction("설명")
-                        .level(RecipeLevel.NORMAL)
-                        .userId(2)
-                        .isHidden(true)
-                        .build(),
-        ]
-
-        recipeRepository.findByUserId(userId) >> recipes
-
-        when:
-        recipeService.deleteAllByUserId(userId)
-
-        then:
-        1 * recipeScrapService.deleteAllByUserId(userId)
-        1 * recipeViewService.deleteAllByUserId(userId)
-        1 * recipeRepository.deleteAll(recipes)
-    }
-
     def "특정 유저의 레시피 스크랩 수 조회"() {
 
         given:

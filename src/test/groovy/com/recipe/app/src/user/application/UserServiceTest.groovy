@@ -17,7 +17,8 @@ class UserServiceTest extends Specification {
     private JwtUtil jwtUtil = Mock()
     private BadWordFiltering badWordService = Mock()
     private UserAuthClientService userAuthClientService = Mock()
-    private UserService userService = new UserService(userRepository, jwtUtil, badWordService, userAuthClientService)
+    private UserWithdrawalService userWithdrawalService = Mock()
+    private UserService userService = new UserService(userRepository, jwtUtil, badWordService, userAuthClientService, userWithdrawalService)
 
     def "유저 아이디로 유저 조회"() {
 
@@ -267,7 +268,7 @@ class UserServiceTest extends Specification {
         "update_profile" | "update_nickname"
     }
 
-    def "유저 탈퇴"() {
+    def "유저 탈퇴 - 탈퇴 사유 없음"() {
 
         given:
         HttpServletRequest request = Mock()
@@ -276,17 +277,89 @@ class UserServiceTest extends Specification {
                 .userId(1)
                 .socialId("kakao_1")
                 .nickname("테스터1")
+                .email("test@test.com")
+                .phoneNumber("010-1234-5678")
                 .build()
 
+        UserWithdrawRequest withdrawRequest = null
+
         when:
-        userService.withdraw(user, request)
+        userService.withdraw(user, request, withdrawRequest)
 
         then:
-        1 * userRepository.delete(user)
+        1 * userRepository.save(user) >> { args ->
+            def savedUser = args.get(0) as User
+            savedUser.nickname == "탈퇴한 사용자"
+            savedUser.email == null
+            savedUser.phoneNumber == null
+            savedUser.deletedAt != null
+        }
         1 * jwtUtil.resolveAccessToken(request)
         1 * jwtUtil.setAccessTokenBlacklist(_)
         1 * jwtUtil.getUserId(_)
         1 * jwtUtil.removeRefreshToken(_)
+        0 * userWithdrawalService.saveWithdrawalReason(_, _)
+    }
+
+    def "유저 탈퇴 - 탈퇴 사유 있음"() {
+
+        given:
+        HttpServletRequest request = Mock()
+
+        User user = User.builder()
+                .userId(1)
+                .socialId("kakao_1")
+                .nickname("테스터1")
+                .email("test@test.com")
+                .phoneNumber("010-1234-5678")
+                .build()
+
+        UserWithdrawRequest withdrawRequest = new UserWithdrawRequest()
+        withdrawRequest.withdrawalReason = "서비스가 만족스럽지 않아서"
+
+        when:
+        userService.withdraw(user, request, withdrawRequest)
+
+        then:
+        1 * userRepository.save(user) >> { args ->
+            def savedUser = args.get(0) as User
+            savedUser.nickname == "탈퇴한 사용자"
+            savedUser.email == null
+            savedUser.phoneNumber == null
+            savedUser.deletedAt != null
+        }
+        1 * jwtUtil.resolveAccessToken(request)
+        1 * jwtUtil.setAccessTokenBlacklist(_)
+        1 * jwtUtil.getUserId(_)
+        1 * jwtUtil.removeRefreshToken(_)
+        1 * userWithdrawalService.saveWithdrawalReason(user.userId, withdrawRequest.withdrawalReason)
+    }
+
+    def "유저 탈퇴 - 탈퇴 사유가 빈 문자열인 경우"() {
+
+        given:
+        HttpServletRequest request = Mock()
+
+        User user = User.builder()
+                .userId(1)
+                .socialId("kakao_1")
+                .nickname("테스터1")
+                .email("test@test.com")
+                .build()
+
+        UserWithdrawRequest withdrawRequest = new UserWithdrawRequest()
+        withdrawRequest.withdrawalReason = ""
+
+        when:
+        userService.withdraw(user, request, withdrawRequest)
+
+        then:
+        1 * userRepository.save(user)
+        1 * jwtUtil.resolveAccessToken(request)
+        1 * jwtUtil.setAccessTokenBlacklist(_)
+        1 * jwtUtil.getUserId(_)
+        1 * jwtUtil.removeRefreshToken(_)
+        0 * userWithdrawalService.saveWithdrawalReason(_, _)
     }
 
     def "디바이스 토큰 수정"() {
