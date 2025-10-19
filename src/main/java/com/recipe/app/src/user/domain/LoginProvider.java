@@ -3,7 +3,7 @@ package com.recipe.app.src.user.domain;
 import java.util.Arrays;
 
 public enum LoginProvider {
-    KAKAO, NAVER, GOOGLE;
+    KAKAO, NAVER, GOOGLE, APPLE;
 
     public static LoginProvider findLoginProvider(String socialId) {
         return Arrays.stream(values()).filter(provider -> socialId.toUpperCase().contains(provider.name()))
