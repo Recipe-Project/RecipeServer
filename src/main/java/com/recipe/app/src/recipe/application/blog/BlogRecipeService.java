@@ -33,6 +33,7 @@ public class BlogRecipeService {
         this.blogRecipeClientSearchService = blogRecipeClientSearchService;
     }
 
+    @Transactional
     public RecipesResponse findBlogRecipesByKeyword(User user, String keyword, long lastBlogRecipeId, int size, String sort) {
 
         badWordFiltering.check(keyword);
@@ -41,19 +42,16 @@ public class BlogRecipeService {
 
         List<BlogRecipe> blogRecipes;
         if (totalCnt < MIN_RECIPE_CNT) {
-
-            blogRecipes = blogRecipeClientSearchService.searchNaverBlogRecipes(keyword, size);
-
-            totalCnt = blogRecipeRepository.countByKeyword(keyword);
-        } else {
-            blogRecipes = findByKeywordOrderBy(keyword, lastBlogRecipeId, size, sort);
+            blogRecipeClientSearchService.searchNaverBlogRecipes(keyword);
         }
+
+        blogRecipes = findByKeywordOrderBy(keyword, lastBlogRecipeId, size, sort);
+        totalCnt = blogRecipeRepository.countByKeyword(keyword);
 
         return getRecipes(user, totalCnt, new BlogRecipes(blogRecipes));
     }
 
-    @Transactional(readOnly = true)
-    public List<BlogRecipe> findByKeywordOrderBy(String keyword, long lastBlogRecipeId, int size, String sort) {
+    private List<BlogRecipe> findByKeywordOrderBy(String keyword, long lastBlogRecipeId, int size, String sort) {
 
         if (sort.equals("scraps")) {
             return findByKeywordOrderByBlogScrapCnt(keyword, lastBlogRecipeId, size);

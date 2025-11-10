@@ -32,6 +32,7 @@ public class YoutubeRecipeService {
         this.youtubeRecipeClientSearchService = youtubeRecipeClientSearchService;
     }
 
+    @Transactional
     public RecipesResponse findYoutubeRecipesByKeyword(User user, String keyword, long lastYoutubeRecipeId, int size, String sort) throws IOException {
 
         badWordFiltering.check(keyword);
@@ -40,19 +41,16 @@ public class YoutubeRecipeService {
 
         List<YoutubeRecipe> youtubeRecipes;
         if (totalCnt < MIN_RECIPE_CNT) {
-
-            youtubeRecipes = youtubeRecipeClientSearchService.searchYoutube(keyword, size);
-
-            totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
-        } else {
-            youtubeRecipes = findByKeywordOrderBy(keyword, lastYoutubeRecipeId, size, sort);
+            youtubeRecipeClientSearchService.searchYoutube(keyword);
         }
+
+        youtubeRecipes = findByKeywordOrderBy(keyword, lastYoutubeRecipeId, size, sort);
+        totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
 
         return getRecipes(user, totalCnt, new YoutubeRecipes(youtubeRecipes));
     }
 
-    @Transactional(readOnly = true)
-    public List<YoutubeRecipe> findByKeywordOrderBy(String keyword, long lastYoutubeRecipeId, int size, String sort) {
+    private List<YoutubeRecipe> findByKeywordOrderBy(String keyword, long lastYoutubeRecipeId, int size, String sort) {
 
         if (sort.equals("scraps")) {
             return findByKeywordOrderByYoutubeScrapCnt(keyword, lastYoutubeRecipeId, size);

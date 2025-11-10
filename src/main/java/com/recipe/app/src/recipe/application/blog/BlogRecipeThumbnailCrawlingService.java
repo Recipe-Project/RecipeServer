@@ -8,6 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.net.URL;
 import java.util.List;
@@ -22,6 +24,7 @@ public class BlogRecipeThumbnailCrawlingService {
     }
 
     @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveThumbnails(List<BlogRecipe> blogRecipes) {
 
         System.out.println("thumbnail save");
