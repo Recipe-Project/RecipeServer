@@ -15,7 +15,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.time.Instant;
@@ -24,6 +23,7 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -44,7 +44,7 @@ public class YoutubeRecipeClientSearchService {
     }
 
     @CircuitBreaker(name = "recipe-youtube-search", fallbackMethod = "fallback")
-    public List<YoutubeRecipe> searchYoutube(String keyword, int size) throws IOException {
+    public void searchYoutube(String keyword) throws IOException {
 
         log.info("youtube search api call");
 
@@ -80,8 +80,6 @@ public class YoutubeRecipeClientSearchService {
         }
 
         createYoutubeRecipes(youtubeRecipes);
-
-        return youtubeRecipes.subList(0, size);
     }
 
     public List<YoutubeRecipe> fallback(String keyword, int size, Exception e) {
@@ -91,12 +89,11 @@ public class YoutubeRecipeClientSearchService {
         return youtubeRecipeRepository.findByKeywordLimit(keyword, size);
     }
 
-    @Transactional
-    public void createYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes) {
+    private void createYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes) {
 
         List<String> youtubeIds = youtubeRecipes.stream().map(YoutubeRecipe::getYoutubeId).collect(Collectors.toList());
         List<YoutubeRecipe> existYoutubeRecipes = youtubeRecipeRepository.findByYoutubeIdIn(youtubeIds);
-        Map<String, YoutubeRecipe> existYoutubeRecipesMapByYoutubeId = existYoutubeRecipes.stream().collect(Collectors.toMap(YoutubeRecipe::getYoutubeId, v -> v));
+        Map<String, YoutubeRecipe> existYoutubeRecipesMapByYoutubeId = existYoutubeRecipes.stream().collect(Collectors.toMap(YoutubeRecipe::getYoutubeId, Function.identity(), (o1, o2) -> o1));
 
         youtubeRecipeRepository.saveAll(youtubeRecipes.stream()
                 .filter(youtubeRecipe -> !existYoutubeRecipesMapByYoutubeId.containsKey(youtubeRecipe.getYoutubeId()))

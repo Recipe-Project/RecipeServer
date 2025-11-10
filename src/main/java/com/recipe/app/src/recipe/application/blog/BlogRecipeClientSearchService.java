@@ -7,7 +7,6 @@ import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -38,7 +37,7 @@ public class BlogRecipeClientSearchService {
     }
 
     @CircuitBreaker(name = "recipe-blog-search", fallbackMethod = "fallback")
-    public List<BlogRecipe> searchNaverBlogRecipes(String keyword, int size) {
+    public void searchNaverBlogRecipes(String keyword) {
 
         log.info("naver blog search api call");
 
@@ -52,8 +51,6 @@ public class BlogRecipeClientSearchService {
         createBlogRecipes(blogRecipes);
 
         blogRecipeThumbnailCrawlingService.saveThumbnails(blogRecipes);
-
-        return blogRecipes.subList(0, size);
     }
 
     public List<BlogRecipe> fallback(String keyword, int size, Exception e) {
@@ -63,12 +60,11 @@ public class BlogRecipeClientSearchService {
         return blogRecipeRepository.findByKeywordLimit(keyword, size);
     }
 
-    @Transactional
-    public void createBlogRecipes(List<BlogRecipe> blogRecipes) {
+    private void createBlogRecipes(List<BlogRecipe> blogRecipes) {
 
         List<String> blogUrls = blogRecipes.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
         List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
-        Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity()));
+        Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity(), (o1, o2) -> o1));
 
         blogRecipeRepository.saveAll(blogRecipes.stream()
                 .filter(blogRecipe -> !existBlogRecipeMapByBlogUrl.containsKey(blogRecipe.getBlogUrl()))
