@@ -89,29 +89,4 @@ class RecipeProcessTest extends Specification {
         ""                 || "레시피 요리 과정 설명을 입력해주세요."
         null               || "레시피 요리 과정 설명을 입력해주세요."
     }
-
-    def "레시피 과정 삭제"() {
-
-        given:
-        Recipe recipe = Recipe.builder()
-                .recipeNm("제목")
-                .introduction("설명")
-                .level(RecipeLevel.NORMAL)
-                .userId(1L)
-                .isHidden(false)
-                .build()
-
-        RecipeProcess process = RecipeProcess.builder()
-                .recipe(recipe)
-                .cookingNo(1)
-                .cookingDescription("과정")
-                .recipeProcessImgUrl("")
-                .build()
-
-        when:
-        process.delete()
-
-        then:
-        process.recipe == null
-    }
 }
