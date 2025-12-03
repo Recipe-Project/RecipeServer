@@ -53,15 +53,17 @@ public class RecipeIngredient extends BaseEntity {
 
         this.recipeIngredientId = recipeIngredientId;
         this.recipe = recipe;
-        recipe.ingredients.add(this);
+        if (recipe != null) {
+            recipe.ingredients.add(this);
+        }
         this.ingredientName = ingredientName;
         this.ingredientIconId = ingredientIconId;
         this.quantity = quantity;
         this.unit = unit;
     }
 
-    public void delete() {
-        this.recipe = null;
+    void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
     }
 
     public boolean hasInFridge(List<String> ingredientNames) {
