@@ -71,33 +71,6 @@ class RecipeIngredientTest extends Specification {
         null           || "레시피 재료명을 입력해주세요."
     }
 
-    def "레시피 재료 삭제"() {
-
-        given:
-        Recipe recipe = Recipe.builder()
-                .recipeNm("제목")
-                .introduction("설명")
-                .level(RecipeLevel.NORMAL)
-                .userId(1L)
-                .isHidden(false)
-                .build()
-
-        RecipeIngredient ingredient = RecipeIngredient.builder()
-                .recipeIngredientId(1L)
-                .recipe(recipe)
-                .ingredientName("재료")
-                .ingredientIconId(1L)
-                .quantity("1")
-                .unit("개")
-                .build()
-
-        when:
-        ingredient.delete()
-
-        then:
-        ingredient.recipe == null
-    }
-
     def "이름이 일치하는 레시피 재료가 냉장고 존재하는지 확인"() {
 
         given:

@@ -51,13 +51,15 @@ public class RecipeProcess extends BaseEntity {
 
         this.recipeProcessId = recipeProcessId;
         this.recipe = recipe;
-        recipe.processes.add(this);
+        if (recipe != null) {
+            recipe.processes.add(this);
+        }
         this.cookingNo = cookingNo;
         this.cookingDescription = cookingDescription;
         this.recipeProcessImgUrl = recipeProcessImgUrl;
     }
 
-    public void delete() {
-        this.recipe = null;
+    void setRecipe(Recipe recipe) {
+        this.recipe = recipe;
     }
 }

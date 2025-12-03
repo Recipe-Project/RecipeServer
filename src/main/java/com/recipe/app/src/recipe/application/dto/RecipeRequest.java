@@ -57,8 +57,12 @@ public class RecipeRequest {
                 .userId(userId)
                 .build();
 
-        ingredients.forEach(ingredient -> ingredient.toEntity(recipe));
-        processes.forEach(process -> process.toEntity(recipe));
+        if (ingredients != null) {
+            ingredients.forEach(ingredient -> ingredient.toEntity(recipe));
+        }
+        if (processes != null) {
+            processes.forEach(process -> process.toEntity(recipe));
+        }
 
         return recipe;
     }

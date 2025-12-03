@@ -4,6 +4,8 @@ import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.utils.BadWordFiltering;
 import com.recipe.app.src.recipe.application.dto.RecipeRequest;
 import com.recipe.app.src.recipe.domain.Recipe;
+import com.recipe.app.src.recipe.domain.RecipeIngredient;
+import com.recipe.app.src.recipe.domain.RecipeProcess;
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException;
 import com.recipe.app.src.recipe.infra.RecipeRepository;
 import com.recipe.app.src.user.domain.User;
@@ -39,6 +41,15 @@ public class RecipeService {
 
         badWordFiltering.check(request.getTitle());
         badWordFiltering.check(request.getIntroduction());
+
+        Recipe recipe = request.toRecipeEntity(user.getUserId());
+        List<RecipeIngredient> recipeIngredients = request.getIngredients().stream()
+                .map(ingredient -> ingredient.toEntity(recipe))
+                .toList();
+        List<RecipeProcess> recipeProcesses = request.getProcesses().stream()
+                .map(process -> process.toEntity(recipe))
+                .toList();
+
 
         recipeRepository.save(request.toRecipeEntity(user.getUserId()));
     }
