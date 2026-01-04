@@ -32,6 +32,8 @@ public class JwtFilter extends GenericFilterBean {
         String accessToken = jwtUtil.resolveAccessToken((HttpServletRequest) request);
         String requestURI = ((HttpServletRequest) request).getRequestURI();
 
+        System.out.println(jwtUtil.createAccessToken(18L));
+
         if (!StringUtils.hasText(accessToken)) {
             logger.info("필수 토큰이 없습니다., uri: {}", requestURI);
         } else if (jwtUtil.isValidAccessToken(accessToken)) {

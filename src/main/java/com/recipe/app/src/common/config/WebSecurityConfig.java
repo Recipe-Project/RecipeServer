@@ -50,6 +50,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/fridges/**").authenticated()
                         .requestMatchers("/fridges/basket/**").authenticated()
                         .requestMatchers("/ingredients/**").authenticated()
+                        .requestMatchers("/recipes/public/**").permitAll()
                         .requestMatchers("/recipes/**").authenticated()
                         .anyRequest().permitAll())
                 .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)

@@ -149,4 +149,38 @@ public class RecipeSearchService {
 
         return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, user, ingredientNamesInFridge, lastRecipe, size);
     }
+
+    @Transactional(readOnly = true)
+    public RecipeDetailResponse findPublicRecipeDetail(long recipeId) {
+
+        Recipe recipe = recipeRepository.findById(recipeId)
+                .orElseThrow(() -> {
+                    throw new NotFoundRecipeException();
+                });
+
+        User postUser = null;
+        if (recipe.getUserId() != null) {
+            postUser = userService.findByUserId(recipe.getUserId());
+        }
+
+        List<String> emptyIngredientList = List.of();
+
+        return RecipeDetailResponse.from(recipe, false, postUser, emptyIngredientList);
+    }
+
+    @Transactional(readOnly = true)
+    public RecommendedRecipesResponse findPublicRecommendedRecipesByIngredients(List<String> ingredientNames, long lastRecipeId, int size) {
+
+        Recipes recipes = new Recipes(recipeRepository.findRecipesInFridge(ingredientNames));
+
+        List<User> recipePostUsers = userService.findByUserIds(recipes.getUserIds());
+
+        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes.getRecipeIds());
+
+        Recipe lastRecipe = recipeRepository.findById(lastRecipeId).orElse(null);
+
+        User anonymousUser = new User();
+
+        return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, anonymousUser, ingredientNames, lastRecipe, size);
+    }
 }
