@@ -16,7 +16,7 @@ public class AppleAuthResponse {
 
         return User.builder()
                 .socialId("apple_" + sub)
-                .nickname(name != null ? name : "Apple User")
+                .nickname(name != null ? name : "")
                 .email(email)
                 .deviceToken(fcmToken)
                 .build();
