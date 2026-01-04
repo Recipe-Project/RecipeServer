@@ -70,10 +70,10 @@ public class Recipe extends BaseEntity {
     @Column(name = "reportYn", nullable = false)
     private String reportYn = "N";
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     List<RecipeIngredient> ingredients = new ArrayList<>();
 
-    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     List<RecipeProcess> processes = new ArrayList<>();
 
     @Builder
@@ -106,25 +106,24 @@ public class Recipe extends BaseEntity {
         this.imgUrl = updateRecipe.imgUrl;
         this.hiddenYn = updateRecipe.hiddenYn;
 
+        // 재료 업데이트 - orphanRemoval로 인해 제거된 항목은 자동 삭제됨
         ingredients.clear();
-
-        if (updateRecipe.ingredients != null && !updateRecipe.ingredients.isEmpty()) {
+        if (updateRecipe.ingredients != null) {
             updateRecipe.ingredients.forEach(ing -> {
-                ing.setRecipe(this);  // 부모 Recipe 변경
+                ing.setRecipe(this);
                 ingredients.add(ing);
             });
-            updateRecipe.ingredients.clear();  // updateRecipe에서는 제거
+            updateRecipe.ingredients.clear();
         }
 
+        // 요리 과정 업데이트 - orphanRemoval로 인해 제거된 항목은 자동 삭제됨
         processes.clear();
-
-        // 새 요리 과정 추가
-        if (updateRecipe.processes != null && !updateRecipe.processes.isEmpty()) {
+        if (updateRecipe.processes != null) {
             updateRecipe.processes.forEach(proc -> {
-                proc.setRecipe(this);  // 부모 Recipe 변경
+                proc.setRecipe(this);
                 processes.add(proc);
             });
-            updateRecipe.processes.clear();  // updateRecipe에서는 제거
+            updateRecipe.processes.clear();
         }
     }
 

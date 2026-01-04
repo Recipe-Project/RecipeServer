@@ -1,5 +1,6 @@
 package com.recipe.app.src.common.client.google.dto;
 
+import com.recipe.app.src.user.domain.NicknameGenerator;
 import com.recipe.app.src.user.domain.User;
 import lombok.Getter;
 
@@ -14,7 +15,7 @@ public class GoogleAuthResponse {
 
         return User.builder()
                 .socialId("google_" + sub)
-                .nickname(name)
+                .nickname(NicknameGenerator.generate())
                 .email(email)
                 .deviceToken(fcmToken)
                 .build();

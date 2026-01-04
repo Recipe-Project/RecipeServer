@@ -296,8 +296,6 @@ class UserServiceTest extends Specification {
         }
         1 * jwtUtil.resolveAccessToken(request)
         1 * jwtUtil.setAccessTokenBlacklist(_)
-        1 * jwtUtil.getUserId(_)
-        1 * jwtUtil.removeRefreshToken(_)
         0 * userWithdrawalService.saveWithdrawalReason(_, _)
     }
 
@@ -330,8 +328,6 @@ class UserServiceTest extends Specification {
         }
         1 * jwtUtil.resolveAccessToken(request)
         1 * jwtUtil.setAccessTokenBlacklist(_)
-        1 * jwtUtil.getUserId(_)
-        1 * jwtUtil.removeRefreshToken(_)
         1 * userWithdrawalService.saveWithdrawalReason(user.userId, withdrawRequest.withdrawalReason)
     }
 
@@ -357,8 +353,6 @@ class UserServiceTest extends Specification {
         1 * userRepository.save(user)
         1 * jwtUtil.resolveAccessToken(request)
         1 * jwtUtil.setAccessTokenBlacklist(_)
-        1 * jwtUtil.getUserId(_)
-        1 * jwtUtil.removeRefreshToken(_)
         0 * userWithdrawalService.saveWithdrawalReason(_, _)
     }
 
@@ -421,8 +415,6 @@ class UserServiceTest extends Specification {
         then:
         1 * jwtUtil.resolveAccessToken(request)
         1 * jwtUtil.setAccessTokenBlacklist(_)
-        1 * jwtUtil.getUserId(_)
-        1 * jwtUtil.removeRefreshToken(_)
     }
 
     def "토큰 재발급"() {

@@ -1,5 +1,6 @@
 package com.recipe.app.src.common.client.apple.dto;
 
+import com.recipe.app.src.user.domain.NicknameGenerator;
 import com.recipe.app.src.user.domain.User;
 import lombok.Builder;
 import lombok.Getter;
@@ -16,7 +17,7 @@ public class AppleAuthResponse {
 
         return User.builder()
                 .socialId("apple_" + sub)
-                .nickname(name != null ? name : "Apple User")
+                .nickname(NicknameGenerator.generate())
                 .email(email)
                 .deviceToken(fcmToken)
                 .build();
