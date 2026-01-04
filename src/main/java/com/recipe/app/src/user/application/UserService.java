@@ -118,7 +118,7 @@ public class UserService {
 
     private User create(User user) {
 
-        return userRepository.findBySocialId(user.getSocialId())
+        return userRepository.findBySocialIdAndDeletedAtIsNull(user.getSocialId())
                 .orElseGet(() -> userRepository.save(user));
     }
 

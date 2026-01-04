@@ -85,7 +85,7 @@ class UserServiceTest extends Specification {
 
         userAuthClientService.getUserByNaverAuthInfo(request) >> user
 
-        userRepository.findBySocialId(user.socialId) >> Optional.of(user)
+        userRepository.findBySocialIdAndDeletedAtIsNull(user.socialId) >> Optional.of(user)
 
         String accessToken = "access_token"
         String refreshToken = "refresh_token"
@@ -141,7 +141,7 @@ class UserServiceTest extends Specification {
 
         userAuthClientService.getUserByKakaoAuthInfo(request) >> user
 
-        userRepository.findBySocialId(user.socialId) >> Optional.of(user)
+        userRepository.findBySocialIdAndDeletedAtIsNull(user.socialId) >> Optional.of(user)
 
         String accessToken = "access_token"
         String refreshToken = "refresh_token"
@@ -197,7 +197,7 @@ class UserServiceTest extends Specification {
 
         userAuthClientService.getUserByGoogleAuthInfo(request) >> user
 
-        userRepository.findBySocialId(user.socialId) >> Optional.of(user)
+        userRepository.findBySocialIdAndDeletedAtIsNull(user.socialId) >> Optional.of(user)
 
         String accessToken = "access_token"
         String refreshToken = "refresh_token"
