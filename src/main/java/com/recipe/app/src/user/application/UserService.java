@@ -162,7 +162,6 @@ public class UserService {
 
         String accessToken = jwtUtil.resolveAccessToken(request);
         jwtUtil.setAccessTokenBlacklist(accessToken);
-        jwtUtil.removeRefreshToken(jwtUtil.getUserId(accessToken));
     }
 
     @Transactional(readOnly = true)
