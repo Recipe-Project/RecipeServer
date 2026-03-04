@@ -35,10 +35,14 @@ public class JwtFilter extends GenericFilterBean {
         if (!StringUtils.hasText(accessToken)) {
             logger.info("필수 토큰이 없습니다., uri: {}", requestURI);
         } else if (jwtUtil.isValidAccessToken(accessToken)) {
-            UserDetails userDetails = userDetailsService.loadUserByUsername(String.valueOf(jwtUtil.getUserId(accessToken)));
-            Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
-            SecurityContextHolder.getContext().setAuthentication(authentication);
-            logger.info("Security context에 인증 정보를 저장했습니다, uri: {}", requestURI);
+            try {
+                UserDetails userDetails = userDetailsService.loadUserByUsername(String.valueOf(jwtUtil.getUserId(accessToken)));
+                Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails, "", userDetails.getAuthorities());
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+                logger.info("Security context에 인증 정보를 저장했습니다, uri: {}", requestURI);
+            } catch (Exception e) {
+                logger.info("사용자 인증에 실패했습니다. {}, uri: {}", e.getMessage(), requestURI);
+            }
         } else {
             logger.info("유효한 Jwt 토큰이 없습니다, uri: {}", requestURI);
         }
