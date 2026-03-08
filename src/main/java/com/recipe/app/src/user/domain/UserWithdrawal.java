@@ -27,7 +27,7 @@ public class UserWithdrawal {
     @Column(name = "userId", nullable = false)
     private Long userId;
 
-    @Column(name = "withdrawalReason", length = 200)
+    @Column(name = "withdrawalReason")
     private String withdrawalReason;
 
     @Column(name = "createdAt", nullable = false, updatable = false)

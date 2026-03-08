@@ -171,6 +171,11 @@ public class UserService {
             throw new UserTokenNotExistException();
         }
 
+        User user = findByUserId(request.getUserId());
+        if (user.isDeleted()) {
+            throw new UserTokenNotExistException();
+        }
+
         return UserTokenRefreshResponse.builder()
                 .userId(request.getUserId())
                 .accessToken(jwtUtil.createAccessToken(request.getUserId()))
