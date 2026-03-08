@@ -420,12 +420,19 @@ class UserServiceTest extends Specification {
     def "토큰 재발급"() {
 
         given:
+        User user = User.builder()
+                .userId(1)
+                .socialId("naver_1")
+                .nickname("테스터1")
+                .build()
+
         UserTokenRefreshRequest request = UserTokenRefreshRequest.builder()
                 .userId(1)
                 .refreshToken("refresh_token")
                 .build()
 
         jwtUtil.isValidRefreshToken(request.refreshToken) >> true
+        userRepository.findById(request.userId) >> Optional.of(user)
 
         String accessToken = "new_access_token"
         String refreshToken = "new_refresh_token"
@@ -450,6 +457,32 @@ class UserServiceTest extends Specification {
                 .build()
 
         jwtUtil.isValidRefreshToken(request.refreshToken) >> false
+
+        when:
+        userService.reissueToken(request)
+
+        then:
+        def e = thrown(UserTokenNotExistException.class)
+        e.message == "유효하지 않은 JWT입니다."
+    }
+
+    def "토큰 재발급 시 탈퇴한 사용자이면 예외 발생"() {
+
+        given:
+        User user = User.builder()
+                .userId(1)
+                .socialId("naver_1")
+                .nickname("테스터1")
+                .build()
+        user.markAsDeleted()
+
+        UserTokenRefreshRequest request = UserTokenRefreshRequest.builder()
+                .userId(1)
+                .refreshToken("refresh_token")
+                .build()
+
+        jwtUtil.isValidRefreshToken(request.refreshToken) >> true
+        userRepository.findById(request.userId) >> Optional.of(user)
 
         when:
         userService.reissueToken(request)
