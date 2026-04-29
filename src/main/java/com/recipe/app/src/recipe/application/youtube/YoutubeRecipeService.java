@@ -7,12 +7,14 @@ import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipes;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeRecipeRepository;
 import com.recipe.app.src.user.domain.User;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.util.List;
 
+@Slf4j
 @Service
 public class YoutubeRecipeService {
 
@@ -33,18 +35,21 @@ public class YoutubeRecipeService {
     }
 
     @Transactional
-    public RecipesResponse findYoutubeRecipesByKeyword(User user, String keyword, long lastYoutubeRecipeId, int size, String sort) throws IOException {
+    public RecipesResponse findYoutubeRecipesByKeyword(User user, String keyword, long lastYoutubeRecipeId, int size, String sort) {
 
         badWordFiltering.check(keyword);
 
         long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
 
-        List<YoutubeRecipe> youtubeRecipes;
         if (totalCnt < MIN_RECIPE_CNT) {
-            youtubeRecipeClientSearchService.searchYoutube(keyword);
+            try {
+                youtubeRecipeClientSearchService.searchYoutube(keyword);
+            } catch (IOException e) {
+                log.warn("youtube search api call failed - {}", e.getMessage());
+            }
         }
 
-        youtubeRecipes = findByKeywordOrderBy(keyword, lastYoutubeRecipeId, size, sort);
+        List<YoutubeRecipe> youtubeRecipes = findByKeywordOrderBy(keyword, lastYoutubeRecipeId, size, sort);
         totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
 
         return getRecipes(user, totalCnt, new YoutubeRecipes(youtubeRecipes));
