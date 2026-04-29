@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.infra;
 
+import com.querydsl.jpa.JPAExpressions;
 import com.recipe.app.src.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.recipe.domain.Recipe;
 import jakarta.persistence.EntityManager;
@@ -33,16 +34,20 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
     @Override
     public Long countByKeyword(String keyword) {
-        return (long) queryFactory
-                .select(recipe.recipeId, recipe.recipeNm, recipe.introduction)
+        return queryFactory
+                .select(recipe.recipeId.countDistinct())
                 .from(recipe)
-                .leftJoin(recipe.ingredients, recipeIngredient).on(recipeIngredient.ingredientName.contains(keyword))
-                .where(recipe.hiddenYn.eq("N"))
-                .groupBy(recipe.recipeId)
-                .having(recipe.recipeNm.contains(keyword)
-                        .or(recipe.introduction.contains(keyword))
-                        .or(recipeIngredient.count().gt(0)))
-                .fetch().size();
+                .where(
+                        recipe.hiddenYn.eq("N"),
+                        recipe.recipeNm.contains(keyword)
+                                .or(recipe.introduction.contains(keyword))
+                                .or(JPAExpressions.selectOne()
+                                        .from(recipeIngredient)
+                                        .where(recipeIngredient.recipe.recipeId.eq(recipe.recipeId)
+                                                .and(recipeIngredient.ingredientName.contains(keyword)))
+                                        .exists())
+                )
+                .fetchOne();
     }
 
     @Override
