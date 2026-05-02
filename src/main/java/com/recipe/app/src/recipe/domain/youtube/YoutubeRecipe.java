@@ -2,11 +2,14 @@ package com.recipe.app.src.recipe.domain.youtube;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
+import com.recipe.app.src.common.utils.KoreanTokenizer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -52,6 +55,9 @@ public class YoutubeRecipe extends BaseEntity {
     @Column(name = "viewCnt", nullable = false)
     private long viewCnt;
 
+    @Column(name = "searchTokens", columnDefinition = "TEXT")
+    private String searchTokens;
+
     @Builder
     public YoutubeRecipe(Long youtubeRecipeId, String title, String description, String thumbnailImgUrl, LocalDate postDate, String channelName, String youtubeId, long scrapCnt, long viewCnt) {
 
@@ -82,5 +88,12 @@ public class YoutubeRecipe extends BaseEntity {
 
     public void plusViewCnt() {
         this.viewCnt++;
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void refreshSearchTokens() {
+        String source = (title != null ? title : "") + " " + (description != null ? description : "");
+        this.searchTokens = KoreanTokenizer.tokenize(source);
     }
 }

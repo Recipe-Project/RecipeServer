@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.domain;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
+import com.recipe.app.src.common.utils.KoreanTokenizer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -10,6 +11,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -36,6 +39,9 @@ public class RecipeIngredient extends BaseEntity {
 
     @Column(name = "ingredientName", nullable = false, length = 64)
     private String ingredientName;
+
+    @Column(name = "searchTokens", length = 128)
+    private String searchTokens;
 
     @Column(name = "ingredientIconId")
     private Long ingredientIconId;
@@ -68,5 +74,11 @@ public class RecipeIngredient extends BaseEntity {
 
     public boolean hasInFridge(List<String> ingredientNames) {
         return ingredientNames.contains(ingredientName);
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void refreshSearchTokens() {
+        this.searchTokens = KoreanTokenizer.tokenize(ingredientName);
     }
 }

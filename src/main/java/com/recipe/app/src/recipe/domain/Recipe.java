@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.domain;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
+import com.recipe.app.src.common.utils.KoreanTokenizer;
 import com.recipe.app.src.recipe.infra.RecipeLevelPersistConverter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -69,6 +72,9 @@ public class Recipe extends BaseEntity {
 
     @Column(name = "reportYn", nullable = false)
     private String reportYn = "N";
+
+    @Column(name = "searchTokens", columnDefinition = "TEXT")
+    private String searchTokens;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     List<RecipeIngredient> ingredients = new ArrayList<>();
@@ -159,5 +165,12 @@ public class Recipe extends BaseEntity {
                 .count();
 
         return Math.round((double) ingredientMatchCnt / ingredients.size() * 100);
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void refreshSearchTokens() {
+        String source = (recipeNm != null ? recipeNm : "") + " " + (introduction != null ? introduction : "");
+        this.searchTokens = KoreanTokenizer.tokenize(source);
     }
 }
