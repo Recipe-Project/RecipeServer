@@ -46,7 +46,7 @@ class RecipeSearchServiceTest extends Specification {
         int size = 10
         String sort = "scraps"
 
-        recipeRepository.countByKeyword(keyword) >> 2
+        recipeRepository.countByKeyword(_ as String) >> 2
 
         recipeScrapService.countByRecipeId(lastRecipeId) >> 0
 
@@ -69,7 +69,7 @@ class RecipeSearchServiceTest extends Specification {
                         .build(),
         ]
 
-        recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(keyword, lastRecipeId, 0, size) >> recipes
+        recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(_ as String, lastRecipeId, 0, size) >> recipes
 
         userService.findByUserIds(users.userId) >> users
 
@@ -120,7 +120,7 @@ class RecipeSearchServiceTest extends Specification {
         int size = 10
         String sort = "views"
 
-        recipeRepository.countByKeyword(keyword) >> 2
+        recipeRepository.countByKeyword(_ as String) >> 2
 
         recipeViewService.countByRecipeId(lastRecipeId) >> 0
 
@@ -143,7 +143,7 @@ class RecipeSearchServiceTest extends Specification {
                         .build(),
         ]
 
-        recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(keyword, lastRecipeId, 0, size) >> recipes
+        recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(_ as String, lastRecipeId, 0, size) >> recipes
 
         userService.findByUserIds(users.userId) >> users
 
@@ -194,7 +194,7 @@ class RecipeSearchServiceTest extends Specification {
         int size = 10
         String sort = "newest"
 
-        recipeRepository.countByKeyword(keyword) >> 2
+        recipeRepository.countByKeyword(_ as String) >> 2
 
         recipeRepository.findById(lastRecipeId) >> Optional.empty()
 
@@ -219,7 +219,7 @@ class RecipeSearchServiceTest extends Specification {
 
         recipeRepository.findById(lastRecipeId) >> Optional.empty()
 
-        recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, null, size) >> recipes
+        recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_ as String, lastRecipeId, null, size) >> recipes
 
         userService.findByUserIds(users.userId) >> users
 
@@ -587,5 +587,22 @@ class RecipeSearchServiceTest extends Specification {
         result.recipes.scrapCnt == recipes.scrapCnt
         result.recipes.viewCnt == recipes.viewCnt
         result.recipes.ingredientsMatchRate == [100, 33]
+    }
+
+    def "레시피 키워드 검색 - 1글자 입력은 빈 결과를 반환한다 (FULLTEXT 토큰 최소 길이 정책)"() {
+
+        given:
+        User user = User.builder().userId(1).socialId("naver_1").nickname("테스터1").build()
+        userService.findByUserIds(_) >> []
+        recipeScrapService.findByRecipeIds(_) >> []
+
+        when:
+        RecipesResponse result = recipeSearchService.findRecipesByKeywordOrderBy(user, "감", 0L, 10, "newest")
+
+        then:
+        result.totalCnt == 0
+        result.recipes.isEmpty()
+        0 * recipeRepository.countByKeyword(_)
+        0 * recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_, _, _, _)
     }
 }
