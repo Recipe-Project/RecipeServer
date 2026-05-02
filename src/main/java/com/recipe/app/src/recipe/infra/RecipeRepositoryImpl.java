@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
+import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
 import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
 import static com.recipe.app.src.recipe.domain.QRecipeScrap.recipeScrap;
@@ -39,13 +40,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .from(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
-                        recipe.recipeNm.contains(keyword)
-                                .or(recipe.introduction.contains(keyword))
-                                .or(JPAExpressions.selectOne()
-                                        .from(recipeIngredient)
-                                        .where(recipeIngredient.recipe.recipeId.eq(recipe.recipeId)
-                                                .and(recipeIngredient.ingredientName.contains(keyword)))
-                                        .exists())
+                        keywordMatch(keyword)
                 )
                 .fetchOne();
     }
@@ -55,18 +50,14 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .leftJoin(recipe.ingredients, recipeIngredient).on(recipeIngredient.ingredientName.contains(keyword))
                 .where(
+                        recipe.hiddenYn.eq("N"),
+                        keywordMatch(keyword),
                         ifIdIsNotNullAndGreaterThanZero((recipeId, createdAt) -> recipe.createdAt.lt(createdAt)
                                         .or(recipe.createdAt.eq(createdAt)
                                                 .and(recipe.recipeId.lt(recipeId))),
-                                lastRecipeId, lastCreatedAt),
-                        recipe.hiddenYn.eq("N")
+                                lastRecipeId, lastCreatedAt)
                 )
-                .groupBy(recipe.recipeId)
-                .having(recipe.recipeNm.contains(keyword)
-                        .or(recipe.introduction.contains(keyword))
-                        .or(recipeIngredient.count().gt(0)))
                 .orderBy(recipe.createdAt.desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
@@ -77,16 +68,14 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .leftJoin(recipe.ingredients, recipeIngredient).on(recipeIngredient.ingredientName.contains(keyword))
-                .where(recipe.hiddenYn.eq("N"),
+                .where(
+                        recipe.hiddenYn.eq("N"),
+                        keywordMatch(keyword),
                         ifIdIsNotNullAndGreaterThanZero((recipeId, recipeScrapCnt) -> recipe.scrapCnt.lt(recipeScrapCnt)
                                         .or(recipe.scrapCnt.eq(recipeScrapCnt)
                                                 .and(recipe.recipeId.lt(recipeId))),
-                                lastRecipeId, lastRecipeScrapCnt))
-                .groupBy(recipe.recipeId)
-                .having(recipe.recipeNm.contains(keyword)
-                        .or(recipe.introduction.contains(keyword))
-                        .or(recipeIngredient.count().gt(0)))
+                                lastRecipeId, lastRecipeScrapCnt)
+                )
                 .orderBy(recipe.scrapCnt.desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
@@ -97,19 +86,26 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
 
         return queryFactory
                 .selectFrom(recipe)
-                .leftJoin(recipe.ingredients, recipeIngredient).on(recipeIngredient.ingredientName.contains(keyword))
-                .where(recipe.hiddenYn.eq("N"),
+                .where(
+                        recipe.hiddenYn.eq("N"),
+                        keywordMatch(keyword),
                         ifIdIsNotNullAndGreaterThanZero((recipeId, recipeViewCnt) -> recipe.viewCnt.lt(recipeViewCnt)
                                         .or(recipe.viewCnt.eq(recipeViewCnt)
                                                 .and(recipe.recipeId.lt(recipeId))),
-                                lastRecipeId, lastRecipeViewCnt))
-                .groupBy(recipe.recipeId)
-                .having(recipe.recipeNm.contains(keyword)
-                        .or(recipe.introduction.contains(keyword))
-                        .or(recipeIngredient.count().gt(0)))
+                                lastRecipeId, lastRecipeViewCnt)
+                )
                 .orderBy(recipe.viewCnt.desc(), recipe.recipeId.desc())
                 .limit(size)
                 .fetch();
+    }
+
+    private com.querydsl.core.types.dsl.BooleanExpression keywordMatch(String keyword) {
+        return matchAgainst(recipe.searchTokens, keyword)
+                .or(JPAExpressions.selectOne()
+                        .from(recipeIngredient)
+                        .where(recipeIngredient.recipe.recipeId.eq(recipe.recipeId)
+                                .and(matchAgainst(recipeIngredient.searchTokens, keyword)))
+                        .exists());
     }
 
     @Override

@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
 import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
@@ -42,15 +43,20 @@ public class RecipeSearchService {
 
         badWordFiltering.check(keyword);
 
-        long totalCnt = recipeRepository.countByKeyword(keyword);
+        String booleanQuery = SearchKeywordNormalizer.toBooleanModeQuery(keyword);
+        if (booleanQuery == null) {
+            return getRecipes(user, 0L, new Recipes(List.of()));
+        }
+
+        long totalCnt = recipeRepository.countByKeyword(booleanQuery);
 
         List<Recipe> recipes;
         if (sort.equals("scraps")) {
-            recipes = findByKeywordOrderByRecipeScrapCnt(keyword, lastRecipeId, size);
+            recipes = findByKeywordOrderByRecipeScrapCnt(booleanQuery, lastRecipeId, size);
         } else if (sort.equals("views")) {
-            recipes = findByKeywordOrderByRecipeViewCnt(keyword, lastRecipeId, size);
+            recipes = findByKeywordOrderByRecipeViewCnt(booleanQuery, lastRecipeId, size);
         } else {
-            recipes = findByKeywordOrderByCreatedAt(keyword, lastRecipeId, size);
+            recipes = findByKeywordOrderByCreatedAt(booleanQuery, lastRecipeId, size);
         }
 
         return getRecipes(user, totalCnt, new Recipes(recipes));

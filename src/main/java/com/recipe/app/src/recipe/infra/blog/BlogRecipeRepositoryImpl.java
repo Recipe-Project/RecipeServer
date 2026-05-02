@@ -9,7 +9,8 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.recipe.app.src.common.utils.QueryUtils.*;
+import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
+import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.recipe.domain.blog.QBlogRecipe.blogRecipe;
 import static com.recipe.app.src.recipe.domain.blog.QBlogScrap.blogScrap;
 
@@ -26,8 +27,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
                 .select(blogRecipe.count())
                 .from(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword))
+                        matchAgainst(blogRecipe.searchTokens, keyword)
                 )
                 .fetchOne();
     }
@@ -38,8 +38,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
         return queryFactory
                 .selectFrom(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword))
+                        matchAgainst(blogRecipe.searchTokens, keyword)
                 )
                 .limit(size)
                 .fetch();
@@ -51,8 +50,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
         return queryFactory
                 .selectFrom(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword)),
+                        matchAgainst(blogRecipe.searchTokens, keyword),
                         ifIdIsNotNullAndGreaterThanZero((blogRecipeId, publishedAt) -> blogRecipe.publishedAt.lt(publishedAt)
                                         .or(blogRecipe.publishedAt.eq(publishedAt)
                                                 .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
@@ -69,8 +67,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
         return queryFactory
                 .selectFrom(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword)),
+                        matchAgainst(blogRecipe.searchTokens, keyword),
                         ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogScrapCnt) -> blogRecipe.scrapCnt.lt(blogScrapCnt)
                                         .or(blogRecipe.scrapCnt.eq(blogScrapCnt)
                                                 .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
@@ -87,8 +84,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
         return queryFactory
                 .selectFrom(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword)),
+                        matchAgainst(blogRecipe.searchTokens, keyword),
                         ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogViewCnt) -> blogRecipe.viewCnt.lt(blogViewCnt)
                                         .or(blogRecipe.viewCnt.eq(blogViewCnt)
                                                 .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),

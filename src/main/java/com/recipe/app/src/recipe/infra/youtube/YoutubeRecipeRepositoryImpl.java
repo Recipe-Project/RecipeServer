@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
+import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeRecipe.youtubeRecipe;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeScrap.youtubeScrap;
 
@@ -25,8 +26,7 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
                 .select(youtubeRecipe.count())
                 .from(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword))
+                        matchAgainst(youtubeRecipe.searchTokens, keyword)
                 )
                 .fetchOne();
     }
@@ -37,8 +37,7 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword))
+                        matchAgainst(youtubeRecipe.searchTokens, keyword)
                 )
                 .limit(size)
                 .fetch();
@@ -50,8 +49,7 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword)),
+                        matchAgainst(youtubeRecipe.searchTokens, keyword),
                         ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, postDate) -> youtubeRecipe.postDate.lt(postDate)
                                         .or(youtubeRecipe.postDate.eq(postDate)
                                                 .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
@@ -68,8 +66,7 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword)),
+                        matchAgainst(youtubeRecipe.searchTokens, keyword),
                         ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeScrapCnt) -> youtubeRecipe.scrapCnt.lt(youtubeScrapCnt)
                                         .or(youtubeRecipe.scrapCnt.eq(youtubeScrapCnt)
                                                 .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
@@ -86,8 +83,7 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword)),
+                        matchAgainst(youtubeRecipe.searchTokens, keyword),
                         ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeViewCnt) -> youtubeRecipe.viewCnt.lt(youtubeViewCnt)
                                         .or(youtubeRecipe.viewCnt.eq(youtubeViewCnt)
                                                 .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),

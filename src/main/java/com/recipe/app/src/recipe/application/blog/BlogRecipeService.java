@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.application.blog;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipes;
@@ -38,15 +39,19 @@ public class BlogRecipeService {
 
         badWordFiltering.check(keyword);
 
-        long totalCnt = blogRecipeRepository.countByKeyword(keyword);
+        String booleanQuery = SearchKeywordNormalizer.toBooleanModeQuery(keyword);
+        if (booleanQuery == null) {
+            return getRecipes(user, 0L, new BlogRecipes(List.of()));
+        }
 
-        List<BlogRecipe> blogRecipes;
+        long totalCnt = blogRecipeRepository.countByKeyword(booleanQuery);
+
         if (totalCnt < MIN_RECIPE_CNT) {
             blogRecipeClientSearchService.searchNaverBlogRecipes(keyword);
         }
 
-        blogRecipes = findByKeywordOrderBy(keyword, lastBlogRecipeId, size, sort);
-        totalCnt = blogRecipeRepository.countByKeyword(keyword);
+        List<BlogRecipe> blogRecipes = findByKeywordOrderBy(booleanQuery, lastBlogRecipeId, size, sort);
+        totalCnt = blogRecipeRepository.countByKeyword(booleanQuery);
 
         return getRecipes(user, totalCnt, new BlogRecipes(blogRecipes));
     }

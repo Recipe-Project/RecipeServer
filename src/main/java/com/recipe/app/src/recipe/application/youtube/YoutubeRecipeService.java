@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.application.youtube;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipes;
@@ -39,7 +40,12 @@ public class YoutubeRecipeService {
 
         badWordFiltering.check(keyword);
 
-        long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
+        String booleanQuery = SearchKeywordNormalizer.toBooleanModeQuery(keyword);
+        if (booleanQuery == null) {
+            return getRecipes(user, 0L, new YoutubeRecipes(List.of()));
+        }
+
+        long totalCnt = youtubeRecipeRepository.countByKeyword(booleanQuery);
 
         if (totalCnt < MIN_RECIPE_CNT) {
             try {
@@ -49,8 +55,8 @@ public class YoutubeRecipeService {
             }
         }
 
-        List<YoutubeRecipe> youtubeRecipes = findByKeywordOrderBy(keyword, lastYoutubeRecipeId, size, sort);
-        totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
+        List<YoutubeRecipe> youtubeRecipes = findByKeywordOrderBy(booleanQuery, lastYoutubeRecipeId, size, sort);
+        totalCnt = youtubeRecipeRepository.countByKeyword(booleanQuery);
 
         return getRecipes(user, totalCnt, new YoutubeRecipes(youtubeRecipes));
     }
