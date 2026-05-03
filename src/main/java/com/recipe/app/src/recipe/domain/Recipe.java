@@ -24,6 +24,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -158,10 +159,12 @@ public class Recipe extends BaseEntity {
         this.hiddenYn = "Y";
     }
 
-    public long calculateIngredientMatchRate(List<String> ingredientNamesInFridge) {
+    public long calculateIngredientMatchRate(Set<String> normalizedFridgeNames) {
+
+        if (ingredients.isEmpty()) return 0;
 
         long ingredientMatchCnt = ingredients.stream()
-                .filter(ingredient -> ingredient.hasInFridge(ingredientNamesInFridge))
+                .filter(ingredient -> ingredient.hasInFridge(normalizedFridgeNames))
                 .count();
 
         return Math.round((double) ingredientMatchCnt / ingredients.size() * 100);

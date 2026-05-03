@@ -8,12 +8,15 @@ import jakarta.persistence.EntityManager;
 import java.time.LocalDateTime;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.querydsl.core.types.dsl.BooleanExpression;
 
 import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
+import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
 import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
@@ -146,11 +149,23 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     @Override
     public List<Recipe> findRecipesInFridge(Collection<String> ingredientNames) {
 
+        if (ingredientNames == null || ingredientNames.isEmpty()) return List.of();
+
+        // OR BOOLEAN MODE 쿼리. "+" 없이 공백 구분이면 토큰 중 하나만 매치되어도 hit.
+        String boolQuery = ingredientNames.stream()
+                .filter(Objects::nonNull)
+                .map(s -> s.toLowerCase().trim())
+                .filter(s -> !s.isEmpty())
+                .distinct()
+                .collect(Collectors.joining(" "));
+
+        if (boolQuery.isEmpty()) return List.of();
+
         return queryFactory
                 .selectFrom(recipe)
                 .join(recipeIngredient).on(recipe.recipeId.eq(recipeIngredient.recipe.recipeId))
                 .where(
-                        (recipeIngredient.ingredientName.in(ingredientNames)),
+                        matchAgainst(recipeIngredient.searchTokens, boolQuery),
                         recipe.hiddenYn.eq("N")
                 )
                 .groupBy(recipe.recipeId)

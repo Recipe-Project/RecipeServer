@@ -304,10 +304,10 @@ class RecipeTest extends Specification {
                 .ingredientName("삼겹살")
                 .build()
 
-        List<String> ingredientNamesInFridge = ["돼지고기", "오리고기", "김치", "소고기"]
+        Set<String> normalizedFridge = ["돼지고기", "오리고기", "김치", "소고기"] as Set
 
         when:
-        long result = recipe.calculateIngredientMatchRate(ingredientNamesInFridge)
+        long result = recipe.calculateIngredientMatchRate(normalizedFridge)
 
         then:
         result == 43

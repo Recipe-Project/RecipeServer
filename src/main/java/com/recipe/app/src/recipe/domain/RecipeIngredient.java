@@ -19,7 +19,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.util.StringUtils;
 
-import java.util.List;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -62,17 +62,26 @@ public class RecipeIngredient extends BaseEntity {
             recipe.ingredients.add(this);
         }
         this.ingredientName = ingredientName;
+        this.searchTokens = normalize(ingredientName);
         this.ingredientIconId = ingredientIconId;
         this.quantity = quantity;
         this.unit = unit;
+    }
+
+    private static String normalize(String name) {
+        return name == null ? "" : name.toLowerCase().trim();
     }
 
     void setRecipe(Recipe recipe) {
         this.recipe = recipe;
     }
 
-    public boolean hasInFridge(List<String> ingredientNames) {
-        return ingredientNames.contains(ingredientName);
+    public boolean hasInFridge(Set<String> normalizedFridgeNames) {
+        if (searchTokens == null || searchTokens.isBlank()) return false;
+        for (String token : searchTokens.split(" ")) {
+            if (!token.isEmpty() && normalizedFridgeNames.contains(token)) return true;
+        }
+        return false;
     }
 
     @PrePersist
@@ -80,6 +89,6 @@ public class RecipeIngredient extends BaseEntity {
     private void refreshSearchTokens() {
         // 재료명은 짧고 단일 명사가 대부분이라 nori stopword 정책이 오히려
         // 도메인 단어("갓", "다시다" 등)를 제거해버린다. 단순 정규화로 대체.
-        this.searchTokens = ingredientName == null ? "" : ingredientName.toLowerCase().trim();
+        this.searchTokens = normalize(ingredientName);
     }
 }
