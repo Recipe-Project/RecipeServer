@@ -2,7 +2,6 @@ package com.recipe.app.src.recipe.domain;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
-import com.recipe.app.src.common.utils.KoreanTokenizer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -79,6 +78,8 @@ public class RecipeIngredient extends BaseEntity {
     @PrePersist
     @PreUpdate
     private void refreshSearchTokens() {
-        this.searchTokens = KoreanTokenizer.tokenize(ingredientName);
+        // 재료명은 짧고 단일 명사가 대부분이라 nori stopword 정책이 오히려
+        // 도메인 단어("갓", "다시다" 등)를 제거해버린다. 단순 정규화로 대체.
+        this.searchTokens = ingredientName == null ? "" : ingredientName.toLowerCase().trim();
     }
 }
