@@ -44,49 +44,50 @@ public class YoutubeRecipeClientSearchService {
     }
 
     @CircuitBreaker(name = "recipe-youtube-search", fallbackMethod = "fallback")
-    public void searchYoutube(String keyword) throws IOException {
+    public void searchYoutube(String keyword) {
 
         log.info("youtube search api call");
 
-        YouTube youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
-            public void initialize(HttpRequest request) throws IOException {
+        try {
+            YouTube youtube = new YouTube.Builder(HTTP_TRANSPORT, JSON_FACTORY, new HttpRequestInitializer() {
+                public void initialize(HttpRequest request) {
+                }
+            }).setApplicationName("youtube-cmdline-search-sample").build();
+
+            YouTube.Search.List search = youtube.search().list("id,snippet");
+
+            search.setKey(youtubeApiKey);
+            search.setQ(keyword + " 레시피");
+            search.setType("video");
+            search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
+            search.setFields(YOUTUBE_SEARCH_FIELDS);
+
+            SearchListResponse searchResponse = search.execute();
+            List<SearchResult> searchResultList = searchResponse.getItems();
+
+            List<YoutubeRecipe> youtubeRecipes = new ArrayList<>();
+            if (searchResultList != null) {
+                for (SearchResult rid : searchResultList) {
+                    youtubeRecipes.add(YoutubeRecipe.builder()
+                            .title(rid.getSnippet().getTitle())
+                            .description(rid.getSnippet().getDescription())
+                            .thumbnailImgUrl(rid.getSnippet().getThumbnails().getDefault().getUrl())
+                            .postDate(LocalDate.ofInstant(Instant.ofEpochMilli(rid.getSnippet().getPublishedAt().getValue()), ZoneId.systemDefault()))
+                            .channelName(rid.getSnippet().getChannelTitle())
+                            .youtubeId(rid.getId().getVideoId())
+                            .build());
+                }
             }
-        }).setApplicationName("youtube-cmdline-search-sample").build();
 
-        // Define the API request for retrieving search results.
-        YouTube.Search.List search = youtube.search().list("id,snippet");
-
-        search.setKey(youtubeApiKey);
-        search.setQ(keyword + " 레시피");
-        search.setType("video");
-        search.setMaxResults(NUMBER_OF_VIDEOS_RETURNED);
-        search.setFields(YOUTUBE_SEARCH_FIELDS);
-
-        SearchListResponse searchResponse = search.execute();
-        List<SearchResult> searchResultList = searchResponse.getItems();
-
-        List<YoutubeRecipe> youtubeRecipes = new ArrayList<>();
-        if (searchResultList != null) {
-            for (SearchResult rid : searchResultList) {
-                youtubeRecipes.add(YoutubeRecipe.builder()
-                        .title(rid.getSnippet().getTitle())
-                        .description(rid.getSnippet().getDescription())
-                        .thumbnailImgUrl(rid.getSnippet().getThumbnails().getDefault().getUrl())
-                        .postDate(LocalDate.ofInstant(Instant.ofEpochMilli(rid.getSnippet().getPublishedAt().getValue()), ZoneId.systemDefault()))
-                        .channelName(rid.getSnippet().getChannelTitle())
-                        .youtubeId(rid.getId().getVideoId())
-                        .build());
-            }
+            createYoutubeRecipes(youtubeRecipes);
+        } catch (IOException e) {
+            throw new IllegalStateException("youtube search api failed", e);
         }
-
-        createYoutubeRecipes(youtubeRecipes);
     }
 
-    public List<YoutubeRecipe> fallback(String keyword, int size, Exception e) {
+    public void fallback(String keyword, Throwable e) {
 
-        log.info("fallback call - " + e.getMessage());
-
-        return youtubeRecipeRepository.findByKeywordLimit(keyword, size);
+        log.warn("youtube search fallback - keyword={}, cause={}", keyword, e.getMessage());
     }
 
     private void createYoutubeRecipes(List<YoutubeRecipe> youtubeRecipes) {

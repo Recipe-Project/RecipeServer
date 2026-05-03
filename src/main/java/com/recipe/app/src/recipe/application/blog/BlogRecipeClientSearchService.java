@@ -53,11 +53,9 @@ public class BlogRecipeClientSearchService {
         blogRecipeThumbnailCrawlingService.saveThumbnails(newlyInserted);
     }
 
-    public List<BlogRecipe> fallback(String keyword, int size, Exception e) {
+    public void fallback(String keyword, Throwable e) {
 
-        log.info("fallback call - " + e.getMessage());
-
-        return blogRecipeRepository.findByKeywordLimit(keyword, size);
+        log.warn("naver blog search fallback - keyword={}, cause={}", keyword, e.getMessage());
     }
 
     private List<BlogRecipe> createBlogRecipes(List<BlogRecipe> blogRecipes) {

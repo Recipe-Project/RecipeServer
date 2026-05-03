@@ -8,14 +8,11 @@ import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipes;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap;
 import com.recipe.app.src.recipe.infra.youtube.YoutubeRecipeRepository;
 import com.recipe.app.src.user.domain.User;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 
-@Slf4j
 @Service
 public class YoutubeRecipeService {
 
@@ -48,11 +45,7 @@ public class YoutubeRecipeService {
         long totalCnt = youtubeRecipeRepository.countByKeyword(booleanQuery);
 
         if (totalCnt < MIN_RECIPE_CNT) {
-            try {
-                youtubeRecipeClientSearchService.searchYoutube(keyword);
-            } catch (IOException e) {
-                log.warn("youtube search api call failed - {}", e.getMessage());
-            }
+            youtubeRecipeClientSearchService.searchYoutube(keyword);
         }
 
         List<YoutubeRecipe> youtubeRecipes = findByKeywordOrderBy(booleanQuery, lastYoutubeRecipeId, size, sort);
