@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
@@ -43,44 +44,44 @@ public class RecipeSearchService {
 
         badWordFiltering.check(keyword);
 
-        String booleanQuery = SearchKeywordNormalizer.toBooleanModeQuery(keyword);
-        if (booleanQuery == null) {
+        SearchQuery query = SearchKeywordNormalizer.normalize(keyword);
+        if (query instanceof SearchQuery.Empty) {
             return getRecipes(user, 0L, new Recipes(List.of()));
         }
 
-        long totalCnt = recipeRepository.countByKeyword(booleanQuery);
+        long totalCnt = recipeRepository.countByKeyword(query);
 
         List<Recipe> recipes;
         if (sort.equals("scraps")) {
-            recipes = findByKeywordOrderByRecipeScrapCnt(booleanQuery, lastRecipeId, size);
+            recipes = findByKeywordOrderByRecipeScrapCnt(query, lastRecipeId, size);
         } else if (sort.equals("views")) {
-            recipes = findByKeywordOrderByRecipeViewCnt(booleanQuery, lastRecipeId, size);
+            recipes = findByKeywordOrderByRecipeViewCnt(query, lastRecipeId, size);
         } else {
-            recipes = findByKeywordOrderByCreatedAt(booleanQuery, lastRecipeId, size);
+            recipes = findByKeywordOrderByCreatedAt(query, lastRecipeId, size);
         }
 
         return getRecipes(user, totalCnt, new Recipes(recipes));
     }
 
-    private List<Recipe> findByKeywordOrderByRecipeScrapCnt(String keyword, long lastRecipeId, int size) {
+    private List<Recipe> findByKeywordOrderByRecipeScrapCnt(SearchQuery query, long lastRecipeId, int size) {
 
         long recipeScrapCnt = recipeScrapService.countByRecipeId(lastRecipeId);
 
-        return recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(keyword, lastRecipeId, recipeScrapCnt, size);
+        return recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(query, lastRecipeId, recipeScrapCnt, size);
     }
 
-    private List<Recipe> findByKeywordOrderByRecipeViewCnt(String keyword, long lastRecipeId, int size) {
+    private List<Recipe> findByKeywordOrderByRecipeViewCnt(SearchQuery query, long lastRecipeId, int size) {
 
         long recipeViewCnt = recipeViewService.countByRecipeId(lastRecipeId);
 
-        return recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(keyword, lastRecipeId, recipeViewCnt, size);
+        return recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(query, lastRecipeId, recipeViewCnt, size);
     }
 
-    private List<Recipe> findByKeywordOrderByCreatedAt(String keyword, long lastRecipeId, int size) {
+    private List<Recipe> findByKeywordOrderByCreatedAt(SearchQuery query, long lastRecipeId, int size) {
 
         Recipe recipe = recipeRepository.findById(lastRecipeId).orElse(null);
 
-        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, recipe != null ? recipe.getCreatedAt() : null, size);
+        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(query, lastRecipeId, recipe != null ? recipe.getCreatedAt() : null, size);
     }
 
     @Transactional(readOnly = true)

@@ -34,7 +34,7 @@ class BlogRecipeServiceTest extends Specification {
         int size = 2
         String sort = "scraps"
 
-        blogRecipeRepository.countByKeyword(_ as String) >> 20
+        blogRecipeRepository.countByKeyword(_) >> 20
 
         blogScrapService.countByBlogRecipeId(lastBlogRecipeId) >> 0
 
@@ -63,7 +63,7 @@ class BlogRecipeServiceTest extends Specification {
                         .build(),
         ]
 
-        blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(_ as String, lastBlogRecipeId, 0, size) >> blogRecipes
+        blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(_, lastBlogRecipeId, 0, size) >> blogRecipes
 
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()
@@ -104,7 +104,7 @@ class BlogRecipeServiceTest extends Specification {
         int size = 2
         String sort = "views"
 
-        blogRecipeRepository.countByKeyword(_ as String) >> 20
+        blogRecipeRepository.countByKeyword(_) >> 20
 
         blogViewService.countByBlogRecipeId(lastBlogRecipeId) >> 0
 
@@ -133,7 +133,7 @@ class BlogRecipeServiceTest extends Specification {
                         .build(),
         ]
 
-        blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(_ as String, lastBlogRecipeId, 0, size) >> blogRecipes
+        blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(_, lastBlogRecipeId, 0, size) >> blogRecipes
 
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()
@@ -174,7 +174,7 @@ class BlogRecipeServiceTest extends Specification {
         int size = 2
         String sort = "newest"
 
-        blogRecipeRepository.countByKeyword(_ as String) >> 20
+        blogRecipeRepository.countByKeyword(_) >> 20
 
         List<BlogRecipe> blogRecipes = [
                 BlogRecipe.builder()
@@ -203,7 +203,7 @@ class BlogRecipeServiceTest extends Specification {
 
         blogRecipeRepository.findById(lastBlogRecipeId) >> Optional.empty()
 
-        blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(_ as String, lastBlogRecipeId, null, size) >> blogRecipes
+        blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(_, lastBlogRecipeId, null, size) >> blogRecipes
 
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()

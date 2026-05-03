@@ -10,8 +10,11 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
+import com.querydsl.core.types.dsl.BooleanExpression;
+
 import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
-import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
+import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
 import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
 import static com.recipe.app.src.recipe.domain.QRecipeScrap.recipeScrap;
@@ -34,25 +37,25 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     }
 
     @Override
-    public Long countByKeyword(String keyword) {
+    public Long countByKeyword(SearchQuery query) {
         return queryFactory
                 .select(recipe.recipeId.countDistinct())
                 .from(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
-                        keywordMatch(keyword)
+                        keywordMatch(query)
                 )
                 .fetchOne();
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(String keyword, Long lastRecipeId, LocalDateTime lastCreatedAt, int size) {
+    public List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(SearchQuery query, Long lastRecipeId, LocalDateTime lastCreatedAt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
-                        keywordMatch(keyword),
+                        keywordMatch(query),
                         ifIdIsNotNullAndGreaterThanZero((recipeId, createdAt) -> recipe.createdAt.lt(createdAt)
                                         .or(recipe.createdAt.eq(createdAt)
                                                 .and(recipe.recipeId.lt(recipeId))),
@@ -64,13 +67,13 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(String keyword, Long lastRecipeId, long lastRecipeScrapCnt, int size) {
+    public List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(SearchQuery query, Long lastRecipeId, long lastRecipeScrapCnt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
-                        keywordMatch(keyword),
+                        keywordMatch(query),
                         ifIdIsNotNullAndGreaterThanZero((recipeId, recipeScrapCnt) -> recipe.scrapCnt.lt(recipeScrapCnt)
                                         .or(recipe.scrapCnt.eq(recipeScrapCnt)
                                                 .and(recipe.recipeId.lt(recipeId))),
@@ -82,13 +85,13 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(String keyword, Long lastRecipeId, long lastRecipeViewCnt, int size) {
+    public List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(SearchQuery query, Long lastRecipeId, long lastRecipeViewCnt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
-                        keywordMatch(keyword),
+                        keywordMatch(query),
                         ifIdIsNotNullAndGreaterThanZero((recipeId, recipeViewCnt) -> recipe.viewCnt.lt(recipeViewCnt)
                                         .or(recipe.viewCnt.eq(recipeViewCnt)
                                                 .and(recipe.recipeId.lt(recipeId))),
@@ -99,12 +102,12 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .fetch();
     }
 
-    private com.querydsl.core.types.dsl.BooleanExpression keywordMatch(String keyword) {
-        return matchAgainst(recipe.searchTokens, keyword)
+    private BooleanExpression keywordMatch(SearchQuery query) {
+        return matchSearchQuery(recipe.searchTokens, query)
                 .or(JPAExpressions.selectOne()
                         .from(recipeIngredient)
                         .where(recipeIngredient.recipe.recipeId.eq(recipe.recipeId)
-                                .and(matchAgainst(recipeIngredient.searchTokens, keyword)))
+                                .and(matchSearchQuery(recipeIngredient.searchTokens, query)))
                         .exists());
     }
 
