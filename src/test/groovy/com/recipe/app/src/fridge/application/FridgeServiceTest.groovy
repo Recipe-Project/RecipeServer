@@ -11,6 +11,7 @@ import com.recipe.app.src.fridgeBasket.application.FridgeBasketService
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket
 import com.recipe.app.src.ingredient.application.IngredientCategoryService
 import com.recipe.app.src.ingredient.application.IngredientService
+import com.recipe.app.src.ingredient.application.IngredientSynonymCache
 import com.recipe.app.src.ingredient.domain.Ingredient
 import com.recipe.app.src.ingredient.domain.IngredientCategory
 import com.recipe.app.src.user.domain.User
@@ -24,7 +25,8 @@ class FridgeServiceTest extends Specification {
     private FridgeBasketService fridgeBasketService = Mock()
     private IngredientService ingredientService = Mock()
     private IngredientCategoryService ingredientCategoryService = Mock()
-    private FridgeService fridgeService = new FridgeService(fridgeRepository, fridgeBasketService, ingredientService, ingredientCategoryService)
+    private IngredientSynonymCache ingredientSynonymCache = Mock()
+    private FridgeService fridgeService = new FridgeService(fridgeRepository, fridgeBasketService, ingredientService, ingredientCategoryService, ingredientSynonymCache)
 
     def "냉장고 생성"() {
 
@@ -585,11 +587,14 @@ class FridgeServiceTest extends Specification {
 
         ingredientService.findByIngredientIds(fridges.ingredientId) >> ingredients
 
+        ingredientSynonymCache.expand(_) >> (["재료1", "재료2"] as Set)
+
         when:
         List<String> result = fridgeService.findIngredientNamesInFridge(userId)
 
         then:
-        result == ["재료1", "재료2"]
+        result.size() == 2
+        result.containsAll(["재료1", "재료2"])
     }
 
     def "유저 아이디와 재료 아이디로 냉장고 삭제"() {
