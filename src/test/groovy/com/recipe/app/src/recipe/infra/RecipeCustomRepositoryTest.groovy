@@ -1,5 +1,7 @@
 package com.recipe.app.src.recipe.infra
 
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery
 import com.recipe.app.src.recipe.domain.Recipe
 import com.recipe.app.src.recipe.domain.RecipeIngredient
 import com.recipe.app.src.recipe.domain.RecipeLevel
@@ -217,7 +219,7 @@ class RecipeCustomRepositoryTest extends Specification {
         recipeRepository.saveAll(recipes);
 
         when:
-        long response = recipeRepository.countByKeyword("테스트");
+        long response = recipeRepository.countByKeyword(SearchKeywordNormalizer.normalize("테스트"));
 
         then:
         response == 3
@@ -266,7 +268,7 @@ class RecipeCustomRepositoryTest extends Specification {
         recipeRepository.saveAll(recipes);
 
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc("테스트", 0L, recipes.createdAt.max().plusMinutes(1), 3);
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(SearchKeywordNormalizer.normalize("테스트"), 0L, recipes.createdAt.max().plusMinutes(1), 3);
 
         then:
         response.size() == 3
@@ -322,7 +324,7 @@ class RecipeCustomRepositoryTest extends Specification {
         recipeRepository.saveAll(recipes);
 
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc("테스트", recipes.get(2).recipeId, 2, 3);
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), recipes.get(2).recipeId, 2, 3);
 
         then:
         response.size() == 2
@@ -376,7 +378,7 @@ class RecipeCustomRepositoryTest extends Specification {
         recipeRepository.saveAll(recipes);
 
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc("테스트", recipes.get(2).recipeId, 2, 3);
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), recipes.get(2).recipeId, 2, 3);
 
         then:
         response.size() == 2
@@ -519,5 +521,62 @@ class RecipeCustomRepositoryTest extends Specification {
         then:
         response.size() == 2
         response.recipeId == [recipes.get(0).recipeId, recipes.get(2).recipeId]
+    }
+
+    def "1글자 ExactToken 검색은 단어 경계 정확 매칭만 매치한다 (재료명 기준)"() {
+
+        given:
+        List<Recipe> recipes = [
+                Recipe.builder()
+                        .recipeNm("음식1")
+                        .introduction("설명1")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(false)
+                        .build(),
+                Recipe.builder()
+                        .recipeNm("음식2")
+                        .introduction("설명2")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(false)
+                        .build(),
+                Recipe.builder()
+                        .recipeNm("음식3")
+                        .introduction("설명3")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(false)
+                        .build(),
+        ]
+
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("갓")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("감자")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(2))
+                .ingredientName("감자전")
+                .build()
+
+        recipeRepository.saveAll(recipes)
+
+        when: "1글자 정확 매칭"
+        SearchQuery query = SearchKeywordNormalizer.normalize(input)
+        long count = recipeRepository.countByKeyword(query)
+
+        then:
+        query instanceof SearchQuery.ExactToken
+        count == expected
+
+        where:
+        input || expected
+        "갓"   || 1L  // RecipeIngredient '갓' 정확 매치
+        "감"   || 0L  // 어떤 재료도 정확히 '감' 이 아님 ('감자','감자전' 매치 안 됨)
+        "자"   || 0L  // 어떤 재료도 정확히 '자' 가 아님
     }
 }

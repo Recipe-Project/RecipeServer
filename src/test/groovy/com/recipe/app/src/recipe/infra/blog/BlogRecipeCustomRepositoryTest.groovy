@@ -1,5 +1,7 @@
 package com.recipe.app.src.recipe.infra.blog
 
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe
 import com.recipe.app.src.recipe.domain.blog.BlogScrap
 import com.recipe.app.src.user.domain.User
@@ -61,7 +63,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
         blogRecipeRepository.saveAll(blogRecipes);
 
         when:
-        long response = blogRecipeRepository.countByKeyword("테스트");
+        long response = blogRecipeRepository.countByKeyword(SearchKeywordNormalizer.normalize("테스트"));
 
         then:
         response == 2
@@ -108,7 +110,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
 
         when:
         BlogRecipe lastBlogRecipe = blogRecipes.get(1);
-        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc("테스트", lastBlogRecipe.getBlogRecipeId(), lastBlogRecipe.getPublishedAt(), 3);
+        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(SearchKeywordNormalizer.normalize("테스트"), lastBlogRecipe.getBlogRecipeId(), lastBlogRecipe.getPublishedAt(), 3);
 
         then:
         response.size() == 2
@@ -176,7 +178,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
         blogRecipeRepository.saveAll(blogRecipes);
 
         when:
-        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc("테스트", blogRecipes.get(3).blogRecipeId, 3, 3);
+        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), blogRecipes.get(3).blogRecipeId, 3, 3);
 
         then:
         response.size() == 2
@@ -240,7 +242,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
         blogRecipeRepository.saveAll(blogRecipes);
 
         when:
-        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc("테스트", blogRecipes.get(3).blogRecipeId, 2, 3);
+        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), blogRecipes.get(3).blogRecipeId, 2, 3);
 
         then:
         response.size() == 2
@@ -312,5 +314,44 @@ class BlogRecipeCustomRepositoryTest extends Specification {
         response.size() == 2
         response.get(0).blogRecipeId == blogRecipes.get(3).blogRecipeId
         response.get(1).blogRecipeId == blogRecipes.get(0).blogRecipeId
+    }
+
+    def "1글자 ExactToken 검색은 단어 경계 정확 매칭만 매치한다"() {
+
+        given:
+        // searchTokens 는 nori 토큰화 결과. title="갓" 인 row 만 1글자 토큰 "갓" 보유.
+        // title="갓김치" 는 토큰이 "갓김치" (사전에 있으면 단일 토큰) 또는 "갓 김치" 로 분해될 수 있음 — 어느 쪽이든 "갓" 정확 토큰은 없으면 매치 안 됨
+        List<BlogRecipe> blogRecipes = [
+                BlogRecipe.builder()
+                        .title("갓")
+                        .description("재료 갓 설명")
+                        .publishedAt(LocalDate.of(2024, 1, 1))
+                        .blogUrl("http://naver.com/exact1")
+                        .blogThumbnailImgUrl("http://test.jpg")
+                        .blogName("테스트")
+                        .build(),
+                BlogRecipe.builder()
+                        .title("감자")
+                        .description("감자 요리")
+                        .publishedAt(LocalDate.of(2024, 1, 1))
+                        .blogUrl("http://naver.com/exact2")
+                        .blogThumbnailImgUrl("http://test.jpg")
+                        .blogName("테스트")
+                        .build(),
+        ]
+        blogRecipeRepository.saveAll(blogRecipes)
+
+        when: "1글자 정확 매칭"
+        SearchQuery query = SearchKeywordNormalizer.normalize(input)
+        long count = blogRecipeRepository.countByKeyword(query)
+
+        then:
+        query instanceof SearchQuery.ExactToken
+        count == expected
+
+        where:
+        input || expected
+        "갓"   || 1L  // title="갓" 인 row 만 매치 ('감자'에는 "갓" 토큰 없음)
+        "자"   || 0L  // 어떤 토큰도 정확히 '자' 가 아님
     }
 }

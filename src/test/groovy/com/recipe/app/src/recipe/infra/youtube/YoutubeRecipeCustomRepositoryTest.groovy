@@ -1,5 +1,7 @@
 package com.recipe.app.src.recipe.infra.youtube
 
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap
 import com.recipe.app.src.user.domain.User
@@ -69,7 +71,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         youtubeRecipeRepository.saveAll(youtubeRecipes);
 
         when:
-        long response = youtubeRecipeRepository.countByKeyword("테스트");
+        long response = youtubeRecipeRepository.countByKeyword(SearchKeywordNormalizer.normalize("테스트"));
 
         then:
         response == 3
@@ -116,7 +118,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
 
         when:
         YoutubeRecipe lastYoutubeRecipe = youtubeRecipes.get(1);
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc("테스트", lastYoutubeRecipe.youtubeRecipeId, lastYoutubeRecipe.postDate, 3);
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(SearchKeywordNormalizer.normalize("테스트"), lastYoutubeRecipe.youtubeRecipeId, lastYoutubeRecipe.postDate, 3);
 
         then:
         response.size() == 2
@@ -180,7 +182,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         youtubeRecipeRepository.saveAll(youtubeRecipes);
 
         when:
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc("테스트", youtubeRecipes.get(3).youtubeRecipeId, 2, 3);
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), youtubeRecipes.get(3).youtubeRecipeId, 2, 3);
 
         then:
         response.size() == 2
@@ -244,7 +246,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         youtubeRecipeRepository.saveAll(youtubeRecipes);
 
         when:
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc("테스트", youtubeRecipes.get(3).youtubeRecipeId, 2, 3)
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), youtubeRecipes.get(3).youtubeRecipeId, 2, 3)
 
         then:
         response.size() == 2
@@ -321,5 +323,42 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         response.get(0).youtubeRecipeId == youtubeRecipes.get(3).youtubeRecipeId
         response.get(1).youtubeRecipeId == youtubeRecipes.get(2).youtubeRecipeId
         response.get(2).youtubeRecipeId == youtubeRecipes.get(0).youtubeRecipeId
+    }
+
+    def "1글자 ExactToken 검색은 단어 경계 정확 매칭만 매치한다"() {
+
+        given:
+        List<YoutubeRecipe> youtubeRecipes = [
+                YoutubeRecipe.builder()
+                        .title("갓")
+                        .description("재료 갓 설명")
+                        .postDate(LocalDate.of(2024, 1, 1))
+                        .channelName("테스트")
+                        .youtubeId("yt-exact-1")
+                        .thumbnailImgUrl("http://test.jpg")
+                        .build(),
+                YoutubeRecipe.builder()
+                        .title("감자")
+                        .description("감자 요리")
+                        .postDate(LocalDate.of(2024, 1, 1))
+                        .channelName("테스트")
+                        .youtubeId("yt-exact-2")
+                        .thumbnailImgUrl("http://test.jpg")
+                        .build(),
+        ]
+        youtubeRecipeRepository.saveAll(youtubeRecipes)
+
+        when: "1글자 정확 매칭"
+        SearchQuery query = SearchKeywordNormalizer.normalize(input)
+        long count = youtubeRecipeRepository.countByKeyword(query)
+
+        then:
+        query instanceof SearchQuery.ExactToken
+        count == expected
+
+        where:
+        input || expected
+        "갓"   || 1L  // title="갓" 인 row 만 매치
+        "자"   || 0L  // 어떤 토큰도 정확히 '자' 가 아님
     }
 }
