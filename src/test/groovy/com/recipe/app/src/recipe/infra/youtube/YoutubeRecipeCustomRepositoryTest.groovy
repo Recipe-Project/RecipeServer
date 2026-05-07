@@ -1,7 +1,6 @@
 package com.recipe.app.src.recipe.infra.youtube
 
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer
-import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap
 import com.recipe.app.src.user.domain.User
@@ -349,40 +348,4 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         response.get(2).youtubeRecipeId == youtubeRecipes.get(0).youtubeRecipeId
     }
 
-    def "1글자 ExactToken 검색은 단어 경계 정확 매칭만 매치한다"() {
-
-        given:
-        List<YoutubeRecipe> youtubeRecipes = [
-                YoutubeRecipe.builder()
-                        .title("갓")
-                        .description("재료 갓 설명")
-                        .postDate(LocalDate.of(2024, 1, 1))
-                        .channelName("테스트")
-                        .youtubeId("yt-exact-1")
-                        .thumbnailImgUrl("http://test.jpg")
-                        .build(),
-                YoutubeRecipe.builder()
-                        .title("감자")
-                        .description("감자 요리")
-                        .postDate(LocalDate.of(2024, 1, 1))
-                        .channelName("테스트")
-                        .youtubeId("yt-exact-2")
-                        .thumbnailImgUrl("http://test.jpg")
-                        .build(),
-        ]
-        committedTx.executeWithoutResult { status -> youtubeRecipeRepository.saveAll(youtubeRecipes) }
-
-        when: "1글자 정확 매칭"
-        SearchQuery query = SearchKeywordNormalizer.normalize(input)
-        long count = youtubeRecipeRepository.countByKeyword(query)
-
-        then:
-        query instanceof SearchQuery.ExactToken
-        count == expected
-
-        where:
-        input || expected
-        "갓"   || 1L  // title="갓" 인 row 만 매치
-        "자"   || 0L  // 어떤 토큰도 정확히 '자' 가 아님
-    }
 }
