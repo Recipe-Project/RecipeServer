@@ -13,10 +13,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.cloud.openfeign.FeignAutoConfiguration
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.TransactionDefinition
+import org.springframework.transaction.support.TransactionTemplate
 import spock.lang.Specification
 
 import java.time.LocalDate
 
+// InnoDB FULLTEXT 가시성 한계: 같은 트랜잭션 안에서 INSERT 한 row 는
+// MATCH AGAINST 결과로 잡히지 않음 (FT 캐시 → 커밋 시 인덱스로 머지).
+// @DataJpaTest 디폴트 ROLLBACK 트랜잭션을 우회하려고 INSERT 는 REQUIRES_NEW 로 별도 커밋,
+// cleanup 에서 같은 방식으로 정리.
 @ActiveProfiles("test")
 @DataJpaTest
 @ImportAutoConfiguration(classes = FeignAutoConfiguration.class)
@@ -30,6 +37,23 @@ class BlogRecipeCustomRepositoryTest extends Specification {
     BlogScrapRepository blogScrapRepository;
     @Autowired
     BlogRecipeRepository blogRecipeRepository;
+    @Autowired
+    PlatformTransactionManager transactionManager;
+
+    private TransactionTemplate committedTx;
+
+    void setup() {
+        committedTx = new TransactionTemplate(transactionManager)
+        committedTx.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
+    }
+
+    void cleanup() {
+        committedTx.executeWithoutResult { status ->
+            blogScrapRepository.deleteAll()
+            blogRecipeRepository.deleteAll()
+            userRepository.deleteAll()
+        }
+    }
 
     def "검색어로 블로그 레시피 갯수 조회"() {
 
@@ -60,7 +84,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogName("테스트")
                         .build()
         ]
-        blogRecipeRepository.saveAll(blogRecipes);
+        committedTx.executeWithoutResult { status -> blogRecipeRepository.saveAll(blogRecipes) }
 
         when:
         long response = blogRecipeRepository.countByKeyword(SearchKeywordNormalizer.normalize("테스트"));
@@ -106,7 +130,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogName("테스트")
                         .build()
         ]
-        blogRecipeRepository.saveAll(blogRecipes);
+        committedTx.executeWithoutResult { status -> blogRecipeRepository.saveAll(blogRecipes) }
 
         when:
         BlogRecipe lastBlogRecipe = blogRecipes.get(1);
@@ -135,7 +159,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .nickname("테스터3")
                         .build(),
         ]
-        userRepository.saveAll(users)
+        committedTx.executeWithoutResult { status -> userRepository.saveAll(users) }
 
         List<BlogRecipe> blogRecipes = [
                 BlogRecipe.builder()
@@ -175,7 +199,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .scrapCnt(3L)
                         .build()
         ]
-        blogRecipeRepository.saveAll(blogRecipes);
+        committedTx.executeWithoutResult { status -> blogRecipeRepository.saveAll(blogRecipes) }
 
         when:
         List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), blogRecipes.get(3).blogRecipeId, 3, 3);
@@ -199,7 +223,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .nickname("테스터2")
                         .build(),
         ]
-        userRepository.saveAll(users)
+        committedTx.executeWithoutResult { status -> userRepository.saveAll(users) }
 
         List<BlogRecipe> blogRecipes = [
                 BlogRecipe.builder()
@@ -239,7 +263,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .viewCnt(2L)
                         .build()
         ]
-        blogRecipeRepository.saveAll(blogRecipes);
+        committedTx.executeWithoutResult { status -> blogRecipeRepository.saveAll(blogRecipes) }
 
         when:
         List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), blogRecipes.get(3).blogRecipeId, 2, 3);
@@ -257,7 +281,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                 .socialId("naver_1")
                 .nickname("테스터1")
                 .build();
-        userRepository.save(user);
+        committedTx.executeWithoutResult { status -> userRepository.save(user) }
 
         List<BlogRecipe> blogRecipes = [
                 BlogRecipe.builder()
@@ -293,7 +317,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogName("테스트")
                         .build()
         ]
-        blogRecipeRepository.saveAll(blogRecipes);
+        committedTx.executeWithoutResult { status -> blogRecipeRepository.saveAll(blogRecipes) }
 
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()
@@ -305,7 +329,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogRecipeId(blogRecipes.get(3).blogRecipeId)
                         .build(),
         ]
-        blogScrapRepository.saveAll(blogScraps);
+        committedTx.executeWithoutResult { status -> blogScrapRepository.saveAll(blogScraps) }
 
         when:
         List<BlogRecipe> response = blogRecipeRepository.findUserScrapBlogRecipesLimit(user.userId, 0L, blogScraps.get(0).createdAt.plusHours(1), 3)
@@ -339,7 +363,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogName("테스트")
                         .build(),
         ]
-        blogRecipeRepository.saveAll(blogRecipes)
+        committedTx.executeWithoutResult { status -> blogRecipeRepository.saveAll(blogRecipes) }
 
         when: "1글자 정확 매칭"
         SearchQuery query = SearchKeywordNormalizer.normalize(input)
