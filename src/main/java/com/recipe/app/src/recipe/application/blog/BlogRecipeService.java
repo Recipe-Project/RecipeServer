@@ -1,6 +1,8 @@
 package com.recipe.app.src.recipe.application.blog;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipes;
@@ -38,49 +40,53 @@ public class BlogRecipeService {
 
         badWordFiltering.check(keyword);
 
-        long totalCnt = blogRecipeRepository.countByKeyword(keyword);
+        SearchQuery query = SearchKeywordNormalizer.normalize(keyword);
+        if (query instanceof SearchQuery.Empty) {
+            return getRecipes(user, 0L, new BlogRecipes(List.of()));
+        }
 
-        List<BlogRecipe> blogRecipes;
+        long totalCnt = blogRecipeRepository.countByKeyword(query);
+
         if (totalCnt < MIN_RECIPE_CNT) {
             blogRecipeClientSearchService.searchNaverBlogRecipes(keyword);
         }
 
-        blogRecipes = findByKeywordOrderBy(keyword, lastBlogRecipeId, size, sort);
-        totalCnt = blogRecipeRepository.countByKeyword(keyword);
+        List<BlogRecipe> blogRecipes = findByKeywordOrderBy(query, lastBlogRecipeId, size, sort);
+        totalCnt = blogRecipeRepository.countByKeyword(query);
 
         return getRecipes(user, totalCnt, new BlogRecipes(blogRecipes));
     }
 
-    private List<BlogRecipe> findByKeywordOrderBy(String keyword, long lastBlogRecipeId, int size, String sort) {
+    private List<BlogRecipe> findByKeywordOrderBy(SearchQuery query, long lastBlogRecipeId, int size, String sort) {
 
         if (sort.equals("scraps")) {
-            return findByKeywordOrderByBlogScrapCnt(keyword, lastBlogRecipeId, size);
+            return findByKeywordOrderByBlogScrapCnt(query, lastBlogRecipeId, size);
         } else if (sort.equals("views")) {
-            return findByKeywordOrderByBlogViewCnt(keyword, lastBlogRecipeId, size);
+            return findByKeywordOrderByBlogViewCnt(query, lastBlogRecipeId, size);
         } else {
-            return findByKeywordOrderByPublishedAt(keyword, lastBlogRecipeId, size);
+            return findByKeywordOrderByPublishedAt(query, lastBlogRecipeId, size);
         }
     }
 
-    private List<BlogRecipe> findByKeywordOrderByBlogScrapCnt(String keyword, long lastBlogRecipeId, int size) {
+    private List<BlogRecipe> findByKeywordOrderByBlogScrapCnt(SearchQuery query, long lastBlogRecipeId, int size) {
 
         long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(keyword, lastBlogRecipeId, lastBlogScrapCnt, size);
+        return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(query, lastBlogRecipeId, lastBlogScrapCnt, size);
     }
 
-    private List<BlogRecipe> findByKeywordOrderByBlogViewCnt(String keyword, long lastBlogRecipeId, int size) {
+    private List<BlogRecipe> findByKeywordOrderByBlogViewCnt(SearchQuery query, long lastBlogRecipeId, int size) {
 
         long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(keyword, lastBlogRecipeId, lastBlogViewCnt, size);
+        return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(query, lastBlogRecipeId, lastBlogViewCnt, size);
     }
 
-    private List<BlogRecipe> findByKeywordOrderByPublishedAt(String keyword, long lastBlogRecipeId, int size) {
+    private List<BlogRecipe> findByKeywordOrderByPublishedAt(SearchQuery query, long lastBlogRecipeId, int size) {
 
         BlogRecipe blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElse(null);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(keyword, lastBlogRecipeId, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
+        return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(query, lastBlogRecipeId, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
     }
 
     @Transactional(readOnly = true)

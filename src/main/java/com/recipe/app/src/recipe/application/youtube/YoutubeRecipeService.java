@@ -1,6 +1,8 @@
 package com.recipe.app.src.recipe.application.youtube;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipes;
@@ -10,7 +12,6 @@ import com.recipe.app.src.user.domain.User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.io.IOException;
 import java.util.List;
 
 @Service
@@ -33,53 +34,57 @@ public class YoutubeRecipeService {
     }
 
     @Transactional
-    public RecipesResponse findYoutubeRecipesByKeyword(User user, String keyword, long lastYoutubeRecipeId, int size, String sort) throws IOException {
+    public RecipesResponse findYoutubeRecipesByKeyword(User user, String keyword, long lastYoutubeRecipeId, int size, String sort) {
 
         badWordFiltering.check(keyword);
 
-        long totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
+        SearchQuery query = SearchKeywordNormalizer.normalize(keyword);
+        if (query instanceof SearchQuery.Empty) {
+            return getRecipes(user, 0L, new YoutubeRecipes(List.of()));
+        }
 
-        List<YoutubeRecipe> youtubeRecipes;
+        long totalCnt = youtubeRecipeRepository.countByKeyword(query);
+
         if (totalCnt < MIN_RECIPE_CNT) {
             youtubeRecipeClientSearchService.searchYoutube(keyword);
         }
 
-        youtubeRecipes = findByKeywordOrderBy(keyword, lastYoutubeRecipeId, size, sort);
-        totalCnt = youtubeRecipeRepository.countByKeyword(keyword);
+        List<YoutubeRecipe> youtubeRecipes = findByKeywordOrderBy(query, lastYoutubeRecipeId, size, sort);
+        totalCnt = youtubeRecipeRepository.countByKeyword(query);
 
         return getRecipes(user, totalCnt, new YoutubeRecipes(youtubeRecipes));
     }
 
-    private List<YoutubeRecipe> findByKeywordOrderBy(String keyword, long lastYoutubeRecipeId, int size, String sort) {
+    private List<YoutubeRecipe> findByKeywordOrderBy(SearchQuery query, long lastYoutubeRecipeId, int size, String sort) {
 
         if (sort.equals("scraps")) {
-            return findByKeywordOrderByYoutubeScrapCnt(keyword, lastYoutubeRecipeId, size);
+            return findByKeywordOrderByYoutubeScrapCnt(query, lastYoutubeRecipeId, size);
         } else if (sort.equals("views")) {
-            return findByKeywordOrderByYoutubeViewCnt(keyword, lastYoutubeRecipeId, size);
+            return findByKeywordOrderByYoutubeViewCnt(query, lastYoutubeRecipeId, size);
         } else {
-            return findByKeywordOrderByPostDate(keyword, lastYoutubeRecipeId, size);
+            return findByKeywordOrderByPostDate(query, lastYoutubeRecipeId, size);
         }
     }
 
-    private List<YoutubeRecipe> findByKeywordOrderByYoutubeScrapCnt(String keyword, long lastYoutubeRecipeId, int size) {
+    private List<YoutubeRecipe> findByKeywordOrderByYoutubeScrapCnt(SearchQuery query, long lastYoutubeRecipeId, int size) {
 
         long youtubeScrapCnt = youtubeScrapService.countByYoutubeRecipeId(lastYoutubeRecipeId);
 
-        return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(keyword, lastYoutubeRecipeId, youtubeScrapCnt, size);
+        return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(query, lastYoutubeRecipeId, youtubeScrapCnt, size);
     }
 
-    private List<YoutubeRecipe> findByKeywordOrderByYoutubeViewCnt(String keyword, long lastYoutubeRecipeId, int size) {
+    private List<YoutubeRecipe> findByKeywordOrderByYoutubeViewCnt(SearchQuery query, long lastYoutubeRecipeId, int size) {
 
         long youtubeViewCnt = youtubeViewService.countByYoutubeRecipeId(lastYoutubeRecipeId);
 
-        return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(keyword, lastYoutubeRecipeId, youtubeViewCnt, size);
+        return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(query, lastYoutubeRecipeId, youtubeViewCnt, size);
     }
 
-    private List<YoutubeRecipe> findByKeywordOrderByPostDate(String keyword, long lastYoutubeRecipeId, int size) {
+    private List<YoutubeRecipe> findByKeywordOrderByPostDate(SearchQuery query, long lastYoutubeRecipeId, int size) {
 
         YoutubeRecipe youtubeRecipe = youtubeRecipeRepository.findById(lastYoutubeRecipeId).orElse(null);
 
-        return youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(keyword, lastYoutubeRecipeId, youtubeRecipe != null ? youtubeRecipe.getPostDate() : null, size);
+        return youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(query, lastYoutubeRecipeId, youtubeRecipe != null ? youtubeRecipe.getPostDate() : null, size);
     }
 
     @Transactional(readOnly = true)

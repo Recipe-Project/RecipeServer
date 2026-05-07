@@ -1,7 +1,10 @@
 package com.recipe.app.src.recipe.application;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.fridge.application.FridgeService;
+import com.recipe.app.src.ingredient.application.IngredientSynonymCache;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse;
@@ -26,15 +29,17 @@ public class RecipeSearchService {
     private final BadWordFiltering badWordFiltering;
     private final RecipeScrapService recipeScrapService;
     private final RecipeViewService recipeViewService;
+    private final IngredientSynonymCache ingredientSynonymCache;
 
     public RecipeSearchService(RecipeRepository recipeRepository, FridgeService fridgeService, UserService userService, BadWordFiltering badWordFiltering,
-                               RecipeScrapService recipeScrapService, RecipeViewService recipeViewService) {
+                               RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, IngredientSynonymCache ingredientSynonymCache) {
         this.recipeRepository = recipeRepository;
         this.fridgeService = fridgeService;
         this.userService = userService;
         this.badWordFiltering = badWordFiltering;
         this.recipeScrapService = recipeScrapService;
         this.recipeViewService = recipeViewService;
+        this.ingredientSynonymCache = ingredientSynonymCache;
     }
 
     @Transactional(readOnly = true)
@@ -42,39 +47,44 @@ public class RecipeSearchService {
 
         badWordFiltering.check(keyword);
 
-        long totalCnt = recipeRepository.countByKeyword(keyword);
+        SearchQuery query = SearchKeywordNormalizer.normalize(keyword);
+        if (query instanceof SearchQuery.Empty) {
+            return getRecipes(user, 0L, new Recipes(List.of()));
+        }
+
+        long totalCnt = recipeRepository.countByKeyword(query);
 
         List<Recipe> recipes;
         if (sort.equals("scraps")) {
-            recipes = findByKeywordOrderByRecipeScrapCnt(keyword, lastRecipeId, size);
+            recipes = findByKeywordOrderByRecipeScrapCnt(query, lastRecipeId, size);
         } else if (sort.equals("views")) {
-            recipes = findByKeywordOrderByRecipeViewCnt(keyword, lastRecipeId, size);
+            recipes = findByKeywordOrderByRecipeViewCnt(query, lastRecipeId, size);
         } else {
-            recipes = findByKeywordOrderByCreatedAt(keyword, lastRecipeId, size);
+            recipes = findByKeywordOrderByCreatedAt(query, lastRecipeId, size);
         }
 
         return getRecipes(user, totalCnt, new Recipes(recipes));
     }
 
-    private List<Recipe> findByKeywordOrderByRecipeScrapCnt(String keyword, long lastRecipeId, int size) {
+    private List<Recipe> findByKeywordOrderByRecipeScrapCnt(SearchQuery query, long lastRecipeId, int size) {
 
         long recipeScrapCnt = recipeScrapService.countByRecipeId(lastRecipeId);
 
-        return recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(keyword, lastRecipeId, recipeScrapCnt, size);
+        return recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(query, lastRecipeId, recipeScrapCnt, size);
     }
 
-    private List<Recipe> findByKeywordOrderByRecipeViewCnt(String keyword, long lastRecipeId, int size) {
+    private List<Recipe> findByKeywordOrderByRecipeViewCnt(SearchQuery query, long lastRecipeId, int size) {
 
         long recipeViewCnt = recipeViewService.countByRecipeId(lastRecipeId);
 
-        return recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(keyword, lastRecipeId, recipeViewCnt, size);
+        return recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(query, lastRecipeId, recipeViewCnt, size);
     }
 
-    private List<Recipe> findByKeywordOrderByCreatedAt(String keyword, long lastRecipeId, int size) {
+    private List<Recipe> findByKeywordOrderByCreatedAt(SearchQuery query, long lastRecipeId, int size) {
 
         Recipe recipe = recipeRepository.findById(lastRecipeId).orElse(null);
 
-        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(keyword, lastRecipeId, recipe != null ? recipe.getCreatedAt() : null, size);
+        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(query, lastRecipeId, recipe != null ? recipe.getCreatedAt() : null, size);
     }
 
     @Transactional(readOnly = true)
@@ -171,7 +181,9 @@ public class RecipeSearchService {
     @Transactional(readOnly = true)
     public RecommendedRecipesResponse findPublicRecommendedRecipesByIngredients(List<String> ingredientNames, long lastRecipeId, int size) {
 
-        Recipes recipes = new Recipes(recipeRepository.findRecipesInFridge(ingredientNames));
+        List<String> expandedIngredientNames = List.copyOf(ingredientSynonymCache.expand(ingredientNames));
+
+        Recipes recipes = new Recipes(recipeRepository.findRecipesInFridge(expandedIngredientNames));
 
         List<User> recipePostUsers = userService.findByUserIds(recipes.getUserIds());
 
@@ -181,6 +193,6 @@ public class RecipeSearchService {
 
         User anonymousUser = new User();
 
-        return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, anonymousUser, ingredientNames, lastRecipe, size);
+        return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, anonymousUser, expandedIngredientNames, lastRecipe, size);
     }
 }

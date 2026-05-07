@@ -1,7 +1,7 @@
 package com.recipe.app.src.recipe.infra.blog;
 
 import com.recipe.app.src.common.infra.BaseRepositoryImpl;
-import com.recipe.app.src.common.utils.QueryUtils;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe;
 
 import jakarta.persistence.EntityManager;
@@ -9,7 +9,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.recipe.app.src.common.utils.QueryUtils.*;
+import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
+import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
+import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
 import static com.recipe.app.src.recipe.domain.blog.QBlogRecipe.blogRecipe;
 import static com.recipe.app.src.recipe.domain.blog.QBlogScrap.blogScrap;
 
@@ -20,14 +22,13 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
     }
 
     @Override
-    public Long countByKeyword(String keyword) {
+    public Long countByKeyword(SearchQuery query) {
 
         return queryFactory
                 .select(blogRecipe.count())
                 .from(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword))
+                        matchSearchQuery(blogRecipe.searchTokens, query)
                 )
                 .fetchOne();
     }
@@ -38,21 +39,19 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
         return queryFactory
                 .selectFrom(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword))
+                        matchAgainst(blogRecipe.searchTokens, keyword)
                 )
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<BlogRecipe> findByKeywordLimitOrderByPublishedAtDesc(String keyword, Long lastBlogRecipeId, LocalDate lastBlogRecipePublishedAt, int size) {
+    public List<BlogRecipe> findByKeywordLimitOrderByPublishedAtDesc(SearchQuery query, Long lastBlogRecipeId, LocalDate lastBlogRecipePublishedAt, int size) {
 
         return queryFactory
                 .selectFrom(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword)),
+                        matchSearchQuery(blogRecipe.searchTokens, query),
                         ifIdIsNotNullAndGreaterThanZero((blogRecipeId, publishedAt) -> blogRecipe.publishedAt.lt(publishedAt)
                                         .or(blogRecipe.publishedAt.eq(publishedAt)
                                                 .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
@@ -64,13 +63,12 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
     }
 
     @Override
-    public List<BlogRecipe> findByKeywordLimitOrderByBlogScrapCntDesc(String keyword, Long lastBlogRecipeId, long lastBlogScrapCnt, int size) {
+    public List<BlogRecipe> findByKeywordLimitOrderByBlogScrapCntDesc(SearchQuery query, Long lastBlogRecipeId, long lastBlogScrapCnt, int size) {
 
         return queryFactory
                 .selectFrom(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword)),
+                        matchSearchQuery(blogRecipe.searchTokens, query),
                         ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogScrapCnt) -> blogRecipe.scrapCnt.lt(blogScrapCnt)
                                         .or(blogRecipe.scrapCnt.eq(blogScrapCnt)
                                                 .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),
@@ -82,13 +80,12 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
     }
 
     @Override
-    public List<BlogRecipe> findByKeywordLimitOrderByBlogViewCntDesc(String keyword, Long lastBlogRecipeId, long lastBlogViewCnt, int size) {
+    public List<BlogRecipe> findByKeywordLimitOrderByBlogViewCntDesc(SearchQuery query, Long lastBlogRecipeId, long lastBlogViewCnt, int size) {
 
         return queryFactory
                 .selectFrom(blogRecipe)
                 .where(
-                        blogRecipe.title.contains(keyword)
-                                .or(blogRecipe.description.contains(keyword)),
+                        matchSearchQuery(blogRecipe.searchTokens, query),
                         ifIdIsNotNullAndGreaterThanZero((blogRecipeId, blogViewCnt) -> blogRecipe.viewCnt.lt(blogViewCnt)
                                         .or(blogRecipe.viewCnt.eq(blogViewCnt)
                                                 .and(blogRecipe.blogRecipeId.lt(blogRecipeId))),

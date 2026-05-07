@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.infra.youtube;
 
 import com.recipe.app.src.common.infra.BaseRepositoryImpl;
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
 import jakarta.persistence.EntityManager;
 
@@ -9,6 +10,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
+import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
+import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeRecipe.youtubeRecipe;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeScrap.youtubeScrap;
 
@@ -19,14 +22,13 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
     }
 
     @Override
-    public Long countByKeyword(String keyword) {
+    public Long countByKeyword(SearchQuery query) {
 
         return queryFactory
                 .select(youtubeRecipe.count())
                 .from(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword))
+                        matchSearchQuery(youtubeRecipe.searchTokens, query)
                 )
                 .fetchOne();
     }
@@ -37,21 +39,19 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword))
+                        matchAgainst(youtubeRecipe.searchTokens, keyword)
                 )
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(String keyword, Long lastYoutubeRecipeId, LocalDate lastYoutubeRecipePostDate, int size) {
+    public List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(SearchQuery query, Long lastYoutubeRecipeId, LocalDate lastYoutubeRecipePostDate, int size) {
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword)),
+                        matchSearchQuery(youtubeRecipe.searchTokens, query),
                         ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, postDate) -> youtubeRecipe.postDate.lt(postDate)
                                         .or(youtubeRecipe.postDate.eq(postDate)
                                                 .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
@@ -63,13 +63,12 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
     }
 
     @Override
-    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeScrapCntDesc(String keyword, Long lastYoutubeRecipeId, long lastYoutubeScrapCnt, int size) {
+    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeScrapCntDesc(SearchQuery query, Long lastYoutubeRecipeId, long lastYoutubeScrapCnt, int size) {
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword)),
+                        matchSearchQuery(youtubeRecipe.searchTokens, query),
                         ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeScrapCnt) -> youtubeRecipe.scrapCnt.lt(youtubeScrapCnt)
                                         .or(youtubeRecipe.scrapCnt.eq(youtubeScrapCnt)
                                                 .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
@@ -81,13 +80,12 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
     }
 
     @Override
-    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeViewCntDesc(String keyword, Long lastYoutubeRecipeId, long lastYoutubeViewCnt, int size) {
+    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeViewCntDesc(SearchQuery query, Long lastYoutubeRecipeId, long lastYoutubeViewCnt, int size) {
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
-                        youtubeRecipe.title.contains(keyword)
-                                .or(youtubeRecipe.description.contains(keyword)),
+                        matchSearchQuery(youtubeRecipe.searchTokens, query),
                         ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeViewCnt) -> youtubeRecipe.viewCnt.lt(youtubeViewCnt)
                                         .or(youtubeRecipe.viewCnt.eq(youtubeViewCnt)
                                                 .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),

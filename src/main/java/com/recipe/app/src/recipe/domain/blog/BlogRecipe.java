@@ -2,11 +2,14 @@ package com.recipe.app.src.recipe.domain.blog;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
+import com.recipe.app.src.common.utils.KoreanTokenizer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -52,6 +55,9 @@ public class BlogRecipe extends BaseEntity {
     @Column(name = "viewCnt", nullable = false)
     private long viewCnt;
 
+    @Column(name = "searchTokens", columnDefinition = "TEXT")
+    private String searchTokens;
+
     @Builder
     public BlogRecipe(Long blogRecipeId, String blogUrl, String blogThumbnailImgUrl, String title, String description, LocalDate publishedAt, String blogName, long scrapCnt, long viewCnt) {
 
@@ -86,5 +92,12 @@ public class BlogRecipe extends BaseEntity {
 
     public void changeThumbnail(String blogThumbnailUrl) {
         this.blogThumbnailImgUrl = blogThumbnailUrl;
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void refreshSearchTokens() {
+        String source = (title != null ? title : "") + " " + (description != null ? description : "");
+        this.searchTokens = KoreanTokenizer.tokenize(source);
     }
 }

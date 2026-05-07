@@ -1,5 +1,6 @@
 package com.recipe.app.src.recipe.infra.youtube
 
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe
 import com.recipe.app.src.recipe.domain.youtube.YoutubeScrap
 import com.recipe.app.src.user.domain.User
@@ -11,10 +12,17 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.cloud.openfeign.FeignAutoConfiguration
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.TransactionDefinition
+import org.springframework.transaction.support.TransactionTemplate
 import spock.lang.Specification
 
 import java.time.LocalDate
 
+// InnoDB FULLTEXT 가시성 한계: 같은 트랜잭션 안에서 INSERT 한 row 는
+// MATCH AGAINST 결과로 잡히지 않음 (FT 캐시 → 커밋 시 인덱스로 머지).
+// @DataJpaTest 디폴트 ROLLBACK 트랜잭션을 우회하려고 INSERT 는 REQUIRES_NEW 로 별도 커밋,
+// cleanup 에서 같은 방식으로 정리.
 @ActiveProfiles("test")
 @DataJpaTest
 @ImportAutoConfiguration(classes = FeignAutoConfiguration.class)
@@ -28,6 +36,23 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
     YoutubeRecipeRepository youtubeRecipeRepository;
     @Autowired
     YoutubeScrapRepository youtubeScrapRepository;
+    @Autowired
+    PlatformTransactionManager transactionManager;
+
+    private TransactionTemplate committedTx;
+
+    void setup() {
+        committedTx = new TransactionTemplate(transactionManager)
+        committedTx.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
+    }
+
+    void cleanup() {
+        committedTx.executeWithoutResult { status ->
+            youtubeScrapRepository.deleteAll()
+            youtubeRecipeRepository.deleteAll()
+            userRepository.deleteAll()
+        }
+    }
 
     def "검색어로 유튜브 레시피 갯수 조회"() {
 
@@ -66,10 +91,10 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .thumbnailImgUrl("http://test.jpg")
                         .build(),
         ]
-        youtubeRecipeRepository.saveAll(youtubeRecipes);
+        committedTx.executeWithoutResult { status -> youtubeRecipeRepository.saveAll(youtubeRecipes) }
 
         when:
-        long response = youtubeRecipeRepository.countByKeyword("테스트");
+        long response = youtubeRecipeRepository.countByKeyword(SearchKeywordNormalizer.normalize("테스트"));
 
         then:
         response == 3
@@ -112,11 +137,11 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .thumbnailImgUrl("http://test.jpg")
                         .build(),
         ]
-        youtubeRecipeRepository.saveAll(youtubeRecipes);
+        committedTx.executeWithoutResult { status -> youtubeRecipeRepository.saveAll(youtubeRecipes) }
 
         when:
         YoutubeRecipe lastYoutubeRecipe = youtubeRecipes.get(1);
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc("테스트", lastYoutubeRecipe.youtubeRecipeId, lastYoutubeRecipe.postDate, 3);
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(SearchKeywordNormalizer.normalize("테스트"), lastYoutubeRecipe.youtubeRecipeId, lastYoutubeRecipe.postDate, 3);
 
         then:
         response.size() == 2
@@ -137,7 +162,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .nickname("테스터2")
                         .build(),
         ]
-        userRepository.saveAll(users)
+        committedTx.executeWithoutResult { status -> userRepository.saveAll(users) }
 
         List<YoutubeRecipe> youtubeRecipes = [
                 YoutubeRecipe.builder()
@@ -177,10 +202,10 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .scrapCnt(2L)
                         .build(),
         ]
-        youtubeRecipeRepository.saveAll(youtubeRecipes);
+        committedTx.executeWithoutResult { status -> youtubeRecipeRepository.saveAll(youtubeRecipes) }
 
         when:
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc("테스트", youtubeRecipes.get(3).youtubeRecipeId, 2, 3);
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), youtubeRecipes.get(3).youtubeRecipeId, 2, 3);
 
         then:
         response.size() == 2
@@ -201,7 +226,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .nickname("테스터2")
                         .build(),
         ]
-        userRepository.saveAll(users)
+        committedTx.executeWithoutResult { status -> userRepository.saveAll(users) }
 
         List<YoutubeRecipe> youtubeRecipes = [
                 YoutubeRecipe.builder()
@@ -241,10 +266,10 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .viewCnt(2L)
                         .build(),
         ]
-        youtubeRecipeRepository.saveAll(youtubeRecipes);
+        committedTx.executeWithoutResult { status -> youtubeRecipeRepository.saveAll(youtubeRecipes) }
 
         when:
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc("테스트", youtubeRecipes.get(3).youtubeRecipeId, 2, 3)
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), youtubeRecipes.get(3).youtubeRecipeId, 2, 3)
 
         then:
         response.size() == 2
@@ -259,7 +284,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                 .socialId("naver_1")
                 .nickname("테스터1")
                 .build();
-        userRepository.save(user);
+        committedTx.executeWithoutResult { status -> userRepository.save(user) }
 
         List<YoutubeRecipe> youtubeRecipes = [
                 YoutubeRecipe.builder()
@@ -295,7 +320,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .thumbnailImgUrl("http://test.jpg")
                         .build(),
         ]
-        youtubeRecipeRepository.saveAll(youtubeRecipes);
+        committedTx.executeWithoutResult { status -> youtubeRecipeRepository.saveAll(youtubeRecipes) }
 
         List<YoutubeScrap> youtubeScraps = [
                 YoutubeScrap.builder()
@@ -311,7 +336,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .youtubeRecipeId(youtubeRecipes.get(3).youtubeRecipeId)
                         .build(),
         ]
-        youtubeScrapRepository.saveAll(youtubeScraps);
+        committedTx.executeWithoutResult { status -> youtubeScrapRepository.saveAll(youtubeScraps) }
 
         when:
         List<YoutubeRecipe> response = youtubeRecipeRepository.findUserScrapYoutubeRecipesLimit(user.userId, 0L, youtubeScraps.get(0).createdAt.plusDays(1), 3);
@@ -322,4 +347,5 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         response.get(1).youtubeRecipeId == youtubeRecipes.get(2).youtubeRecipeId
         response.get(2).youtubeRecipeId == youtubeRecipes.get(0).youtubeRecipeId
     }
+
 }

@@ -1,5 +1,7 @@
 package com.recipe.app.src.recipe.infra
 
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer
+import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery
 import com.recipe.app.src.recipe.domain.Recipe
 import com.recipe.app.src.recipe.domain.RecipeIngredient
 import com.recipe.app.src.recipe.domain.RecipeLevel
@@ -13,8 +15,15 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.cloud.openfeign.FeignAutoConfiguration
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.context.TestPropertySource
+import org.springframework.transaction.PlatformTransactionManager
+import org.springframework.transaction.TransactionDefinition
+import org.springframework.transaction.support.TransactionTemplate
 import spock.lang.Specification
 
+// InnoDB FULLTEXT 가시성 한계:
+//   같은 트랜잭션 안에서 INSERT 한 row 는 MATCH AGAINST 결과로 잡히지 않음 (FT 캐시 → 커밋 시 인덱스로 머지).
+//   @DataJpaTest 디폴트 트랜잭션은 테스트 끝에 ROLLBACK → MATCH 가 항상 0 건 반환.
+//   해법: setup/given 의 INSERT 를 REQUIRES_NEW 로 별도 커밋, cleanup 에서 같은 방식으로 정리.
 @ActiveProfiles("test")
 @DataJpaTest
 @ImportAutoConfiguration(classes = FeignAutoConfiguration.class)
@@ -28,10 +37,16 @@ class RecipeCustomRepositoryTest extends Specification {
     RecipeRepository recipeRepository;
     @Autowired
     RecipeScrapRepository recipeScrapRepository;
+    @Autowired
+    PlatformTransactionManager transactionManager;
 
     private List<User> users;
+    private TransactionTemplate committedTx;
 
     void setup() {
+        committedTx = new TransactionTemplate(transactionManager)
+        committedTx.propagationBehavior = TransactionDefinition.PROPAGATION_REQUIRES_NEW
+
         users = [
                 User.builder()
                         .socialId("naver_1")
@@ -42,7 +57,15 @@ class RecipeCustomRepositoryTest extends Specification {
                         .nickname("테스터2")
                         .build(),
         ]
-        userRepository.saveAll(users);
+        committedTx.executeWithoutResult { status -> userRepository.saveAll(users) }
+    }
+
+    void cleanup() {
+        committedTx.executeWithoutResult { status ->
+            recipeScrapRepository.deleteAll()
+            recipeRepository.deleteAll()
+            userRepository.deleteAll()
+        }
     }
 
     def "레시피 상세 조회 시 공개인 경우 성공"() {
@@ -74,7 +97,7 @@ class RecipeCustomRepositoryTest extends Specification {
                 .ingredientName("재료")
                 .build()
 
-        recipeRepository.saveAll(recipes)
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
         Optional<Recipe> recipe = recipeRepository.findRecipeDetail(recipes.get(0).getRecipeId(), users.get(0).getUserId())
@@ -119,7 +142,7 @@ class RecipeCustomRepositoryTest extends Specification {
                 .ingredientName("재료")
                 .build()
 
-        recipeRepository.saveAll(recipes)
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
         Optional<Recipe> recipe = recipeRepository.findRecipeDetail(recipes.get(1).getRecipeId(), users.get(0).getUserId())
@@ -165,7 +188,7 @@ class RecipeCustomRepositoryTest extends Specification {
                 .ingredientName("재료")
                 .build()
 
-        recipeRepository.saveAll(recipes)
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
         Optional<Recipe> recipe = recipeRepository.findRecipeDetail(recipes.get(1).getRecipeId(), users.get(1).getUserId())
@@ -214,10 +237,10 @@ class RecipeCustomRepositoryTest extends Specification {
                 .ingredientName("테스트")
                 .build()
 
-        recipeRepository.saveAll(recipes);
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
-        long response = recipeRepository.countByKeyword("테스트");
+        long response = recipeRepository.countByKeyword(SearchKeywordNormalizer.normalize("테스트"));
 
         then:
         response == 3
@@ -263,10 +286,10 @@ class RecipeCustomRepositoryTest extends Specification {
                 .ingredientName("테스트")
                 .build()
 
-        recipeRepository.saveAll(recipes);
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc("테스트", 0L, recipes.createdAt.max().plusMinutes(1), 3);
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(SearchKeywordNormalizer.normalize("테스트"), 0L, recipes.createdAt.max().plusMinutes(1), 3);
 
         then:
         response.size() == 3
@@ -319,10 +342,10 @@ class RecipeCustomRepositoryTest extends Specification {
                 .ingredientName("테스트")
                 .build()
 
-        recipeRepository.saveAll(recipes);
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc("테스트", recipes.get(2).recipeId, 2, 3);
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), recipes.get(2).recipeId, 2, 3);
 
         then:
         response.size() == 2
@@ -373,10 +396,10 @@ class RecipeCustomRepositoryTest extends Specification {
                 .ingredientName("테스트")
                 .build()
 
-        recipeRepository.saveAll(recipes);
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc("테스트", recipes.get(2).recipeId, 2, 3);
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), recipes.get(2).recipeId, 2, 3);
 
         then:
         response.size() == 2
@@ -410,7 +433,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(false)
                         .build(),
         ]
-        recipeRepository.saveAll(recipes);
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         List<RecipeScrap> recipeScraps = [
                 RecipeScrap.builder()
@@ -422,7 +445,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .recipeId(recipes.get(2).recipeId)
                         .build(),
         ]
-        recipeScrapRepository.saveAll(recipeScraps);
+        committedTx.executeWithoutResult { status -> recipeScrapRepository.saveAll(recipeScraps) }
 
         when:
         List<Recipe> response = recipeRepository.findUserScrapRecipesLimit(users.get(0).userId, 0L, recipeScraps.createdAt.max().plusMinutes(1), 3);
@@ -459,7 +482,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(false)
                         .build(),
         ]
-        recipeRepository.saveAll(recipes);
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
         List<Recipe> response = recipeRepository.findLimitByUserId(users.get(0).userId, recipes.get(2).recipeId, 3);
@@ -511,7 +534,7 @@ class RecipeCustomRepositoryTest extends Specification {
                 .ingredientName("테스트")
                 .build()
 
-        recipeRepository.saveAll(recipes);
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
         when:
         List<Recipe> response = recipeRepository.findRecipesInFridge(["테스트"]);
@@ -519,5 +542,62 @@ class RecipeCustomRepositoryTest extends Specification {
         then:
         response.size() == 2
         response.recipeId == [recipes.get(0).recipeId, recipes.get(2).recipeId]
+    }
+
+    def "1글자 ExactToken 검색은 단어 경계 정확 매칭만 매치한다 (재료명 기준)"() {
+
+        given:
+        List<Recipe> recipes = [
+                Recipe.builder()
+                        .recipeNm("음식1")
+                        .introduction("설명1")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(false)
+                        .build(),
+                Recipe.builder()
+                        .recipeNm("음식2")
+                        .introduction("설명2")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(false)
+                        .build(),
+                Recipe.builder()
+                        .recipeNm("음식3")
+                        .introduction("설명3")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(false)
+                        .build(),
+        ]
+
+        RecipeIngredient.builder()
+                .recipe(recipes.get(0))
+                .ingredientName("갓")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(1))
+                .ingredientName("감자")
+                .build()
+        RecipeIngredient.builder()
+                .recipe(recipes.get(2))
+                .ingredientName("감자전")
+                .build()
+
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
+
+        when: "1글자 정확 매칭"
+        SearchQuery query = SearchKeywordNormalizer.normalize(input)
+        long count = recipeRepository.countByKeyword(query)
+
+        then:
+        query instanceof SearchQuery.ExactToken
+        count == expected
+
+        where:
+        input || expected
+        "갓"   || 1L  // RecipeIngredient '갓' 정확 매치
+        "감"   || 0L  // 어떤 재료도 정확히 '감' 이 아님 ('감자','감자전' 매치 안 됨)
+        "자"   || 0L  // 어떤 재료도 정확히 '자' 가 아님
     }
 }

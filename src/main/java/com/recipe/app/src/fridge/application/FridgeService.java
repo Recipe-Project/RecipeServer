@@ -10,6 +10,7 @@ import com.recipe.app.src.fridgeBasket.application.FridgeBasketService;
 import com.recipe.app.src.fridgeBasket.domain.FridgeBasket;
 import com.recipe.app.src.ingredient.application.IngredientCategoryService;
 import com.recipe.app.src.ingredient.application.IngredientService;
+import com.recipe.app.src.ingredient.application.IngredientSynonymCache;
 import com.recipe.app.src.ingredient.domain.Ingredient;
 import com.recipe.app.src.ingredient.domain.IngredientCategory;
 import com.recipe.app.src.user.domain.User;
@@ -29,12 +30,14 @@ public class FridgeService {
     private final FridgeBasketService fridgeBasketService;
     private final IngredientService ingredientService;
     private final IngredientCategoryService ingredientCategoryService;
+    private final IngredientSynonymCache ingredientSynonymCache;
 
-    public FridgeService(FridgeRepository fridgeRepository, FridgeBasketService fridgeBasketService, IngredientService ingredientService, IngredientCategoryService ingredientCategoryService) {
+    public FridgeService(FridgeRepository fridgeRepository, FridgeBasketService fridgeBasketService, IngredientService ingredientService, IngredientCategoryService ingredientCategoryService, IngredientSynonymCache ingredientSynonymCache) {
         this.fridgeRepository = fridgeRepository;
         this.fridgeBasketService = fridgeBasketService;
         this.ingredientService = ingredientService;
         this.ingredientCategoryService = ingredientCategoryService;
+        this.ingredientSynonymCache = ingredientSynonymCache;
     }
 
     @Transactional
@@ -140,9 +143,11 @@ public class FridgeService {
 
         List<Ingredient> ingredients = ingredientService.findByIngredientIds(ingredientIds);
 
-        return ingredients.stream()
-                .flatMap(ingredient -> ingredient.getIngredientNameWithSimilar().stream())
+        List<String> rawNames = ingredients.stream()
+                .map(Ingredient::getIngredientName)
                 .collect(Collectors.toList());
+
+        return List.copyOf(ingredientSynonymCache.expand(rawNames));
     }
 
     private List<Long> getIngredientIdsInFridges(Collection<Fridge> fridges) {

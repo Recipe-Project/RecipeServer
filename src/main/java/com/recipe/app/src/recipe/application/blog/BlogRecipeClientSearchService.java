@@ -48,25 +48,23 @@ public class BlogRecipeClientSearchService {
                 NAVER_BLOG_SEARCH_SORT,
                 keyword + " 레시피").toEntity();
 
-        createBlogRecipes(blogRecipes);
+        List<BlogRecipe> newlyInserted = createBlogRecipes(blogRecipes);
 
-        blogRecipeThumbnailCrawlingService.saveThumbnails(blogRecipes);
+        blogRecipeThumbnailCrawlingService.saveThumbnails(newlyInserted);
     }
 
-    public List<BlogRecipe> fallback(String keyword, int size, Exception e) {
+    public void fallback(String keyword, Throwable e) {
 
-        log.info("fallback call - " + e.getMessage());
-
-        return blogRecipeRepository.findByKeywordLimit(keyword, size);
+        log.warn("naver blog search fallback - keyword={}, cause={}", keyword, e.getMessage());
     }
 
-    private void createBlogRecipes(List<BlogRecipe> blogRecipes) {
+    private List<BlogRecipe> createBlogRecipes(List<BlogRecipe> blogRecipes) {
 
         List<String> blogUrls = blogRecipes.stream().map(BlogRecipe::getBlogUrl).collect(Collectors.toList());
         List<BlogRecipe> existBlogRecipes = blogRecipeRepository.findByBlogUrlIn(blogUrls);
         Map<String, BlogRecipe> existBlogRecipeMapByBlogUrl = existBlogRecipes.stream().collect(Collectors.toMap(BlogRecipe::getBlogUrl, Function.identity(), (o1, o2) -> o1));
 
-        blogRecipeRepository.saveAll(blogRecipes.stream()
+        return blogRecipeRepository.saveAll(blogRecipes.stream()
                 .filter(blogRecipe -> !existBlogRecipeMapByBlogUrl.containsKey(blogRecipe.getBlogUrl()))
                 .collect(Collectors.toList()));
     }

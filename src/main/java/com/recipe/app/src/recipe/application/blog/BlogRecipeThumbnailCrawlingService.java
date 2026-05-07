@@ -27,8 +27,6 @@ public class BlogRecipeThumbnailCrawlingService {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void saveThumbnails(List<BlogRecipe> blogRecipes) {
 
-        System.out.println("thumbnail save");
-
         for (BlogRecipe blogRecipe : blogRecipes) {
             blogRecipe.changeThumbnail(getBlogThumbnailUrl(blogRecipe.getBlogUrl()));
         }

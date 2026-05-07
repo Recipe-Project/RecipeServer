@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Schema(description = "레시피 상세 응답 DTO")
@@ -72,6 +74,12 @@ public class RecipeDetailResponse {
 
     public static RecipeDetailResponse from(Recipe recipe, boolean isUserScrap, User postUser, List<String> ingredientNamesInFridge) {
 
+        Set<String> normalizedFridge = ingredientNamesInFridge.stream()
+                .filter(Objects::nonNull)
+                .map(s -> s.toLowerCase().trim())
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+
         return RecipeDetailResponse.builder()
                 .recipeId(recipe.getRecipeId())
                 .recipeName(recipe.getRecipeNm())
@@ -82,7 +90,7 @@ public class RecipeDetailResponse {
                 .recipeIngredients(recipe.getIngredients().stream()
                         .map(ingredient -> RecipeIngredientResponse.from(
                                 ingredient,
-                                ingredient.hasInFridge(ingredientNamesInFridge)))
+                                ingredient.hasInFridge(normalizedFridge)))
                         .collect(Collectors.toList()))
                 .recipeProcesses(recipe.getProcesses().stream()
                         .map(RecipeProcessResponse::from)

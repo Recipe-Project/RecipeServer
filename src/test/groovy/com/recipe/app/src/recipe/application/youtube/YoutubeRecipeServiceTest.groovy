@@ -35,7 +35,7 @@ class YoutubeRecipeServiceTest extends Specification {
         int size = 2
         String sort = "scraps"
 
-        youtubeRecipeRepository.countByKeyword(keyword) >> 20
+        youtubeRecipeRepository.countByKeyword(_) >> 20
 
         youtubeScrapService.countByYoutubeRecipeId(lastYoutubeRecipeId) >> 0
 
@@ -64,7 +64,7 @@ class YoutubeRecipeServiceTest extends Specification {
                         .build()
         ]
 
-        youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(keyword, lastYoutubeRecipeId, 0, size) >> youtubeRecipes
+        youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(_, lastYoutubeRecipeId, 0, size) >> youtubeRecipes
 
         List<YoutubeScrap> youtubeScraps = [
                 YoutubeScrap.builder()
@@ -105,7 +105,7 @@ class YoutubeRecipeServiceTest extends Specification {
         int size = 2
         String sort = "views"
 
-        youtubeRecipeRepository.countByKeyword(keyword) >> 20
+        youtubeRecipeRepository.countByKeyword(_) >> 20
 
         youtubeViewService.countByYoutubeRecipeId(lastYoutubeRecipeId) >> 0
 
@@ -134,7 +134,7 @@ class YoutubeRecipeServiceTest extends Specification {
                         .build()
         ]
 
-        youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(keyword, lastYoutubeRecipeId, 0, size) >> youtubeRecipes
+        youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(_, lastYoutubeRecipeId, 0, size) >> youtubeRecipes
 
         List<YoutubeScrap> youtubeScraps = [
                 YoutubeScrap.builder()
@@ -175,7 +175,7 @@ class YoutubeRecipeServiceTest extends Specification {
         int size = 2
         String sort = "newest"
 
-        youtubeRecipeRepository.countByKeyword(keyword) >> 20
+        youtubeRecipeRepository.countByKeyword(_) >> 20
 
         youtubeViewService.countByYoutubeRecipeId(lastYoutubeRecipeId) >> 0
 
@@ -206,7 +206,7 @@ class YoutubeRecipeServiceTest extends Specification {
 
         youtubeRecipeRepository.findById(lastYoutubeRecipeId) >> Optional.empty()
 
-        youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(keyword, lastYoutubeRecipeId, null, size) >> youtubeRecipes
+        youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(_, lastYoutubeRecipeId, null, size) >> youtubeRecipes
 
         List<YoutubeScrap> youtubeScraps = [
                 YoutubeScrap.builder()

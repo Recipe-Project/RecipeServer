@@ -11,6 +11,8 @@ import lombok.Getter;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -33,6 +35,12 @@ public class RecommendedRecipesResponse {
     public static RecommendedRecipesResponse from(Recipes recipes, List<User> recipePostUsers, List<RecipeScrap> recipeScraps, User user,
                                                   List<String> ingredientNamesInFridge, Recipe lastRecipe, int size) {
 
+        Set<String> normalizedFridge = ingredientNamesInFridge.stream()
+                .filter(Objects::nonNull)
+                .map(s -> s.toLowerCase().trim())
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toSet());
+
         Map<Long, User> recipePostUserMapByUserId = recipePostUsers.stream()
                 .collect(Collectors.toMap(User::getUserId, Function.identity()));
 
@@ -41,7 +49,7 @@ public class RecommendedRecipesResponse {
                 .recipes(recipes.getRecipes().stream()
                         .map((recipe) -> RecommendedRecipeResponse.from(recipe,
                                 recipePostUserMapByUserId.get(recipe.getUserId()),
-                                recipe.calculateIngredientMatchRate(ingredientNamesInFridge),
+                                recipe.calculateIngredientMatchRate(normalizedFridge),
                                 recipeScraps,
                                 user))
                         .sorted(Comparator.comparing(RecommendedRecipeResponse::getIngredientsMatchRate).thenComparing(RecommendedRecipeResponse::getRecipeId).reversed())
@@ -51,7 +59,7 @@ public class RecommendedRecipesResponse {
                             }
 
                             return recommendedRecipe.getRecipeId() < lastRecipe.getRecipeId()
-                                    && recommendedRecipe.getIngredientsMatchRate() <= lastRecipe.calculateIngredientMatchRate(ingredientNamesInFridge);
+                                    && recommendedRecipe.getIngredientsMatchRate() <= lastRecipe.calculateIngredientMatchRate(normalizedFridge);
                         })
                         .limit(size)
                         .collect(Collectors.toList()))

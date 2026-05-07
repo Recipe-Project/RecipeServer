@@ -92,10 +92,10 @@ class RecipeIngredientTest extends Specification {
                 .unit("개")
                 .build()
 
-        List<String> ingredientNamesInFridge = ["돼지고기", "김치"]
+        Set<String> normalizedFridge = ["돼지고기", "김치"] as Set
 
         when:
-        boolean result = ingredient.hasInFridge(ingredientNamesInFridge)
+        boolean result = ingredient.hasInFridge(normalizedFridge)
 
         then:
         result == expected

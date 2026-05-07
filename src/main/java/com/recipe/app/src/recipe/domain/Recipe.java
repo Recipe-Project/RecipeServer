@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.domain;
 
 import com.google.common.base.Preconditions;
 import com.recipe.app.src.common.entity.BaseEntity;
+import com.recipe.app.src.common.utils.KoreanTokenizer;
 import com.recipe.app.src.recipe.infra.RecipeLevelPersistConverter;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -11,6 +12,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.PrePersist;
+import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -21,6 +24,7 @@ import org.springframework.util.StringUtils;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -69,6 +73,9 @@ public class Recipe extends BaseEntity {
 
     @Column(name = "reportYn", nullable = false)
     private String reportYn = "N";
+
+    @Column(name = "searchTokens", columnDefinition = "TEXT")
+    private String searchTokens;
 
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     List<RecipeIngredient> ingredients = new ArrayList<>();
@@ -152,12 +159,21 @@ public class Recipe extends BaseEntity {
         this.hiddenYn = "Y";
     }
 
-    public long calculateIngredientMatchRate(List<String> ingredientNamesInFridge) {
+    public long calculateIngredientMatchRate(Set<String> normalizedFridgeNames) {
+
+        if (ingredients.isEmpty()) return 0;
 
         long ingredientMatchCnt = ingredients.stream()
-                .filter(ingredient -> ingredient.hasInFridge(ingredientNamesInFridge))
+                .filter(ingredient -> ingredient.hasInFridge(normalizedFridgeNames))
                 .count();
 
         return Math.round((double) ingredientMatchCnt / ingredients.size() * 100);
+    }
+
+    @PrePersist
+    @PreUpdate
+    private void refreshSearchTokens() {
+        String source = (recipeNm != null ? recipeNm : "") + " " + (introduction != null ? introduction : "");
+        this.searchTokens = KoreanTokenizer.tokenize(source);
     }
 }
