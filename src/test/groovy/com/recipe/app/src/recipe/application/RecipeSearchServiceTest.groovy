@@ -3,6 +3,7 @@ package com.recipe.app.src.recipe.application
 
 import com.recipe.app.src.common.utils.BadWordFiltering
 import com.recipe.app.src.fridge.application.FridgeService
+import com.recipe.app.src.ingredient.application.IngredientSynonymCache
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse
 import com.recipe.app.src.recipe.application.dto.RecipesResponse
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse
@@ -23,8 +24,9 @@ class RecipeSearchServiceTest extends Specification {
     private BadWordFiltering badWordService = Mock()
     private RecipeScrapService recipeScrapService = Mock()
     private RecipeViewService recipeViewService = Mock()
+    private IngredientSynonymCache ingredientSynonymCache = Mock()
     private RecipeSearchService recipeSearchService = new RecipeSearchService(recipeRepository, fridgeService, userService, badWordService,
-            recipeScrapService, recipeViewService)
+            recipeScrapService, recipeViewService, ingredientSynonymCache)
 
     def "레시피 키워드 검색 - 스크랩 수 정렬"() {
 
@@ -587,6 +589,59 @@ class RecipeSearchServiceTest extends Specification {
         result.recipes.scrapCnt == recipes.scrapCnt
         result.recipes.viewCnt == recipes.viewCnt
         result.recipes.ingredientsMatchRate == [100, 33]
+    }
+
+    def "Public 추천 - 입력 재료를 동의어 확장 후 FULLTEXT 매칭한다"() {
+
+        given:
+        long lastRecipeId = 0
+        int size = 10
+        List<String> inputIngredientNames = ["새우"]
+        Set<String> expandedSet = ["새우", "대하"] as Set
+
+        List<Recipe> recipes = [
+                Recipe.builder()
+                        .recipeId(1L)
+                        .recipeNm("대하구이")
+                        .introduction("대하 들어간 레시피")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(1L)
+                        .isHidden(false)
+                        .build()
+        ]
+
+        ingredientSynonymCache.expand(inputIngredientNames) >> expandedSet
+        userService.findByUserIds(_) >> []
+        recipeScrapService.findByRecipeIds(_) >> []
+        recipeRepository.findById(lastRecipeId) >> Optional.empty()
+
+        when:
+        RecommendedRecipesResponse result = recipeSearchService.findPublicRecommendedRecipesByIngredients(inputIngredientNames, lastRecipeId, size)
+
+        then: "동의어 expand 결과(새우+대하)가 그대로 검색 인자로 전달된다"
+        1 * recipeRepository.findRecipesInFridge({ Collection<String> arg -> arg as Set == expandedSet }) >> recipes
+        result.totalCnt == 1
+        result.recipes.recipeId == [1L]
+    }
+
+    def "Public 추천 - 빈 입력은 빈 결과를 반환한다"() {
+
+        given:
+        long lastRecipeId = 0
+        int size = 10
+
+        ingredientSynonymCache.expand([]) >> ([] as Set)
+        recipeRepository.findRecipesInFridge(_) >> []
+        userService.findByUserIds(_) >> []
+        recipeScrapService.findByRecipeIds(_) >> []
+        recipeRepository.findById(lastRecipeId) >> Optional.empty()
+
+        when:
+        RecommendedRecipesResponse result = recipeSearchService.findPublicRecommendedRecipesByIngredients([], lastRecipeId, size)
+
+        then:
+        result.totalCnt == 0
+        result.recipes.isEmpty()
     }
 
     def "레시피 키워드 검색 - 빈/공백 입력은 빈 결과를 반환한다"() {

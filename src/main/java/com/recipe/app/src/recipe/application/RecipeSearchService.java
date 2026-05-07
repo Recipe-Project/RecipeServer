@@ -4,6 +4,7 @@ import com.recipe.app.src.common.utils.BadWordFiltering;
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.fridge.application.FridgeService;
+import com.recipe.app.src.ingredient.application.IngredientSynonymCache;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
 import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse;
@@ -28,15 +29,17 @@ public class RecipeSearchService {
     private final BadWordFiltering badWordFiltering;
     private final RecipeScrapService recipeScrapService;
     private final RecipeViewService recipeViewService;
+    private final IngredientSynonymCache ingredientSynonymCache;
 
     public RecipeSearchService(RecipeRepository recipeRepository, FridgeService fridgeService, UserService userService, BadWordFiltering badWordFiltering,
-                               RecipeScrapService recipeScrapService, RecipeViewService recipeViewService) {
+                               RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, IngredientSynonymCache ingredientSynonymCache) {
         this.recipeRepository = recipeRepository;
         this.fridgeService = fridgeService;
         this.userService = userService;
         this.badWordFiltering = badWordFiltering;
         this.recipeScrapService = recipeScrapService;
         this.recipeViewService = recipeViewService;
+        this.ingredientSynonymCache = ingredientSynonymCache;
     }
 
     @Transactional(readOnly = true)
@@ -178,7 +181,9 @@ public class RecipeSearchService {
     @Transactional(readOnly = true)
     public RecommendedRecipesResponse findPublicRecommendedRecipesByIngredients(List<String> ingredientNames, long lastRecipeId, int size) {
 
-        Recipes recipes = new Recipes(recipeRepository.findRecipesInFridge(ingredientNames));
+        List<String> expandedIngredientNames = List.copyOf(ingredientSynonymCache.expand(ingredientNames));
+
+        Recipes recipes = new Recipes(recipeRepository.findRecipesInFridge(expandedIngredientNames));
 
         List<User> recipePostUsers = userService.findByUserIds(recipes.getUserIds());
 
@@ -188,6 +193,6 @@ public class RecipeSearchService {
 
         User anonymousUser = new User();
 
-        return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, anonymousUser, ingredientNames, lastRecipe, size);
+        return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, anonymousUser, expandedIngredientNames, lastRecipe, size);
     }
 }
