@@ -31,7 +31,7 @@ class SearchKeywordNormalizerTest extends Specification {
         "B"    || "b"
     }
 
-    def "한글 합성어는 BooleanQuery 로 +token 형태가 된다"() {
+    def "한글 합성어는 BooleanQuery 로 OR(연산자 없는 토큰 나열) 형태가 된다"() {
 
         when:
         SearchQuery query = SearchKeywordNormalizer.normalize(input)
@@ -42,20 +42,30 @@ class SearchKeywordNormalizerTest extends Specification {
 
         where:
         input    || expected
-        "소면"     || "+소면"
-        "양파"     || "+양파"
-        "감자전"   || "+감자전"
-        "김치찌개" || "+김치찌개"
+        "소면"     || "소면"
+        "양파"     || "양파"
+        "감자전"   || "감자전"
+        "김치찌개" || "김치찌개"
     }
 
-    def "복수 토큰은 +token1 +token2 형식으로 AND 매칭된다"() {
+    def "복수 토큰은 공백 구분 OR 형식으로 매칭된다"() {
 
         when:
         SearchQuery query = SearchKeywordNormalizer.normalize("감자 양파")
 
         then:
         query instanceof SearchQuery.BooleanQuery
-        ((SearchQuery.BooleanQuery) query).query() == "+감자 +양파"
+        ((SearchQuery.BooleanQuery) query).query() == "감자 양파"
+    }
+
+    def "1글자로 쪼개지는 합성어도 OR 라 1글자 토큰이 그대로 남는다 (닭가슴살)"() {
+
+        when: "nori 가 '닭가슴살' 을 '닭'(1글자) + '가슴살' 로 분리"
+        SearchQuery query = SearchKeywordNormalizer.normalize("닭가슴살")
+
+        then: "OR 이므로 1글자 '닭' 이 남아도 FULLTEXT 가 무시하고 '가슴살' 로 매칭 가능 (AND 였으면 +닭 때문에 0건)"
+        query instanceof SearchQuery.BooleanQuery
+        ((SearchQuery.BooleanQuery) query).query() == "닭 가슴살"
     }
 
     def "BOOLEAN MODE 특수문자는 제거된다"() {
@@ -65,7 +75,7 @@ class SearchKeywordNormalizerTest extends Specification {
 
         then:
         query instanceof SearchQuery.BooleanQuery
-        ((SearchQuery.BooleanQuery) query).query() == "+감자 +양파"
+        ((SearchQuery.BooleanQuery) query).query() == "감자 양파"
     }
 
     def "조사가 붙은 입력은 명사만 추출되어 반영된다"() {
@@ -75,7 +85,7 @@ class SearchKeywordNormalizerTest extends Specification {
 
         then:
         query instanceof SearchQuery.BooleanQuery
-        ((SearchQuery.BooleanQuery) query).query() == "+감자"
+        ((SearchQuery.BooleanQuery) query).query() == "감자"
     }
 
     def "연속 공백/탭은 단일 공백으로 정리된다"() {
@@ -85,6 +95,6 @@ class SearchKeywordNormalizerTest extends Specification {
 
         then:
         query instanceof SearchQuery.BooleanQuery
-        ((SearchQuery.BooleanQuery) query).query() == "+감자 +양파"
+        ((SearchQuery.BooleanQuery) query).query() == "감자 양파"
     }
 }
