@@ -377,6 +377,35 @@ class UserServiceTest extends Specification {
         user.deviceToken == request.fcmToken
     }
 
+    def "알림 OFF: 빈 토큰(#desc)을 보내면 디바이스 토큰이 초기화된다 (에러 없이)"() {
+
+        given:
+        User user = User.builder()
+                .userId(1)
+                .socialId("kakao_1")
+                .nickname("테스터1")
+                .deviceToken("old_token")
+                .build()
+
+        UserDeviceTokenRequest request = UserDeviceTokenRequest.builder()
+                .fcmToken(fcmToken)
+                .build()
+
+        when:
+        userService.updateFcmToken(user, request)
+
+        then: "에러 없이 저장되고, 푸시 수신 불가(쓸 수 있는 토큰 없음) 상태가 된다"
+        noExceptionThrown()
+        1 * userRepository.save(user)
+        !StringUtils.hasText(user.deviceToken)
+
+        where:
+        desc      | fcmToken
+        "빈문자열" | ""
+        "공백"     | "   "
+        "null"     | null
+    }
+
     def "유저 아이디 목록 내 유저 목록 조회"() {
 
         given:
