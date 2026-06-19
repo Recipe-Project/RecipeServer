@@ -157,7 +157,7 @@ class UserTest extends Specification {
         user.deviceToken == updateDeviceToken
     }
 
-    def "유저 디바이스 토큰 변경 시 유효하지 않은 요청값인 경우 예외 발생"() {
+    def "유저 디바이스 토큰 변경 시 빈 값(null/빈문자열)이면 예외 없이 그대로 비워진다 (알림 OFF)"() {
 
         given:
         User user = User.builder()
@@ -174,12 +174,10 @@ class UserTest extends Specification {
         user.changeDeviceToken(deviceToken)
 
         then:
-        def e = thrown(IllegalArgumentException.class)
-        e.message == expected
+        noExceptionThrown()
+        user.deviceToken == deviceToken
 
         where:
-        deviceToken || expected
-        null        || "FCM 토큰을 입력해주세요."
-        ""          || "FCM 토큰을 입력해주세요."
+        deviceToken << [null, ""]
     }
 }
