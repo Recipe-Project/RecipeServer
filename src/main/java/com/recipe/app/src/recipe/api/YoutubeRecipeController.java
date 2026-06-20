@@ -28,7 +28,7 @@ public class YoutubeRecipeController {
 
     @Operation(summary = "유튜브 레시피 목록 조회 API")
     @GetMapping
-    @LoginCheck
+    @LoginCheck(required = false)
     public RecipesResponse getYoutubeRecipes(@Parameter(hidden = true) User user,
                                              @Parameter(example = "감자", name = "검색어")
                                              @RequestParam(value = "keyword") String keyword,

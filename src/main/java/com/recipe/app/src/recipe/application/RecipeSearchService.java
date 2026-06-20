@@ -90,19 +90,20 @@ public class RecipeSearchService {
     @Transactional(readOnly = true)
     public RecipeDetailResponse findRecipeDetail(User user, long recipeId) {
 
-        Recipe recipe = recipeRepository.findRecipeDetail(recipeId, user.getUserId())
-                .orElseThrow(() -> {
-                    throw new NotFoundRecipeException();
-                });
+        // user == null(비로그인): 쿼리가 공개글만 반환하고, 냉장고 매칭/스크랩 여부 등 개인화는 생략
+        Long userId = user != null ? user.getUserId() : null;
 
-        List<String> ingredientNamesInFridge = fridgeService.findIngredientNamesInFridge(user.getUserId());
+        Recipe recipe = recipeRepository.findRecipeDetail(recipeId, userId)
+                .orElseThrow(NotFoundRecipeException::new);
 
-        boolean isUserScrap = recipeScrapService.existsByUserIdAndRecipeId(user.getUserId(), recipe.getRecipeId());
+        List<String> ingredientNamesInFridge = userId != null
+                ? fridgeService.findIngredientNamesInFridge(userId)
+                : List.of();
 
-        User postUser = null;
-        if (recipe.getUserId() != null) {
-            postUser = userService.findByUserId(recipe.getUserId());
-        }
+        boolean isUserScrap = userId != null
+                && recipeScrapService.existsByUserIdAndRecipeId(userId, recipe.getRecipeId());
+
+        User postUser = recipe.getUserId() != null ? userService.findByUserId(recipe.getUserId()) : null;
 
         return RecipeDetailResponse.from(recipe, isUserScrap, postUser, ingredientNamesInFridge);
     }
@@ -158,24 +159,6 @@ public class RecipeSearchService {
         Recipe lastRecipe = recipeRepository.findById(lastRecipeId).orElse(null);
 
         return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, user, ingredientNamesInFridge, lastRecipe, size);
-    }
-
-    @Transactional(readOnly = true)
-    public RecipeDetailResponse findPublicRecipeDetail(long recipeId) {
-
-        Recipe recipe = recipeRepository.findById(recipeId)
-                .orElseThrow(() -> {
-                    throw new NotFoundRecipeException();
-                });
-
-        User postUser = null;
-        if (recipe.getUserId() != null) {
-            postUser = userService.findByUserId(recipe.getUserId());
-        }
-
-        List<String> emptyIngredientList = List.of();
-
-        return RecipeDetailResponse.from(recipe, false, postUser, emptyIngredientList);
     }
 
     @Transactional(readOnly = true)

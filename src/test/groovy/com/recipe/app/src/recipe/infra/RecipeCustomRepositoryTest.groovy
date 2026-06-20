@@ -197,6 +197,51 @@ class RecipeCustomRepositoryTest extends Specification {
         !recipe.isPresent()
     }
 
+    def "레시피 상세 조회 시 비로그인(userId=null)이면 공개 레시피는 조회된다"() {
+
+        given:
+        List<Recipe> recipes = [
+                Recipe.builder()
+                        .recipeNm("공개제목")
+                        .introduction("설명")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(false)
+                        .build(),
+        ]
+
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
+
+        when:
+        Optional<Recipe> recipe = recipeRepository.findRecipeDetail(recipes.get(0).getRecipeId(), null)
+
+        then:
+        recipe.isPresent()
+        !recipe.get().isHidden()
+    }
+
+    def "레시피 상세 조회 시 비로그인(userId=null)이면 비공개 레시피는 조회되지 않는다"() {
+
+        given:
+        List<Recipe> recipes = [
+                Recipe.builder()
+                        .recipeNm("비공개제목")
+                        .introduction("설명")
+                        .level(RecipeLevel.NORMAL)
+                        .userId(users.get(0).userId)
+                        .isHidden(true)
+                        .build(),
+        ]
+
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
+
+        when:
+        Optional<Recipe> recipe = recipeRepository.findRecipeDetail(recipes.get(0).getRecipeId(), null)
+
+        then:
+        !recipe.isPresent()
+    }
+
     def "검색어로 레시피 갯수 조회"() {
 
         given:

@@ -327,6 +327,33 @@ class RecipeSearchServiceTest extends Specification {
         result.isReported == recipe.isReported()
     }
 
+    def "비로그인(null user) 키워드 검색은 NPE 없이 isUserScrap=false 로 응답한다"() {
+
+        given:
+        Recipe recipe = Recipe.builder()
+                .recipeId(1)
+                .recipeNm("제목1")
+                .introduction("설명1")
+                .level(RecipeLevel.NORMAL)
+                .userId(1L)
+                .isHidden(false)
+                .build()
+
+        recipeRepository.countByKeyword(_) >> 1
+        recipeRepository.findById(_) >> Optional.empty()
+        recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_, _, _, _) >> [recipe]
+        userService.findByUserIds(_) >> []
+        recipeScrapService.findByRecipeIds(_) >> []
+
+        when:
+        RecipesResponse result = recipeSearchService.findRecipesByKeywordOrderBy(null, "테스트", 0L, 10, "newest")
+
+        then:
+        noExceptionThrown()
+        result.recipes.size() == 1
+        !result.recipes[0].isUserScrap
+    }
+
     def "레시피 상세 조회 시 레시피 존재 하지 않으면 오류 발생"() {
 
         given:
