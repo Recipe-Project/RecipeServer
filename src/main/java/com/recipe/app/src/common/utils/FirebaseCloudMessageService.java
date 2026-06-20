@@ -6,6 +6,8 @@ import com.google.auth.oauth2.GoogleCredentials;
 import com.recipe.app.src.common.entity.FcmMessage;
 import lombok.RequiredArgsConstructor;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -16,6 +18,8 @@ import java.util.List;
 @Component
 @RequiredArgsConstructor
 public class FirebaseCloudMessageService {
+
+    private static final Logger log = LoggerFactory.getLogger(FirebaseCloudMessageService.class);
 
     private final String API_URL = "https://fcm.googleapis.com/v1/projects/recipeapp-a79ed/messages:send";
     private final ObjectMapper objectMapper;
@@ -32,8 +36,14 @@ public class FirebaseCloudMessageService {
                 .addHeader(HttpHeaders.AUTHORIZATION, "Bearer " + getAccessToken())
                 .addHeader(HttpHeaders.CONTENT_TYPE, "application/json; UTF-8")
                 .build();
-        Response response = client.newCall(request)
-                .execute();
+        try (Response response = client.newCall(request).execute()) {
+            String responseBody = response.body() != null ? response.body().string() : "";
+            if (!response.isSuccessful()) {
+                log.warn("FCM 발송 거절. status={}, error={}", response.code(), responseBody);
+                throw new IOException("FCM send failed: " + response.code() + " " + responseBody);
+            }
+            log.info("FCM 발송 성공. resp={}", responseBody);
+        }
     }
 
     // fcm 메시지를 만들고 이를 objectmapper를 이용해 string으로 변환하여 반환한다.

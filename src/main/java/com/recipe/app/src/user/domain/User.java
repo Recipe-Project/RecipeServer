@@ -83,8 +83,7 @@ public class User extends BaseEntity {
 
     public void changeDeviceToken(String deviceToken) {
 
-        Preconditions.checkArgument(StringUtils.hasText(deviceToken), "FCM 토큰을 입력해주세요.");
-
+        // 들어온 값을 그대로 저장. 알림 OFF 시 클라이언트가 빈 값("" / null)을 보내 푸시 수신을 끈다.
         this.deviceToken = deviceToken;
     }
 

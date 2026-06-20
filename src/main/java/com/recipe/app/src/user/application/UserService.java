@@ -147,6 +147,7 @@ public class UserService {
     @Transactional
     public void updateFcmToken(User user, UserDeviceTokenRequest request) {
 
+        // 들어온 값을 그대로 저장. 빈 값("" / null)이면 알림 OFF (푸시 수신 중지).
         user.changeDeviceToken(request.getFcmToken());
         userRepository.save(user);
     }
