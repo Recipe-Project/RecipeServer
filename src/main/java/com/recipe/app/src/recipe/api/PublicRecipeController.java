@@ -30,7 +30,7 @@ public class PublicRecipeController {
     @GetMapping("/{recipeId}")
     public RecipeDetailResponse getPublicRecipe(@PathVariable long recipeId) {
 
-        return recipeSearchService.findPublicRecipeDetail(recipeId);
+        return recipeSearchService.findRecipeDetail(null, recipeId);
     }
 
     @Operation(summary = "공개 추천 레시피 목록 조회 API (로그인 불필요)")

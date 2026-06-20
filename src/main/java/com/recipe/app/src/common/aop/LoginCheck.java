@@ -9,4 +9,9 @@ import java.lang.annotation.Target;
 @Target(ElementType.METHOD)
 public @interface LoginCheck {
 
+    /**
+     * true(기본): 인증 없으면 예외.
+     * false: 인증 없어도 통과시키되 컨트롤러의 User 파라미터에 null 을 주입(선택적 로그인).
+     */
+    boolean required() default true;
 }

@@ -64,7 +64,7 @@ public class RecipeResponse {
                 .thumbnailImgUrl(recipe.getImgUrl())
                 .postUserName(recipePostUser != null ? recipePostUser.getNickname() : null)
                 .postDate(recipe.getCreatedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
-                .isUserScrap(recipeScraps.stream()
+                .isUserScrap(user != null && recipeScraps.stream()
                         .anyMatch(recipeScrap ->
                                 recipeScrap.getRecipeId().equals(recipe.getRecipeId())
                                         && recipeScrap.getUserId().equals(user.getUserId())))
@@ -82,7 +82,7 @@ public class RecipeResponse {
                 .postUserName(recipe.getBlogName())
                 .postDate(recipe.getPublishedAt().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .linkUrl(recipe.getBlogUrl())
-                .isUserScrap(blogScraps.stream()
+                .isUserScrap(user != null && blogScraps.stream()
                         .anyMatch(blogScrap ->
                                 blogScrap.getBlogRecipeId().equals(recipe.getBlogRecipeId())
                                         && blogScrap.getUserId().equals(user.getUserId())))
@@ -100,7 +100,7 @@ public class RecipeResponse {
                 .postUserName(recipe.getChannelName())
                 .postDate(recipe.getPostDate().format(DateTimeFormatter.ofPattern("yyyy.M.d")))
                 .linkUrl("https://www.youtube.com/watch?v=" + recipe.getYoutubeId())
-                .isUserScrap(youtubeScraps.stream()
+                .isUserScrap(user != null && youtubeScraps.stream()
                         .anyMatch(youtubeScrap ->
                                 youtubeScrap.getYoutubeRecipeId().equals(recipe.getYoutubeRecipeId())
                                         && youtubeScrap.getUserId().equals(user.getUserId())))

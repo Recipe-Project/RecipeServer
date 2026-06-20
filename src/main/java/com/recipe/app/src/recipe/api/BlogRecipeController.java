@@ -28,7 +28,7 @@ public class BlogRecipeController {
 
     @Operation(summary = "블로그 레시피 목록 조회 API")
     @GetMapping("")
-    @LoginCheck
+    @LoginCheck(required = false)
     public RecipesResponse getBlogRecipes(@Parameter(hidden = true) User user,
                                           @Parameter(name = "검색어", example = "감자")
                                           @RequestParam(value = "keyword") String keyword,

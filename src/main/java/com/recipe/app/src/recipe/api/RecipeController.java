@@ -36,7 +36,7 @@ public class RecipeController {
 
     @Operation(summary = "레시피 목록 조회 API")
     @GetMapping
-    @LoginCheck
+    @LoginCheck(required = false)
     public RecipesResponse getRecipes(@Parameter(hidden = true) User user,
                                       @Parameter(example = "감자", name = "검색어")
                                       @RequestParam(value = "keyword") String keyword,
@@ -52,7 +52,7 @@ public class RecipeController {
 
     @Operation(summary = "레시피 상세 조회 API")
     @GetMapping("/{recipeId}")
-    @LoginCheck
+    @LoginCheck(required = false)
     public RecipeDetailResponse getRecipe(@Parameter(hidden = true) User user, @PathVariable long recipeId) {
 
         return recipeSearchService.findRecipeDetail(user, recipeId);

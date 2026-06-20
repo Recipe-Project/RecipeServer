@@ -34,7 +34,8 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
                 .selectFrom(recipe)
                 .where(recipe.recipeId.eq(recipeId)
                         .and(recipe.hiddenYn.eq("N")
-                                .or(recipe.hiddenYn.eq("Y").and(recipe.userId.eq(userId))))
+                                // userId == null(비로그인)이면 본인 비공개 조건을 제외 → 공개글만. (Querydsl 은 or(null) 을 무시)
+                                .or(userId != null ? recipe.hiddenYn.eq("Y").and(recipe.userId.eq(userId)) : null))
                 )
                 .fetchOne());
     }
