@@ -53,7 +53,7 @@ public class WebSecurityConfig {
                         .requestMatchers("/ingredients/**").authenticated()
                         .requestMatchers("/recipes/public/**").permitAll()
                         // 토큰 없이 허용: 레시피/블로그/유튜브 목록·검색, 레시피 상세(숫자 id). 그 외 GET(scraps/users 등)·POST/DELETE 는 인증 유지
-                        .requestMatchers(HttpMethod.GET, "/recipes", "/recipes/blog", "/recipes/youtube", "/recipes/{recipeId:[0-9]+}").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/recipes", "/recipes/blog", "/recipes/youtube", "/recipes/best-keywords", "/recipes/{recipeId:[0-9]+}").permitAll()
                         .requestMatchers("/recipes/**").authenticated()
                         .anyRequest().permitAll())
                 .addFilterBefore(new JwtFilter(jwtUtil, userDetailsService), UsernamePasswordAuthenticationFilter.class)
