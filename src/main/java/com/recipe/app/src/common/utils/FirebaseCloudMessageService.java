@@ -68,7 +68,7 @@ public class FirebaseCloudMessageService {
         String firebaseConfigPath = "recipeapp-key.json";
         GoogleCredentials googleCredentials = GoogleCredentials
                 .fromStream(new ClassPathResource(firebaseConfigPath).getInputStream())
-                .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
+                .createScoped(List.of("https://www.googleapis.com/auth/firebase.messaging"));
         googleCredentials.refreshIfExpired();
         return googleCredentials.getAccessToken().getTokenValue();
     }
