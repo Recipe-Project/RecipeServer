@@ -1,13 +1,16 @@
 package com.recipe.app.src.recipe.application
 
+import com.recipe.app.src.recipe.application.event.RecipeReportedEvent
 import com.recipe.app.src.recipe.domain.RecipeReport
 import com.recipe.app.src.recipe.infra.RecipeReportRepository
+import org.springframework.context.ApplicationEventPublisher
 import spock.lang.Specification
 
 class RecipeReportServiceTest extends Specification {
 
     private RecipeReportRepository recipeReportRepository = Mock()
-    private RecipeReportService recipeReportService = new RecipeReportService(recipeReportRepository)
+    private ApplicationEventPublisher eventPublisher = Mock()
+    private RecipeReportService recipeReportService = new RecipeReportService(recipeReportRepository, eventPublisher)
 
     def "레시피 신고 생성"() {
 
@@ -21,6 +24,7 @@ class RecipeReportServiceTest extends Specification {
 
         then:
         1 * recipeReportRepository.save(_)
+        1 * eventPublisher.publishEvent(_ as RecipeReportedEvent)
     }
 
     def "레시피 신고 생성 시 이미 생성된 경우 새로 생성하지 않음"() {
@@ -41,6 +45,7 @@ class RecipeReportServiceTest extends Specification {
 
         then:
         0 * recipeReportRepository.save(recipeReport)
+        0 * eventPublisher.publishEvent(_)
     }
 
     def "신고 횟수에 따라 신고된 레시피인지 여부 확인"() {
