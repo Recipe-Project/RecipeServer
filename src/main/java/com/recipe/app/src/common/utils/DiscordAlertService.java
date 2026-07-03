@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 처리되지 않은 예외(500)를 Discord 채널로 알림 전송한다.
+ * 서버 이벤트(500 에러, 레시피 신고)를 Discord 채널로 알림 전송한다.
  * 운영(prod) 프로필에서만 빈으로 등록되며, 요청 스레드를 막지 않도록 비동기(enqueue)로 전송한다.
  */
 @Component
@@ -27,22 +27,61 @@ public class DiscordAlertService {
 
     private static final Logger log = LoggerFactory.getLogger(DiscordAlertService.class);
     private static final int RED = 15158332;
+    private static final int ORANGE = 15105570;
     private static final int MAX_STACKTRACE_LENGTH = 1000; // Discord embed field value 제한(1024) 대응
 
     @Value("${discord.webhook.url:}")
-    private String webhookUrl;
+    private String errorWebhookUrl;
+
+    @Value("${discord.webhook.report-url:}")
+    private String reportWebhookUrl;
 
     private final ObjectMapper objectMapper;
     private final OkHttpClient client = new OkHttpClient();
 
+    /**
+     * 처리되지 않은 예외(500) 알림.
+     */
     public void sendErrorAlert(String httpMethod, String requestUri, Throwable throwable) {
+        Map<String, Object> embed = Map.of(
+                "title", "🚨 500 Internal Server Error",
+                "color", RED,
+                "fields", List.of(
+                        field("Endpoint", httpMethod + " " + requestUri),
+                        field("Exception", throwable.getClass().getSimpleName()),
+                        field("Message", truncate(throwable.getMessage())),
+                        field("Stacktrace", "```" + stackTrace(throwable) + "```")
+                )
+        );
+        send(errorWebhookUrl, embed);
+    }
+
+    /**
+     * 레시피 신고 접수 알림.
+     *
+     * @param reachedThreshold 누적 신고가 숨김 처리 기준 이상인지 여부
+     */
+    public void sendReportAlert(long recipeId, long reporterUserId, long reportCount, boolean reachedThreshold) {
+        Map<String, Object> embed = Map.of(
+                "title", reachedThreshold ? "⛔ 레시피 신고 (기준 초과)" : "⚠️ 레시피 신고 접수",
+                "color", reachedThreshold ? RED : ORANGE,
+                "fields", List.of(
+                        field("Recipe ID", String.valueOf(recipeId)),
+                        field("신고자 User ID", String.valueOf(reporterUserId)),
+                        field("누적 신고 수", reportCount + "회" + (reachedThreshold ? " (기준 초과 · 숨김 처리 대상)" : ""))
+                )
+        );
+        send(reportWebhookUrl, embed);
+    }
+
+    private void send(String webhookUrl, Map<String, Object> embed) {
         if (!StringUtils.hasText(webhookUrl)) {
             log.warn("Discord webhook URL 이 설정되지 않아 알림을 건너뜁니다.");
             return;
         }
 
         try {
-            String payload = makePayload(httpMethod, requestUri, throwable);
+            String payload = objectMapper.writeValueAsString(Map.of("embeds", List.of(embed)));
             RequestBody body = RequestBody.create(payload, MediaType.get("application/json; charset=utf-8"));
             Request request = new Request.Builder()
                     .url(webhookUrl)
@@ -70,18 +109,8 @@ public class DiscordAlertService {
         }
     }
 
-    private String makePayload(String httpMethod, String requestUri, Throwable throwable) throws IOException {
-        Map<String, Object> embed = Map.of(
-                "title", "🚨 500 Internal Server Error",
-                "color", RED,
-                "fields", List.of(
-                        Map.of("name", "Endpoint", "value", httpMethod + " " + requestUri, "inline", false),
-                        Map.of("name", "Exception", "value", throwable.getClass().getSimpleName(), "inline", false),
-                        Map.of("name", "Message", "value", truncate(throwable.getMessage()), "inline", false),
-                        Map.of("name", "Stacktrace", "value", "```" + stackTrace(throwable) + "```", "inline", false)
-                )
-        );
-        return objectMapper.writeValueAsString(Map.of("embeds", List.of(embed)));
+    private Map<String, Object> field(String name, String value) {
+        return Map.of("name", name, "value", truncate(value), "inline", false);
     }
 
     private String stackTrace(Throwable throwable) {
