@@ -42,12 +42,13 @@ public class DiscordAlertService {
     /**
      * 처리되지 않은 예외(500) 알림.
      */
-    public void sendErrorAlert(String httpMethod, String requestUri, Throwable throwable) {
+    public void sendErrorAlert(String httpMethod, String requestUri, String clientIp, Throwable throwable) {
         Map<String, Object> embed = Map.of(
                 "title", "🚨 500 Internal Server Error",
                 "color", RED,
                 "fields", List.of(
                         field("Endpoint", httpMethod + " " + requestUri),
+                        field("Client IP", clientIp),
                         field("Exception", throwable.getClass().getSimpleName()),
                         field("Message", truncate(throwable.getMessage())),
                         field("Stacktrace", "```" + stackTrace(throwable) + "```")
@@ -72,6 +73,22 @@ public class DiscordAlertService {
                 )
         );
         send(reportWebhookUrl, embed);
+    }
+
+    /**
+     * 스캔성 요청 급증 감지 알림 (개별 요청이 아니라 집계 결과 1회 전송).
+     * 드물게 발생하므로 별도 채널 없이 500 에러 채널로 보내되 제목/색으로 구분한다.
+     */
+    public void sendScanSurgeAlert(int count, long windowMinutes, List<String> topIps) {
+        Map<String, Object> embed = Map.of(
+                "title", "⚠️ 스캔성 요청 급증 감지",
+                "color", ORANGE,
+                "fields", List.of(
+                        field("감지", "최근 " + windowMinutes + "분간 " + count + "건 (임계치 초과)"),
+                        field("Top IP", topIps.isEmpty() ? "(none)" : String.join("\n", topIps))
+                )
+        );
+        send(errorWebhookUrl, embed);
     }
 
     private void send(String webhookUrl, Map<String, Object> embed) {

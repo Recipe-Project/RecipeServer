@@ -38,10 +38,12 @@ public class RecipeResponse {
     private final long scrapCnt;
     @Schema(description = "조회수")
     private final long viewCnt;
+    @Schema(description = "재료 일치도")
+    private final long ingredientsMatchRate;
 
     @Builder
     public RecipeResponse(Long recipeId, String recipeName, String introduction, String thumbnailImgUrl, String postUserName, String postDate,
-                          String linkUrl, Boolean isUserScrap, long scrapCnt, long viewCnt) {
+                          String linkUrl, Boolean isUserScrap, long scrapCnt, long viewCnt, long ingredientsMatchRate) {
 
         this.recipeId = recipeId;
         this.recipeName = recipeName;
@@ -53,9 +55,15 @@ public class RecipeResponse {
         this.isUserScrap = isUserScrap;
         this.scrapCnt = scrapCnt;
         this.viewCnt = viewCnt;
+        this.ingredientsMatchRate = ingredientsMatchRate;
     }
 
     public static RecipeResponse from(Recipe recipe, User recipePostUser, List<RecipeScrap> recipeScraps, User user) {
+
+        return from(recipe, recipePostUser, recipeScraps, user, 0L);
+    }
+
+    public static RecipeResponse from(Recipe recipe, User recipePostUser, List<RecipeScrap> recipeScraps, User user, long ingredientsMatchRate) {
 
         return RecipeResponse.builder()
                 .recipeId(recipe.getRecipeId())
@@ -70,6 +78,7 @@ public class RecipeResponse {
                                         && recipeScrap.getUserId().equals(user.getUserId())))
                 .scrapCnt(recipe.getScrapCnt())
                 .viewCnt(recipe.getViewCnt())
+                .ingredientsMatchRate(ingredientsMatchRate)
                 .build();
     }
 

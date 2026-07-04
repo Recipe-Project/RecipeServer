@@ -7,7 +7,6 @@ import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.ingredient.application.IngredientSynonymCache;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
-import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse;
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
 import com.recipe.app.src.recipe.domain.Recipes;
@@ -125,9 +124,15 @@ public class RecipeSearchService {
 
         long totalCnt = recipeRepository.countByUserId(user.getUserId());
 
-        List<Recipe> recipes = findLimitByUserId(user.getUserId(), lastRecipeId, size);
+        Recipes recipes = new Recipes(findLimitByUserId(user.getUserId(), lastRecipeId, size));
 
-        return getRecipes(user, totalCnt, new Recipes(recipes));
+        List<User> recipePostUsers = userService.findByUserIds(recipes.getUserIds());
+
+        List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes.getRecipeIds());
+
+        List<String> ingredientNamesInFridge = fridgeService.findIngredientNamesInFridge(user.getUserId());
+
+        return RecipesResponse.from(totalCnt, recipes, recipePostUsers, recipeScraps, user, ingredientNamesInFridge);
     }
 
     @Transactional(readOnly = true)
@@ -146,7 +151,7 @@ public class RecipeSearchService {
     }
 
     @Transactional(readOnly = true)
-    public RecommendedRecipesResponse findRecommendedRecipesByUserFridge(User user, long lastRecipeId, int size) {
+    public RecipesResponse findRecommendedRecipesByUserFridge(User user, long lastRecipeId, int size) {
 
         List<String> ingredientNamesInFridge = fridgeService.findIngredientNamesInFridge(user.getUserId());
 
@@ -158,11 +163,11 @@ public class RecipeSearchService {
 
         Recipe lastRecipe = recipeRepository.findById(lastRecipeId).orElse(null);
 
-        return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, user, ingredientNamesInFridge, lastRecipe, size);
+        return RecipesResponse.from(recipes, recipePostUsers, recipeScraps, user, ingredientNamesInFridge, lastRecipe, size);
     }
 
     @Transactional(readOnly = true)
-    public RecommendedRecipesResponse findPublicRecommendedRecipesByIngredients(List<String> ingredientNames, long lastRecipeId, int size) {
+    public RecipesResponse findPublicRecommendedRecipesByIngredients(List<String> ingredientNames, long lastRecipeId, int size) {
 
         List<String> expandedIngredientNames = List.copyOf(ingredientSynonymCache.expand(ingredientNames));
 
@@ -176,6 +181,6 @@ public class RecipeSearchService {
 
         User anonymousUser = new User();
 
-        return RecommendedRecipesResponse.from(recipes, recipePostUsers, recipeScraps, anonymousUser, expandedIngredientNames, lastRecipe, size);
+        return RecipesResponse.from(recipes, recipePostUsers, recipeScraps, anonymousUser, expandedIngredientNames, lastRecipe, size);
     }
 }
