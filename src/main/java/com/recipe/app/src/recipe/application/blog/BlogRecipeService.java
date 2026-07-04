@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.application.blog;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.recipe.application.keyword.SearchKeywordService;
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
@@ -22,17 +23,20 @@ public class BlogRecipeService {
     private final BlogViewService blogViewService;
     private final BadWordFiltering badWordFiltering;
     private final BlogRecipeClientSearchService blogRecipeClientSearchService;
+    private final SearchKeywordService searchKeywordService;
 
 
     private static final int MIN_RECIPE_CNT = 10;
 
     public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BlogViewService blogViewService,
-                             BadWordFiltering badWordFiltering, BlogRecipeClientSearchService blogRecipeClientSearchService) {
+                             BadWordFiltering badWordFiltering, BlogRecipeClientSearchService blogRecipeClientSearchService,
+                             SearchKeywordService searchKeywordService) {
         this.blogRecipeRepository = blogRecipeRepository;
         this.blogScrapService = blogScrapService;
         this.blogViewService = blogViewService;
         this.badWordFiltering = badWordFiltering;
         this.blogRecipeClientSearchService = blogRecipeClientSearchService;
+        this.searchKeywordService = searchKeywordService;
     }
 
     @Transactional
@@ -53,6 +57,9 @@ public class BlogRecipeService {
 
         List<BlogRecipe> blogRecipes = findByKeywordOrderBy(query, lastBlogRecipeId, size, sort);
         totalCnt = blogRecipeRepository.countByKeyword(query);
+
+        // 검색 로그 적재 (비동기·fire-and-forget). 욕설/빈 검색어는 위에서 이미 걸러진 상태.
+        searchKeywordService.record(keyword, user != null ? user.getUserId() : null);
 
         return getRecipes(user, totalCnt, new BlogRecipes(blogRecipes));
     }

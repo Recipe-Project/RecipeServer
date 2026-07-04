@@ -2,6 +2,7 @@ package com.recipe.app.src.recipe.application.blog
 
 import com.recipe.app.src.common.utils.BadWordFiltering
 import com.recipe.app.src.recipe.application.dto.RecipesResponse
+import com.recipe.app.src.recipe.application.keyword.SearchKeywordService
 import com.recipe.app.src.recipe.domain.blog.BlogRecipe
 import com.recipe.app.src.recipe.domain.blog.BlogScrap
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository
@@ -18,7 +19,8 @@ class BlogRecipeServiceTest extends Specification {
     private BlogViewService blogViewService = Mock()
     private BadWordFiltering badWordService = Mock()
     private BlogRecipeClientSearchService blogRecipeClientSearchService = Mock()
-    private BlogRecipeService blogRecipeService = new BlogRecipeService(blogRecipeRepository, blogScrapService, blogViewService, badWordService, blogRecipeClientSearchService)
+    private SearchKeywordService searchKeywordService = Mock()
+    private BlogRecipeService blogRecipeService = new BlogRecipeService(blogRecipeRepository, blogScrapService, blogViewService, badWordService, blogRecipeClientSearchService, searchKeywordService)
 
     def "블로그 레시피 검색 - 스크랩순"() {
 
