@@ -6,7 +6,6 @@ import com.recipe.app.src.recipe.application.RecipeService;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipeRequest;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
-import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse;
 import com.recipe.app.src.user.domain.User;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -89,7 +88,7 @@ public class RecipeController {
     @Operation(summary = "냉장고 파먹기 레시피 목록 조회 API")
     @GetMapping("/fridges-recommendation")
     @LoginCheck
-    public RecommendedRecipesResponse getFridgesRecipes(@Parameter(hidden = true) User user,
+    public RecipesResponse getFridgesRecipes(@Parameter(hidden = true) User user,
                                                         @Parameter(example = "0", name = "마지막 조회 레시피 아이디")
                                                         @RequestParam(value = "startAfter") long startAfter,
                                                         @Parameter(example = "20", name = "사이즈")

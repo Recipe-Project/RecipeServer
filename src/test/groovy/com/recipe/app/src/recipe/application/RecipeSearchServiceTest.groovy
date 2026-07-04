@@ -6,7 +6,6 @@ import com.recipe.app.src.fridge.application.FridgeService
 import com.recipe.app.src.ingredient.application.IngredientSynonymCache
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse
 import com.recipe.app.src.recipe.application.dto.RecipesResponse
-import com.recipe.app.src.recipe.application.dto.RecommendedRecipesResponse
 import com.recipe.app.src.recipe.domain.*
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException
 import com.recipe.app.src.recipe.infra.RecipeRepository
@@ -503,6 +502,8 @@ class RecipeSearchServiceTest extends Specification {
                         .build()
         ]
 
+        fridgeService.findIngredientNamesInFridge(users.get(0).getUserId()) >> []
+
         when:
         RecipesResponse result = recipeSearchService.findRecipesByUser(users.get(0), lastRecipeId, size)
 
@@ -602,7 +603,7 @@ class RecipeSearchServiceTest extends Specification {
         recipeRepository.findById(lastRecipeId) >> Optional.empty()
 
         when:
-        RecommendedRecipesResponse result = recipeSearchService.findRecommendedRecipesByUserFridge(users.get(0), lastRecipeId, size)
+        RecipesResponse result = recipeSearchService.findRecommendedRecipesByUserFridge(users.get(0), lastRecipeId, size)
 
         then:
         result.totalCnt == 2
@@ -643,7 +644,7 @@ class RecipeSearchServiceTest extends Specification {
         recipeRepository.findById(lastRecipeId) >> Optional.empty()
 
         when:
-        RecommendedRecipesResponse result = recipeSearchService.findPublicRecommendedRecipesByIngredients(inputIngredientNames, lastRecipeId, size)
+        RecipesResponse result = recipeSearchService.findPublicRecommendedRecipesByIngredients(inputIngredientNames, lastRecipeId, size)
 
         then: "동의어 expand 결과(새우+대하)가 그대로 검색 인자로 전달된다"
         1 * recipeRepository.findRecipesInFridge({ Collection<String> arg -> arg as Set == expandedSet }) >> recipes
@@ -664,7 +665,7 @@ class RecipeSearchServiceTest extends Specification {
         recipeRepository.findById(lastRecipeId) >> Optional.empty()
 
         when:
-        RecommendedRecipesResponse result = recipeSearchService.findPublicRecommendedRecipesByIngredients([], lastRecipeId, size)
+        RecipesResponse result = recipeSearchService.findPublicRecommendedRecipesByIngredients([], lastRecipeId, size)
 
         then:
         result.totalCnt == 0
