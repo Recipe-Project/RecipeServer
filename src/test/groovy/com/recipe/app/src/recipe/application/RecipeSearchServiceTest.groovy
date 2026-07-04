@@ -6,6 +6,7 @@ import com.recipe.app.src.fridge.application.FridgeService
 import com.recipe.app.src.ingredient.application.IngredientSynonymCache
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse
 import com.recipe.app.src.recipe.application.dto.RecipesResponse
+import com.recipe.app.src.recipe.application.keyword.SearchKeywordService
 import com.recipe.app.src.recipe.domain.*
 import com.recipe.app.src.recipe.exception.NotFoundRecipeException
 import com.recipe.app.src.recipe.infra.RecipeRepository
@@ -24,8 +25,9 @@ class RecipeSearchServiceTest extends Specification {
     private RecipeScrapService recipeScrapService = Mock()
     private RecipeViewService recipeViewService = Mock()
     private IngredientSynonymCache ingredientSynonymCache = Mock()
+    private SearchKeywordService searchKeywordService = Mock()
     private RecipeSearchService recipeSearchService = new RecipeSearchService(recipeRepository, fridgeService, userService, badWordService,
-            recipeScrapService, recipeViewService, ingredientSynonymCache)
+            recipeScrapService, recipeViewService, ingredientSynonymCache, searchKeywordService)
 
     def "레시피 키워드 검색 - 스크랩 수 정렬"() {
 
