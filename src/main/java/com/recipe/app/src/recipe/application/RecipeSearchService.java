@@ -7,6 +7,7 @@ import com.recipe.app.src.fridge.application.FridgeService;
 import com.recipe.app.src.ingredient.application.IngredientSynonymCache;
 import com.recipe.app.src.recipe.application.dto.RecipeDetailResponse;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
+import com.recipe.app.src.recipe.application.keyword.SearchKeywordService;
 import com.recipe.app.src.recipe.domain.Recipe;
 import com.recipe.app.src.recipe.domain.RecipeScrap;
 import com.recipe.app.src.recipe.domain.Recipes;
@@ -29,9 +30,11 @@ public class RecipeSearchService {
     private final RecipeScrapService recipeScrapService;
     private final RecipeViewService recipeViewService;
     private final IngredientSynonymCache ingredientSynonymCache;
+    private final SearchKeywordService searchKeywordService;
 
     public RecipeSearchService(RecipeRepository recipeRepository, FridgeService fridgeService, UserService userService, BadWordFiltering badWordFiltering,
-                               RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, IngredientSynonymCache ingredientSynonymCache) {
+                               RecipeScrapService recipeScrapService, RecipeViewService recipeViewService, IngredientSynonymCache ingredientSynonymCache,
+                               SearchKeywordService searchKeywordService) {
         this.recipeRepository = recipeRepository;
         this.fridgeService = fridgeService;
         this.userService = userService;
@@ -39,6 +42,7 @@ public class RecipeSearchService {
         this.recipeScrapService = recipeScrapService;
         this.recipeViewService = recipeViewService;
         this.ingredientSynonymCache = ingredientSynonymCache;
+        this.searchKeywordService = searchKeywordService;
     }
 
     @Transactional(readOnly = true)
@@ -61,6 +65,9 @@ public class RecipeSearchService {
         } else {
             recipes = findByKeywordOrderByCreatedAt(query, lastRecipeId, size);
         }
+
+        // 검색 로그 적재 (비동기·fire-and-forget). 욕설/빈 검색어는 위에서 이미 걸러진 상태.
+        searchKeywordService.record(keyword, user != null ? user.getUserId() : null);
 
         return getRecipes(user, totalCnt, new Recipes(recipes));
     }
