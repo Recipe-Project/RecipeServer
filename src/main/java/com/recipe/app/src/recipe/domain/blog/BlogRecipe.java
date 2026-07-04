@@ -37,16 +37,16 @@ public class BlogRecipe extends BaseEntity {
     @Column(name = "blogThumbnailImgUrl")
     private String blogThumbnailImgUrl;
 
-    @Column(name = "title", nullable = false, length = 128)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false, length = 200)
+    @Column(name = "description", nullable = false)
     private String description;
 
     @Column(name = "publishedAt", nullable = false)
     private LocalDate publishedAt;
 
-    @Column(name = "blogName", nullable = false, length = 45)
+    @Column(name = "blogName", nullable = false)
     private String blogName;
 
     @Column(name = "scrapCnt", nullable = false)
