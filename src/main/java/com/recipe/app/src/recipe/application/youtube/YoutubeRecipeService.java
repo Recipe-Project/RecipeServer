@@ -1,6 +1,7 @@
 package com.recipe.app.src.recipe.application.youtube;
 
 import com.recipe.app.src.common.utils.BadWordFiltering;
+import com.recipe.app.src.recipe.application.keyword.SearchKeywordService;
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer;
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.recipe.application.dto.RecipesResponse;
@@ -23,14 +24,17 @@ public class YoutubeRecipeService {
     private final YoutubeViewService youtubeViewService;
     private final BadWordFiltering badWordFiltering;
     private final YoutubeRecipeClientSearchService youtubeRecipeClientSearchService;
+    private final SearchKeywordService searchKeywordService;
 
     public YoutubeRecipeService(YoutubeRecipeRepository youtubeRecipeRepository, YoutubeScrapService youtubeScrapService, YoutubeViewService youtubeViewService,
-                                BadWordFiltering badWordFiltering, YoutubeRecipeClientSearchService youtubeRecipeClientSearchService) {
+                                BadWordFiltering badWordFiltering, YoutubeRecipeClientSearchService youtubeRecipeClientSearchService,
+                                SearchKeywordService searchKeywordService) {
         this.youtubeRecipeRepository = youtubeRecipeRepository;
         this.youtubeScrapService = youtubeScrapService;
         this.youtubeViewService = youtubeViewService;
         this.badWordFiltering = badWordFiltering;
         this.youtubeRecipeClientSearchService = youtubeRecipeClientSearchService;
+        this.searchKeywordService = searchKeywordService;
     }
 
     @Transactional
@@ -51,6 +55,9 @@ public class YoutubeRecipeService {
 
         List<YoutubeRecipe> youtubeRecipes = findByKeywordOrderBy(query, lastYoutubeRecipeId, size, sort);
         totalCnt = youtubeRecipeRepository.countByKeyword(query);
+
+        // 검색 로그 적재 (비동기·fire-and-forget). 욕설/빈 검색어는 위에서 이미 걸러진 상태.
+        searchKeywordService.record(keyword, user != null ? user.getUserId() : null);
 
         return getRecipes(user, totalCnt, new YoutubeRecipes(youtubeRecipes));
     }

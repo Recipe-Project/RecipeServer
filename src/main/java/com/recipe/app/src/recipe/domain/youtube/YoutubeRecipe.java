@@ -31,10 +31,10 @@ public class YoutubeRecipe extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long youtubeRecipeId;
 
-    @Column(name = "title", nullable = false, length = 128)
+    @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", length = 200)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "thumbnailImgUrl", nullable = false)
