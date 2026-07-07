@@ -18,11 +18,20 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.util.StringUtils;
+import org.springframework.web.ErrorResponse;
+import org.springframework.web.HttpMediaTypeNotAcceptableException;
+import org.springframework.web.HttpMediaTypeNotSupportedException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.util.Map;
@@ -79,6 +88,26 @@ public class GeneralExceptionHandler {
         log.warn("Request rejected by firewall. {} {} from {} - {}", request.getMethod(), request.getRequestURI(), clientIp, e.getMessage());
         scanAttackMonitor.record(clientIp);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(Map.of("message", "잘못된 요청입니다."));
+    }
+
+    // Spring MVC 표준 예외(파라미터 누락·타입 불일치·미지원 메서드 등)는 예외가 가진 상태코드(400/405/415…)를
+    // 그대로 내려준다. 클라이언트 잘못이므로 500 으로 뭉개지 않고 알림도 보내지 않는다.
+    // ErrorResponse 는 인터페이스(Throwable 아님)라 @ExceptionHandler 로 직접 잡을 수 없어,
+    // 실제 예외 타입을 나열해 잡고 상태코드는 런타임에 ErrorResponse 로 읽는다.
+    @ExceptionHandler({
+            ServletRequestBindingException.class,
+            MethodArgumentTypeMismatchException.class,
+            MethodArgumentNotValidException.class,
+            HttpMessageNotReadableException.class,
+            HttpRequestMethodNotSupportedException.class,
+            HttpMediaTypeNotSupportedException.class,
+            HttpMediaTypeNotAcceptableException.class
+    })
+    public ResponseEntity<?> handleSpringMvcException(Exception e, HttpServletRequest request) {
+        HttpStatusCode status = (e instanceof ErrorResponse er) ? er.getStatusCode() : HttpStatus.BAD_REQUEST;
+        log.warn("{} {} {} from {} - {}", status.value(), request.getMethod(), request.getRequestURI(),
+                clientIp(request), e.getMessage());
+        return ResponseEntity.status(status).body(Map.of("message", "잘못된 요청입니다."));
     }
 
     // 위에서 처리되지 않은 모든 예외 = 500. 로그를 남기고 (webhook 설정 시) Discord 로 알림을 보낸다.
