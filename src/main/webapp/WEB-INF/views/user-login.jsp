@@ -38,7 +38,7 @@
     <p>
         <a href="https://accounts.google.com/o/oauth2/v2/auth?client_id=<%=googleClientId%>&redirect_uri=<%=googleRedirectURI%>&response_type=code&scope=email%20profile%20openid&access_type=offline">
             <img width="200" height="50"
-                 src="https://developers.google.com/static/identity/images/branding_guideline_sample_lt_sq_lg.svg"
+                 src="https://developers.google.com/identity/images/btn_google_signin_light_normal_web.png"
                  alt="구글 로그인 버튼"/>
         </a>
     </p>
