@@ -66,7 +66,7 @@ class YoutubeRecipeServiceTest extends Specification {
                         .build()
         ]
 
-        youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(_, lastYoutubeRecipeId, 0, size) >> youtubeRecipes
+        youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(_, lastYoutubeRecipeId, _, 0, size) >> youtubeRecipes
 
         List<YoutubeScrap> youtubeScraps = [
                 YoutubeScrap.builder()
@@ -136,7 +136,7 @@ class YoutubeRecipeServiceTest extends Specification {
                         .build()
         ]
 
-        youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(_, lastYoutubeRecipeId, 0, size) >> youtubeRecipes
+        youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(_, lastYoutubeRecipeId, _, 0, size) >> youtubeRecipes
 
         List<YoutubeScrap> youtubeScraps = [
                 YoutubeScrap.builder()
@@ -208,7 +208,7 @@ class YoutubeRecipeServiceTest extends Specification {
 
         youtubeRecipeRepository.findById(lastYoutubeRecipeId) >> Optional.empty()
 
-        youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(_, lastYoutubeRecipeId, null, size) >> youtubeRecipes
+        youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(_, lastYoutubeRecipeId, _, null, size) >> youtubeRecipes
 
         List<YoutubeScrap> youtubeScraps = [
                 YoutubeScrap.builder()

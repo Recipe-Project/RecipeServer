@@ -75,23 +75,26 @@ public class YoutubeRecipeService {
 
     private List<YoutubeRecipe> findByKeywordOrderByYoutubeScrapCnt(SearchQuery query, long lastYoutubeRecipeId, int size) {
 
+        Double lastRelevance = youtubeRecipeRepository.findRelevanceScoreByYoutubeRecipeId(query, lastYoutubeRecipeId);
         long youtubeScrapCnt = youtubeScrapService.countByYoutubeRecipeId(lastYoutubeRecipeId);
 
-        return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(query, lastYoutubeRecipeId, youtubeScrapCnt, size);
+        return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(query, lastYoutubeRecipeId, lastRelevance, youtubeScrapCnt, size);
     }
 
     private List<YoutubeRecipe> findByKeywordOrderByYoutubeViewCnt(SearchQuery query, long lastYoutubeRecipeId, int size) {
 
+        Double lastRelevance = youtubeRecipeRepository.findRelevanceScoreByYoutubeRecipeId(query, lastYoutubeRecipeId);
         long youtubeViewCnt = youtubeViewService.countByYoutubeRecipeId(lastYoutubeRecipeId);
 
-        return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(query, lastYoutubeRecipeId, youtubeViewCnt, size);
+        return youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(query, lastYoutubeRecipeId, lastRelevance, youtubeViewCnt, size);
     }
 
     private List<YoutubeRecipe> findByKeywordOrderByPostDate(SearchQuery query, long lastYoutubeRecipeId, int size) {
 
+        Double lastRelevance = youtubeRecipeRepository.findRelevanceScoreByYoutubeRecipeId(query, lastYoutubeRecipeId);
         YoutubeRecipe youtubeRecipe = youtubeRecipeRepository.findById(lastYoutubeRecipeId).orElse(null);
 
-        return youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(query, lastYoutubeRecipeId, youtubeRecipe != null ? youtubeRecipe.getPostDate() : null, size);
+        return youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(query, lastYoutubeRecipeId, lastRelevance, youtubeRecipe != null ? youtubeRecipe.getPostDate() : null, size);
     }
 
     @Transactional(readOnly = true)

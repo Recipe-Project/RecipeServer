@@ -3,15 +3,20 @@ package com.recipe.app.src.recipe.infra.youtube;
 import com.recipe.app.src.common.infra.BaseRepositoryImpl;
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
 import com.recipe.app.src.recipe.domain.youtube.YoutubeRecipe;
+import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberExpression;
 import jakarta.persistence.EntityManager;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Supplier;
 
 import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
 import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
+import static com.recipe.app.src.common.utils.QueryUtils.relevanceScore;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeRecipe.youtubeRecipe;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeScrap.youtubeScrap;
 
@@ -46,54 +51,91 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
     }
 
     @Override
-    public List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(SearchQuery query, Long lastYoutubeRecipeId, LocalDate lastYoutubeRecipePostDate, int size) {
+    public Double findRelevanceScoreByYoutubeRecipeId(SearchQuery query, Long youtubeRecipeId) {
+
+        if (youtubeRecipeId == null || youtubeRecipeId <= 0 || !(query instanceof SearchQuery.BooleanQuery b)) {
+            return null;
+        }
+
+        return queryFactory
+                .select(relevanceScore(youtubeRecipe.searchTokens, b.query()))
+                .from(youtubeRecipe)
+                .where(youtubeRecipe.youtubeRecipeId.eq(youtubeRecipeId))
+                .fetchOne();
+    }
+
+    @Override
+    public List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(SearchQuery query, Long lastYoutubeRecipeId, Double lastRelevance, LocalDate lastYoutubeRecipePostDate, int size) {
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
                         matchSearchQuery(youtubeRecipe.searchTokens, query),
-                        ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, postDate) -> youtubeRecipe.postDate.lt(postDate)
-                                        .or(youtubeRecipe.postDate.eq(postDate)
-                                                .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
-                                lastYoutubeRecipeId, lastYoutubeRecipePostDate)
+                        relevanceCursor(query, lastYoutubeRecipeId, lastRelevance,
+                                () -> youtubeRecipe.postDate.lt(lastYoutubeRecipePostDate), () -> youtubeRecipe.postDate.eq(lastYoutubeRecipePostDate))
                 )
-                .orderBy(youtubeRecipe.postDate.desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .orderBy(relevanceOrder(query, youtubeRecipe.postDate.desc()))
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeScrapCntDesc(SearchQuery query, Long lastYoutubeRecipeId, long lastYoutubeScrapCnt, int size) {
+    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeScrapCntDesc(SearchQuery query, Long lastYoutubeRecipeId, Double lastRelevance, long lastYoutubeScrapCnt, int size) {
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
                         matchSearchQuery(youtubeRecipe.searchTokens, query),
-                        ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeScrapCnt) -> youtubeRecipe.scrapCnt.lt(youtubeScrapCnt)
-                                        .or(youtubeRecipe.scrapCnt.eq(youtubeScrapCnt)
-                                                .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
-                                lastYoutubeRecipeId, lastYoutubeScrapCnt)
+                        relevanceCursor(query, lastYoutubeRecipeId, lastRelevance,
+                                () -> youtubeRecipe.scrapCnt.lt(lastYoutubeScrapCnt), () -> youtubeRecipe.scrapCnt.eq(lastYoutubeScrapCnt))
                 )
-                .orderBy(youtubeRecipe.scrapCnt.desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .orderBy(relevanceOrder(query, youtubeRecipe.scrapCnt.desc()))
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeViewCntDesc(SearchQuery query, Long lastYoutubeRecipeId, long lastYoutubeViewCnt, int size) {
+    public List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeViewCntDesc(SearchQuery query, Long lastYoutubeRecipeId, Double lastRelevance, long lastYoutubeViewCnt, int size) {
 
         return queryFactory
                 .selectFrom(youtubeRecipe)
                 .where(
                         matchSearchQuery(youtubeRecipe.searchTokens, query),
-                        ifIdIsNotNullAndGreaterThanZero((youtubeRecipeId, youtubeViewCnt) -> youtubeRecipe.viewCnt.lt(youtubeViewCnt)
-                                        .or(youtubeRecipe.viewCnt.eq(youtubeViewCnt)
-                                                .and(youtubeRecipe.youtubeRecipeId.lt(youtubeRecipeId))),
-                                lastYoutubeRecipeId, lastYoutubeViewCnt)
+                        relevanceCursor(query, lastYoutubeRecipeId, lastRelevance,
+                                () -> youtubeRecipe.viewCnt.lt(lastYoutubeViewCnt), () -> youtubeRecipe.viewCnt.eq(lastYoutubeViewCnt))
                 )
-                .orderBy(youtubeRecipe.viewCnt.desc(), youtubeRecipe.youtubeRecipeId.desc())
+                .orderBy(relevanceOrder(query, youtubeRecipe.viewCnt.desc()))
                 .limit(size)
                 .fetch();
+    }
+
+    // "검색어 일치율 대분류 → 소분류(secondary) → youtubeRecipeId" keyset 커서. (recipe 와 동일 패턴)
+    private BooleanExpression relevanceCursor(SearchQuery query, Long lastYoutubeRecipeId, Double lastRelevance,
+                                              Supplier<BooleanExpression> secondaryLt, Supplier<BooleanExpression> secondaryEq) {
+
+        if (lastYoutubeRecipeId == null || lastYoutubeRecipeId <= 0) {
+            return null;
+        }
+
+        BooleanExpression idLt = youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId);
+
+        if (query instanceof SearchQuery.BooleanQuery b && lastRelevance != null) {
+            NumberExpression<Double> score = relevanceScore(youtubeRecipe.searchTokens, b.query());
+            return score.lt(lastRelevance)
+                    .or(score.eq(lastRelevance).and(secondaryLt.get()))
+                    .or(score.eq(lastRelevance).and(secondaryEq.get()).and(idLt));
+        }
+
+        return secondaryLt.get().or(secondaryEq.get().and(idLt));
+    }
+
+    private OrderSpecifier<?>[] relevanceOrder(SearchQuery query, OrderSpecifier<?> secondary) {
+
+        if (query instanceof SearchQuery.BooleanQuery b) {
+            return new OrderSpecifier<?>[]{relevanceScore(youtubeRecipe.searchTokens, b.query()).desc(), secondary, youtubeRecipe.youtubeRecipeId.desc()};
+        }
+
+        return new OrderSpecifier<?>[]{secondary, youtubeRecipe.youtubeRecipeId.desc()};
     }
 
     @Override

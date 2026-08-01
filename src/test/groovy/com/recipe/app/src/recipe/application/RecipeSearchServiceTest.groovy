@@ -72,7 +72,7 @@ class RecipeSearchServiceTest extends Specification {
                         .build(),
         ]
 
-        recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(_, lastRecipeId, 0, size) >> recipes
+        recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(_, lastRecipeId, _, 0, size) >> recipes
 
         userService.findByUserIds(users.userId) >> users
 
@@ -146,7 +146,7 @@ class RecipeSearchServiceTest extends Specification {
                         .build(),
         ]
 
-        recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(_, lastRecipeId, 0, size) >> recipes
+        recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(_, lastRecipeId, _, 0, size) >> recipes
 
         userService.findByUserIds(users.userId) >> users
 
@@ -222,7 +222,7 @@ class RecipeSearchServiceTest extends Specification {
 
         recipeRepository.findById(lastRecipeId) >> Optional.empty()
 
-        recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_, lastRecipeId, null, size) >> recipes
+        recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_, lastRecipeId, _, null, size) >> recipes
 
         userService.findByUserIds(users.userId) >> users
 
@@ -342,7 +342,7 @@ class RecipeSearchServiceTest extends Specification {
 
         recipeRepository.countByKeyword(_) >> 1
         recipeRepository.findById(_) >> Optional.empty()
-        recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_, _, _, _) >> [recipe]
+        recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_, _, _, _, _) >> [recipe]
         userService.findByUserIds(_) >> []
         recipeScrapService.findByRecipeIds(_) >> []
 
@@ -688,7 +688,7 @@ class RecipeSearchServiceTest extends Specification {
         result.totalCnt == 0
         result.recipes.isEmpty()
         0 * recipeRepository.countByKeyword(_)
-        0 * recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_, _, _, _)
+        0 * recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(_, _, _, _, _)
 
         where:
         input << ["", "   ", "\t"]

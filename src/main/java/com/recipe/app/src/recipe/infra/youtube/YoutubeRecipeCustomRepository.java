@@ -13,11 +13,14 @@ public interface YoutubeRecipeCustomRepository {
 
     List<YoutubeRecipe> findByKeywordLimit(String keyword, int size);
 
-    List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(SearchQuery query, Long lastYoutubeRecipeId, LocalDate lastYoutubeRecipePostDate, int size);
+    // 아래 정렬들은 모두 "검색어 일치율(relevance) 대분류 → 각 정렬키 소분류 → youtubeRecipeId" 순.
+    Double findRelevanceScoreByYoutubeRecipeId(SearchQuery query, Long youtubeRecipeId);
 
-    List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeScrapCntDesc(SearchQuery query, Long lastYoutubeRecipeId, long youtubeScrapCnt, int size);
+    List<YoutubeRecipe> findByKeywordLimitOrderByPostDateDesc(SearchQuery query, Long lastYoutubeRecipeId, Double lastRelevance, LocalDate lastYoutubeRecipePostDate, int size);
 
-    List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeViewCntDesc(SearchQuery query, Long lastYoutubeRecipeId, long youtubeViewCnt, int size);
+    List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeScrapCntDesc(SearchQuery query, Long lastYoutubeRecipeId, Double lastRelevance, long youtubeScrapCnt, int size);
+
+    List<YoutubeRecipe> findByKeywordLimitOrderByYoutubeViewCntDesc(SearchQuery query, Long lastYoutubeRecipeId, Double lastRelevance, long youtubeViewCnt, int size);
 
     List<YoutubeRecipe> findUserScrapYoutubeRecipesLimit(Long userId, Long lastYoutubeRecipeId, LocalDateTime scrapCreatedAt, int size);
 }

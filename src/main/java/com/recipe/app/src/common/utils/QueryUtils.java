@@ -2,6 +2,7 @@ package com.recipe.app.src.common.utils;
 
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.Expressions;
+import com.querydsl.core.types.dsl.NumberExpression;
 import com.querydsl.core.types.dsl.StringPath;
 
 import java.util.function.BiFunction;
@@ -21,8 +22,16 @@ public class QueryUtils {
      * MySQL FULLTEXT BOOLEAN MODE 매칭 조건. SearchKeywordNormalizer 가 만든 BOOLEAN 모드 쿼리 문자열을 받는다.
      */
     public static BooleanExpression matchAgainst(StringPath column, String booleanQuery) {
+        return relevanceScore(column, booleanQuery).gt(0);
+    }
+
+    /**
+     * MySQL FULLTEXT BOOLEAN MODE 의 relevance 점수(매칭 토큰 수 기반)를 그대로 반환한다.
+     * WHERE 필터(matchAgainst)와 ORDER BY(정확도순) 양쪽에서 재사용한다.
+     */
+    public static NumberExpression<Double> relevanceScore(StringPath column, String booleanQuery) {
         return Expressions.numberTemplate(Double.class,
-                "function('match_against', {0}, {1})", column, booleanQuery).gt(0);
+                "function('match_against', {0}, {1})", column, booleanQuery);
     }
 
     /**

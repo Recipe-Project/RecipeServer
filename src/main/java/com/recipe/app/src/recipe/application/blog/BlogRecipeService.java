@@ -92,23 +92,26 @@ public class BlogRecipeService {
 
     private List<BlogRecipe> findByKeywordOrderByBlogScrapCnt(SearchQuery query, long lastBlogRecipeId, int size) {
 
+        Double lastRelevance = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, lastBlogRecipeId);
         long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(query, lastBlogRecipeId, lastBlogScrapCnt, size);
+        return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(query, lastBlogRecipeId, lastRelevance, lastBlogScrapCnt, size);
     }
 
     private List<BlogRecipe> findByKeywordOrderByBlogViewCnt(SearchQuery query, long lastBlogRecipeId, int size) {
 
+        Double lastRelevance = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, lastBlogRecipeId);
         long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(query, lastBlogRecipeId, lastBlogViewCnt, size);
+        return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(query, lastBlogRecipeId, lastRelevance, lastBlogViewCnt, size);
     }
 
     private List<BlogRecipe> findByKeywordOrderByPublishedAt(SearchQuery query, long lastBlogRecipeId, int size) {
 
+        Double lastRelevance = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, lastBlogRecipeId);
         BlogRecipe blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElse(null);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(query, lastBlogRecipeId, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
+        return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(query, lastBlogRecipeId, lastRelevance, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
     }
 
     @Transactional(readOnly = true)
