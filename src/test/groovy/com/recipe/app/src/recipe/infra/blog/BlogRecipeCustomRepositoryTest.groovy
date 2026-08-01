@@ -105,8 +105,8 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogName("테스트")
                         .build(),
                 BlogRecipe.builder()
-                        .title("제목2")
-                        .description("테스트설명2")
+                        .title("테스트제목2")
+                        .description("설명2")
                         .publishedAt(LocalDate.of(2024, 1, 5))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -122,7 +122,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
-                        .description("테스트설명3")
+                        .description("설명3")
                         .publishedAt(LocalDate.of(2024, 1, 3))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -133,7 +133,9 @@ class BlogRecipeCustomRepositoryTest extends Specification {
 
         when:
         BlogRecipe lastBlogRecipe = blogRecipes.get(1);
-        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(SearchKeywordNormalizer.normalize("테스트"), lastBlogRecipe.getBlogRecipeId(), lastBlogRecipe.getPublishedAt(), 3);
+        def query = SearchKeywordNormalizer.normalize("테스트")
+        Double lastRel = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, lastBlogRecipe.getBlogRecipeId())
+        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(query, lastBlogRecipe.getBlogRecipeId(), lastRel, lastBlogRecipe.getPublishedAt(), 3);
 
         then:
         response.size() == 2
@@ -171,8 +173,8 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .scrapCnt(0L)
                         .build(),
                 BlogRecipe.builder()
-                        .title("제목2")
-                        .description("테스트설명2")
+                        .title("테스트제목2")
+                        .description("설명2")
                         .publishedAt(LocalDate.of(2024, 1, 5))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -190,7 +192,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
-                        .description("테스트설명3")
+                        .description("설명3")
                         .publishedAt(LocalDate.of(2024, 1, 3))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -201,7 +203,9 @@ class BlogRecipeCustomRepositoryTest extends Specification {
         committedTx.executeWithoutResult { status -> blogRecipeRepository.saveAll(blogRecipes) }
 
         when:
-        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), blogRecipes.get(3).blogRecipeId, 3, 3);
+        def query = SearchKeywordNormalizer.normalize("테스트")
+        Double lastRel = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, blogRecipes.get(3).blogRecipeId)
+        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(query, blogRecipes.get(3).blogRecipeId, lastRel, 3, 3);
 
         then:
         response.size() == 2
@@ -235,8 +239,8 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .viewCnt(2L)
                         .build(),
                 BlogRecipe.builder()
-                        .title("제목2")
-                        .description("테스트설명2")
+                        .title("테스트제목2")
+                        .description("설명2")
                         .publishedAt(LocalDate.of(2024, 1, 5))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -254,7 +258,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
-                        .description("테스트설명3")
+                        .description("설명3")
                         .publishedAt(LocalDate.of(2024, 1, 3))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -265,7 +269,9 @@ class BlogRecipeCustomRepositoryTest extends Specification {
         committedTx.executeWithoutResult { status -> blogRecipeRepository.saveAll(blogRecipes) }
 
         when:
-        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), blogRecipes.get(3).blogRecipeId, 2, 3);
+        def query = SearchKeywordNormalizer.normalize("테스트")
+        Double lastRel = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, blogRecipes.get(3).blogRecipeId)
+        List<BlogRecipe> response = blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(query, blogRecipes.get(3).blogRecipeId, lastRel, 2, 3);
 
         then:
         response.size() == 2
@@ -292,8 +298,8 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogName("테스트")
                         .build(),
                 BlogRecipe.builder()
-                        .title("제목2")
-                        .description("테스트설명2")
+                        .title("테스트제목2")
+                        .description("설명2")
                         .publishedAt(LocalDate.of(2024, 1, 5))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -309,7 +315,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
-                        .description("테스트설명3")
+                        .description("설명3")
                         .publishedAt(LocalDate.of(2024, 1, 3))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")

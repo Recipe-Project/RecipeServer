@@ -83,8 +83,8 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .thumbnailImgUrl("http://test.jpg")
                         .build(),
                 YoutubeRecipe.builder()
-                        .title("제목")
-                        .description("테스트설명")
+                        .title("테스트제목")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 1))
                         .channelName("테스트")
                         .youtubeId("youtube4")
@@ -129,8 +129,8 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .thumbnailImgUrl("http://test.jpg")
                         .build(),
                 YoutubeRecipe.builder()
-                        .title("제목")
-                        .description("테스트설명")
+                        .title("테스트제목")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 1))
                         .channelName("테스트")
                         .youtubeId("youtube4")
@@ -141,7 +141,9 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
 
         when:
         YoutubeRecipe lastYoutubeRecipe = youtubeRecipes.get(1);
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(SearchKeywordNormalizer.normalize("테스트"), lastYoutubeRecipe.youtubeRecipeId, lastYoutubeRecipe.postDate, 3);
+        def query = SearchKeywordNormalizer.normalize("테스트")
+        Double lastRel = youtubeRecipeRepository.findRelevanceScoreByYoutubeRecipeId(query, lastYoutubeRecipe.youtubeRecipeId)
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByPostDateDesc(query, lastYoutubeRecipe.youtubeRecipeId, lastRel, lastYoutubeRecipe.postDate, 3);
 
         then:
         response.size() == 2
@@ -167,7 +169,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         List<YoutubeRecipe> youtubeRecipes = [
                 YoutubeRecipe.builder()
                         .title("테스트제목")
-                        .description("테스트설명")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 3))
                         .channelName("테스트")
                         .youtubeId("youtube1")
@@ -176,7 +178,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 YoutubeRecipe.builder()
                         .title("테스트제목")
-                        .description("테스트")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 5))
                         .channelName("테스트")
                         .youtubeId("youtube2")
@@ -193,8 +195,8 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .scrapCnt(1L)
                         .build(),
                 YoutubeRecipe.builder()
-                        .title("제목")
-                        .description("테스트설명")
+                        .title("테스트제목")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 1))
                         .channelName("테스트")
                         .youtubeId("youtube4")
@@ -205,7 +207,9 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         committedTx.executeWithoutResult { status -> youtubeRecipeRepository.saveAll(youtubeRecipes) }
 
         when:
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), youtubeRecipes.get(3).youtubeRecipeId, 2, 3);
+        def query = SearchKeywordNormalizer.normalize("테스트")
+        Double lastRel = youtubeRecipeRepository.findRelevanceScoreByYoutubeRecipeId(query, youtubeRecipes.get(3).youtubeRecipeId)
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeScrapCntDesc(query, youtubeRecipes.get(3).youtubeRecipeId, lastRel, 2, 3);
 
         then:
         response.size() == 2
@@ -231,7 +235,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         List<YoutubeRecipe> youtubeRecipes = [
                 YoutubeRecipe.builder()
                         .title("테스트제목")
-                        .description("테스트설명")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 3))
                         .channelName("테스트")
                         .youtubeId("youtube1")
@@ -240,7 +244,7 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 YoutubeRecipe.builder()
                         .title("테스트제목")
-                        .description("테스트")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 5))
                         .channelName("테스트")
                         .youtubeId("youtube2")
@@ -257,8 +261,8 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .viewCnt(1L)
                         .build(),
                 YoutubeRecipe.builder()
-                        .title("제목")
-                        .description("테스트설명")
+                        .title("테스트제목")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 1))
                         .channelName("테스트")
                         .youtubeId("youtube4")
@@ -269,7 +273,9 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
         committedTx.executeWithoutResult { status -> youtubeRecipeRepository.saveAll(youtubeRecipes) }
 
         when:
-        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), youtubeRecipes.get(3).youtubeRecipeId, 2, 3)
+        def query = SearchKeywordNormalizer.normalize("테스트")
+        Double lastRel = youtubeRecipeRepository.findRelevanceScoreByYoutubeRecipeId(query, youtubeRecipes.get(3).youtubeRecipeId)
+        List<YoutubeRecipe> response = youtubeRecipeRepository.findByKeywordLimitOrderByYoutubeViewCntDesc(query, youtubeRecipes.get(3).youtubeRecipeId, lastRel, 2, 3)
 
         then:
         response.size() == 2
@@ -312,8 +318,8 @@ class YoutubeRecipeCustomRepositoryTest extends Specification {
                         .thumbnailImgUrl("http://test.jpg")
                         .build(),
                 YoutubeRecipe.builder()
-                        .title("제목")
-                        .description("테스트설명")
+                        .title("테스트제목")
+                        .description("설명")
                         .postDate(LocalDate.of(2024, 1, 1))
                         .channelName("테스트")
                         .youtubeId("youtube4")

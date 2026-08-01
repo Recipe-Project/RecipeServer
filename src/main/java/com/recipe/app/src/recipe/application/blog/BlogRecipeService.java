@@ -10,10 +10,12 @@ import com.recipe.app.src.recipe.domain.blog.BlogRecipes;
 import com.recipe.app.src.recipe.domain.blog.BlogScrap;
 import com.recipe.app.src.recipe.infra.blog.BlogRecipeRepository;
 import com.recipe.app.src.user.domain.User;
+import com.google.common.util.concurrent.Striped;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.concurrent.locks.Lock;
 
 @Service
 public class BlogRecipeService {
@@ -27,6 +29,11 @@ public class BlogRecipeService {
 
 
     private static final int MIN_RECIPE_CNT = 10;
+
+    // 같은 키워드를 여러 요청이 동시에 처음 검색할 때, 각자 findByBlogUrlIn(빈 결과) → 각자 saveAll 로
+    // 같은 blogUrl 이 중복 저장되는 레이스를 막는다. 단일 인스턴스(EC2 1대) 전제의 JVM 내부 락.
+    // 고정 64개 stripe 라 키워드가 늘어도 락 객체가 무한정 쌓이지 않는다.
+    private final Striped<Lock> keywordLocks = Striped.lock(64);
 
     public BlogRecipeService(BlogRecipeRepository blogRecipeRepository, BlogScrapService blogScrapService, BlogViewService blogViewService,
                              BadWordFiltering badWordFiltering, BlogRecipeClientSearchService blogRecipeClientSearchService,
@@ -52,7 +59,15 @@ public class BlogRecipeService {
         long totalCnt = blogRecipeRepository.countByKeyword(query);
 
         if (totalCnt < MIN_RECIPE_CNT) {
-            blogRecipeClientSearchService.searchNaverBlogRecipes(keyword);
+            // 락을 잡은 한 요청만 네이버에서 채우고, 그 트랜잭션(REQUIRES_NEW)이 커밋된 뒤 락을 푼다.
+            // 뒤이어 락을 잡는 요청은 findByBlogUrlIn 에서 앞 요청이 커밋한 행을 보고 걸러내므로 중복이 안 쌓인다.
+            Lock lock = keywordLocks.get(keyword);
+            lock.lock();
+            try {
+                blogRecipeClientSearchService.searchNaverBlogRecipes(keyword);
+            } finally {
+                lock.unlock();
+            }
         }
 
         List<BlogRecipe> blogRecipes = findByKeywordOrderBy(query, lastBlogRecipeId, size, sort);
@@ -77,23 +92,26 @@ public class BlogRecipeService {
 
     private List<BlogRecipe> findByKeywordOrderByBlogScrapCnt(SearchQuery query, long lastBlogRecipeId, int size) {
 
+        Double lastRelevance = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, lastBlogRecipeId);
         long lastBlogScrapCnt = blogScrapService.countByBlogRecipeId(lastBlogRecipeId);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(query, lastBlogRecipeId, lastBlogScrapCnt, size);
+        return blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(query, lastBlogRecipeId, lastRelevance, lastBlogScrapCnt, size);
     }
 
     private List<BlogRecipe> findByKeywordOrderByBlogViewCnt(SearchQuery query, long lastBlogRecipeId, int size) {
 
+        Double lastRelevance = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, lastBlogRecipeId);
         long lastBlogViewCnt = blogViewService.countByBlogRecipeId(lastBlogRecipeId);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(query, lastBlogRecipeId, lastBlogViewCnt, size);
+        return blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(query, lastBlogRecipeId, lastRelevance, lastBlogViewCnt, size);
     }
 
     private List<BlogRecipe> findByKeywordOrderByPublishedAt(SearchQuery query, long lastBlogRecipeId, int size) {
 
+        Double lastRelevance = blogRecipeRepository.findRelevanceScoreByBlogRecipeId(query, lastBlogRecipeId);
         BlogRecipe blogRecipe = blogRecipeRepository.findById(lastBlogRecipeId).orElse(null);
 
-        return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(query, lastBlogRecipeId, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
+        return blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(query, lastBlogRecipeId, lastRelevance, blogRecipe == null ? null : blogRecipe.getPublishedAt(), size);
     }
 
     @Transactional(readOnly = true)

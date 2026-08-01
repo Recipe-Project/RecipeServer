@@ -14,11 +14,15 @@ public interface RecipeCustomRepository {
 
     Long countByKeyword(SearchQuery query);
 
-    List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(SearchQuery query, Long lastRecipeId, LocalDateTime createdAt, int size);
+    // 아래 정렬들은 모두 "검색어 일치율(relevance) 대분류 → 각 정렬키 소분류 → recipeId" 순.
+    // lastRelevance 는 커서(직전 페이지 마지막 레시피)의 현재 검색어 기준 점수. findRelevanceScoreByRecipeId 로 구해 넘긴다.
+    Double findRelevanceScoreByRecipeId(SearchQuery query, Long recipeId);
 
-    List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(SearchQuery query, Long lastRecipeId, long recipeScrapCnt, int size);
+    List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(SearchQuery query, Long lastRecipeId, Double lastRelevance, LocalDateTime createdAt, int size);
 
-    List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(SearchQuery query, Long lastRecipeId, long recipeViewCnt, int size);
+    List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(SearchQuery query, Long lastRecipeId, Double lastRelevance, long recipeScrapCnt, int size);
+
+    List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(SearchQuery query, Long lastRecipeId, Double lastRelevance, long recipeViewCnt, int size);
 
     List<Recipe> findUserScrapRecipesLimit(Long userId, Long lastRecipeId, LocalDateTime scrapCreatedAt, int size);
 

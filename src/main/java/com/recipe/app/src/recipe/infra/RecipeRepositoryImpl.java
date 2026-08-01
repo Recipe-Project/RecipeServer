@@ -13,11 +13,15 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.recipe.app.src.common.utils.SearchKeywordNormalizer.SearchQuery;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
+import com.querydsl.core.types.dsl.NumberExpression;
 
 import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreaterThanZero;
 import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
+import static com.recipe.app.src.common.utils.QueryUtils.relevanceScore;
+import static com.recipe.app.src.common.utils.QueryUtils.titlePriorityScore;
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
 import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
 import static com.recipe.app.src.recipe.domain.QRecipeScrap.recipeScrap;
@@ -53,57 +57,104 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(SearchQuery query, Long lastRecipeId, LocalDateTime lastCreatedAt, int size) {
+    public List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(SearchQuery query, Long lastRecipeId, Double lastRelevance, LocalDateTime lastCreatedAt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
                         keywordMatch(query),
-                        ifIdIsNotNullAndGreaterThanZero((recipeId, createdAt) -> recipe.createdAt.lt(createdAt)
-                                        .or(recipe.createdAt.eq(createdAt)
-                                                .and(recipe.recipeId.lt(recipeId))),
-                                lastRecipeId, lastCreatedAt)
+                        relevanceCursor(query, lastRecipeId, lastRelevance,
+                                () -> recipe.createdAt.lt(lastCreatedAt), () -> recipe.createdAt.eq(lastCreatedAt))
                 )
-                .orderBy(recipe.createdAt.desc(), recipe.recipeId.desc())
+                .orderBy(relevanceOrder(query, recipe.createdAt.desc()))
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(SearchQuery query, Long lastRecipeId, long lastRecipeScrapCnt, int size) {
+    public Double findRelevanceScoreByRecipeId(SearchQuery query, Long recipeId) {
+
+        // 커서로 쓸 "직전 페이지 마지막 레시피"의 현재 검색어 기준 점수를 구한다. (최신순의 createdAt findById 대응)
+        // 점수 개념이 없는 1글자(ExactToken)/빈 쿼리는 null → 첫 페이지처럼 keyset 조건 없이 처리된다.
+        if (recipeId == null || recipeId <= 0 || !(query instanceof SearchQuery.BooleanQuery b)) {
+            return null;
+        }
+
+        return queryFactory
+                .select(titlePriorityScore(recipe.titleSearchTokens, recipe.searchTokens, b.query()))
+                .from(recipe)
+                .where(recipe.recipeId.eq(recipeId))
+                .fetchOne();
+    }
+
+    @Override
+    public List<Recipe> findByKeywordLimitOrderByRecipeScrapCntDesc(SearchQuery query, Long lastRecipeId, Double lastRelevance, long lastRecipeScrapCnt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
                         keywordMatch(query),
-                        ifIdIsNotNullAndGreaterThanZero((recipeId, recipeScrapCnt) -> recipe.scrapCnt.lt(recipeScrapCnt)
-                                        .or(recipe.scrapCnt.eq(recipeScrapCnt)
-                                                .and(recipe.recipeId.lt(recipeId))),
-                                lastRecipeId, lastRecipeScrapCnt)
+                        relevanceCursor(query, lastRecipeId, lastRelevance,
+                                () -> recipe.scrapCnt.lt(lastRecipeScrapCnt), () -> recipe.scrapCnt.eq(lastRecipeScrapCnt))
                 )
-                .orderBy(recipe.scrapCnt.desc(), recipe.recipeId.desc())
+                .orderBy(relevanceOrder(query, recipe.scrapCnt.desc()))
                 .limit(size)
                 .fetch();
     }
 
     @Override
-    public List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(SearchQuery query, Long lastRecipeId, long lastRecipeViewCnt, int size) {
+    public List<Recipe> findByKeywordLimitOrderByRecipeViewCntDesc(SearchQuery query, Long lastRecipeId, Double lastRelevance, long lastRecipeViewCnt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
                         keywordMatch(query),
-                        ifIdIsNotNullAndGreaterThanZero((recipeId, recipeViewCnt) -> recipe.viewCnt.lt(recipeViewCnt)
-                                        .or(recipe.viewCnt.eq(recipeViewCnt)
-                                                .and(recipe.recipeId.lt(recipeId))),
-                                lastRecipeId, lastRecipeViewCnt)
+                        relevanceCursor(query, lastRecipeId, lastRelevance,
+                                () -> recipe.viewCnt.lt(lastRecipeViewCnt), () -> recipe.viewCnt.eq(lastRecipeViewCnt))
                 )
-                .orderBy(recipe.viewCnt.desc(), recipe.recipeId.desc())
+                .orderBy(relevanceOrder(query, recipe.viewCnt.desc()))
                 .limit(size)
                 .fetch();
+    }
+
+    /**
+     * "검색어 일치율(relevance) 대분류 → 소분류(secondary) → recipeId" 정렬의 keyset 커서.
+     * BooleanQuery(2글자+)면 relevance 를 맨 앞에, 그 외(1글자 ExactToken 등)엔 relevance 계층 없이 기존 순수 keyset.
+     * secondary 는 lastCreatedAt 이 null 일 수 있어 지연 평가(Supplier)로 받는다. lastRecipeId<=0(첫 페이지)이면 커서 없음.
+     */
+    private BooleanExpression relevanceCursor(SearchQuery query, Long lastRecipeId, Double lastRelevance,
+                                              java.util.function.Supplier<BooleanExpression> secondaryLt,
+                                              java.util.function.Supplier<BooleanExpression> secondaryEq) {
+
+        if (lastRecipeId == null || lastRecipeId <= 0) {
+            return null;
+        }
+
+        BooleanExpression idLt = recipe.recipeId.lt(lastRecipeId);
+
+        if (query instanceof SearchQuery.BooleanQuery b && lastRelevance != null) {
+            NumberExpression<Double> score = titlePriorityScore(recipe.titleSearchTokens, recipe.searchTokens, b.query());
+            return score.lt(lastRelevance)
+                    .or(score.eq(lastRelevance).and(secondaryLt.get()))
+                    .or(score.eq(lastRelevance).and(secondaryEq.get()).and(idLt));
+        }
+
+        return secondaryLt.get().or(secondaryEq.get().and(idLt));
+    }
+
+    /**
+     * BooleanQuery 면 relevance DESC 를 맨 앞에 둔 정렬키, 그 외엔 기존 (secondary, recipeId) 정렬키를 반환.
+     */
+    private OrderSpecifier<?>[] relevanceOrder(SearchQuery query, OrderSpecifier<?> secondary) {
+
+        if (query instanceof SearchQuery.BooleanQuery b) {
+            return new OrderSpecifier<?>[]{titlePriorityScore(recipe.titleSearchTokens, recipe.searchTokens, b.query()).desc(), secondary, recipe.recipeId.desc()};
+        }
+
+        return new OrderSpecifier<?>[]{secondary, recipe.recipeId.desc()};
     }
 
     private BooleanExpression keywordMatch(SearchQuery query) {

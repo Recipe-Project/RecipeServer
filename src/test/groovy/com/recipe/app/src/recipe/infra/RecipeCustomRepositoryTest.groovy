@@ -303,14 +303,14 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(false)
                         .build(),
                 Recipe.builder()
-                        .recipeNm("제목")
-                        .introduction("테스트설명")
+                        .recipeNm("테스트제목")
+                        .introduction("설명")
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
                         .isHidden(false)
                         .build(),
                 Recipe.builder()
-                        .recipeNm("제목")
+                        .recipeNm("테스트제목")
                         .introduction("설명")
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
@@ -333,14 +333,82 @@ class RecipeCustomRepositoryTest extends Specification {
 
         committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
+        // 세 레시피 모두 "테스트" 를 동일하게 포함 → 일치율 균일 → 소분류(최신순)만으로 순서 결정
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(SearchKeywordNormalizer.normalize("테스트"), 0L, recipes.createdAt.max().plusMinutes(1), 3);
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(SearchKeywordNormalizer.normalize("테스트"), 0L, null, recipes.createdAt.max().plusMinutes(1), 3);
 
         then:
         response.size() == 3
         response.get(0).recipeId == recipes.get(2).recipeId
         response.get(1).recipeId == recipes.get(1).recipeId
         response.get(2).recipeId == recipes.get(0).recipeId
+    }
+
+    def "검색어로 레시피 목록 조회 - 일치율이 소분류(스크랩순)보다 우선한다"() {
+
+        given:
+        Recipe both = Recipe.builder()
+                .recipeNm("간장국수")
+                .introduction("간장 국수 만드는 법")   // 간장+국수 → 높은 일치율
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(0).userId)
+                .isHidden(false)
+                .scrapCnt(0L)                          // 스크랩은 0
+                .build()
+        Recipe onlyOne = Recipe.builder()
+                .recipeNm("비빔국수")
+                .introduction("새콤한 국수 요리")       // 국수만 → 낮은 일치율
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(0).userId)
+                .isHidden(false)
+                .scrapCnt(100L)                        // 스크랩은 많음
+                .build()
+
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll([onlyOne, both]) }
+
+        SearchQuery query = SearchKeywordNormalizer.normalize("간장 국수")
+
+        when: "스크랩순 정렬"
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(query, 0L, null, 0, 10)
+
+        then: "스크랩이 0이어도 일치율 높은(간장+국수) 레시피가 스크랩 100짜리보다 위로 온다"
+        query instanceof SearchQuery.BooleanQuery
+        response.size() == 2
+        response.get(0).recipeId == both.recipeId
+        response.get(1).recipeId == onlyOne.recipeId
+    }
+
+    def "검색어로 레시피 목록 조회 - 제목 매칭이 내용 매칭보다 우선한다"() {
+
+        given:
+        Recipe titleMatch = Recipe.builder()
+                .recipeNm("간장국수")                    // 제목에서 매칭
+                .introduction("맛있는 레시피")
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(0).userId)
+                .isHidden(false)
+                .scrapCnt(0L)                          // 스크랩은 0
+                .build()
+        Recipe descMatch = Recipe.builder()
+                .recipeNm("볶음밥")
+                .introduction("간장 국수 만드는 재료")   // 내용에서만 매칭
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(0).userId)
+                .isHidden(false)
+                .scrapCnt(100L)                        // 스크랩은 많음
+                .build()
+
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll([descMatch, titleMatch]) }
+
+        SearchQuery query = SearchKeywordNormalizer.normalize("간장 국수")
+
+        when: "스크랩순 정렬"
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(query, 0L, null, 0, 10)
+
+        then: "제목에서 맞은 레시피가 스크랩 0이어도, 내용에서만 맞은 스크랩 100짜리보다 위로 온다"
+        response.size() == 2
+        response.get(0).recipeId == titleMatch.recipeId
+        response.get(1).recipeId == descMatch.recipeId
     }
 
     def "검색어로 레시피 목록 조회 - 스크랩 수 많은 순 정렬"() {
@@ -365,7 +433,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .scrapCnt(0L)
                         .build(),
                 Recipe.builder()
-                        .recipeNm("제목")
+                        .recipeNm("테스트제목")
                         .introduction("설명")
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
@@ -389,8 +457,11 @@ class RecipeCustomRepositoryTest extends Specification {
 
         committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
+        // 세 레시피 모두 "테스트" 를 동일하게 포함 → 일치율 균일 → 소분류(스크랩순)만으로 순서 결정
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(SearchKeywordNormalizer.normalize("테스트"), recipes.get(2).recipeId, 2, 3);
+        SearchQuery query = SearchKeywordNormalizer.normalize("테스트")
+        Double lastRelevance = recipeRepository.findRelevanceScoreByRecipeId(query, recipes.get(2).recipeId)
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(query, recipes.get(2).recipeId, lastRelevance, 2, 3);
 
         then:
         response.size() == 2
@@ -419,7 +490,7 @@ class RecipeCustomRepositoryTest extends Specification {
                         .viewCnt(0L)
                         .build(),
                 Recipe.builder()
-                        .recipeNm("제목")
+                        .recipeNm("테스트제목")
                         .introduction("설명")
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
@@ -443,8 +514,11 @@ class RecipeCustomRepositoryTest extends Specification {
 
         committedTx.executeWithoutResult { status -> recipeRepository.saveAll(recipes) }
 
+        // 세 레시피 모두 "테스트" 를 동일하게 포함 → 일치율 균일 → 소분류(조회순)만으로 순서 결정
         when:
-        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(SearchKeywordNormalizer.normalize("테스트"), recipes.get(2).recipeId, 2, 3);
+        SearchQuery query = SearchKeywordNormalizer.normalize("테스트")
+        Double lastRelevance = recipeRepository.findRelevanceScoreByRecipeId(query, recipes.get(2).recipeId)
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(query, recipes.get(2).recipeId, lastRelevance, 2, 3);
 
         then:
         response.size() == 2

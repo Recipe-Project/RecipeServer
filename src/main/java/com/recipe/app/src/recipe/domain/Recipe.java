@@ -77,6 +77,10 @@ public class Recipe extends BaseEntity {
     @Column(name = "searchTokens", columnDefinition = "TEXT")
     private String searchTokens;
 
+    // 제목(recipeNm)만 토큰화. 검색 정렬에서 "제목 매칭 우선" 계층에 사용.
+    @Column(name = "titleSearchTokens", columnDefinition = "TEXT")
+    private String titleSearchTokens;
+
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.ALL, orphanRemoval = true)
     List<RecipeIngredient> ingredients = new ArrayList<>();
 
@@ -175,5 +179,6 @@ public class Recipe extends BaseEntity {
     private void refreshSearchTokens() {
         String source = (recipeNm != null ? recipeNm : "") + " " + (introduction != null ? introduction : "");
         this.searchTokens = KoreanTokenizer.tokenize(source);
+        this.titleSearchTokens = KoreanTokenizer.tokenize(recipeNm != null ? recipeNm : "");
     }
 }

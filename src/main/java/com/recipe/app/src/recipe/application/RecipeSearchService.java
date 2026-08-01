@@ -74,23 +74,26 @@ public class RecipeSearchService {
 
     private List<Recipe> findByKeywordOrderByRecipeScrapCnt(SearchQuery query, long lastRecipeId, int size) {
 
+        Double lastRelevance = recipeRepository.findRelevanceScoreByRecipeId(query, lastRecipeId);
         long recipeScrapCnt = recipeScrapService.countByRecipeId(lastRecipeId);
 
-        return recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(query, lastRecipeId, recipeScrapCnt, size);
+        return recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(query, lastRecipeId, lastRelevance, recipeScrapCnt, size);
     }
 
     private List<Recipe> findByKeywordOrderByRecipeViewCnt(SearchQuery query, long lastRecipeId, int size) {
 
+        Double lastRelevance = recipeRepository.findRelevanceScoreByRecipeId(query, lastRecipeId);
         long recipeViewCnt = recipeViewService.countByRecipeId(lastRecipeId);
 
-        return recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(query, lastRecipeId, recipeViewCnt, size);
+        return recipeRepository.findByKeywordLimitOrderByRecipeViewCntDesc(query, lastRecipeId, lastRelevance, recipeViewCnt, size);
     }
 
     private List<Recipe> findByKeywordOrderByCreatedAt(SearchQuery query, long lastRecipeId, int size) {
 
+        Double lastRelevance = recipeRepository.findRelevanceScoreByRecipeId(query, lastRecipeId);
         Recipe recipe = recipeRepository.findById(lastRecipeId).orElse(null);
 
-        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(query, lastRecipeId, recipe != null ? recipe.getCreatedAt() : null, size);
+        return recipeRepository.findByKeywordLimitOrderByCreatedAtDesc(query, lastRecipeId, lastRelevance, recipe != null ? recipe.getCreatedAt() : null, size);
     }
 
     @Transactional(readOnly = true)

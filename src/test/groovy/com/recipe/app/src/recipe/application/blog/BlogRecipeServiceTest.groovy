@@ -65,7 +65,7 @@ class BlogRecipeServiceTest extends Specification {
                         .build(),
         ]
 
-        blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(_, lastBlogRecipeId, 0, size) >> blogRecipes
+        blogRecipeRepository.findByKeywordLimitOrderByBlogScrapCntDesc(_, lastBlogRecipeId, _, 0, size) >> blogRecipes
 
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()
@@ -135,7 +135,7 @@ class BlogRecipeServiceTest extends Specification {
                         .build(),
         ]
 
-        blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(_, lastBlogRecipeId, 0, size) >> blogRecipes
+        blogRecipeRepository.findByKeywordLimitOrderByBlogViewCntDesc(_, lastBlogRecipeId, _, 0, size) >> blogRecipes
 
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()
@@ -205,7 +205,7 @@ class BlogRecipeServiceTest extends Specification {
 
         blogRecipeRepository.findById(lastBlogRecipeId) >> Optional.empty()
 
-        blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(_, lastBlogRecipeId, null, size) >> blogRecipes
+        blogRecipeRepository.findByKeywordLimitOrderByPublishedAtDesc(_, lastBlogRecipeId, _, null, size) >> blogRecipes
 
         List<BlogScrap> blogScraps = [
                 BlogScrap.builder()
