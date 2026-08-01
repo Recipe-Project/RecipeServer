@@ -36,32 +36,37 @@ public class SearchTokensBackfillRunner implements ApplicationRunner {
     public void run(ApplicationArguments args) {
 
         log.info("SearchTokens backfill started");
-        backfill("Recipe", "recipeId", new String[]{"recipeNm", "introduction"}, NORI_TOKENIZE);
+        backfill("Recipe", "recipeId", "searchTokens", new String[]{"recipeNm", "introduction"}, NORI_TOKENIZE);
         // RecipeIngredient 는 단일 명사 위주라 nori stopword 정책이 도메인 단어를 제거해버림 (예: "갓","다시다").
         // 단순 정규화로 처리.
-        backfill("RecipeIngredient", "recipeIngredientId", new String[]{"ingredientName"}, SIMPLE_NORMALIZE);
-        backfill("BlogRecipe", "blogRecipeId", new String[]{"title", "description"}, NORI_TOKENIZE);
-        backfill("YoutubeRecipe", "youtubeRecipeId", new String[]{"title", "description"}, NORI_TOKENIZE);
+        backfill("RecipeIngredient", "recipeIngredientId", "searchTokens", new String[]{"ingredientName"}, SIMPLE_NORMALIZE);
+        backfill("BlogRecipe", "blogRecipeId", "searchTokens", new String[]{"title", "description"}, NORI_TOKENIZE);
+        backfill("YoutubeRecipe", "youtubeRecipeId", "searchTokens", new String[]{"title", "description"}, NORI_TOKENIZE);
+
+        // 제목 우선 정렬용 titleSearchTokens (제목만 토큰화). 재료(RecipeIngredient)는 제목 개념이 없어 제외.
+        backfill("Recipe", "recipeId", "titleSearchTokens", new String[]{"recipeNm"}, NORI_TOKENIZE);
+        backfill("BlogRecipe", "blogRecipeId", "titleSearchTokens", new String[]{"title"}, NORI_TOKENIZE);
+        backfill("YoutubeRecipe", "youtubeRecipeId", "titleSearchTokens", new String[]{"title"}, NORI_TOKENIZE);
         log.info("SearchTokens backfill done");
     }
 
-    private void backfill(String table, String pk, String[] sourceColumns, Function<String, String> tokenizer) {
+    private void backfill(String table, String pk, String targetColumn, String[] sourceColumns, Function<String, String> tokenizer) {
 
-        log.info("[{}] backfill started", table);
+        log.info("[{}.{}] backfill started", table, targetColumn);
         long lastId = 0L;
         long total = 0L;
         while (true) {
             long startId = lastId;
-            BatchResult r = transactionTemplate.execute(status -> processBatch(table, pk, sourceColumns, startId, tokenizer));
+            BatchResult r = transactionTemplate.execute(status -> processBatch(table, pk, targetColumn, sourceColumns, startId, tokenizer));
             if (r == null || r.processed == 0) break;
             lastId = r.lastId;
             total += r.updated;
-            log.info("[{}] progress lastId={} updatedSoFar={}", table, lastId, total);
+            log.info("[{}.{}] progress lastId={} updatedSoFar={}", table, targetColumn, lastId, total);
         }
-        log.info("[{}] backfill done. updated={}", table, total);
+        log.info("[{}.{}] backfill done. updated={}", table, targetColumn, total);
     }
 
-    private BatchResult processBatch(String table, String pk, String[] sourceColumns, long startId, Function<String, String> tokenizer) {
+    private BatchResult processBatch(String table, String pk, String targetColumn, String[] sourceColumns, long startId, Function<String, String> tokenizer) {
 
         String columnList = String.join(", ", sourceColumns);
         String selectSql = "SELECT " + pk + ", " + columnList +
@@ -78,7 +83,7 @@ public class SearchTokensBackfillRunner implements ApplicationRunner {
 
         if (rows.isEmpty()) return new BatchResult(0, 0, startId);
 
-        String updateSql = "UPDATE " + table + " SET searchTokens = :tokens WHERE " + pk + " = :id";
+        String updateSql = "UPDATE " + table + " SET " + targetColumn + " = :tokens WHERE " + pk + " = :id";
 
         int updated = 0;
         long lastId = startId;

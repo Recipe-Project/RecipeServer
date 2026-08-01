@@ -17,6 +17,7 @@ import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreater
 import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
 import static com.recipe.app.src.common.utils.QueryUtils.relevanceScore;
+import static com.recipe.app.src.common.utils.QueryUtils.titlePriorityScore;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeRecipe.youtubeRecipe;
 import static com.recipe.app.src.recipe.domain.youtube.QYoutubeScrap.youtubeScrap;
 
@@ -58,7 +59,7 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
         }
 
         return queryFactory
-                .select(relevanceScore(youtubeRecipe.searchTokens, b.query()))
+                .select(titlePriorityScore(youtubeRecipe.titleSearchTokens, youtubeRecipe.searchTokens, b.query()))
                 .from(youtubeRecipe)
                 .where(youtubeRecipe.youtubeRecipeId.eq(youtubeRecipeId))
                 .fetchOne();
@@ -120,7 +121,7 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
         BooleanExpression idLt = youtubeRecipe.youtubeRecipeId.lt(lastYoutubeRecipeId);
 
         if (query instanceof SearchQuery.BooleanQuery b && lastRelevance != null) {
-            NumberExpression<Double> score = relevanceScore(youtubeRecipe.searchTokens, b.query());
+            NumberExpression<Double> score = titlePriorityScore(youtubeRecipe.titleSearchTokens, youtubeRecipe.searchTokens, b.query());
             return score.lt(lastRelevance)
                     .or(score.eq(lastRelevance).and(secondaryLt.get()))
                     .or(score.eq(lastRelevance).and(secondaryEq.get()).and(idLt));
@@ -132,7 +133,7 @@ public class YoutubeRecipeRepositoryImpl extends BaseRepositoryImpl implements Y
     private OrderSpecifier<?>[] relevanceOrder(SearchQuery query, OrderSpecifier<?> secondary) {
 
         if (query instanceof SearchQuery.BooleanQuery b) {
-            return new OrderSpecifier<?>[]{relevanceScore(youtubeRecipe.searchTokens, b.query()).desc(), secondary, youtubeRecipe.youtubeRecipeId.desc()};
+            return new OrderSpecifier<?>[]{titlePriorityScore(youtubeRecipe.titleSearchTokens, youtubeRecipe.searchTokens, b.query()).desc(), secondary, youtubeRecipe.youtubeRecipeId.desc()};
         }
 
         return new OrderSpecifier<?>[]{secondary, youtubeRecipe.youtubeRecipeId.desc()};

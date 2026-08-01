@@ -21,6 +21,7 @@ import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreater
 import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
 import static com.recipe.app.src.common.utils.QueryUtils.relevanceScore;
+import static com.recipe.app.src.common.utils.QueryUtils.titlePriorityScore;
 import static com.recipe.app.src.recipe.domain.QRecipe.recipe;
 import static com.recipe.app.src.recipe.domain.QRecipeIngredient.recipeIngredient;
 import static com.recipe.app.src.recipe.domain.QRecipeScrap.recipeScrap;
@@ -81,7 +82,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
         }
 
         return queryFactory
-                .select(relevanceScore(recipe.searchTokens, b.query()))
+                .select(titlePriorityScore(recipe.titleSearchTokens, recipe.searchTokens, b.query()))
                 .from(recipe)
                 .where(recipe.recipeId.eq(recipeId))
                 .fetchOne();
@@ -135,7 +136,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
         BooleanExpression idLt = recipe.recipeId.lt(lastRecipeId);
 
         if (query instanceof SearchQuery.BooleanQuery b && lastRelevance != null) {
-            NumberExpression<Double> score = relevanceScore(recipe.searchTokens, b.query());
+            NumberExpression<Double> score = titlePriorityScore(recipe.titleSearchTokens, recipe.searchTokens, b.query());
             return score.lt(lastRelevance)
                     .or(score.eq(lastRelevance).and(secondaryLt.get()))
                     .or(score.eq(lastRelevance).and(secondaryEq.get()).and(idLt));
@@ -150,7 +151,7 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     private OrderSpecifier<?>[] relevanceOrder(SearchQuery query, OrderSpecifier<?> secondary) {
 
         if (query instanceof SearchQuery.BooleanQuery b) {
-            return new OrderSpecifier<?>[]{relevanceScore(recipe.searchTokens, b.query()).desc(), secondary, recipe.recipeId.desc()};
+            return new OrderSpecifier<?>[]{titlePriorityScore(recipe.titleSearchTokens, recipe.searchTokens, b.query()).desc(), secondary, recipe.recipeId.desc()};
         }
 
         return new OrderSpecifier<?>[]{secondary, recipe.recipeId.desc()};

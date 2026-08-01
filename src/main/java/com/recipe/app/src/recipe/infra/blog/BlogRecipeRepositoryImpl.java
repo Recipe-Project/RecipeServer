@@ -17,6 +17,7 @@ import static com.recipe.app.src.common.utils.QueryUtils.ifIdIsNotNullAndGreater
 import static com.recipe.app.src.common.utils.QueryUtils.matchAgainst;
 import static com.recipe.app.src.common.utils.QueryUtils.matchSearchQuery;
 import static com.recipe.app.src.common.utils.QueryUtils.relevanceScore;
+import static com.recipe.app.src.common.utils.QueryUtils.titlePriorityScore;
 import static com.recipe.app.src.recipe.domain.blog.QBlogRecipe.blogRecipe;
 import static com.recipe.app.src.recipe.domain.blog.QBlogScrap.blogScrap;
 
@@ -58,7 +59,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
         }
 
         return queryFactory
-                .select(relevanceScore(blogRecipe.searchTokens, b.query()))
+                .select(titlePriorityScore(blogRecipe.titleSearchTokens, blogRecipe.searchTokens, b.query()))
                 .from(blogRecipe)
                 .where(blogRecipe.blogRecipeId.eq(blogRecipeId))
                 .fetchOne();
@@ -120,7 +121,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
         BooleanExpression idLt = blogRecipe.blogRecipeId.lt(lastBlogRecipeId);
 
         if (query instanceof SearchQuery.BooleanQuery b && lastRelevance != null) {
-            NumberExpression<Double> score = relevanceScore(blogRecipe.searchTokens, b.query());
+            NumberExpression<Double> score = titlePriorityScore(blogRecipe.titleSearchTokens, blogRecipe.searchTokens, b.query());
             return score.lt(lastRelevance)
                     .or(score.eq(lastRelevance).and(secondaryLt.get()))
                     .or(score.eq(lastRelevance).and(secondaryEq.get()).and(idLt));
@@ -132,7 +133,7 @@ public class BlogRecipeRepositoryImpl extends BaseRepositoryImpl implements Blog
     private OrderSpecifier<?>[] relevanceOrder(SearchQuery query, OrderSpecifier<?> secondary) {
 
         if (query instanceof SearchQuery.BooleanQuery b) {
-            return new OrderSpecifier<?>[]{relevanceScore(blogRecipe.searchTokens, b.query()).desc(), secondary, blogRecipe.blogRecipeId.desc()};
+            return new OrderSpecifier<?>[]{titlePriorityScore(blogRecipe.titleSearchTokens, blogRecipe.searchTokens, b.query()).desc(), secondary, blogRecipe.blogRecipeId.desc()};
         }
 
         return new OrderSpecifier<?>[]{secondary, blogRecipe.blogRecipeId.desc()};

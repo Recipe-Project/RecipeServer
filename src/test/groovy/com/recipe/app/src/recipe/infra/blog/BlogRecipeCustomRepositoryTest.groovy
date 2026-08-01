@@ -105,8 +105,8 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogName("테스트")
                         .build(),
                 BlogRecipe.builder()
-                        .title("제목2")
-                        .description("테스트설명2")
+                        .title("테스트제목2")
+                        .description("설명2")
                         .publishedAt(LocalDate.of(2024, 1, 5))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -173,8 +173,8 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .scrapCnt(0L)
                         .build(),
                 BlogRecipe.builder()
-                        .title("제목2")
-                        .description("테스트설명2")
+                        .title("테스트제목2")
+                        .description("설명2")
                         .publishedAt(LocalDate.of(2024, 1, 5))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -192,7 +192,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
-                        .description("테스트설명3")
+                        .description("설명3")
                         .publishedAt(LocalDate.of(2024, 1, 3))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -239,8 +239,8 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .viewCnt(2L)
                         .build(),
                 BlogRecipe.builder()
-                        .title("제목2")
-                        .description("테스트설명2")
+                        .title("테스트제목2")
+                        .description("설명2")
                         .publishedAt(LocalDate.of(2024, 1, 5))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -258,7 +258,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
-                        .description("테스트설명3")
+                        .description("설명3")
                         .publishedAt(LocalDate.of(2024, 1, 3))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -298,8 +298,8 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .blogName("테스트")
                         .build(),
                 BlogRecipe.builder()
-                        .title("제목2")
-                        .description("테스트설명2")
+                        .title("테스트제목2")
+                        .description("설명2")
                         .publishedAt(LocalDate.of(2024, 1, 5))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")
@@ -315,7 +315,7 @@ class BlogRecipeCustomRepositoryTest extends Specification {
                         .build(),
                 BlogRecipe.builder()
                         .title("테스트제목3")
-                        .description("테스트설명3")
+                        .description("설명3")
                         .publishedAt(LocalDate.of(2024, 1, 3))
                         .blogUrl("http://naver.com")
                         .blogThumbnailImgUrl("http://test.jpg")

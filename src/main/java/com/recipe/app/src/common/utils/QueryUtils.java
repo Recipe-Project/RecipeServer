@@ -35,6 +35,15 @@ public class QueryUtils {
     }
 
     /**
+     * "제목 매칭 우선" 정렬용 가중치 점수 = 제목 일치율 × 1,000,000 + 전체 일치율.
+     * 제목에서 맞으면 점수가 압도적으로 커져, 내용에서만 맞은 결과보다 항상 위로 정렬된다.
+     * (BOOLEAN MODE 점수는 짧은 레시피 텍스트 기준 한 자릿수 수준이라 1e6 가중치면 계층이 뒤집히지 않는다.)
+     */
+    public static NumberExpression<Double> titlePriorityScore(StringPath titleTokens, StringPath allTokens, String booleanQuery) {
+        return relevanceScore(titleTokens, booleanQuery).multiply(1_000_000.0).add(relevanceScore(allTokens, booleanQuery));
+    }
+
+    /**
      * 1글자 토큰 정확 매칭. FULLTEXT 인덱스의 ngram_token_size 제약 때문에 1글자는 BOOLEAN 모드로 잡지 못해
      * 공백 구분 단어 경계 LIKE 로 대체. 풀스캔이라 비용 있지만 1글자 검색 빈도 자체가 낮다고 가정.
      * 매칭 예: searchTokens="갓" 또는 "오 갓 김치" -> "갓" 매치, "갓김치"는 매치 안 됨.

@@ -58,6 +58,10 @@ public class YoutubeRecipe extends BaseEntity {
     @Column(name = "searchTokens", columnDefinition = "TEXT")
     private String searchTokens;
 
+    // 제목(title)만 토큰화. 검색 정렬에서 "제목 매칭 우선" 계층에 사용.
+    @Column(name = "titleSearchTokens", columnDefinition = "TEXT")
+    private String titleSearchTokens;
+
     @Builder
     public YoutubeRecipe(Long youtubeRecipeId, String title, String description, String thumbnailImgUrl, LocalDate postDate, String channelName, String youtubeId, long scrapCnt, long viewCnt) {
 
@@ -95,5 +99,6 @@ public class YoutubeRecipe extends BaseEntity {
     private void refreshSearchTokens() {
         String source = (title != null ? title : "") + " " + (description != null ? description : "");
         this.searchTokens = KoreanTokenizer.tokenize(source);
+        this.titleSearchTokens = KoreanTokenizer.tokenize(title != null ? title : "");
     }
 }

@@ -303,8 +303,8 @@ class RecipeCustomRepositoryTest extends Specification {
                         .isHidden(false)
                         .build(),
                 Recipe.builder()
-                        .recipeNm("제목")
-                        .introduction("테스트설명")
+                        .recipeNm("테스트제목")
+                        .introduction("설명")
                         .level(RecipeLevel.NORMAL)
                         .userId(users.get(0).userId)
                         .isHidden(false)
@@ -376,6 +376,39 @@ class RecipeCustomRepositoryTest extends Specification {
         response.size() == 2
         response.get(0).recipeId == both.recipeId
         response.get(1).recipeId == onlyOne.recipeId
+    }
+
+    def "검색어로 레시피 목록 조회 - 제목 매칭이 내용 매칭보다 우선한다"() {
+
+        given:
+        Recipe titleMatch = Recipe.builder()
+                .recipeNm("간장국수")                    // 제목에서 매칭
+                .introduction("맛있는 레시피")
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(0).userId)
+                .isHidden(false)
+                .scrapCnt(0L)                          // 스크랩은 0
+                .build()
+        Recipe descMatch = Recipe.builder()
+                .recipeNm("볶음밥")
+                .introduction("간장 국수 만드는 재료")   // 내용에서만 매칭
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(0).userId)
+                .isHidden(false)
+                .scrapCnt(100L)                        // 스크랩은 많음
+                .build()
+
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll([descMatch, titleMatch]) }
+
+        SearchQuery query = SearchKeywordNormalizer.normalize("간장 국수")
+
+        when: "스크랩순 정렬"
+        List<Recipe> response = recipeRepository.findByKeywordLimitOrderByRecipeScrapCntDesc(query, 0L, null, 0, 10)
+
+        then: "제목에서 맞은 레시피가 스크랩 0이어도, 내용에서만 맞은 스크랩 100짜리보다 위로 온다"
+        response.size() == 2
+        response.get(0).recipeId == titleMatch.recipeId
+        response.get(1).recipeId == descMatch.recipeId
     }
 
     def "검색어로 레시피 목록 조회 - 스크랩 수 많은 순 정렬"() {
