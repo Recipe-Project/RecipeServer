@@ -24,8 +24,9 @@ public class BlogThumbnailRetryScheduler {
         this.blogRecipeThumbnailCrawlingService = blogRecipeThumbnailCrawlingService;
     }
 
-    // 6시간마다 (00/06/12/18시)
-    @Scheduled(cron = "0 0 0/6 * * *")
+    // 매시 정각. (실측 결과 이 규모 크롤엔 네이버 rate-limit 이 걸리지 않아 자주 돌려도 안전.
+    //  빈 게 없으면 아무 일도 안 하므로 백로그 소진 후에도 무해)
+    @Scheduled(cron = "0 0 * * * *")
     public void retryEmptyThumbnails() {
         int processed = blogRecipeThumbnailCrawlingService.retryEmptyThumbnails(BATCH_SIZE);
         log.info("scheduled blog thumbnail retry processed={}", processed);
