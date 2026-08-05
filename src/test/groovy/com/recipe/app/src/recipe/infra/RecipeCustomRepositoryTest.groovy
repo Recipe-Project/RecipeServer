@@ -411,6 +411,47 @@ class RecipeCustomRepositoryTest extends Specification {
         response.get(1).recipeId == descMatch.recipeId
     }
 
+    def "내 레시피 검색 - userId 로 내 레시피(비공개 포함)만, 남의 레시피는 제외"() {
+
+        given:
+        Recipe mine = Recipe.builder()
+                .recipeNm("테스트제목")
+                .introduction("설명")
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(0).userId)
+                .isHidden(false)
+                .build()
+        Recipe mineHidden = Recipe.builder()
+                .recipeNm("테스트제목")
+                .introduction("설명")
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(0).userId)
+                .isHidden(true)                     // 내 비공개 → 포함돼야
+                .build()
+        Recipe others = Recipe.builder()
+                .recipeNm("테스트제목")
+                .introduction("설명")
+                .level(RecipeLevel.NORMAL)
+                .userId(users.get(1).userId)        // 남의 레시피 → 제외돼야
+                .isHidden(false)
+                .build()
+
+        committedTx.executeWithoutResult { status -> recipeRepository.saveAll([mine, mineHidden, others]) }
+
+        SearchQuery query = SearchKeywordNormalizer.normalize("테스트")
+        Long myUserId = users.get(0).userId
+
+        when:
+        long count = recipeRepository.countByKeywordAndUserId(query, myUserId)
+        List<Recipe> response = recipeRepository.findByKeywordAndUserIdLimitOrderByCreatedAtDesc(query, myUserId, 0L, null, null, 10)
+
+        then: "내 레시피(공개+비공개) 2건만, 남의 것 제외"
+        count == 2
+        response.size() == 2
+        response*.recipeId.toSet() == [mine.recipeId, mineHidden.recipeId].toSet()
+        !(others.recipeId in response*.recipeId)
+    }
+
     def "검색어로 레시피 목록 조회 - 스크랩 수 많은 순 정렬"() {
 
         given:

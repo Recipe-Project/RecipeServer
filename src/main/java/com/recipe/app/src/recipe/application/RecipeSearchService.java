@@ -130,17 +130,34 @@ public class RecipeSearchService {
     }
 
     @Transactional(readOnly = true)
-    public RecipesResponse findRecipesByUser(User user, long lastRecipeId, int size) {
+    public RecipesResponse findRecipesByUser(User user, String keyword, long lastRecipeId, int size) {
 
-        long totalCnt = recipeRepository.countByUserId(user.getUserId());
+        Long userId = user.getUserId();
+        SearchQuery query = SearchKeywordNormalizer.normalize(keyword);
 
-        Recipes recipes = new Recipes(findLimitByUserId(user.getUserId(), lastRecipeId, size));
+        long totalCnt;
+        List<Recipe> foundRecipes;
+        if (query instanceof SearchQuery.Empty) {
+            // 검색어 없음 → 내 레시피 전체 (recipeId 역순)
+            totalCnt = recipeRepository.countByUserId(userId);
+            foundRecipes = findLimitByUserId(userId, lastRecipeId, size);
+        } else {
+            // 검색어 있음 → 내 레시피 검색 (내 비공개 포함, 일치율 → 최신순)
+            badWordFiltering.check(keyword);
+            totalCnt = recipeRepository.countByKeywordAndUserId(query, userId);
+            Double lastRelevance = recipeRepository.findRelevanceScoreByRecipeId(query, lastRecipeId);
+            Recipe last = recipeRepository.findById(lastRecipeId).orElse(null);
+            foundRecipes = recipeRepository.findByKeywordAndUserIdLimitOrderByCreatedAtDesc(query, userId, lastRecipeId, lastRelevance,
+                    last != null ? last.getCreatedAt() : null, size);
+        }
+
+        Recipes recipes = new Recipes(foundRecipes);
 
         List<User> recipePostUsers = userService.findByUserIds(recipes.getUserIds());
 
         List<RecipeScrap> recipeScraps = recipeScrapService.findByRecipeIds(recipes.getRecipeIds());
 
-        List<String> ingredientNamesInFridge = fridgeService.findIngredientNamesInFridge(user.getUserId());
+        List<String> ingredientNamesInFridge = fridgeService.findIngredientNamesInFridge(userId);
 
         return RecipesResponse.from(totalCnt, recipes, recipePostUsers, recipeScraps, user, ingredientNamesInFridge);
     }
