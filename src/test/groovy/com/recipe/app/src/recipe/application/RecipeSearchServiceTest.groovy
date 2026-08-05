@@ -507,7 +507,7 @@ class RecipeSearchServiceTest extends Specification {
         fridgeService.findIngredientNamesInFridge(users.get(0).getUserId()) >> []
 
         when:
-        RecipesResponse result = recipeSearchService.findRecipesByUser(users.get(0), lastRecipeId, size)
+        RecipesResponse result = recipeSearchService.findRecipesByUser(users.get(0), null, lastRecipeId, size)
 
         then:
         result.totalCnt == 2
@@ -520,6 +520,41 @@ class RecipeSearchServiceTest extends Specification {
         result.recipes.isUserScrap == [true, false]
         result.recipes.scrapCnt == recipes.scrapCnt
         result.recipes.viewCnt == recipes.viewCnt
+    }
+
+    def "등록한 레시피 조회 - keyword 있으면 내 레시피 검색 경로(userId 전달), 목록 경로 안 탐"() {
+
+        given:
+        User user = User.builder().userId(1).socialId("naver_1").nickname("테스터1").build()
+        String keyword = "테스트"
+        long lastRecipeId = 0
+        int size = 10
+
+        recipeRepository.countByKeywordAndUserId(_, user.userId) >> 1
+        recipeRepository.findRelevanceScoreByRecipeId(_, lastRecipeId) >> null
+        recipeRepository.findById(lastRecipeId) >> Optional.empty()
+
+        Recipe recipe = Recipe.builder()
+                .recipeId(1)
+                .recipeNm("테스트제목")
+                .introduction("설명")
+                .level(RecipeLevel.NORMAL)
+                .userId(user.userId)
+                .isHidden(false)
+                .build()
+
+        userService.findByUserIds(_) >> [user]
+        recipeScrapService.findByRecipeIds(_) >> []
+        fridgeService.findIngredientNamesInFridge(user.userId) >> []
+
+        when:
+        RecipesResponse result = recipeSearchService.findRecipesByUser(user, keyword, lastRecipeId, size)
+
+        then: "keyword 있으면 userId 로 내 레시피 검색 쿼리를 호출하고, 전체 목록 경로는 타지 않는다"
+        1 * recipeRepository.findByKeywordAndUserIdLimitOrderByCreatedAtDesc(_, user.userId, lastRecipeId, _, _, size) >> [recipe]
+        0 * recipeRepository.findLimitByUserId(_, _, _)
+        result.totalCnt == 1
+        result.recipes.recipeId == [recipe.recipeId]
     }
 
     def "냉장고 재료 일치하는 레시피 목록 조회"() {

@@ -57,12 +57,40 @@ public class RecipeRepositoryImpl extends BaseRepositoryImpl implements RecipeCu
     }
 
     @Override
+    public Long countByKeywordAndUserId(SearchQuery query, Long userId) {
+        return queryFactory
+                .select(recipe.recipeId.countDistinct())
+                .from(recipe)
+                .where(
+                        recipe.userId.eq(userId),
+                        keywordMatch(query)
+                )
+                .fetchOne();
+    }
+
+    @Override
     public List<Recipe> findByKeywordLimitOrderByCreatedAtDesc(SearchQuery query, Long lastRecipeId, Double lastRelevance, LocalDateTime lastCreatedAt, int size) {
 
         return queryFactory
                 .selectFrom(recipe)
                 .where(
                         recipe.hiddenYn.eq("N"),
+                        keywordMatch(query),
+                        relevanceCursor(query, lastRecipeId, lastRelevance,
+                                () -> recipe.createdAt.lt(lastCreatedAt), () -> recipe.createdAt.eq(lastCreatedAt))
+                )
+                .orderBy(relevanceOrder(query, recipe.createdAt.desc()))
+                .limit(size)
+                .fetch();
+    }
+
+    @Override
+    public List<Recipe> findByKeywordAndUserIdLimitOrderByCreatedAtDesc(SearchQuery query, Long userId, Long lastRecipeId, Double lastRelevance, LocalDateTime lastCreatedAt, int size) {
+
+        return queryFactory
+                .selectFrom(recipe)
+                .where(
+                        recipe.userId.eq(userId),
                         keywordMatch(query),
                         relevanceCursor(query, lastRecipeId, lastRelevance,
                                 () -> recipe.createdAt.lt(lastCreatedAt), () -> recipe.createdAt.eq(lastCreatedAt))

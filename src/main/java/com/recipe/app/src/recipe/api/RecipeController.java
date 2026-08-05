@@ -97,16 +97,18 @@ public class RecipeController {
         return recipeSearchService.findRecommendedRecipesByUserFridge(user, startAfter, size);
     }
 
-    @Operation(summary = "등록한 레시피 목록 조회 API")
+    @Operation(summary = "등록한 레시피 목록 조회 API", description = "keyword 를 주면 내 레시피(비공개 포함) 내에서 검색, 없으면 전체 목록")
     @GetMapping("/users")
     @LoginCheck
     public RecipesResponse getUserRecipes(@Parameter(hidden = true) User user,
                                           @Parameter(example = "0", name = "마지막 조회 레시피 아이디")
                                           @RequestParam(value = "startAfter") long startAfter,
                                           @Parameter(example = "20", name = "사이즈")
-                                          @RequestParam(value = "size") int size) {
+                                          @RequestParam(value = "size") int size,
+                                          @Parameter(example = "김치", name = "검색어(선택)")
+                                          @RequestParam(value = "keyword", required = false) String keyword) {
 
-        return recipeSearchService.findRecipesByUser(user, startAfter, size);
+        return recipeSearchService.findRecipesByUser(user, keyword, startAfter, size);
     }
 
     @Operation(summary = "레시피 등록 API")
